@@ -1,19 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&display=swap');
+
 body {
     background-color: #d7d7d7;
-    font-family: Roboto Sans, Arial, sans-serif;
+    font-family: 'Poppins', 'Roboto Flex', Arial, sans-serif;
 }
 
 #container select,
 #container button,
 #container input {
-    font-family: Roboto Sans, Arial, sans-serif;
+    font-family: 'Poppins', 'Roboto Flex', Arial, sans-serif;
 }
 
+#message-counter,
 #footer-bar {
     color: gray;
     font-size: 0.7em;
     text-align: right;
-    font-family: Roboto Condensed;
+    font-family: 'Roboto Condensed';
 }
 
 #footer-bar a {
@@ -70,6 +73,7 @@ body {
     justify-content: space-between;
     margin-bottom: 10px;
     margin-top: 10px;
+    min-height: 100px;
 }
 
 #message-box textarea {
@@ -126,7 +130,7 @@ button#start {
     margin-bottom: 5px;
 }
 
-#start_info button {
+#start-info button {
     width: 100%;
 }
 
@@ -146,4 +150,12 @@ button#start {
 
 #control-box button:hover {
     text-decoration: underline;
+}
+
+#start-text {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

@@ -1,4 +1,3 @@
-import re
 import random
 from pathlib import Path
 from flask import Flask, request, jsonify
@@ -8,14 +7,13 @@ import openai
 import logging
 import time
 import config
+
+__version__ = '0.1.0'
 logger = logging.getLogger('heymans')
 
 
 def get_system_prompt(course, name, source):
-    source = Path(source).read_text()
-    source = re.sub('(?<!\n)\n(?!\n)', ' ', source).replace('\n ', ' ')
-    while '\n\n\n' in source:
-        source = source.replace('\n\n\n', '\n\n')
+    source = config.clean_source(Path(source).read_text())
     tmpl = jinja2.Template(
         (Path('sources') / course / 'prompt_template.txt').read_text())
     return tmpl.render(ai_name=config.ai_name, source=source, name=name)
@@ -65,6 +63,7 @@ def api():
     else:
         logger.info(f'resuming session {session_id}')
     if message:
+        message = message[:config.max_message_length]
         chat_history['messages'].append({"role": "user", "content": message})
     log_chat(session_id, chat_history)
     print(message)
@@ -101,6 +100,8 @@ def render(path):
                        server_url=config.server_url,
                        default_name=config.default_name,
                        default_student_nr=config.default_student_nr,
+                       max_message_length=config.max_message_length,
+                       version=__version__,
                        course_content=json.dumps(config.course_content))
 
 

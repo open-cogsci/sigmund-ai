@@ -17,6 +17,7 @@ server_port = 5000
 server_url = 'http://localhost:5000'
 ai_name = 'Heymans'  # How the AI calls itself
 max_chat_length = 20
+max_message_length = 1000
 # Default student identifiers
 default_name = 'Anonymous Student'
 default_student_nr = 'S12345678'
@@ -44,6 +45,12 @@ model = 'gpt-4'  # 'dummy' for testing, 'gpt-3.5-turbo' for simpler model
 def is_valid_student_nr(student_nr):
     """Takes a student number and returns True if it is valid."""
     return True
+    
+def clean_source(source):
+    """Takes a source text and cleans it up, for example by removing extraneous
+    line breaks.
+    """
+    return source
 ```
 
 Next, for each chapter, organize `.txt` files with sections from that chapter in the following way:

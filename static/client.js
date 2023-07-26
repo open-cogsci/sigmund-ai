@@ -2,6 +2,15 @@ let sessionId = null;
 let conversationFinished = false;
 
 window.onload = function() {
+    var params = new URLSearchParams(window.location.search);
+    const nameInput =document.getElementById('name');
+    if (params.has('name')) {
+      nameInput.value = params.get('name');
+    }
+    const studentNrInput = document.getElementById('student_nr');
+    if (params.has('student_nr')) {
+      studentNrInput.value = params.get('student_nr');
+    }
     // Generate a unique session ID
     sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
 
@@ -10,10 +19,11 @@ window.onload = function() {
     const reportButton = document.getElementById('report');
     const messageInput = document.getElementById('message');
     const messageBox = document.getElementById('message-box');
-    messageBox.style.display = 'none';  // Hide the message box initially
+    messageBox.style.display = 'none';
+    const messageCounter = document.getElementById('message-counter');
+    messageCounter.style.display = 'none';
     const controlBox = document.getElementById('control-box');
     controlBox.style.display = 'none';  // Hide the message box initially
-    
     const responseDiv = document.getElementById('response');
     responseDiv.style.display = 'none';  // Hide the message box initially
 
@@ -34,8 +44,9 @@ window.onload = function() {
 
     document.getElementById('start').addEventListener('click', function() {
         this.style.display = 'none';  // Hide the start button
-        document.getElementById('start_info').style.display = 'none';
+        document.getElementById('start-info').style.display = 'none';
         messageBox.style.display = 'flex'
+        messageCounter.style.display = 'block'
         controlBox.style.display = 'block'
         responseDiv.style.display = 'block'
         sendMessage('');
@@ -51,7 +62,7 @@ window.onload = function() {
     });
     
     restartButton.addEventListener('click', function() {
-        window.location.href = '/chat';
+        window.location.href = '/chat?name=' + nameInput.value + ' &student_nr=' + studentNrInput.value;
     });
     
     reportButton.addEventListener('click', function() {
@@ -62,6 +73,9 @@ window.onload = function() {
 };
 
 async function sendMessage(message) {
+    // Clear character counter
+    const counter = document.getElementById('message-counter');
+    counter.innerText = ''
     const responseDiv = document.getElementById('response');
     // Show the user's message
     if (message) {
@@ -114,7 +128,8 @@ async function sendMessage(message) {
             if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
                 conversationFinished = true;
                 document.getElementById('message-box').style.display = 'none';
-                document.getElementById('control-box').style.display = 'none';
+                document.getElementById('message-counter').style.display = 'none';
+                document.getElementById('report').style.display = 'none';
             }
         }
     } catch (e) {
@@ -156,4 +171,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Update the chapter select whenever the selected course changes
     courseSelect.addEventListener('change', updateChapterSelect);
+    
+    let textarea = document.getElementById('message');
+    let maxLength = {{ max_message_length }};
+    let counter = document.getElementById('message-counter');
+
+    function updateCounter() {
+        let length = textarea.value.length;
+        counter.innerText = length + '/' + maxLength + ' characters';
+
+        if (length >= maxLength) {
+            textarea.value = textarea.value.slice(0, maxLength - 1);
+        }
+    }
+
+    textarea.addEventListener('input', updateCounter);
+
+    // Call the function once at start to initialize the counter
+    updateCounter();
 });

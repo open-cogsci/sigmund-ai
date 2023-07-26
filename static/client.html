@@ -10,7 +10,13 @@
         <img src='static/logo.jpg' id="header-logo">
     </div>
     <div id="container">
-        <div id="start_info">
+        <div id="start-info">
+            <div id="start-text">
+            {{ ai_name }} is a friendly AI tutor who will help you study through questions and dialogue. Simply enter your name and student number, select a course and chapter, and get started!
+            <br /><br />
+            Conversations with Heymans are not confidential, and may be reviewed by lecturers.
+            </div>
+        
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" placeholder="Enter your name" value="{{ default_name }}">
@@ -39,11 +45,12 @@
             <textarea id="message" placeholder="Enter your message" disabled></textarea>
             <button id="send" disabled>Send</button>
         </div>
+        <div id="message-counter" style="text-align: right;"></div>
         <div id="control-box">
             <button id="restart" disabled>Restart conversation</button>
             <button id="report" disabled>Report conversation (something is wrong)</button>
         </div>
-        <div id="footer-bar">Copyright 2023 Sebastiaan Mathôt <a href='https://github.com/smathot/heymans-ai-tutor'>(source code)</a></div>
+        <div id="footer-bar">Heymans AI tutor {{ version}} // Copyright 2023 Sebastiaan Mathôt // <a href='https://github.com/smathot/heymans-ai-tutor'>Open source GPL3</a></div>
     </div>
 </body>
 </html>
