@@ -130,6 +130,7 @@ async function sendMessage(message) {
                 document.getElementById('message-box').style.display = 'none';
                 document.getElementById('message-counter').style.display = 'none';
                 document.getElementById('report').style.display = 'none';
+                document.getElementsByTagName('body')[0].classList.add('body-finished');
             }
         }
     } catch (e) {

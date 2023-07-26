@@ -8,8 +8,9 @@ import logging
 import time
 import config
 
-__version__ = '0.1.1'
+__version__ = '0.1.3'
 logger = logging.getLogger('heymans')
+logging.basicConfig(level=logging.INFO, force=True)
 
 
 def get_system_prompt(course, name, source):
@@ -19,16 +20,22 @@ def get_system_prompt(course, name, source):
     return tmpl.render(ai_name=config.ai_name, source=source, name=name)
     
 
-def log_chat(session_id, chat_history):
+def save_chat_history(session_id, chat_history):
     if not Path('sessions').exists():
         Path('sessions').mkdir()
     Path(f'sessions/{session_id}.json').write_text(
         json.dumps(chat_history))
 
 
+def load_chat_history(session_id):
+    path = Path(f'sessions/{session_id}.json')
+    if path.exists():
+        return json.loads(Path(f'sessions/{session_id}.json').read_text())
+    return None
+
+
 app = Flask(__name__, static_url_path='/static')
 openai.api_key = config.openai_api_key
-sessions = {}
 
 
 @app.route('/api', methods=['POST'])
@@ -36,13 +43,13 @@ def api():
     data = request.get_json()
     message = data['message']
     session_id = data.get('session_id', 'default')
-    chat_history = sessions.get(session_id, None)
+    chat_history = load_chat_history(session_id)
     student_nr = data['student_nr'].strip()
     if not config.is_valid_student_nr(student_nr):
         return jsonify({'response': f'I\'m sorry, but {student_nr} is not a '
                                      'valid student number for this course.'})
     if chat_history is None:
-        logger.info(f'initializing session {session_id}')
+        logger.info(f'initializing session (session_id={session_id})')
         name = data['name'].strip()
         if not name:
             name = 'Anonymous Student'
@@ -50,7 +57,7 @@ def api():
         chapter = data['chapter']
         source_folder = Path('sources') / course / chapter
         source = random.choice(list(source_folder.glob('*.txt')))
-        logger.info(f'using source {source}')
+        logger.info(f'using source {source} (session_id={session_id})')
         system_prompt = get_system_prompt(course, name, source)
         chat_history = {
             'name': name,
@@ -61,15 +68,17 @@ def api():
             'messages': [{"role": "system", "content": system_prompt}]
         }
     else:
-        logger.info(f'resuming session {session_id}')
+        logger.info(f'resuming session (session_id={session_id})')
     if message:
         message = message[:config.max_message_length]
         chat_history['messages'].append({"role": "user", "content": message})
-    log_chat(session_id, chat_history)
-    print(message)
+    save_chat_history(session_id, chat_history)
+    logger.info(f'Received message: {message} (session_id={session_id})')
     if '<REPORT>' in message:
+        logger.info(f'conversation reported (session_id={session_id})')
         ai_message = 'Thank you for your feedback. Restart the conversation to try again! <REPORTED>'
     elif len(chat_history['messages']) > config.max_chat_length:
+        logger.info(f'conversation too long (session_id={session_id})')
         ai_message = 'You have reached the maximum number of messages. Restart the conversation to try again!'
     else:
         if config.model == 'dummy':
@@ -88,8 +97,7 @@ def api():
             ai_message = response.choices[0].message['content']
     chat_history['messages'].append(
         {"role": "assistant", "content": ai_message})
-    log_chat(session_id, chat_history)
-    sessions[session_id] = chat_history
+    save_chat_history(session_id, chat_history)
     return jsonify({'response': ai_message})
     
 

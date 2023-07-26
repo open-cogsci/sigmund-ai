@@ -5,6 +5,10 @@ body {
     font-family: 'Poppins', 'Roboto Flex', Arial, sans-serif;
 }
 
+.body-finished {
+    background-color: #60B669!important;
+}
+
 #container select,
 #container button,
 #container input {

@@ -4,7 +4,7 @@ Copyright 2023 Sebastiaan Mathôt
 
 This is a working prototype of an AI-based tutor that asks open-ended questions to students based on sections from a textbook. The AI gives feedback until the student answers the question correctly. This is intended as formative testing.
 
-Heymans uses OpenAI chat models and required an OpenAI API key.
+Heymans uses OpenAI chat models and requires an OpenAI API key.
 
 
 ## Installation
