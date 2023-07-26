@@ -13,8 +13,14 @@ Download the source code and create a `config.py` in the main source folder (i.e
 
 ```python
 page_title = 'Heymans AI'
+# The server port and url specify the external address of the app
 server_port = 5000
-server_url = 'http://localhost:5000'
+server_url = 'http://127.0.0.1:5000'
+# The flask host and port specify the internal address of the app through the
+# host and port arguments to app.run(). These can be different from the 
+# external address if the app is running behind a proxy.
+flask_host= '0.0.0.0'
+flask_port = 5000
 ai_name = 'Heymans'  # How the AI calls itself
 max_chat_length = 20
 max_message_length = 1000

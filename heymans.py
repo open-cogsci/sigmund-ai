@@ -8,7 +8,7 @@ import logging
 import time
 import config
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 logger = logging.getLogger('heymans')
 
 
@@ -116,4 +116,4 @@ def javascript():
 
 
 if __name__ == '__main__':
-    app.run(port=config.server_port)
+    app.run(host=config.flask_host, port=config.flask_port)
