@@ -39,13 +39,13 @@ def api():
     message = data['message']
     session_id = data.get('session_id', 'default')
     chat_history = sessions.get(session_id, None)
-    student_nr = data['student_nr']
+    student_nr = data['student_nr'].strip()
     if not config.is_valid_student_nr(student_nr):
         return jsonify({'response': f'I\'m sorry, but {student_nr} is not a '
                                      'valid student number for this course.'})
     if chat_history is None:
         logger.info(f'initializing session {session_id}')
-        name = data['name']
+        name = data['name'].strip()
         if not name:
             name = 'Anonymous Student'
         course = data['course']
@@ -67,7 +67,10 @@ def api():
     if message:
         chat_history['messages'].append({"role": "user", "content": message})
     log_chat(session_id, chat_history)
-    if len(chat_history['messages']) > config.max_chat_length:
+    print(message)
+    if '<REPORT>' in message:
+        ai_message = 'Thank you for your feedback. Restart the conversation to try again! <REPORTED>'
+    elif len(chat_history['messages']) > config.max_chat_length:
         ai_message = 'You have reached the maximum number of messages. Restart the conversation to try again!'
     else:
         if config.model == 'dummy':

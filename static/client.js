@@ -6,9 +6,13 @@ window.onload = function() {
     sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
 
     const sendButton = document.getElementById('send');
+    const restartButton = document.getElementById('restart');
+    const reportButton = document.getElementById('report');
     const messageInput = document.getElementById('message');
     const messageBox = document.getElementById('message-box');
     messageBox.style.display = 'none';  // Hide the message box initially
+    const controlBox = document.getElementById('control-box');
+    controlBox.style.display = 'none';  // Hide the message box initially
     
     const responseDiv = document.getElementById('response');
     responseDiv.style.display = 'none';  // Hide the message box initially
@@ -29,12 +33,10 @@ window.onload = function() {
     });
 
     document.getElementById('start').addEventListener('click', function() {
-        // Start the conversation when the start button is clicked
         this.style.display = 'none';  // Hide the start button
         document.getElementById('start_info').style.display = 'none';
-        // sendButton.style.display = 'inline';  // Show the send button
-        // messageInput.style.display = 'inline';  // Show the message box
         messageBox.style.display = 'flex'
+        controlBox.style.display = 'block'
         responseDiv.style.display = 'block'
         sendMessage('');
     });
@@ -45,6 +47,16 @@ window.onload = function() {
         messageInput.value = '';
         if (!conversationFinished) {
             sendMessage(message);
+        }
+    });
+    
+    restartButton.addEventListener('click', function() {
+        window.location.href = '/chat';
+    });
+    
+    reportButton.addEventListener('click', function() {
+        if (!conversationFinished) {
+            sendMessage('<REPORT>');
         }
     });
 };
@@ -89,6 +101,8 @@ async function sendMessage(message) {
         // Hide the loading indicator and enable the message box when a response is received
         responseDiv.removeChild(loadingMessageBox)
         document.getElementById('message').disabled = false;
+        document.getElementById('restart').disabled = false;
+        document.getElementById('report').disabled = false;
 
         if (data.error) {
             responseDiv.innerText = 'Error: ' + data.error;
@@ -97,10 +111,10 @@ async function sendMessage(message) {
             messageBox.className = 'message-ai';
             messageBox.innerText = '{{ ai_name }}: ' + data.response;
             responseDiv.appendChild(messageBox);
-            if (data.response.endsWith('<FINISHED>')) {
+            if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
                 conversationFinished = true;
-                document.getElementById('message').style.display = 'none';  // Hide the message box
-                document.getElementById('send').style.display = 'none';  // Hide the send button
+                document.getElementById('message-box').style.display = 'none';
+                document.getElementById('control-box').style.display = 'none';
             }
         }
     } catch (e) {

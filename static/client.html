@@ -8,7 +8,6 @@
 <body>
     <div id="header-bar">
         <img src='static/logo.jpg' id="header-logo">
-        <div "header-text">Talk to Heymans about psychology! <a href='chat'>Restart conversation</a></div>
     </div>
     <div id="container">
         <div id="start_info">
@@ -18,7 +17,7 @@
             </div>
             <div class="form-group">
                 <label for="student_nr">Student number</label>
-                <input type="text" id="student_nr" placeholder="Enter your student number" value=" {{ default_student_nr }}">
+                <input type="text" id="student_nr" placeholder="Enter your student number" value="{{ default_student_nr }}">
             </div>
             <div class="form-group">
                 <label for="course">Course</label>
@@ -39,6 +38,10 @@
         <div id="message-box">
             <textarea id="message" placeholder="Enter your message" disabled></textarea>
             <button id="send" disabled>Send</button>
+        </div>
+        <div id="control-box">
+            <button id="restart" disabled>Restart conversation</button>
+            <button id="report" disabled>Report conversation (something is wrong)</button>
         </div>
         <div id="footer-bar">Copyright 2023 Sebastiaan Mathôt <a href='https://github.com/smathot/heymans-ai-tutor'>(source code)</a></div>
     </div>

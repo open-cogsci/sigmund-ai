@@ -30,7 +30,6 @@ body {
 
 #header-logo {
     max-height: 30px;
-    margin-bottom: 5px;
 }
 
 #container {
@@ -50,10 +49,6 @@ body {
     background-color: white;
     color: #dc002d;
     margin-bottom: 10px;
-}
-
-#header-bar a {
-    color: #dc002d;
 }
 
 .message-user {
@@ -133,4 +128,22 @@ button#start {
 
 #start_info button {
     width: 100%;
+}
+
+#control-box {
+    margin-bottom: 10px;
+}
+
+#control-box button {
+    font-size: 0.6em;
+    padding: 5px;
+    border: none;
+    color: black;
+    background-color: #eeeeec;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#control-box button:hover {
+    text-decoration: underline;
 }
