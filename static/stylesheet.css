@@ -1,0 +1,136 @@
+body {
+    background-color: #d7d7d7;
+    font-family: Roboto Sans, Arial, sans-serif;
+}
+
+#container select,
+#container button,
+#container input {
+    font-family: Roboto Sans, Arial, sans-serif;
+}
+
+#footer-bar {
+    color: gray;
+    font-size: 0.7em;
+    text-align: right;
+    font-family: Roboto Condensed;
+}
+
+#footer-bar a {
+    color: gray;
+}
+
+#header-bar,
+#container {
+    margin: auto;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#header-logo {
+    max-height: 30px;
+    margin-bottom: 5px;
+}
+
+#container {
+    max-width: 600px;
+    background-color: #fff;
+}
+
+#container select,
+#container input[type="text"] {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#header-bar {
+    background-color: white;
+    color: #dc002d;
+    margin-bottom: 10px;
+}
+
+#header-bar a {
+    color: #dc002d;
+}
+
+.message-user {
+    color: #60B669;
+}
+
+.message-loading {
+    color: gray;
+}
+
+.message-loading,
+.message-user,
+.message-ai {
+    margin-bottom: 10px;
+}
+
+#message-box {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+#message-box textarea {
+    width: 85%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#message-box button {
+    width: 14%;
+    padding: 10px;
+    border: none;
+    color: #fff;
+    background-color: #60B669;
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#message-box button:disabled {
+    background-color: #cccccc;
+}
+
+button#start {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: #fff;
+    background-color: #009CEF;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#response {
+    min-height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+#loading {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#start_info button {
+    width: 100%;
+}

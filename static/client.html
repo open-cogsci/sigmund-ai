@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="static/stylesheet.css">
+    <script src="client.js"></script>
+</head>
+<body>
+    <div id="header-bar">
+        <img src='static/logo.jpg' id="header-logo">
+        <div "header-text">Talk to Heymans about psychology! <a href='chat'>Restart conversation</a></div>
+    </div>
+    <div id="container">
+        <div id="start_info">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter your name" value="{{ default_name }}">
+            </div>
+            <div class="form-group">
+                <label for="student_nr">Student number</label>
+                <input type="text" id="student_nr" placeholder="Enter your student number" value=" {{ default_student_nr }}">
+            </div>
+            <div class="form-group">
+                <label for="course">Course</label>
+                <select id="course">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="chapter">Chapter</label>
+                <select id="chapter">
+                </select>
+            </div>
+            <div class="form-group">
+                <button id="start">Start conversation</button>
+            </div>
+        </div>
+        <div id="response">
+        </div>
+        <div id="message-box">
+            <textarea id="message" placeholder="Enter your message" disabled></textarea>
+            <button id="send" disabled>Send</button>
+        </div>
+        <div id="footer-bar">Copyright 2023 Sebastiaan Mathôt <a href='https://github.com/smathot/heymans-ai-tutor'>(source code)</a></div>
+    </div>
+</body>
+</html>
