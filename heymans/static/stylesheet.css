@@ -9,6 +9,10 @@ body {
     background-color: #60B669!important;
 }
 
+.body-reported {
+    background-color: #dc002d!important;
+}
+
 #container select,
 #container button,
 #container input {

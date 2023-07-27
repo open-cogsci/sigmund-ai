@@ -119,7 +119,8 @@ async function sendMessage(message) {
                 name: document.getElementById('name').value,
                 student_nr: document.getElementById('student_nr').value,
                 course: document.getElementById('course').value,
-                chapter: document.getElementById('chapter').value
+                chapter: document.getElementById('chapter').value,
+                chatmode: document.getElementById('chatmode').value
             })
         });
         data = await res.json();
@@ -145,7 +146,11 @@ async function sendMessage(message) {
             document.getElementById('message-box').style.display = 'none';
             document.getElementById('message-counter').style.display = 'none';
             document.getElementById('report').style.display = 'none';
+        }
+        if (data.response.endsWith('<FINISHED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-finished');
+        } else if (data.response.endsWith('<REPORTED>')) {
+            document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
     }
 }
@@ -205,4 +210,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Call the function once at start to initialize the counter
     updateCounter();
+    
+    var chatmode = document.getElementById("chatmode");
+    var courseGroup = document.getElementById("courseGroup");
+    var chapterGroup = document.getElementById("chapterGroup");
+
+    chatmode.onchange = function() {
+        if(chatmode.value === "qa") {
+            courseGroup.style.display = "none";
+            chapterGroup.style.display = "none";
+        } else {
+            courseGroup.style.display = "block";
+            chapterGroup.style.display = "block";
+        }
+    }
 });

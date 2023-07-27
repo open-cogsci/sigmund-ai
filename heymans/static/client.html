@@ -28,11 +28,18 @@
                 <input type="text" id="student_nr" placeholder="Enter your student number" value="{{ default_student_nr }}">
             </div>
             <div class="form-group">
+                <label for="chatmode">I want to …</label>
+                <select id="chatmode">
+                    <option value="practice">Practice</option>
+                    <option value="qa">Ask a question</option>
+                </select>
+            </div>
+            <div class="form-group" id="courseGroup">
                 <label for="course">Course</label>
                 <select id="course">
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="chapterGroup">
                 <label for="chapter">Chapter</label>
                 <select id="chapter">
                 </select>

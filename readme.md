@@ -44,6 +44,7 @@ course_content = {
         }
     }
 }
+qa_start_message = 'What would you like to know?'
 openai_api_key = 'your_openai_api_key_here'
 model = 'gpt-4'  # 'dummy' for testing, 'gpt-3.5-turbo' for simpler model
 
@@ -118,6 +119,9 @@ https://localhost:5000/chat
 - flask
 - openai
 - jinja2
+- langchain
+- tiktoken
+- faiss or faiss-cpu
 
 
 ## License
