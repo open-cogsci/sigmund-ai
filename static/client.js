@@ -72,6 +72,17 @@ window.onload = function() {
     });
 };
 
+async function fetchWithRetry(url, options, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await fetch(url, options);
+        } catch (err) {
+            console.log('an error occurred while fetching: ' + err);
+            if (i === retries - 1) throw err; // if last retry, throw error
+        }
+    }
+}
+
 async function sendMessage(message) {
     // Clear character counter
     const counter = document.getElementById('message-counter');
@@ -94,8 +105,10 @@ async function sendMessage(message) {
     document.getElementById('message').disabled = true;
     document.getElementById('send').disabled = true;
 
+    let res;
+    let data;
     try {
-        const res = await fetch('{{ server_url }}/api', {
+        res = await fetchWithRetry('{{ server_url }}/api', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -109,32 +122,31 @@ async function sendMessage(message) {
                 chapter: document.getElementById('chapter').value
             })
         });
-
-        const data = await res.json();
-
-        // Hide the loading indicator and enable the message box when a response is received
-        responseDiv.removeChild(loadingMessageBox)
-        document.getElementById('message').disabled = false;
-        document.getElementById('restart').disabled = false;
-        document.getElementById('report').disabled = false;
-
-        if (data.error) {
-            responseDiv.innerText = 'Error: ' + data.error;
-        } else {
-            const messageBox = document.createElement('div');
-            messageBox.className = 'message-ai';
-            messageBox.innerText = '{{ ai_name }}: ' + data.response;
-            responseDiv.appendChild(messageBox);
-            if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
-                conversationFinished = true;
-                document.getElementById('message-box').style.display = 'none';
-                document.getElementById('message-counter').style.display = 'none';
-                document.getElementById('report').style.display = 'none';
-                document.getElementsByTagName('body')[0].classList.add('body-finished');
-            }
-        }
+        data = await res.json();
     } catch (e) {
         responseDiv.innerText = 'Error: ' + e;
+    }
+
+    // Hide the loading indicator and enable the message box when a response is received
+    responseDiv.removeChild(loadingMessageBox)
+    document.getElementById('message').disabled = false;
+    document.getElementById('restart').disabled = false;
+    document.getElementById('report').disabled = false;
+
+    if (data.error) {
+        responseDiv.innerText = 'Error: ' + data.error;
+    } else {
+        const messageBox = document.createElement('div');
+        messageBox.className = 'message-ai';
+        messageBox.innerText = '{{ ai_name }}: ' + data.response;
+        responseDiv.appendChild(messageBox);
+        if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
+            conversationFinished = true;
+            document.getElementById('message-box').style.display = 'none';
+            document.getElementById('message-counter').style.display = 'none';
+            document.getElementById('report').style.display = 'none';
+            document.getElementsByTagName('body')[0].classList.add('body-finished');
+        }
     }
 }
 
@@ -158,9 +170,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         let selectedCourse = courseSelect.value;
         let chapters = courseContent[selectedCourse].chapters;
-
+        let option = document.createElement('option');
+        option.value = '__any__';
+        option.text = 'Any';
+        chapterSelect.add(option);
         for (let chapter in chapters) {
-            let option = document.createElement('option');
+            option = document.createElement('option');
             option.value = chapter;
             option.text = chapters[chapter];
             chapterSelect.add(option);

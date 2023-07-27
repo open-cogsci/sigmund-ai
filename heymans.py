@@ -8,7 +8,7 @@ import logging
 import time
 import config
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 logger = logging.getLogger('heymans')
 logging.basicConfig(level=logging.INFO, force=True)
 
@@ -55,6 +55,12 @@ def api():
             name = 'Anonymous Student'
         course = data['course']
         chapter = data['chapter']
+        # If any chapter is selected, randomly select one of the folders from
+        # the course folder
+        if chapter == '__any__':
+            course_folder = Path('sources') / course
+            chapter = random.choice(
+                [f.name for f in course_folder.iterdir() if f.is_dir()])
         source_folder = Path('sources') / course / chapter
         source = random.choice(list(source_folder.glob('*.txt')))
         logger.info(f'using source {source} (session_id={session_id})')
@@ -82,7 +88,7 @@ def api():
         ai_message = 'You have reached the maximum number of messages. Restart the conversation to try again!'
     else:
         if config.model == 'dummy':
-            time.sleep(1)
+            time.sleep(.2)
             if len(chat_history['messages']) > 3:
                 ai_message = '<FINISHED>'
             else:
