@@ -54,6 +54,7 @@ def api():
             'course': course,
             'chapter': chapter,
             'source': str(source),
+            'chatmode': chatmode,
             'messages': []
         }
         if chatmode == 'practice':
