@@ -1,5 +1,6 @@
 import random
 from pathlib import Path
+from datetime import datetime
 from flask import Flask, request, jsonify
 import jinja2
 import json
@@ -23,6 +24,7 @@ def get_system_prompt(course, name, source):
 def save_chat_history(session_id, chat_history):
     if not Path('sessions').exists():
         Path('sessions').mkdir()
+    chat_history['end_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     Path(f'sessions/{session_id}.json').write_text(
         json.dumps(chat_history))
 
@@ -68,6 +70,7 @@ def api():
         chat_history = {
             'name': name,
             'student_nr': student_nr,
+            'start_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'course': course,
             'chapter': chapter,
             'source': str(source),
