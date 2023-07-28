@@ -22,9 +22,14 @@ def qa(chat_history=None):
     qa_history = [(q['content'], a['content'])
                   for q, a in zip(questions, answers)]
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
-    data = [TextLoader(src).load()[0]
-            for src in Path('sources').glob('**/**/*.txt')]
-    db = FAISS.from_documents(data, embeddings_model)
+    db_cache = Path('.db.cache')
+    if db_cache.exists():
+        db = FAISS.load_local(db_cache, embeddings_model)
+    else:
+        data = [TextLoader(src).load()[0]
+                for src in Path('sources').glob('**/**/*.txt')]
+        db = FAISS.from_documents(data, embeddings_model)
+        db.save_local(db_cache)
     llm = ChatOpenAI(model='gpt-4', openai_api_key=config.openai_api_key)
     qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever())
     question = chat_history['messages'][-1]['content']
