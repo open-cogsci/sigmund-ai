@@ -40,9 +40,8 @@ def api():
         # If any chapter is selected, randomly select one of the folders from
         # the course folder
         if chapter == '__any__':
-            course_folder = Path('sources') / course
             chapter = random.choice(
-                [f.name for f in course_folder.iterdir() if f.is_dir()])
+                list(config.course_content[course]['chapters']))
         source_folder = Path('sources') / course / chapter
         source = random.choice(list(source_folder.glob('*.txt')))
         logger.info(f'using source {source} (session_id={session_id})')
