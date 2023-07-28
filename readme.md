@@ -31,6 +31,7 @@ default_student_nr = 'S12345678'
 course_content = {
     'course_code_1': {
         'title': 'Course Title 1',
+        'textbook': 'Book 1',
         'chapters': {
             '1': 'First Chapter',
             '2': 'Second Chapter'
@@ -38,6 +39,7 @@ course_content = {
     },
     'course_code_2': {
         'title': 'Course Title 2',
+        'textbook': 'Book 2',
         'chapters': {
             '1': 'First Chapter',
             '2': 'Second Chapter'

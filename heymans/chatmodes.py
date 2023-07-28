@@ -11,7 +11,7 @@ from . import config
 def practice(chat_history):
     response = openai.ChatCompletion.create(
         model=config.model, messages=chat_history['messages'])
-    return response.choices[0].message['content']
+    return response.choices[0].message['content'], None
     
     
 def qa(chat_history=None):
@@ -30,8 +30,19 @@ def qa(chat_history=None):
                 for src in Path('sources').glob('**/**/*.txt')]
         db = FAISS.from_documents(data, embeddings_model)
         db.save_local(db_cache)
-    llm = ChatOpenAI(model='gpt-4', openai_api_key=config.openai_api_key)
-    qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever())
+    llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
+    qa = ConversationalRetrievalChain.from_llm(llm, db.as_retriever(),
+                                               return_generated_question=True,
+                                               return_source_documents=True)
     question = chat_history['messages'][-1]['content']
     result = qa({'question': question, 'chat_history': qa_history})
-    return result['answer']
+    sources = [source.metadata['source']
+               for source in result['source_documents']]
+    return result['answer'], sources
+
+
+def predict(msg):
+    if config.model == 'dummy':
+        return 'Dummy prediction'
+    llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
+    return llm.predict(msg)

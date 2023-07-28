@@ -66,6 +66,7 @@ def api():
         chat_history['messages'].append({"role": "user", "content": message})
     utils.save_chat_history(session_id, chat_history)
     logger.info(f'Received message: {message} (session_id={session_id})')
+    sources = None
     if '<REPORT>' in message:
         logger.info(f'conversation reported (session_id={session_id})')
         ai_message = 'Thank you for your feedback. Restart the conversation to try again! <REPORTED>'
@@ -79,20 +80,18 @@ def api():
                 ai_message = '<FINISHED>'
             else:
                 ai_message = f'Dummy response based on {chat_history["source"]}'
+                sources = [Path('sources/PSBE1-01/5/5.5.txt')]
         else:
+            chat_func = chatmodes.qa if chatmode == 'qa' \
+                else chatmodes.practice
             try:
-                if chatmode == 'practice':
-                    ai_message = chatmodes.practice(chat_history)
-                elif chatmode == 'qa':
-                    ai_message = chatmodes.qa(chat_history)
-                else:
-                    ai_message = f'Invalid chat mode: {chatmode}'
+                ai_message, sources = chat_func(chat_history)
             except Exception as e:
                 return jsonify({'error': str(e)}), 400
     chat_history['messages'].append(
         {"role": "assistant", "content": ai_message})
     utils.save_chat_history(session_id, chat_history)
-    return jsonify({'response': ai_message})
+    return jsonify({'response': ai_message + utils.format_sources(sources)})
 
 
 @app.route('/chat')

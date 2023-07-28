@@ -139,7 +139,7 @@ async function sendMessage(message) {
     } else {
         const messageBox = document.createElement('div');
         messageBox.className = 'message-ai';
-        messageBox.innerText = '{{ ai_name }}: ' + data.response;
+        messageBox.innerHTML = '{{ ai_name }}: ' + data.response;
         responseDiv.appendChild(messageBox);
         if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
             conversationFinished = true;

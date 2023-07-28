@@ -76,6 +76,13 @@ body {
     margin-bottom: 10px;
 }
 
+.message-sources {
+    color: gray;
+    font-size: 0.7em;
+    font-family: 'Roboto Condensed';
+    margin-top: 10px;
+}
+
 #message-box {
     display: flex;
     justify-content: space-between;
