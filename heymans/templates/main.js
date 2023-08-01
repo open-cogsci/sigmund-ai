@@ -44,7 +44,7 @@ function initMain(event) {
 
     // Trigger the send button when Enter is pressed inside the message box
     messageInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             if (!sendButton.disabled) {
                 sendButton.click();
