@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&display=swap');
 
 body {
-    background-color: #d7d7d7;
-    font-family: 'Poppins', 'Roboto Flex', Arial, sans-serif;
+    background-color: {{ background_color }};
+    font-family: '{{ primary_font }}', 'Roboto Flex', Arial, sans-serif;
 }
 
 .body-finished {
-    background-color: #60B669!important;
+    background-color: {{ finished_color }}!important;
 }
 
 .body-reported {
-    background-color: #dc002d!important;
+    background-color: {{ reported_color }}!important;
 }
 
 #container select,
 #container button,
 #container input {
-    font-family: 'Poppins', 'Roboto Flex', Arial, sans-serif;
+    font-family: '{{ primary_font }}', 'Roboto Flex', Arial, sans-serif;
 }
 
 #message-counter,
@@ -24,7 +24,7 @@ body {
     color: gray;
     font-size: 0.7em;
     text-align: right;
-    font-family: 'Roboto Condensed';
+    font-family: '{{ secondary_font }}';
 }
 
 #footer-bar a {
@@ -58,12 +58,11 @@ body {
 
 #header-bar {
     background-color: white;
-    color: #dc002d;
     margin-bottom: 10px;
 }
 
 .message-user {
-    color: #60B669;
+    color: {{ user_message_color }};
 }
 
 .message-loading {
@@ -74,6 +73,10 @@ body {
 .message-user,
 .message-ai {
     margin-bottom: 10px;
+}
+
+.codehilite pre {
+    padding: 10px;
 }
 
 .message-sources {
@@ -103,7 +106,7 @@ body {
     padding: 10px;
     border: none;
     color: #fff;
-    background-color: #60B669;
+    background-color: {{ send_button_color }};
     margin-left: 10px;
     border-radius: 4px;
     cursor: pointer;
@@ -118,7 +121,7 @@ button#start {
     padding: 10px;
     border: none;
     color: #fff;
-    background-color: #009CEF;
+    background-color: {{ start_button_color }};
     border-radius: 4px;
     cursor: pointer;
 }
@@ -130,6 +133,10 @@ button#start {
     padding: 10px;
     margin-bottom: 10px;
     word-wrap: break-word;
+}
+
+#response p {
+    margin: 0px;
 }
 
 #loading {

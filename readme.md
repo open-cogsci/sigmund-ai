@@ -124,6 +124,7 @@ https://localhost:5000/chat
 - langchain
 - tiktoken
 - faiss or faiss-cpu
+- jq
 
 
 ## License

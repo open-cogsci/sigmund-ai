@@ -19,13 +19,14 @@ window.onload = function() {
     const reportButton = document.getElementById('report');
     const messageInput = document.getElementById('message');
     const messageBox = document.getElementById('message-box');
-    messageBox.style.display = 'none';
     const messageCounter = document.getElementById('message-counter');
-    messageCounter.style.display = 'none';
     const controlBox = document.getElementById('control-box');
-    controlBox.style.display = 'none';  // Hide the message box initially
     const responseDiv = document.getElementById('response');
-    responseDiv.style.display = 'none';  // Hide the message box initially
+    const chatArea = document.getElementById('chat-area');
+    // messageBox.style.display = 'none';
+    // messageCounter.style.display = 'none';
+    // controlBox.style.display = 'none';
+    // responseDiv.style.display = 'none';
 
     messageInput.addEventListener('input', function() {
         // Enable the send button if there are at least 3 characters in the message box
@@ -43,12 +44,14 @@ window.onload = function() {
     });
 
     document.getElementById('start').addEventListener('click', function() {
-        this.style.display = 'none';  // Hide the start button
+        // this.style.display = 'none';
         document.getElementById('start-info').style.display = 'none';
-        messageBox.style.display = 'flex'
-        messageCounter.style.display = 'block'
-        controlBox.style.display = 'block'
-        responseDiv.style.display = 'block'
+        // messageBox.style.display = 'flex'
+        // messageCounter.style.display = 'block'
+        // controlBox.style.display = 'block'
+        // responseDiv.style.display = 'block'
+        debugger;
+        chatArea.style.display = 'block';
         sendMessage('');
     });
 
@@ -139,7 +142,7 @@ async function sendMessage(message) {
     } else {
         const messageBox = document.createElement('div');
         messageBox.className = 'message-ai';
-        messageBox.innerHTML = '{{ ai_name }}: ' + data.response;
+        messageBox.innerHTML = data.response;
         responseDiv.appendChild(messageBox);
         if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
             conversationFinished = true;
@@ -156,6 +159,7 @@ async function sendMessage(message) {
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
+
     let courseContent = {{ course_content }};
     let courseSelect = document.getElementById('course');
     let chapterSelect = document.getElementById('chapter');
@@ -192,25 +196,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Update the chapter select whenever the selected course changes
     courseSelect.addEventListener('change', updateChapterSelect);
-    
-    let textarea = document.getElementById('message');
-    let maxLength = {{ max_message_length }};
-    let counter = document.getElementById('message-counter');
-
-    function updateCounter() {
-        let length = textarea.value.length;
-        counter.innerText = length + '/' + maxLength + ' characters';
-
-        if (length >= maxLength) {
-            textarea.value = textarea.value.slice(0, maxLength - 1);
-        }
-    }
-
-    textarea.addEventListener('input', updateCounter);
-
-    // Call the function once at start to initialize the counter
-    updateCounter();
-    
     var chatmode = document.getElementById("chatmode");
     var courseGroup = document.getElementById("courseGroup");
     var chapterGroup = document.getElementById("chapterGroup");
@@ -224,4 +209,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
             chapterGroup.style.display = "block";
         }
     }
+    let textarea = document.getElementById('message');
+    let maxLength = {{ max_message_length }};
+    let counter = document.getElementById('message-counter');
+    function updateCounter() {
+        let length = textarea.value.length;
+        counter.innerText = length + '/' + maxLength + ' characters';
+
+        if (length >= maxLength) {
+            textarea.value = textarea.value.slice(0, maxLength - 1);
+        }
+    }
+    textarea.addEventListener('input', updateCounter);
+    updateCounter();
 });
