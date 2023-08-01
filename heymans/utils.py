@@ -14,6 +14,8 @@ logger = logging.getLogger('heymans')
 
 
 def md(text):
+    if '<REPORTED>' in text or '<FINISHED>' in text:
+        return text
     return markdown.markdown(text,
                              extensions=[FencedCodeExtension(),
                                          CodeHiliteExtension()])
