@@ -83,16 +83,18 @@ https://127.0.0.1:5000/library
 
 ## Dependencies
 
-- python
+- faiss (or faiss-cpu)
 - flask
 - flask-login
 - flask-wtf
-- openai
 - jinja2
-- langchain
-- tiktoken
-- faiss (or faiss-cpu)
 - jq
+- langchain
+- markdown
+- openai
+- pypdf
+- python
+- tiktoken
 
 
 ## License
