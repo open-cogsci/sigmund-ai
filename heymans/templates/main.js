@@ -83,12 +83,21 @@ async function sendMessage(message) {
         responseDiv.appendChild(userMessageBox);
     }
     
-    const loadingMessageBox = document.createElement('div');
-    loadingMessageBox.id = 'loading-message';
-    loadingMessageBox.innerText = '{{ ai_name }} is searching, thinking, and typing …';
-    loadingMessageBox.className = 'message-loading';
-    responseDiv.appendChild(loadingMessageBox);
 
+    
+    const loadingMessageBox = document.createElement('div');
+    let baseMessage = "{{ ai_name }} is searching, thinking, and typing ";
+    loadingMessageBox.id = 'loading-message';
+    loadingMessageBox.className = 'message-loading';
+    loadingMessageBox.innerText = baseMessage;
+    responseDiv.appendChild(loadingMessageBox);
+    let dotCount = 0;
+    function updateMessage() {
+        dotCount = (dotCount % 3) + 1;
+        let newMessage = baseMessage + '.'.repeat(dotCount);
+        loadingMessageBox.innerText = newMessage;
+    }
+    let messageInterval = setInterval(updateMessage, 1000);
     messageInput.disabled = true;
     sendButton.disabled = true;
 
@@ -106,6 +115,7 @@ async function sendMessage(message) {
     }
 
     // Hide the loading indicator and enable the message box when a response is received
+    clearInterval(messageInterval)
     responseDiv.removeChild(loadingMessageBox)
     messageInput.disabled = false;
     restartButton.disabled = false;
