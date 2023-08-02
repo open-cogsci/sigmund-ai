@@ -1,5 +1,4 @@
 let sessionId = null;
-let conversationFinished = false;
 
 function globalElements(event) {
     // Generate a unique session ID
@@ -56,15 +55,11 @@ function initMain(event) {
         // Send a message when the send button is clicked
         const message = messageInput.value;
         messageInput.value = '';
-        if (!conversationFinished) {
-            sendMessage(message);
-        }
+        sendMessage(message);
     });
     
     reportButton.addEventListener('click', function() {
-        if (!conversationFinished) {
-            sendMessage('<REPORT>');
-        }
+        sendMessage('<REPORT>')
     });
 }
 
@@ -80,6 +75,7 @@ async function fetchWithRetry(url, options, retries = 3) {
 }
 
 async function sendMessage(message) {
+    console.log('user message: ' + message)
     messageCounter.innerText = ''
     // Show the user's message
     if (message) {
@@ -123,16 +119,19 @@ async function sendMessage(message) {
         const aiMessage = document.createElement('div');
         aiMessage.className = 'message-ai';
         aiMessage.innerHTML = data.response;
-        responseDiv.appendChild(aiMessage);
-        if (data.response.endsWith('<FINISHED>') || data.response.endsWith('<REPORTED>') ) {
-            conversationFinished = true;
+        console.log('ai message: ' + data.response)
+        if (data.response.includes('<FINISHED>') 
+                || data.response.includes('<REPORTED>')
+                || data.response.includes('<TOO_LONG>')) 
+        {
             messageBox.style.display = 'none';
             messageCounter.style.display = 'none';
             reportButton.style.display = 'none';
         }
-        if (data.response.endsWith('<FINISHED>')) {
+        responseDiv.appendChild(aiMessage);
+        if (data.response.includes('<FINISHED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-finished');
-        } else if (data.response.endsWith('<REPORTED>')) {
+        } else if (data.response.includes('<REPORTED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
     }

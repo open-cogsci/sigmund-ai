@@ -67,30 +67,34 @@ def format_sources(sources):
     formatted_sources = []
     for source in sources:
         logger.info(f'source: {source}')
-        path = Path(source['source'])
-        # PDF sources that have a name and page number
-        if path.name in config.sources and 'page' in source:
-            formatted_source = \
-                f'{config.sources[path.name]}, page {source["page"]}'
-        elif 'url' in source:
+        if 'url' in source:
             formatted_source = \
                 f'<a href="{source["url"]}">{source["title"]}</a>'
-        # Textbook sources that have a textbook, chapter, and section
+        elif 'source' in Path:
+            path = Path(source['source'])
+            # PDF sources that have a name and page number
+            if path.name in config.sources and 'page' in source:
+                formatted_source = \
+                    f'{config.sources[path.name]}, page {source["page"]}'
+            # Textbook sources that have a textbook, chapter, and section
+            else:
+                # Then it's not a textbook section
+                if len(path.parts) < 3:
+                    continue
+                section = path.name
+                # Remove .txt extension and '-X' suffix that indicates sections
+                # that # have split up into smaller sections to fit into the prompt
+                section = section[:-4].rsplit('-', 1)[0]
+                course = path.parent.parent.name
+                if course not in config.course_content:
+                    return ''
+                course_info = config.course_content[course]
+                textbook = course_info['textbook']
+                chapter = course_info['chapters'][path.parent.name]
+                formatted_source = \
+                    f'{textbook}, chapter {chapter}, section {section}'
         else:
-            # Then it's not a textbook section
-            if len(path.parts) < 3:
-                continue
-            section = path.name
-            # Remove .txt extension and '-X' suffix that indicates sections
-            # that # have split up into smaller sections to fit into the prompt
-            section = section[:-4].rsplit('-', 1)[0]
-            course = path.parent.parent.name
-            if course not in config.course_content:
-                return ''
-            course_info = config.course_content[course]
-            textbook = course_info['textbook']
-            chapter = course_info['chapters'][path.parent.name]
-            formatted_source = f'{textbook}, chapter {chapter}, section {section}'
+            formatted_source = str(source)
         if formatted_source not in formatted_sources:
             formatted_sources.append(formatted_source)
     summarized_sources = chatmodes.predict(f'''You have just provided an answer based on the sources below.

@@ -6,6 +6,8 @@ from . import config, library
 
 
 def practice(chat_history):
+    if config.model == 'dummy':
+        return dummy(chat_history)
     response = openai.ChatCompletion.create(
         model=config.model, messages=chat_history['messages'])
     return response.choices[0].message['content'], None
@@ -14,6 +16,8 @@ def practice(chat_history):
 def qa(chat_history=None):
     if chat_history is None:
         return config.qa_start_message, None
+    if config.model == 'dummy':
+        return dummy(chat_history)
     questions = chat_history['messages'][:-1:2]
     answers = chat_history['messages'][1::2]
     qa_history = [(q['content'], a['content'])
@@ -36,3 +40,12 @@ def predict(msg):
         return 'Dummy prediction'
     llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
     return llm.predict(msg)
+
+
+def dummy(chat_history):
+    if len(chat_history['messages']) > 3:
+        ai_message = 'Finished <FINISHED>'
+    else:
+        ai_message = 'Dummy response'
+    sources = [{'url': 'https://sigmundai.eu', 'title': 'Sigmund AI'}]
+    return ai_message, sources

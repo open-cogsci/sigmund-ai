@@ -22,27 +22,20 @@ def api_main(message, session_id, chat_history, chat_func):
         message = message[:config.max_message_length]
         chat_history['messages'].append({"role": "user", "content": message})
     utils.save_chat_history(session_id, chat_history)
-    logger.info(f'Received message: {message} (session_id={session_id})')
+    logger.info(f'user message: {message} (session_id={session_id})')
     sources = None
     if '<REPORT>' in message:
         logger.info(f'conversation reported (session_id={session_id})')
         ai_message = 'Thank you for your feedback. Restart the conversation to try again! <REPORTED>'
     elif len(chat_history['messages']) > config.max_chat_length:
         logger.info(f'conversation too long (session_id={session_id})')
-        ai_message = 'You have reached the maximum number of messages. Restart the conversation to try again!'
+        ai_message = 'You have reached the maximum number of messages. Restart the conversation to try again! <TOO_LONG>'
     else:
-        if config.model == 'dummy':
-            time.sleep(.2)
-            if len(chat_history['messages']) > 3:
-                ai_message = '<FINISHED>'
-            else:
-                ai_message = f'Dummy response based on {chat_history["source"]}'
-                sources = [Path('sources/PSBE1-01/5/5.5.txt')]
-        else:
-            ai_message, sources = chat_func(chat_history)
+        ai_message, sources = chat_func(chat_history)
     chat_history['messages'].append(
         {"role": "assistant", "content": ai_message})
     utils.save_chat_history(session_id, chat_history)
+    logger.info(f'ai message: {ai_message} (session_id={session_id})')
     return jsonify(
         {'response': utils.md(f'{config.ai_name}: {ai_message}') +
          utils.format_sources(sources)})
