@@ -109,20 +109,23 @@ async function sendMessage(message) {
             headers: {'Content-Type': 'application/json'},
             body: requestBody(message, sessionId)
         });
+        console.log(res)
         data = await res.json();
+        responseDiv.removeChild(loadingMessageBox)
     } catch (e) {
-        responseDiv.innerText = 'Error: ' + e;
+        responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.'
+        console.log(e)
     }
 
     // Hide the loading indicator and enable the message box when a response is received
     clearInterval(messageInterval)
-    responseDiv.removeChild(loadingMessageBox)
     messageInput.disabled = false;
     restartButton.disabled = false;
     reportButton.disabled = false;
 
     if (data.error) {
-        responseDiv.innerText = 'Error: ' + data.error;
+        responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.'
+        console.log(data.error)
     } else {
         const aiMessage = document.createElement('div');
         aiMessage.className = 'message-ai';
