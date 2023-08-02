@@ -6,15 +6,12 @@
         <link rel="stylesheet" href="stylesheet.css">
         <link rel="stylesheet" href="static/pygments.css">
         <link rel="icon" type="image/svg" href="static/favicon.svg">
-        <script src="main.js"></script>
-        <script src="qa.js"></script>
     </head>
 <body>
     {% include 'header.html' %}
     <div id="container">
-        {% include 'logout.html' %}
-        <div id="chat-area">
-        {% include 'chat-area.html' %}
+        <div id="library">
+        {{ library|safe }}
         </div>
         {% include 'footer.html' %}
     </div>

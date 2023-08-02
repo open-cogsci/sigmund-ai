@@ -21,7 +21,7 @@ def md(text):
                                          CodeHiliteExtension()])
 
 
-def render(path):
+def render(path, **kwargs):
     return render_template(
         path, ai_name=config.ai_name, page_title=config.page_title,
         server_url=config.server_url, default_name=config.default_name,
@@ -36,7 +36,11 @@ def render(path):
         start_button_color=config.start_button_color,
         finished_color=config.finished_color,
         reported_color=config.reported_color,
-        header_logo=config.header_logo)
+        header_logo=config.header_logo,
+        link_color=config.link_color,
+        visited_link_color=config.visited_link_color,
+        library=md(config.library_text), login_text=md(config.login_text),
+        **kwargs)
 
 
 def get_system_prompt(course, name, source):
@@ -70,7 +74,7 @@ def format_sources(sources):
         if 'url' in source:
             formatted_source = \
                 f'<a href="{source["url"]}">{source["title"]}</a>'
-        elif 'source' in Path:
+        elif 'source' in source:
             path = Path(source['source'])
             # PDF sources that have a name and page number
             if path.name in config.sources and 'page' in source:

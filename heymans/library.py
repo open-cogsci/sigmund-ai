@@ -20,14 +20,17 @@ def load_library(force_reindex=False):
             JSONLoader
         logger.info('initializing library')
         data = []
+        # Course are organized a text files per chapter and section. This is so
+        # that they can also be used for practice
         for course in config.course_content.keys():
-            logger.info(f'indexing course: {course}')
-            data += [TextLoader(src).load()[0]
-                    for src in (src_path / course).glob('**/*.txt')]
-        data = []
+            sections = list((src_path / course).glob('**/*.txt'))
+            logger.info(f'indexing course: {course}: {len(sections)} sections')
+            data += [TextLoader(section).load()[0] for section in sections]
+        # PDF files are unstructured. They can be named through config.sources
         for src in src_path.glob('pdf/**/*.pdf'):
             logger.info(f'indexing pdf: {src}')
             data += PyPDFLoader(str(src)).load_and_split()
+        # jsonl is mainly for documentation
         for src in src_path.glob('jsonl/*.jsonl'):
             logger.info(f'indexing json: {src}')
             loader = JSONLoader(src, jq_schema='', content_key='content',

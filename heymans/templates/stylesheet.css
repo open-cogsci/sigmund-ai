@@ -5,6 +5,14 @@ body {
     font-family: '{{ primary_font }}', 'Roboto Flex', Arial, sans-serif;
 }
 
+a {
+    color: {{ link_color }}
+}
+
+a:visited {
+    color: {{ visited_link_color }}
+}
+
 .body-finished {
     background-color: {{ finished_color }}!important;
 }
@@ -17,6 +25,17 @@ body {
 #container button,
 #container input {
     font-family: '{{ primary_font }}', 'Roboto Flex', Arial, sans-serif;
+}
+
+.codehilite pre {
+    overflow: auto;
+}
+
+#logout {
+    font-size: 0.7em;
+    text-align: right;
+    font-family: '{{ secondary_font }}';
+    margin-bottom: 10px;
 }
 
 #message-counter,
@@ -60,7 +79,8 @@ body {
 }
 
 #container select,
-#container input[type="text"] {
+#container input[type="text"],
+#container input[type="password"] {
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -122,6 +142,7 @@ body {
     background-color: #cccccc;
 }
 
+input#submit,
 button#start {
     width: 100%;
     padding: 10px;
@@ -133,7 +154,6 @@ button#start {
 }
 
 #response {
-    min-height: 100px;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
@@ -141,8 +161,10 @@ button#start {
     word-wrap: break-word;
 }
 
+#start-text p,
 #response p {
     margin: 0px;
+    margin-block-end: 10px;
 }
 
 #loading {
@@ -186,4 +208,9 @@ button#start {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+#library {
+    margin-left: 10px;
+    margin-right: 10px;
 }

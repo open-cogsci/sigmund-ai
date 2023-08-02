@@ -10,7 +10,8 @@ def practice(chat_history):
         return dummy(chat_history)
     response = openai.ChatCompletion.create(
         model=config.model, messages=chat_history['messages'])
-    return response.choices[0].message['content'], None
+    answer = config.response_rewriter(response.choices[0].message['content'])
+    return answer, None
 
 
 def qa(chat_history=None):
@@ -26,13 +27,14 @@ def qa(chat_history=None):
     qa = ConversationalRetrievalChain.from_llm(
         llm, library.load_library(), return_generated_question=True,
         return_source_documents=True,
-        max_tokens_limit=config.max_source_tokens,
-        condense_question_prompt=PromptTemplate.from_template(
-            config.condense_question_prompt))
+        max_tokens_limit=config.max_source_tokens)
+        # condense_question_prompt=PromptTemplate.from_template(
+        #     config.condense_question_prompt))
     question = chat_history['messages'][-1]['content']
     result = qa({'question': question, 'chat_history': qa_history})
     sources = [source.metadata for source in result['source_documents']]
-    return result['answer'], sources
+    answer = config.response_rewriter(result['answer'])
+    return answer, sources
 
 
 def predict(msg):

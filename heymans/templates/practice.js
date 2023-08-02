@@ -30,13 +30,6 @@ function initPractice(event) {
 
     var params = new URLSearchParams(window.location.search);
 
-    if (params.has('name')) {
-      nameInput.value = params.get('name');
-    }
-    if (params.has('student_nr')) {
-      studentNrInput.value = params.get('student_nr');
-    }
-
     startButton.addEventListener('click', function() {
         if (chatmodeInput.value == 'practice') {
             startInfo.style.display = 'none';
@@ -58,7 +51,7 @@ function initPractice(event) {
     }
     
     restartButton.addEventListener('click', function() {
-        window.location.href = '/practice?name=' + nameInput.value + ' &student_nr=' + studentNrInput.value;
+        window.location.href = '/practice';
     });
 }
 
@@ -66,8 +59,6 @@ function requestBody(message, session_id) {
     return JSON.stringify({
         message: message, 
         session_id: sessionId,
-        name: nameInput.value,
-        student_nr: studentNrInput.value,
         course: courseInput.value,
         chapter: chapterInput.value,
         chatmode: chatmodeInput.value

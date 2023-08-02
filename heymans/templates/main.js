@@ -4,8 +4,6 @@ function globalElements(event) {
     // Generate a unique session ID
     sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
     window.responseDiv = document.getElementById('response');
-    window.nameInput =document.getElementById('name');
-    window.studentNrInput = document.getElementById('student_nr');
     window.courseInput = document.getElementById('course');
     window.chapterInput = document.getElementById('chapter');
     window.chatmodeInput = document.getElementById('chatmode');
@@ -87,7 +85,7 @@ async function sendMessage(message) {
     
     const loadingMessageBox = document.createElement('div');
     loadingMessageBox.id = 'loading-message';
-    loadingMessageBox.innerText = '{{ ai_name }} is typing …';
+    loadingMessageBox.innerText = '{{ ai_name }} is searching, thinking, and typing …';
     loadingMessageBox.className = 'message-loading';
     responseDiv.appendChild(loadingMessageBox);
 

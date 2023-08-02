@@ -2,65 +2,20 @@
 
 Copyright 2023 Sebastiaan Mathôt
 
-This is a working prototype of an AI-based tutor that asks open-ended questions to students based on sections from a textbook. The AI gives feedback until the student answers the question correctly. This is intended as formative testing.
+This is a working prototype of an AI-based tutor that offers two chat modes:
+
+- In __practice__ mode, Heymans asks open-ended questions to students based on sections from a textbook. The AI gives feedback until the student answers the question correctly. This is intended as formative testing.
+- In __Q&A__ mode, students can ask questions, which Heymans attempts to answer based on the sources in its library.
 
 Heymans uses OpenAI chat models and requires an OpenAI API key.
 
 
-## Installation
+## Configuring
 
-Download the source code and create a `config.py` in the main source folder (i.e. alongside `heymans.py`)"
-
-```python
-page_title = 'Heymans AI'
-# The server port and url specify the external address of the app
-server_port = 5000
-server_url = 'http://127.0.0.1:5000'
-# The flask host and port specify the internal address of the app through the
-# host and port arguments to app.run(). These can be different from the 
-# external address if the app is running behind a proxy.
-flask_host= '0.0.0.0'
-flask_port = 5000
-ai_name = 'Heymans'  # How the AI calls itself
-max_chat_length = 20
-max_message_length = 1000
-# Default student identifiers
-default_name = 'Anonymous Student'
-default_student_nr = 'S12345678'
-# Defines which courses exist and which chapters each course has
-course_content = {
-    'course_code_1': {
-        'title': 'Course Title 1',
-        'textbook': 'Book 1',
-        'chapters': {
-            '1': 'First Chapter',
-            '2': 'Second Chapter'
-        }
-    },
-    'course_code_2': {
-        'title': 'Course Title 2',
-        'textbook': 'Book 2',
-        'chapters': {
-            '1': 'First Chapter',
-            '2': 'Second Chapter'
-        }
-    }
-}
-qa_start_message = 'What would you like to know?'
-openai_api_key = 'your_openai_api_key_here'
-model = 'gpt-4'  # 'dummy' for testing, 'gpt-3.5-turbo' for simpler model
+Download the source code and create a `config.py` in the `heymans` package folder. See `config.example.py` for a commented example.
 
 
-def is_valid_student_nr(student_nr):
-    """Takes a student number and returns True if it is valid."""
-    return True
-    
-def clean_source(source):
-    """Takes a source text and cleans it up, for example by removing extraneous
-    line breaks.
-    """
-    return source
-```
+### Adding courses for practice mode
 
 Next, for each chapter, organize `.txt` files with sections from that chapter in the following way:
 
@@ -80,38 +35,49 @@ Each course also needs a template for the system prompt, which contains general 
 sources/course_code_1/prompt_template.txt
 ```
 
-The prompt template is a ninja2 template that contains various placeholders that will be filled in based on the configuration and user identity. For example:
+The prompt template is a ninja2 template that contains various placeholders that will be filled in based on the configuration and user identity. See `prompt_template.example.txt` for an example.
+
+In practice mode, for each conversation, one section is sampled at random based on the selected course and chapter.
+
+
+### Adding PDF sources
+
+You can add PDF sources to:
 
 ```
-You are a friendly tutor for an introductory psychology course. Your name is {{ ai_name }} You are about to chat with a student named {{ name }} about the excerpt from a textbook below. The student is a beginner, so keep questions and feedback simple.
-
-<textbook>
-{{ source }}
-</textbook>
-
-The chat session is structured as follows:
-
-- Begin the conversation with the student by asking a short, open-ended question based on the material provided above. Indicate which section is the basis for the question.
-- Evaluate the student's response to determine if it sufficiently demonstrates understanding of the concept(s).
-- If the response does not connect to the question, remind the student that the assignment should be taken seriously.
-- If the response resembles the textbook or your own feedback, remind the student to use his or her own words.
-- If the response is satisfactory, conclude the teaching session. Do not offer to continue the conversation. End your response with <FINISHED>.
-- If it the response is not satisfactory, provide constructive feedback and suggestions for improvement.
-- After providing feedback, allow the student to respond with an improved answer. Continue this feedback cycle until the answer demonstrates a satisfactory understanding of the concept(s).
+sources/pdf/
 ```
 
-For each conversation, one section is sampled at random based on the selected course and chapter.
+Each PDF source should have a human-readable name in the config file.
 
-Next, start Heymans:
 
-```
-python heymans.py
-```
+### Adding JSONL sources
 
-And visit the chat endpoint on the server, which given the above configuration is:
+You can also add `.jsonl` sources:
 
 ```
-https://localhost:5000/chat
+sources/jsonl/
+```
+
+
+## Running
+
+
+Once Heymans is properly configured, you can start the app in development mode through:
+
+```
+python app.py
+```
+
+You can then open any of the end points:
+
+```
+https://127.0.0.1:5000/
+https://127.0.0.1:5000/practice
+https://127.0.0.1:5000/qa
+https://127.0.0.1:5000/login
+https://127.0.0.1:5000/logout
+https://127.0.0.1:5000/library
 ```
 
 
@@ -119,11 +85,13 @@ https://localhost:5000/chat
 
 - python
 - flask
+- flask-login
+- flask-wtf
 - openai
 - jinja2
 - langchain
 - tiktoken
-- faiss or faiss-cpu
+- faiss (or faiss-cpu)
 - jq
 
 
