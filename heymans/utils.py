@@ -40,7 +40,7 @@ def render(path, **kwargs):
         link_color=config.link_color,
         visited_link_color=config.visited_link_color,
         library=md(config.library_text), login_text=md(config.login_text),
-        **kwargs)
+        analytics_script=config.analytics_script, **kwargs)
 
 
 def get_system_prompt(course, name, source):

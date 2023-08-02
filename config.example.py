@@ -82,6 +82,8 @@ sources = {
 # OpenAI settings. Keep your key secret!
 openai_api_key = 'sk-your-openai-api-key'
 model = 'gpt-4'  # gpt-4, gpt-3.5-turbo, or dummy
+# Google analytics script (optional)
+analytics_script = ''
 
 
 def clean_source(source):
