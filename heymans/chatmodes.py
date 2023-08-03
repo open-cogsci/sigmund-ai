@@ -28,8 +28,6 @@ def qa(chat_history=None):
         llm, library.load_library(), return_generated_question=True,
         return_source_documents=True,
         max_tokens_limit=config.max_source_tokens)
-        # condense_question_prompt=PromptTemplate.from_template(
-        #     config.condense_question_prompt))
     question = chat_history['messages'][-1]['content']
     result = qa({'question': question, 'chat_history': qa_history})
     sources = [source.metadata for source in result['source_documents']]
