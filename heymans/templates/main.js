@@ -18,6 +18,7 @@ function globalElements(event) {
     window.startButton = document.getElementById('start');
     window.courseGroup = document.getElementById("courseGroup");
     window.chapterGroup = document.getElementById("chapterGroup");
+    window.exampleQueries = document.getElementById("example-queries");
 }
 
 function initMain(event) {
@@ -74,6 +75,9 @@ async function fetchWithRetry(url, options, retries = 3) {
 
 async function sendMessage(message) {
     console.log('user message: ' + message)
+    if (message !== "" && exampleQueries !== null) {
+        exampleQueries.style.display = 'none';
+    }
     messageCounter.innerText = ''
     // Show the user's message
     if (message) {
@@ -82,9 +86,6 @@ async function sendMessage(message) {
         userMessageBox.className = 'message-user';
         responseDiv.appendChild(userMessageBox);
     }
-    
-
-    
     const loadingMessageBox = document.createElement('div');
     let baseMessage = "{{ ai_name }} is searching, thinking, and typing ";
     loadingMessageBox.id = 'loading-message';

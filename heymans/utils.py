@@ -4,6 +4,7 @@ import logging
 from flask import render_template
 from datetime import datetime
 from pathlib import Path
+import random
 import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
@@ -40,7 +41,8 @@ def render(path, **kwargs):
         link_color=config.link_color,
         visited_link_color=config.visited_link_color,
         library=md(config.library_text), login_text=md(config.login_text),
-        analytics_script=config.analytics_script, **kwargs)
+        analytics_script=config.analytics_script,
+        example_queries=example_query_html(), **kwargs)
 
 
 def get_system_prompt(course, name, source):
@@ -63,6 +65,13 @@ def load_chat_history(session_id):
     if path.exists():
         return json.loads(Path(f'sessions/{session_id}.json').read_text())
     return None
+
+
+def example_query_html():
+    html = ''
+    for q in random.sample(config.example_queries, 3):
+        html += f'<button class="example-query">{q}</button>'
+    return html
 
 
 def format_sources(sources):

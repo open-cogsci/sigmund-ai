@@ -214,3 +214,26 @@ button#start {
     margin-left: 10px;
     margin-right: 10px;
 }
+
+#example-queries {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.example-query {
+    flex: 1 0 30%;
+    margin: 10px;
+    font-size: 0.6em;
+    padding: 10px;
+    color: black;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.example-query:hover {
+    color: #fff;
+    background-color: {{ send_button_color }};
+}
