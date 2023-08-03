@@ -28,6 +28,13 @@ library_text = '''
 
 Your library sources here
 '''
+# Three example queries are selected and shown at random when the conversation
+# starts in Q&A mode
+example_queries = [
+    'You could try this question',
+    'Or maybe this question',
+    'Or maybe even this one'
+]
 # Server configuration.
 # The external server address, that is, the URL that users visit
 server_url = 'http://yourwebsite.eu'
