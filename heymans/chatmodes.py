@@ -1,7 +1,10 @@
 import openai
+import logging
+logger = logging.getLogger('heymans')
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts.prompt import PromptTemplate
+from datamatrix.functional import memoize
 from . import config, library
 
 
@@ -14,6 +17,22 @@ def practice(chat_history):
     return answer, None
 
 
+def _create_wrapper(fnc):
+    def inner(*args, **kwargs):
+        messages = kwargs['messages']
+        system_message = messages[0]
+        user_message = messages[0]
+        logger.info('Generating Q&A answer (this may occur several times due to retries within the openai libary) ...')
+        logger.info(f'Sending {len(messages)} messages')
+        for msg in messages:
+            logger.info(f'role: {msg["role"]}, length: {len(msg["content"])}, words: {len(msg["content"].split())}')
+        logger.info(f'query: {messages[-1]}')
+        result = fnc(*args, **kwargs)
+        logger.info('Done generating …')
+        return result
+    return inner
+
+
 def qa(chat_history=None):
     if chat_history is None:
         return config.qa_start_message, None
@@ -24,6 +43,7 @@ def qa(chat_history=None):
     qa_history = [(q['content'], a['content'])
                   for q, a in zip(questions, answers)]
     llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
+    llm.client.create = _create_wrapper(llm.client.create)
     qa = ConversationalRetrievalChain.from_llm(
         llm, library.load_library(), return_generated_question=True,
         return_source_documents=True,
@@ -38,8 +58,13 @@ def qa(chat_history=None):
 def predict(msg):
     if config.model == 'dummy':
         return 'Dummy prediction'
-    llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
-    return llm.predict(msg)
+    @memoize(persistent=True)
+    def inner(msg):
+        llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
+        print('Generating prediction ...')
+        print(f'length: {len(msg)}, words: {len(msg.split())}')
+        return llm.predict(msg)
+    return inner(msg)
 
 
 def dummy(chat_history):
