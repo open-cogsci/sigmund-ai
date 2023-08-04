@@ -18,11 +18,16 @@ I always look things up in [my library](/library) to make sure that what I say
 is correct.
 
 Please log in.'''
-qa_start_message = f'''Hi there, my name is { ai_name }, your friendly AI assistant. 
+qa_start_message = f'''Hi there, my name is { ai_name }, your friendly AI assistant.
 I always look things up in [my library](/library) to make sure that what I say
 is correct.
 
 Now shoot! What would you like to know?'''
+qa_prompt = f'''You are {ai_name}, a friendly AI assistant with.
+Use the following pieces of context to answer the users question. 
+If you don't know the answer, say that you are unsure and make a best guess.
+----------------
+{{context}}'''
 library_text = '''
 ## Library
 

@@ -3,7 +3,8 @@ import logging
 logger = logging.getLogger('heymans')
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
-from langchain.prompts.prompt import PromptTemplate
+from langchain.prompts.chat import ChatPromptTemplate, \
+    SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from datamatrix.functional import memoize
 from . import config, library
 
@@ -26,6 +27,7 @@ def _create_wrapper(fnc):
         logger.info(f'Sending {len(messages)} messages')
         for msg in messages:
             logger.info(f'role: {msg["role"]}, length: {len(msg["content"])}, words: {len(msg["content"].split())}')
+        # logger.info(f'prompt: {messages[0]}')
         logger.info(f'query: {messages[-1]}')
         result = fnc(*args, **kwargs)
         logger.info('Done generating …')
@@ -44,10 +46,15 @@ def qa(chat_history=None):
                   for q, a in zip(questions, answers)]
     llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
     llm.client.create = _create_wrapper(llm.client.create)
+    prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(config.qa_prompt),
+        HumanMessagePromptTemplate.from_template("{question}"),
+    ])
     qa = ConversationalRetrievalChain.from_llm(
         llm, library.load_library(), return_generated_question=True,
         return_source_documents=True,
-        max_tokens_limit=config.max_source_tokens)
+        max_tokens_limit=config.max_source_tokens,
+        combine_docs_chain_kwargs={'prompt': prompt})
     question = chat_history['messages'][-1]['content']
     result = qa({'question': question, 'chat_history': qa_history})
     sources = [source.metadata for source in result['source_documents']]
