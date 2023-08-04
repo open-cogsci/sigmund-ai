@@ -97,21 +97,26 @@ def api_qa():
     message = data['message']
     session_id = data.get('session_id', 'default')
     chat_history = utils.load_chat_history(session_id)
+    user_info = config.user_info(current_user.get_id())
     if chat_history is None:
         # The first message from the Q&A chatmode to start the conversation
         if not message:
+            if hasattr(config, 'init_user_qa'):
+                config.init_user_qa(user_info)
             ai_message, sources = chatmodes.qa()
             return jsonify(
                 {'response': utils.md(f'{config.ai_name}: {ai_message}') +
                 utils.format_sources(sources)})
         logger.info(f'initializing session (session_id={session_id})')
         chat_history = {
-            'user_info': config.user_info(current_user.get_id()),
+            'user_info': user_info,
             'start_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'messages': []
         }
     else:
         logger.info(f'resuming session (session_id={session_id})')
+    if hasattr(config, 'resume_user_qa'):
+        config.resume_user_qa(user_info)
     return api_main(message, session_id, chat_history, chatmodes.qa)
 
 

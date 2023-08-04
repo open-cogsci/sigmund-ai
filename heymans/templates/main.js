@@ -78,6 +78,9 @@ async function sendMessage(message) {
     if (message !== "" && exampleQueries !== null) {
         exampleQueries.style.display = 'none';
     }
+    if (document.getElementById("user-message") !== null) {
+        document.getElementById("user-message").style.display = 'none';
+    }
     messageCounter.innerText = ''
     // Show the user's message
     if (message) {

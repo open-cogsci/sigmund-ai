@@ -238,3 +238,10 @@ button#start {
     color: #fff;
     background-color: {{ send_button_color }};
 }
+
+#user-message {
+    border-top: solid 1px;
+    padding-top: 10px;
+    font-size: 0.6em;
+    margin-bottom: -10px;
+}
