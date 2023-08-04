@@ -65,13 +65,15 @@ def qa(chat_history=None):
 def predict(msg):
     if config.model == 'dummy':
         return 'Dummy prediction'
-    @memoize(persistent=True)
-    def inner(msg):
-        llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
-        print('Generating prediction ...')
-        print(f'length: {len(msg)}, words: {len(msg.split())}')
-        return llm.predict(msg)
-    return inner(msg)
+    if config.model == 'gpt-4':
+        @memoize(persistent=True)
+        def inner(msg):
+            llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
+            print('Generating prediction ...')
+            print(f'length: {len(msg)}, words: {len(msg.split())}')
+            return llm.predict(msg)
+        return inner(msg)
+    return llm.predict(msg)
 
 
 def dummy(chat_history):
