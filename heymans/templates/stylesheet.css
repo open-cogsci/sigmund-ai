@@ -29,6 +29,7 @@ a:visited {
 
 .codehilite pre {
     overflow: auto;
+    line-height: 150%;
 }
 
 #logout {
