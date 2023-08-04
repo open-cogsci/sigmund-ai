@@ -16,8 +16,8 @@ class SigmundVectorStore(FAISS):
             k -= len(docs)
         else:
             docs = []
-        return docs + super().similarity_search(query, k-1, filter, fetch_k,
-                                                **kwargs)
+        docs += super().similarity_search(query, k, filter, fetch_k, **kwargs)
+        return docs
 
 
 def load_library(force_reindex=False):
