@@ -100,7 +100,7 @@ def format_sources(sources):
                 section = section[:-4].rsplit('-', 1)[0]
                 course = path.parent.parent.name
                 if course not in config.course_content:
-                    return ''
+                    continue
                 course_info = config.course_content[course]
                 textbook = course_info['textbook']
                 chapter = course_info['chapters'][path.parent.name]
