@@ -10,6 +10,7 @@ General tips:
 - The code comments are for you. You don't need to include them verbatim in your responses.
 - inline_javascript can be combined with GUI items. Example: show stimulus display with inline_javascript, collect key press with keyboard_response GUI item
 - Variables defined in loop item are globals in inline_javascript
+- Use syntactically valid JavaScript for run-if and show-if expressions. Not `[correct] = 1` but `correct == 1`
 - JavaScript is more limited than Python. Example: there is no JavaScript Keyboard object.
 Don't confuse GUI items with JavaScript objects:
 - Scripts in GUI items do not support if statements or for loops

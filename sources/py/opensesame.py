@@ -10,6 +10,7 @@ General tips:
 - inline_script can be combined with GUI items. Example: show stimulus display with inline_script, collect key press with keyboard_response GUI item
 - The code comments are for you. You don't need to include them verbatim in your responses.
 - Variables defined in loop item are globals in inline_script
+- Use syntactically valid Python for run-if and show-if expressions. Not `[correct] = 1` but `correct == 1`
 Don't confuse GUI items with Python objects:
 - Don't suggest Python scripts when the question refers to the GUI. Example: don't suggest using a Canvas when the question is about a sketchpad
 - Scripts in GUI items do not support if statements or for loops
