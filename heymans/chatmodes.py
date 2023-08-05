@@ -58,19 +58,22 @@ def qa(chat_history=None):
     question = chat_history['messages'][-1]['content']
     result = qa({'question': question, 'chat_history': qa_history})
     sources = [source.metadata for source in result['source_documents']]
-    answer = config.response_rewriter(result['answer'])
+    if hasattr(config, 'response_rewriter'):
+        answer = config.response_rewriter(result['answer'])
+    else:
+        answer = result['answer']
     return answer, sources
 
 
 def predict(msg):
     if config.model == 'dummy':
         return 'Dummy prediction'
+    llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
     if config.model == 'gpt-4':
         @memoize(persistent=True)
         def inner(msg):
-            llm = ChatOpenAI(model=config.model, openai_api_key=config.openai_api_key)
-            print('Generating prediction ...')
-            print(f'length: {len(msg)}, words: {len(msg.split())}')
+            logger.info('Generating prediction ...')
+            logger.info(f'length: {len(msg)}, words: {len(msg.split())}')
             return llm.predict(msg)
         return inner(msg)
     return llm.predict(msg)
