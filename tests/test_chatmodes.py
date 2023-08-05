@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 from heymans import chatmodes, config
+import argparse
 import logging
 logger = logging.getLogger('heymans')
 import re
@@ -57,18 +58,27 @@ def score_testcase(question, requirements):
     return score
 
 
-def test_qa():
+def test_qa(select_cases=None):
     results = []
     for description, testcase in read_testcases().items():
+        if select_cases is not None and description not in select_cases:
+            results.append((None, description))
+            continue
         score = score_testcase(**testcase)
-        results.append((score, testcase))
+        results.append((score, description))
     for score, description in results:
-        if score < 3:
+        if score is None:
+            print(f'SKIP: testing {description}')
+        elif score < 3:
             print(f'FAIL: testing {description}, score: {score}')
         else:
             print(f'PASS: testing {description}, score: {score}')
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cases', action='store',
+                        help='A comma-separated list of test cases to be run')
+    args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG, force=True)
-    test_qa()
+    test_qa(args.cases)
