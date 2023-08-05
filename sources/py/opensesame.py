@@ -8,8 +8,10 @@ Python in the GUI:
 - Use Python for conditional (run-if, break-if, show-if) expressions: `correct == 1`
 General tips:
 - inline_script can be combined with GUI items. Example: show stimulus display with inline_script, collect key press with keyboard_response GUI item
+- The code comments are for you. You don't need to include them verbatim in your responses.
 - Variables defined in loop item are globals in inline_script
 Don't confuse GUI items with Python objects:
+- Don't suggest Python scripts when the question refers to the GUI. Example: don't suggest using a Canvas when the question is about a sketchpad
 - Scripts in GUI items do not support if statements or for loops
 - A sketchpad is a GUI item, and a `Canvas` is a Python object
 - A keyboard_response is a GUI item, and a `Keyboard` is a Python object
@@ -34,7 +36,7 @@ responses.add(response=key, correct=correct, response_time=response_time)  # Rem
 # END_RUN_PHASE
 # END_EXAMPLE
 
-# START_EXAMPLE: circles in a circular arrangement
+# START_EXAMPLE: circles in a circular arrangement followed by mouse click
 # Related terms: visual search, additional singleton
 # START_PREPARE_PHASE
 import random
@@ -43,8 +45,17 @@ search_canvas += FixDot()
 target_index = random.randint(0, 5)  # randomly select target position
 for index, (x, y) in enumerate(xy_circle(6, rho=200)):  # 6 coordinates in a circle
     color = 'red' if index == target_index else 'blue'
-    search_canvas += Rect(x=x-10, y=y+10, w=20, h=20, fill=True, color=color)
+    search_canvas += Rect(x=x - 10, y=y + 10, w=20, h=20, fill=True, color=color)
+my_mouse = Mouse(timeout=2000)  # Uppercase. Never pass exp
 # END_PREPARE_PHASE
+# START_RUN_PHASE
+t0 = search_canvas.show()
+button, pos, t1 = my_mouse.get_click()  # button and pos are `None` when a timeout occurs
+if pos is not None:
+    x, y = pos  # unless a timeout occurred, pos is a (x, y) tuple that corresonds to the clicked location
+else:
+    x = y = None
+# END_RUN_PHASE
 # END_EXAMPLE
 
 # START_EXAMPLE: bilateral display with images on left and right0
