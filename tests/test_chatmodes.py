@@ -1,15 +1,15 @@
 from pathlib import Path
-import sys
-sys.path.append(str(Path(__file__).parent.parent))
+# import sys
+# sys.path.append(str(Path(__file__).parent.parent))
 from heymans import chatmodes, config
 import argparse
+from datetime import datetime
+import re
 import logging
 logger = logging.getLogger('heymans')
-import re
+logging.basicConfig(level=logging.INFO, force=True)
 
 
-TEST_MODEL = 'gpt-4'
-# TEST_MODEL = 'gpt-3.5-turbo'
 VALIDATION_MODEL = 'gpt-4'
 VALIDATION_TEMPLATE = '''I would like you to check the answer provided below. Briefly motivate why the answer does or does not meet the requirements. End your reply with "score:", were score is a value between 0 (really poor) and 5 (excellent), with 3 or higher being an acceptable answer.
 
@@ -19,6 +19,14 @@ Requirements:
 Answer:
 {answer}
 '''
+
+
+def init_testlog():
+    global testlog
+    testlog_folder = Path(__file__).parent / 'testlog'
+    if not testlog_folder.exists():
+        testlog_folder.mkdir()
+    testlog = Path(testlog_folder) / f'testlog.{str(datetime.now())}.{config.model}.log'
 
 
 def read_testcases():
@@ -37,13 +45,14 @@ def read_testcases():
     return output
 
 
-def score_testcase(question, requirements):
+def score_testcase(description, question, requirements):
     chat_history = {'messages': [{"role": "user", "content": question}]}
-    config.model = TEST_MODEL
     answer, _ = chatmodes.qa(chat_history)
+    test_model = config.model
     config.model = VALIDATION_MODEL
     validation_response = chatmodes.predict(
         VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
+    config.model = test_model
     logger.debug('Question:')
     logger.debug(question)
     logger.debug('Answer:')
@@ -51,20 +60,18 @@ def score_testcase(question, requirements):
     logger.debug('Validation response:')
     logger.debug(validation_response)
     score = float(validation_response.lower().split('score:')[-1].strip(' .'))
-    testlog = Path('tests/testcases.log')
-    # testlog.touch()
     with testlog.open('a') as fd:
-        fd.write(f'---\nTest model:\n{TEST_MODEL}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n{validation_response}\n\n')
+        fd.write(f'# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n{validation_response}\n\n')
     return score
 
 
-def test_qa(select_cases=None):
+def score_testcases(select_cases=None):
     results = []
     for description, testcase in read_testcases().items():
         if select_cases is not None and description not in select_cases:
             results.append((None, description))
             continue
-        score = score_testcase(**testcase)
+        score = score_testcase(description, **testcase)
         results.append((score, description))
     for score, description in results:
         if score is None:
@@ -73,12 +80,15 @@ def test_qa(select_cases=None):
             print(f'FAIL: testing {description}, score: {score}')
         else:
             print(f'PASS: testing {description}, score: {score}')
+            
+            
+def test_gpt4():
+    config.model = 'gpt-4'
+    init_testlog()
+    score_testcases()
+    
 
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--cases', action='store',
-                        help='A comma-separated list of test cases to be run')
-    args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG, force=True)
-    test_qa(args.cases)
+def test_gpt35turbo():
+    config.model = 'gpt-3.5-turbo'
+    init_testlog()
+    score_testcases()
