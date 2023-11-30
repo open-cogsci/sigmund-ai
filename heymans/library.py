@@ -26,7 +26,7 @@ def load_library(force_reindex=False):
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
     if not force_reindex and db_cache.exists():
         logger.info('loading library from cache')
-        db = SigmundVectorStore.load_local(db_cache, embeddings_model)
+        db = FAISS.load_local(db_cache, embeddings_model)
     else:
         from langchain.document_loaders import TextLoader, PyPDFLoader, \
             JSONLoader
@@ -56,7 +56,7 @@ def load_library(force_reindex=False):
                 f'ingesting chunk {i}-{i + config.chunk_size}/{len(data)}')
             chunk = data[i:i + config.chunk_size]
             if not i:
-                db = SigmundVectorStore.from_documents(chunk, embeddings_model)
+                db = FAISS.from_documents(chunk, embeddings_model)
             else:
                 time.sleep(config.chunk_throttle)
                 db.add_documents(chunk)

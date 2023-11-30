@@ -1,6 +1,6 @@
 # Run-if expression (GUI)
 
-I have a sketchpad that I would like to show only after an incorrect response. Can you show me how to do that?'
+I have a sketchpad that I would like to show only after an incorrect response. Can you show me how to do that?
 
 The answer should:
         

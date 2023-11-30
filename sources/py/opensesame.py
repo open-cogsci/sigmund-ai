@@ -22,7 +22,7 @@ Don't confuse GUI items with Python objects:
 # START_EXAMPLE: randomly positioned rectangles followed by key press
 # Related terms: visual search
 # START_PREPARE_PHASE
-search_canvas = Canvas()  # Uppercase. Never pass exp parameter
+search_canvas = Canvas()  # Uppercase. Never pass exp parameter. Do not import from openexp.
 search_canvas += FixDot()
 for x, y in xy_random(6, width=200, height=200, min_dist=40):  # 6 random coordinates within a 200x200 area
     search_canvas += Rect(x=x-10, y=y+10, w=20, h=20, fill=True)
@@ -131,7 +131,7 @@ my_sound = Synth(osc='sine', freq=220, length=100)  # Uppercase. Never pass exp 
 
 # START_EXAMPLE: draw circle where mouse is clicked
 # START_RUN_PHASE
-my_mouse = Mouse(visible=True)  # Uppercase. Never pass exp parameter
+my_mouse = Mouse(visible=True)  # Uppercase. Never pass exp parameter. Do not import from openexp.
 my_canvas = Canvas()
 my_canvas['circle'] = Circle(x=0, y=0, r=10)  # Named Circle element
 my_canvas.show()
