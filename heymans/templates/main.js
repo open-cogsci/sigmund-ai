@@ -1,4 +1,5 @@
 let sessionId = null;
+const api_endpoint = 'api/chat'
 
 function globalElements(event) {
     // Generate a unique session ID
@@ -150,6 +151,13 @@ async function sendMessage(message) {
             document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
     }
+}
+
+function requestBody(message, session_id) {
+    return JSON.stringify({
+        message: message, 
+        session_id: sessionId
+    })
 }
 
 document.addEventListener('DOMContentLoaded', globalElements)

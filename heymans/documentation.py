@@ -61,7 +61,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         for query in queries:
             logger.info(f'retrieving from FAISS: {query}')
             for doc in self._retriever.invoke(query):
-                if doc.page_content not in self._heymans.documentation:
+                if doc.page_content not in self._heymans.documentation and \
+                        doc not in docs:
                     logger.info(
                         f'Retrieving {doc.metadata["url"]} (length={len(doc.page_content)})')
                     docs.append(doc.page_content)
@@ -78,12 +79,12 @@ class OpenSesameDocumentationSource(BaseDocumentationSource):
         self._py_keywords = ['opensesame', 'inline_script', 'python', 'canvas',
             'keyboard', 'mouse', 'sampler', 'synth', 'sequence', 'loop',
             'variable', 'experiment', 'stimulus', 'display', 'task',
-            'paradigm']
+            'paradigm', 'run if', 'run-if', 'show if', 'show-if']
         self._js_keywords = ['osweb', 'javascript', 'online', 'browser',
             'inline_javascript', 'firefox', 'safari']
 
     def search(self, queries):
-        queries = ''.join(queries)
+        queries = ''.join(queries).lower()
         if any(keyword in queries 
                for keyword in self._py_keywords + self._js_keywords):
             if any(keyword in queries for keyword in self._js_keywords):

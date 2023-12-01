@@ -1,14 +1,13 @@
 import jinja2
 import json
 import logging
-from flask import render_template
+from flask import render_template, render_template_string
 from datetime import datetime
 from pathlib import Path
 import random
 import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
-from . import chatmodes
 from . import config
 from . import __version__
 logger = logging.getLogger('heymans')
@@ -22,13 +21,18 @@ def md(text):
                                          CodeHiliteExtension()])
 
 
+def clean(text):
+    return render_template_string(text)
+    
+
 def render(path, **kwargs):
     return render_template(
-        path, ai_name=config.ai_name, page_title=config.page_title,
-        server_url=config.server_url, default_name=config.default_name,
-        default_student_nr=config.default_student_nr,
-        max_message_length=config.max_message_length, version=__version__,
-        course_content=json.dumps(config.course_content),
+        path,
+        ai_name=config.ai_name,
+        page_title=config.page_title,
+        server_url=config.server_url,
+        max_message_length=config.max_message_length,
+        version=__version__,
         primary_font=config.primary_font,
         secondary_font=config.secondary_font,
         background_color=config.background_color,
@@ -40,81 +44,4 @@ def render(path, **kwargs):
         header_logo=config.header_logo,
         link_color=config.link_color,
         visited_link_color=config.visited_link_color,
-        library=md(config.library_text), login_text=md(config.login_text),
-        analytics_script=config.analytics_script,
-        example_queries=example_query_html(), **kwargs)
-
-
-def get_system_prompt(course, name, source):
-    source = config.clean_source(Path(source).read_text())
-    tmpl = jinja2.Template(
-        (Path('sources') / course / 'prompt_template.txt').read_text())
-    return tmpl.render(ai_name=config.ai_name, source=source, name=name)
-
-
-def save_chat_history(session_id, chat_history):
-    if not Path('sessions').exists():
-        Path('sessions').mkdir()
-    chat_history['end_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    Path(f'sessions/{session_id}.json').write_text(
-        json.dumps(chat_history))
-
-
-def load_chat_history(session_id):
-    path = Path(f'sessions/{session_id}.json')
-    if path.exists():
-        return json.loads(Path(f'sessions/{session_id}.json').read_text())
-    return None
-
-
-def example_query_html():
-    html = ''
-    for q in random.sample(config.example_queries, 3):
-        html += f'<button class="example-query">{q}</button>'
-    return html
-
-
-def format_sources(sources):
-    if not sources:
-        return ''
-    formatted_sources = []
-    for source in sources:
-        logger.info(f'source: {source}')
-        if 'url' in source:
-            formatted_source = \
-                f'<a href="{source["url"]}">{source["title"]}</a>'
-        elif 'source' in source:
-            path = Path(source['source'])
-            # PDF sources that have a name and page number
-            if path.name in config.sources and 'page' in source:
-                formatted_source = \
-                    f'{config.sources[path.name]}, page {source["page"]}'
-            # Textbook sources that have a textbook, chapter, and section
-            else:
-                # Then it's not a textbook section
-                if len(path.parts) < 3:
-                    continue
-                section = path.name
-                # Remove .txt extension and '-X' suffix that indicates sections
-                # that # have split up into smaller sections to fit into the prompt
-                section = section[:-4].rsplit('-', 1)[0]
-                course = path.parent.parent.name
-                if course not in config.course_content:
-                    continue
-                course_info = config.course_content[course]
-                textbook = course_info['textbook']
-                chapter = course_info['chapters'][path.parent.name]
-                formatted_source = \
-                    f'{textbook}, chapter {chapter}, section {section}'
-        else:
-            formatted_source = str(source)
-        if formatted_source not in formatted_sources:
-            formatted_sources.append(formatted_source)
-    summarized_sources = chatmodes.predict(f'''You have just provided an answer based on the sources below.
-
-```python
-{formatted_sources}
-```
-
-Please response with a phrase that indicates that you've consulted these sources, starting with: For this answer I read''')
-    return f'<div class="message-sources">{summarized_sources}</div>'
+        **kwargs)

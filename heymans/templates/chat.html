@@ -7,17 +7,12 @@
         <link rel="stylesheet" href="static/pygments.css">
         <link rel="icon" type="image/svg" href="static/favicon.svg">
         <script src="main.js"></script>
-        <script src="practice.js"></script>
-        {{ analytics_script|safe }}
     </head>
 <body>
     {% include 'header.html' %}
     <div id="container">
         {% include 'logout.html' %}
-        <div id="start-info">
-        {% include 'start-info.html' %}
-        </div>
-        <div id="chat-area" style="display:none;">
+        <div id="chat-area">
         {% include 'chat-area.html' %}
         </div>
         {% include 'footer.html' %}
