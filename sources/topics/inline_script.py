@@ -1,26 +1,11 @@
 """
-Python in inline_script:
-- Execute Python code for desktop or laboratory experiments. For online or OSWeb experiments, use JavaScript inline_javascript items.
+# Instructions for Python in inline_script
+
 - Stimulus preparation should be done in Prepare phase. Stimulus presentation, response collection, etc. should be done in Run phase. The Prepare and Run phase are tabs in the `inline_script` GUI item.
 - Canvas, Keyboard, FixDot, Rect, Circle, xy_random, responses, clock, etc. are always available and do not need to be imported.
-Python in the GUI:
-- Embed Python in GUI controls as f-strings/ template strings. Example: sketchpad text: `Your response time was {resonse_time} ms`. Example: sampler sound file: `{sound_name}.mp3`
-- Use Python for conditional (run-if, break-if, show-if) expressions: `correct == 1`
-General tips:
-- inline_script can be combined with GUI items. Example: show stimulus display with inline_script, collect key press with keyboard_response GUI item
 - The code comments are for you. You don't need to include them verbatim in your responses.
 - Variables defined in loop item are globals in inline_script
-- Use syntactically valid Python for run-if and show-if expressions. Not `[correct] = 1` but `correct == 1`
-Don't confuse GUI items with Python objects:
-- Don't suggest Python scripts when the question refers to the GUI. Example: don't suggest using a Canvas when the question is about a sketchpad
-- Scripts in GUI items do not support if statements or for loops
-- A sketchpad is a GUI item, and a `Canvas` is a Python object
-- A keyboard_response is a GUI item, and a `Keyboard` is a Python object
-- A mouse_response is a GUI item, and a `Mouse` is a Python object
-- Sampler and Synth can refer to either GUI items or Python objects, depending on the context
 """
-# START_EXAMPLE: randomly positioned rectangles followed by key press
-# Related terms: visual search
 # START_PREPARE_PHASE
 search_canvas = Canvas()  # Uppercase. Never pass exp parameter. Do not import from openexp.
 search_canvas += FixDot()

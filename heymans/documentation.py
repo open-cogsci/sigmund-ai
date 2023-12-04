@@ -1,8 +1,10 @@
+import asyncio
 from pathlib import Path
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 import logging
 from . import config
+from . import prompt
 logger = logging.getLogger('heymans')
 
 
@@ -26,8 +28,26 @@ class Documentation:
     def __contains__(self, doc):
         return doc in self._documents
     
+    def append(self, doc):
+        if doc not in self._documents:
+            self._documents.append(doc)
+            
+    def strip_irrelevant(self, question):
+        prompts = [prompt.render(prompt.JUDGE_RELEVANCE, documentation=doc,
+                                 question=question)
+                   for doc in self]
+        replies = [self._heymans.condense_model.predict(prompt)
+                   for prompt in prompts]
+        relevant = []
+        for reply, doc in zip(replies, self):
+            if not reply.lower().startswith('no'):
+                relevant.append(doc)
+            else:
+                logger.info(f'stripping irrelevant documentation')
+        self._documents = relevant
+    
     def clear(self):
-        logger.info('clearing documentaion')
+        logger.info('clearing documentation')
         self._documents = []
         
     def search(self, queries):
@@ -62,7 +82,7 @@ class FAISSDocumentationSource(BaseDocumentationSource):
             logger.info(f'retrieving from FAISS: {query}')
             for doc in self._retriever.invoke(query):
                 if doc.page_content not in self._heymans.documentation and \
-                        doc not in docs:
+                        doc.page_content not in docs:
                     logger.info(
                         f'Retrieving {doc.metadata["url"]} (length={len(doc.page_content)})')
                     docs.append(doc.page_content)

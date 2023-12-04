@@ -14,7 +14,6 @@ class Messages:
     
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
-        self._condense_model = model(heymans, model=config.condense_model)
         self._condensed_text = None
         self._message_history = [('assistant', self.welcome_message())]
         self._condensed_message_history = self._message_history[:]
@@ -56,7 +55,8 @@ class Messages:
         messages = [{"role": "system", "content": system_prompt}]
         prompt_length = sum(len(content) for role, content
                             in self._condensed_message_history)
-        logger.info(f'prompt length (without system prompt): {prompt_length} characters')
+        logger.info(f'system prompt length: {len(system_prompt)}')
+        logger.info(f'prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
             logger.info('no need to condense')
             return
@@ -67,10 +67,13 @@ class Messages:
             condense_length += len(content)
             condense_messages.insert(0, (role, content))
         logger.info(f'condensing {len(condense_messages)} messages')
-        condense_text = '\n\n'.join(
-            f'You said: {content}' if role == 'system' else f'User said: {content}'
-            for role, content in condense_messages)
-        self._condensed_text = self._condense_model.predict(condense_text)
+        condense_prompt = prompt.render(
+            prompt.CONDENSE_HISTORY,
+            history=''.join(
+                f'You said: {content}' if role == 'system' else f'User said: {content}'
+                for role, content in condense_messages))
+        self._condensed_text = self._heymans.condense_model.predict(
+            condense_prompt)
         
     def _system_prompt(self):
         if len(self._heymans.documentation):

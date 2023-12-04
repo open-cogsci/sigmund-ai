@@ -3,6 +3,7 @@ import re
 import json
 import logging
 from langchain.schema import AIMessage
+import time
 logger = logging.getLogger('heymans')
 
 
@@ -12,19 +13,28 @@ class BaseModel:
         self._heymans = heymans
 
     def predict(self, messages):
-        logger.info(f'predicting with {self.__clas__} model')
+        t0 = time.time()
+        logger.info(f'predicting with {self.__class__} model')
         if isinstance(messages, str):
-            return self._model.predict(messages)
-        reply = self._model.predict_messages(messages).content
-        try:
-            request = json.loads(reply)
-        except json.JSONDecodeError:
-            logger.info('received regular reply')
-            return reply
-        if isinstance(request, dict):
-            logger.info(f'reply is JSON request: {request}')
-            return request
-        logger.info('reply is JSON but not a request, treating as regular')
+            reply = self._model.predict(messages)
+            dt = time.time() - t0
+            logger.info(f'predicting {len(reply) + len(messages)} took {dt} s')
+        else:
+            reply = self._model.predict_messages(messages).content
+            dt = time.time() - t0
+            msg_len = sum([len(m.content) for m in messages])
+            logger.info(f'predicting {len(reply) + msg_len} took {dt} s')
+            if reply.startswith('```json\n') and reply.endswith('```'):
+                reply = reply.strip().lstrip('```json\n').rstrip('```')
+            try:
+                request = json.loads(reply)
+            except json.JSONDecodeError:
+                logger.info('received regular reply')
+                return reply
+            if isinstance(request, dict):
+                logger.info(f'reply is JSON request: {request}')
+                return request
+            logger.info('reply is JSON but not a request, treating as regular')
         return reply
 
 

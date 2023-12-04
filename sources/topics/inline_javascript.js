@@ -1,20 +1,9 @@
 /**
-JavaScript in inline_javascriptscript:
-- Execute JavaScript code for online or OSWeb experiments. For desktop or laboratory experiments, use Python inline_script items.
+# Instuctions for JavaScript in inline_javascriptscript
+
 - Stimulus preparation should be done in Prepare phase. Stimulus presentation, response collection, etc. should be done in Run phase. The Prepare and Run phase are tabs in the `inline_javascript` GUI item.
 JavaScript in the GUI:
-- Embed JavaScript in GUI controls as template literals/ template strings, except that `$` prefix is not needed. Example: sketchpad text: `Your response time was {resonse_time} ms`. Example: sampler sound file: `{sound_name}.mp3`
-- Use JavaScript for conditional (run-if, break-if, show-if) expressions: `correct == 1`
-General tips:
-- Don't suggest JavaScript when the question refers to the GUI. Example: don't suggest using a Canvas when the question is about a sketchpad
 - The code comments are for you. You don't need to include them verbatim in your responses.
-- inline_javascript can be combined with GUI items. Example: show stimulus display with inline_javascript, collect key press with keyboard_response GUI item
-- Variables defined in loop item are globals in inline_javascript
-- Use syntactically valid JavaScript for run-if and show-if expressions. Not `[correct] = 1` but `correct == 1`
-- JavaScript is more limited than Python. Example: there is no JavaScript Keyboard object.
-Don't confuse GUI items with JavaScript objects:
-- Scripts in GUI items do not support if statements or for loops
-- A sketchpad is a GUI item, and a `Canvas` is a JavaScript object
 **/
 // START_EXAMPLE: randomly positioned rectangles
 // Related terms: visual search

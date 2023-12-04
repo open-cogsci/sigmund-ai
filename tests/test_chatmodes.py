@@ -1,7 +1,9 @@
 from pathlib import Path
-# import sys
-# sys.path.append(str(Path(__file__).parent.parent))
-from heymans import chatmodes, config
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+from heymans import config
+from heymans.heymans import Heymans
+from heymans.model import GPT4Model
 import argparse
 from datetime import datetime
 import re
@@ -10,8 +12,7 @@ logger = logging.getLogger('heymans')
 logging.basicConfig(level=logging.INFO, force=True)
 
 
-VALIDATION_MODEL = 'gpt-4'
-VALIDATION_TEMPLATE = '''I would like you to check the answer provided below. Briefly motivate why the answer does or does not meet the requirements. End your reply with "score:", were score is a value between 0 (really poor) and 5 (excellent), with 3 or higher being an acceptable answer.
+VALIDATION_TEMPLATE = '''Check the answer provided below. Briefly motivate why the answer does or does not meet the requirements. End your reply with "score:", were score is a value between 0 (really poor) and 5 (excellent), with 3 or higher being an acceptable answer.
 
 Requirements:
 {requirements}
@@ -26,7 +27,7 @@ def init_testlog():
     testlog_folder = Path(__file__).parent / 'testlog'
     if not testlog_folder.exists():
         testlog_folder.mkdir()
-    testlog = Path(testlog_folder) / f'testlog.{str(datetime.now())}.{config.model}.log'
+    testlog = Path(testlog_folder) / f'testlog.{str(datetime.now())}.{config.answer_model}.log'
 
 
 def read_testcases():
@@ -45,33 +46,33 @@ def read_testcases():
     return output
 
 
-def score_testcase(description, question, requirements):
+def score_testcase(heymans, validation_model, description, question,
+                   requirements):
     chat_history = {'messages': [{"role": "user", "content": question}]}
-    answer, _ = chatmodes.qa(chat_history)
-    test_model = config.model
-    config.model = VALIDATION_MODEL
-    validation_response = chatmodes.predict(
+    answer = heymans.send_user_message(question)
+    validation_response = validation_model.predict(
         VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
-    config.model = test_model
     logger.debug('Question:')
     logger.debug(question)
     logger.debug('Answer:')
     logger.debug(answer)
     logger.debug('Validation response:')
     logger.debug(validation_response)
-    score = float(validation_response.lower().split('score:')[-1].strip(' .'))
+    score = float(validation_response.lower().split('score:')[-1].strip(' .')[0])
     with testlog.open('a') as fd:
-        fd.write(f'# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n{validation_response}\n\n')
+        fd.write(f'*********\n\n# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n\n{validation_response}\n\n')
     return score
 
 
 def score_testcases(select_cases=None):
+    heymans = Heymans(user_id='pytest')
+    validation_model = GPT4Model(heymans)
     results = []
     for description, testcase in read_testcases().items():
         if select_cases is not None and description not in select_cases:
             results.append((None, description))
             continue
-        score = score_testcase(description, **testcase)
+        score = score_testcase(heymans, validation_model, description, **testcase)
         results.append((score, description))
     for score, description in results:
         if score is None:
@@ -83,12 +84,25 @@ def score_testcases(select_cases=None):
             
             
 def test_gpt4():
-    config.model = 'gpt-4'
+    config.answer_model = 'gpt-4'
     init_testlog()
     score_testcases()
     
 
-def test_gpt35turbo():
-    config.model = 'gpt-3.5-turbo'
+def test_gpt35():
+    config.answer_model = 'gpt-3.5'
     init_testlog()
     score_testcases()
+    
+    
+def test_claude21():
+    config.answer_model = 'claude-2.1'
+    init_testlog()
+    score_testcases()
+
+
+if __name__ == '__main__':
+    import logging; logging.basicConfig(level=logging.INFO, force=True)
+    test_gpt4()
+    # test_gpt35()
+    # test_claude21()

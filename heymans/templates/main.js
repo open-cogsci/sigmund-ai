@@ -5,6 +5,7 @@ function globalElements(event) {
     // Generate a unique session ID
     sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
     window.responseDiv = document.getElementById('response');
+    window.documentationDiv = document.getElementById('documentation');
     window.courseInput = document.getElementById('course');
     window.chapterInput = document.getElementById('chapter');
     window.chatmodeInput = document.getElementById('chatmode');
@@ -150,6 +151,8 @@ async function sendMessage(message) {
         } else if (data.response.includes('<REPORTED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
+        console.log('documentation:')
+        console.log(data.documentation);
     }
 }
 
