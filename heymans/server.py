@@ -36,9 +36,9 @@ def api_chat():
     session_id = data.get('session_id', 'default')
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True)
-    reply, documentation = heymans.send_user_message(message)
+    reply, sources = heymans.send_user_message(message)
     return jsonify({'response': utils.md(f'{config.ai_name}: {reply}'),
-                    'documentation': str(documentation)})
+                    'sources': sources})
     
     
 def chat_page():

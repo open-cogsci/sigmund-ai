@@ -151,8 +151,34 @@ async function sendMessage(message) {
         } else if (data.response.includes('<REPORTED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
-        console.log('documentation:')
-        console.log(data.documentation);
+        // Create a div for sources
+        const sourcesDiv = document.createElement('div');
+        sourcesDiv.className = 'message-sources';
+        
+        // Parse the JSON string to an object
+        const sources = JSON.parse(data.sources);
+        console.log(sources);
+        
+        // Iterate over the sources and create clickable links for non-null sources
+        // Flag to track if there are any valid sources
+        let hasValidSources = false;
+        sources.forEach(sourceObj => {
+            if (sourceObj.url) {
+                hasValidSources = true;
+                const sourceLink = document.createElement('a');
+                sourceLink.href = sourceObj.url;
+                sourceLink.textContent = sourceObj.url;
+                sourceLink.target = '_blank';
+                sourcesDiv.appendChild(sourceLink);
+                sourcesDiv.appendChild(document.createElement('br'));
+            }
+        });
+        if (hasValidSources) {
+            aiMessage.appendChild(sourcesDiv);
+        }
+        
+        // Append the AI message div to the response div
+        responseDiv.appendChild(aiMessage);
     }
 }
 

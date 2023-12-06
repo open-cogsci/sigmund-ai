@@ -2,6 +2,7 @@ from .model import model
 from . import config
 from pathlib import Path
 import logging
+from langchain_core.documents import Document
 logger = logging.getLogger('heymans')
 
 
@@ -39,5 +40,7 @@ class TopicsTool(BaseTool):
                 logger.warning(f'unknown topic: {topic}')
                 continue
             logger.info(f'appending doc for topic: {topic}')
-            self._heymans.documentation.append(
-                Path(config.topic_sources[topic]).read_text())
+            doc = Document(
+                page_content=Path(config.topic_sources[topic]).read_text())
+            doc.metadata['important'] = True
+            self._heymans.documentation.append(doc)

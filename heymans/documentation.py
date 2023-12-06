@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -16,33 +17,43 @@ class Documentation:
         
     def __str__(self):
         return '\n\n'.join(
-            f"<document>{doc}</document>\n" for doc in self._documents)
+            f"<document>{doc.page_content}</document>\n" for doc in self._documents)
+        
+    def to_json(self):
+        return json.dumps([{'page_content': doc.page_content,
+                            'url': doc.metadata.get('url', None)}
+                           for doc in self])
         
     def __iter__(self):
         return (doc for doc in self._documents)
     
     def __len__(self):
-        return sum(len(doc) for doc in self._documents)
+        return sum(len(doc.page_content) for doc in self._documents)
         
     def __contains__(self, doc):
         return doc in self._documents
     
     def append(self, doc):
-        if doc not in self._documents:
-            self._documents.append(doc)
+        if any(doc.page_content == d.page_content for d in self):
+            return
+        self._documents.append(doc)
             
     def strip_irrelevant(self, question):
-        prompts = [prompt.render(prompt.JUDGE_RELEVANCE, documentation=doc,
+        important = [doc for doc in self
+                     if doc.metadata.get('important', False)]
+        optional = [doc for doc in self
+                    if not doc.metadata.get('important', False)]
+        prompts = [prompt.render(prompt.JUDGE_RELEVANCE,
+                                 documentation=doc.page_content,
                                  question=question)
-                   for doc in self]
+                   for doc in optional]
         replies = self._heymans.condense_model.predict_multiple(prompts)
-        relevant = []
-        for reply, doc in zip(replies, self):
+        for reply, doc in zip(replies, optional):
             if not reply.lower().startswith('no'):
-                relevant.append(doc)
+                important.append(doc)
             else:
                 logger.info(f'stripping irrelevant documentation')
-        self._documents = relevant
+        self._documents = important
         if not self._documents:
             logger.info(f'adding placeholder docs')
             self._documents = ['No relevant documentation was found']
@@ -65,7 +76,7 @@ class BaseDocumentationSource:
     
     def search(self, queries):
         pass
-    
+
     
 class FAISSDocumentationSource(BaseDocumentationSource):
     
@@ -86,31 +97,6 @@ class FAISSDocumentationSource(BaseDocumentationSource):
                         doc.page_content not in docs:
                     logger.info(
                         f'Retrieving {doc.metadata["url"]} (length={len(doc.page_content)})')
-                    docs.append(doc.page_content)
+                    docs.append(doc)
                     break
         return docs
-    
-    
-class OpenSesameDocumentationSource(BaseDocumentationSource):
-    
-    def __init__(self, heymans):
-        super().__init__(heymans)
-        self._py_doc = Path('sources/py/opensesame.py').read_text()
-        self._js_doc = Path('sources/js/opensesame.js').read_text()
-        self._py_keywords = ['opensesame', 'inline_script', 'python', 'canvas',
-            'keyboard', 'mouse', 'sampler', 'synth', 'sequence', 'loop',
-            'variable', 'experiment', 'stimulus', 'display', 'task',
-            'paradigm', 'run if', 'run-if', 'show if', 'show-if']
-        self._js_keywords = ['osweb', 'javascript', 'online', 'browser',
-            'inline_javascript', 'firefox', 'safari']
-
-    def search(self, queries):
-        queries = ''.join(queries).lower()
-        if any(keyword in queries 
-               for keyword in self._py_keywords + self._js_keywords):
-            if any(keyword in queries for keyword in self._js_keywords):
-                logger.info('retrieving general osweb documentation')
-                return [self._js_doc]
-            logger.info('retrieving general opensesame documentation')
-            return [self._py_doc]
-        return []

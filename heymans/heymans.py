@@ -1,8 +1,7 @@
 import logging
 import jinja2
 from . import config, library
-from .documentation import Documentation, OpenSesameDocumentationSource, \
-    FAISSDocumentationSource
+from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
 from .tools import TopicsTool, SearchTool
@@ -37,9 +36,9 @@ class Heymans:
             self._run_tools(message, reply)
             self.documentation.strip_irrelevant(message)
         self.messages.append('assistant', reply)
-        documentation = str(self.documentation)
+        sources = self.documentation.to_json()
         self.documentation.clear()
-        return reply, documentation
+        return reply, sources
 
     def _run_tools(self, message, reply):
         if not isinstance(reply, dict):
