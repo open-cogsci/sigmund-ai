@@ -14,18 +14,11 @@ class Messages:
     
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
-        self._condensed_text = None
-        metadata = self._metadata()
-        metadata['search_model'] = 'Welcome message'
-        self._message_history = [('assistant', self.welcome_message(), 
-                                  metadata)]
-        self._condensed_message_history = [
-            (role, content) for role, content, metadata
-            in self._message_history[:]]
         self._session_path = Path(f'sessions/{heymans.user_id}.json')
         self._persistent = persistent
+        self.clear()
         if self._persistent:
-            self._load()
+            self.load()
         
     def __len__(self):
         return len(self._message_history)
@@ -34,7 +27,17 @@ class Messages:
         for msg in self._message_history:
             yield msg
             
-    def _metadata(self):
+    def clear(self):
+        self._condensed_text = None
+        metadata = self.metadata()
+        metadata['search_model'] = 'Welcome message'
+        self._message_history = [('assistant', self.welcome_message(), 
+                                  metadata)]
+        self._condensed_message_history = [
+            (role, content) for role, content, metadata
+            in self._message_history[:]]        
+            
+    def metadata(self):
         return {'timestamp': time.strftime('%a %d %b %Y %H:%M'),
                 'sources': self._heymans.documentation.to_json(),
                 'search_model': config.search_model,
@@ -42,12 +45,12 @@ class Messages:
                 'answer_model': config.answer_model}
         
     def append(self, role, message):
-        metadata = self._metadata()
+        metadata = self.metadata()
         self._message_history.append((role, message, metadata))
         self._condensed_message_history.append((role, message))
         self._condense_message_history()
         if self._persistent:
-            self._save()
+            self.save()
         return metadata
     
     def prompt(self):
@@ -105,7 +108,7 @@ class Messages:
                 summary=self._condensed_text)
         return system_prompt
 
-    def _load(self):
+    def load(self):
         if not self._session_path.exists():
             logger.info(f'starting new session: {self._session_path}')
             return
@@ -124,7 +127,7 @@ class Messages:
             'condensed_message_history', [])
         self._message_metadata = session.get('message_metadata', [])
     
-    def _save(self):
+    def save(self):
         session = {
             'condensed_text': self._condensed_text,
             'message_history': self._message_history,

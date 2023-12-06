@@ -42,6 +42,13 @@ def api_chat():
                     'metadata': metadata})
     
     
+def clear_message_history():
+    user_id = current_user.get_id()
+    heymans = Heymans(user_id=user_id, persistent=True)
+    heymans.messages.clear()
+    heymans.messages.save()
+    
+    
 def chat_page():
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True)
@@ -104,6 +111,11 @@ def login_failed():
 def logout():
     logout_user()
     return redirect('/login')
+
+@app.route('/clear')
+def clear():
+    clear_message_history()
+    return redirect('/chat')
 
 
 @app.route('/')

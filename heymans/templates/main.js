@@ -10,8 +10,6 @@ function globalElements(event) {
     window.chapterInput = document.getElementById('chapter');
     window.chatmodeInput = document.getElementById('chatmode');
     window.sendButton = document.getElementById('send');
-    window.restartButton = document.getElementById('restart');
-    window.reportButton = document.getElementById('report');
     window.messageInput = document.getElementById('message');
     window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
@@ -57,10 +55,6 @@ function initMain(event) {
         const message = messageInput.value;
         messageInput.value = '';
         sendMessage(message);
-    });
-    
-    reportButton.addEventListener('click', function() {
-        sendMessage('<REPORT>')
     });
 }
 
