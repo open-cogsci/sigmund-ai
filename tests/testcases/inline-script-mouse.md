@@ -4,13 +4,12 @@ The answer should:
 
 - Refer to a Python inline_script
 - Indicate that the mouse should be prepared in the prepare phase and used to collect a response in the run phase
-- In the prepare phase: Initialize a mouse with an uppercase function: `my_mouse = Mouse()`. The name of the keyboard can be anything and doesn't need to be `my_mouse`.
-- In the run phase: Collect a keyboard with `button, pos, t = my_mouse.get_click(timeout=500, visible=True)`
-- The `timeout` and `visible` parameters can also be passed during initialization: `my_mouse = Mouse(timeout=2000, visible=True)`
+- In the prepare phase: Initialize a mouse as follows: `my_mouse = Mouse()`. The name of the mouse can be anything and doesn't need to be `my_mouse`.
+- In the run phase: Collect a keyboard with `button, pos, t = my_mouse.get_click()`. The name of the variables can be anything and don't need to be `button`, `pos`, and `t`.
+- The `timeout` and `visible` should be specified either during initialization: `my_mouse = Mouse(timeout=2000, visible=True)` or when getting the click: `button, pos, t = my_mouse.get_click(timeout=2000, visible=True)`
 
 The answer should not not:
 
 - Refer to a `mouse_response` item
 - Use JavaScript
-- Initialize the mouse with a lowercase function
-- Pass `exp` as argument when initializing the mouse
+- Pass `exp` as argument when initializing the mouse, although other arguments may be passed as explained above

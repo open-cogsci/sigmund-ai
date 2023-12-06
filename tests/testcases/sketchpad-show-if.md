@@ -7,6 +7,6 @@ The answer should:
 
 The answer should * not*:
 
-- Refer to Python inline_script or contain other Python code
-- Refer to JavaScript inline_javascript or contain other JavaScript code
+- Refer to Python inline_script or contain other Python code, although markdown code blocks are allowed
+- Refer to JavaScript inline_javascript or contain other JavaScript code, although markdown code blocks are allowed
 - Refer to a run-if expression or use multiple sketchpads

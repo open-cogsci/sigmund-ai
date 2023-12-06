@@ -1,5 +1,6 @@
 from pathlib import Path
 import sys
+import statistics
 sys.path.append(str(Path(__file__).parent.parent))
 from heymans import config
 from heymans.heymans import Heymans
@@ -43,41 +44,56 @@ def read_testcases():
     return output
 
 
-def score_testcase(heymans, validation_model, description, question,
-                   requirements):
-    chat_history = {'messages': [{"role": "user", "content": question}]}
-    answer, documentation = heymans.send_user_message(question)
-    validation_response = validation_model.predict(
-        VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
-    logger.info('Question:')
-    logger.info(question)
-    logger.info('Answer:')
-    logger.info(answer)
-    logger.info('Validation response:')
-    logger.info(validation_response)
-    score = float(validation_response.lower().split('score:')[-1].strip(' .')[0])
-    with testlog.open('a') as fd:
-        fd.write(f'*********\n\n# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n\n{validation_response}\n\n')
-    return score
+def score_testcase(description, question, requirements, n=3):
+    heymans = Heymans(user_id='pytest')
+    validation_model = GPT4Model(heymans)
+    scores = []
+    for i in range(n):
+        answer, documentation = heymans.send_user_message(question)
+        while True:
+            validation_response = validation_model.predict(
+                VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
+            logger.info('Question:')
+            logger.info(question)
+            logger.info('Answer:')
+            logger.info(answer)
+            logger.info('Validation response:')
+            logger.info(validation_response)
+            try:
+                score = float(validation_response.lower().split('score:')[-1].strip(' .')[0])
+            except Exception as e:
+                logger.warning(f'failed to parse validation answer: {e}')
+            else:
+                break
+        scores.append(score)
+        with testlog.open('a') as fd:
+            fd.write(f'*********\n\n# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n\n{validation_response}\n\n')
+    return scores
 
 
 def score_testcases(select_cases=None):
-    heymans = Heymans(user_id='pytest')
-    validation_model = GPT4Model(heymans)
     results = []
     for description, testcase in read_testcases().items():
         if select_cases is not None and description not in select_cases:
             results.append((None, description))
             continue
-        score = score_testcase(heymans, validation_model, description, **testcase)
-        results.append((score, description))
-    for score, description in results:
-        if score is None:
-            print(f'SKIP: testing {description}')
-        elif score < 3:
-            print(f'FAIL: testing {description}, score: {score}')
-        else:
-            print(f'PASS: testing {description}, score: {score}')
+        scores = score_testcase(description, **testcase)
+        results.append((scores, description))
+    with testlog.open('a') as fd:
+        fd.write('\n\nSummary:\n')
+        for scores, description in results:
+            if scores is None:
+                score = None
+            else:
+                score = statistics.mean(scores)
+            if score is None:
+                s = f'SKIP: testing {description}'
+            elif score < 3:
+                s = f'FAIL: testing {description}, score: {score} ({scores})'
+            else:
+                s = f'PASS: testing {description}, score: {score} ({scores})'
+            print(s)
+            fd.write(s + '\n')
             
             
 def test_gpt4():
@@ -100,6 +116,6 @@ def test_claude21():
 
 if __name__ == '__main__':
     import logging; logging.basicConfig(level=logging.INFO, force=True)
+    test_claude21()
+    test_gpt35()
     test_gpt4()
-    # test_gpt35()
-    # test_claude21()
