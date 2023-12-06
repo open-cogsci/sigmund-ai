@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
@@ -36,8 +35,7 @@ class Documentation:
         prompts = [prompt.render(prompt.JUDGE_RELEVANCE, documentation=doc,
                                  question=question)
                    for doc in self]
-        replies = [self._heymans.condense_model.predict(prompt)
-                   for prompt in prompts]
+        replies = self._heymans.condense_model.predict_multiple(prompts)
         relevant = []
         for reply, doc in zip(replies, self):
             if not reply.lower().startswith('no'):
@@ -45,6 +43,9 @@ class Documentation:
             else:
                 logger.info(f'stripping irrelevant documentation')
         self._documents = relevant
+        if not self._documents:
+            logger.info(f'adding placeholder docs')
+            self._documents = ['No relevant documentation was found']
     
     def clear(self):
         logger.info('clearing documentation')

@@ -29,7 +29,6 @@ def load_user(user_id):
     return User(user_id)
 login_manager.init_app(app)
 
-
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     data = request.get_json()

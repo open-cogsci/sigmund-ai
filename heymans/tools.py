@@ -17,6 +17,9 @@ class BaseTool:
 class SearchTool(BaseTool):
     
     def use(self, message, args):
+        if len(self._heymans.documentation) == 0:
+            logger.info('no topics were added, so skipping search')
+            return
         if not isinstance(args, list):
             logger.warning(f'search tool expects a list, not {args}')
             args = [message]

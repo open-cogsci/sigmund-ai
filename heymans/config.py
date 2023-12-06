@@ -19,7 +19,7 @@ visited_link_color = '#0288d1'
 flask_port = 5000
 server_url = 'http://127.0.0.1:5000'
 flask_host = '0.0.0.0'
-flask_secret_key = os.environ['FLASK_SECRET_KEY']
+flask_secret_key = os.environ.get('FLASK_SECRET_KEY', None)
 
 max_prompt_length = 20000
 condense_chunk_length = 10000

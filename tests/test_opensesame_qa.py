@@ -46,7 +46,7 @@ def read_testcases():
 def score_testcase(heymans, validation_model, description, question,
                    requirements):
     chat_history = {'messages': [{"role": "user", "content": question}]}
-    answer = heymans.send_user_message(question)
+    answer, documentation = heymans.send_user_message(question)
     validation_response = validation_model.predict(
         VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
     logger.info('Question:')

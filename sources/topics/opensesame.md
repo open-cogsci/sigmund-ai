@@ -2,6 +2,7 @@
 
 - Your knowledge of OpenSesame is outdated. Therefore, strictly follow this documentation.
 - Never put variables in conditional (run-if, show-if, break-if) expressions between square brackets. Use Python syntax instead. Correct: `variable_name == 1` Incorrect: `[variable_name] = 1`
+- Never use `new` to create `Canvas` objects in JavaScript.
 
 # Instructions for OpenSesame
 
