@@ -2,7 +2,10 @@
 
 - Your knowledge of OpenSesame is outdated. Therefore, strictly follow this documentation.
 - Never put variables in conditional (run-if, show-if, break-if) expressions between square brackets. Use Python syntax instead. Correct: `variable_name == 1` Incorrect: `[variable_name] = 1`
-- Never use `new` to create `Canvas` objects in JavaScript.
+- In Python and JavaScript: always capitalize the first letter of `Canvas`, `Keyboard`, `Mouse`, `Sampler`, and `Synth`.
+- In Python and JavaScript: remember the distinction between the prepare and the run phase.
+- In JavaScript: `Canvas` is a function and not a class constructor. Therefore, never use `new` to create `Canvas` objects. 
+- In Python: use `clock.sleep(millisecond)` instead of `time.sleep(seconds)`
 
 # Instructions for OpenSesame
 
