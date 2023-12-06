@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
+from langchain_core.documents import Document
 import logging
 from . import config
 from . import prompt
@@ -56,7 +57,8 @@ class Documentation:
         self._documents = important
         if not self._documents:
             logger.info(f'adding placeholder docs')
-            self._documents = ['No relevant documentation was found']
+            self._documents = [
+                Document(page_content='No relevant documentation was found')]
     
     def clear(self):
         logger.info('clearing documentation')

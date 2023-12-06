@@ -151,16 +151,25 @@ async function sendMessage(message) {
         } else if (data.response.includes('<REPORTED>')) {
             document.getElementsByTagName('body')[0].classList.add('body-reported');
         }
+        // Parse the JSON string to an object
+        const metadata = data.metadata
+        // Create a div for timestamp
+        const timestampDiv = document.createElement('div');
+        timestampDiv.className = 'message-timestamp';
+        timestampDiv.innerHTML = metadata['timestamp'];
+        aiMessage.appendChild(timestampDiv);
+        // Create a div for timestamp
+        const answerModelDiv = document.createElement('div');
+        answerModelDiv.className = 'message-answer-model';
+        answerModelDiv.innerHTML = metadata['answer_model'];
+        aiMessage.appendChild(answerModelDiv);
         // Create a div for sources
         const sourcesDiv = document.createElement('div');
+        const sources = JSON.parse(metadata.sources)
         sourcesDiv.className = 'message-sources';
-        
-        // Parse the JSON string to an object
-        const sources = JSON.parse(data.sources);
-        console.log(sources);
-        
         // Iterate over the sources and create clickable links for non-null sources
         // Flag to track if there are any valid sources
+        console.log(metadata['sources']);
         let hasValidSources = false;
         sources.forEach(sourceObj => {
             if (sourceObj.url) {

@@ -1,5 +1,6 @@
 import random
 import markdown
+import json
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, jsonify, Response, render_template, \
@@ -36,23 +37,45 @@ def api_chat():
     session_id = data.get('session_id', 'default')
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True)
-    reply, sources = heymans.send_user_message(message)
+    reply, metadata = heymans.send_user_message(message)
     return jsonify({'response': utils.md(f'{config.ai_name}: {reply}'),
-                    'sources': sources})
+                    'metadata': metadata})
     
     
 def chat_page():
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True)
     html = ''
-    for role, message in heymans.messages:
+    previous_timestamp = None
+    previous_answer_model = None
+    for role, message, metadata in heymans.messages:
         if role == 'assistant':
             html_body = utils.md(f'{config.ai_name}: {message}')
             html_class = 'message-ai'
         else:
-            html_body = utils.clean(f'You: {message}')
+            html_body = '<p>' + utils.clean(f'You: {message}') + '</p>'
             html_class = 'message-user'
-        html += f'<div class="{html_class}">{html_body}</div>'
+        if 'sources' in metadata:
+            sources_div = '<div class="message-sources">'
+            sources = json.loads(metadata['sources'])
+            for source in sources:
+                if source['url']:
+                    sources_div += f'<a href="{source["url"]}">{source["url"]}</a><br />'
+            sources_div += '</div>'
+        else:
+            sources_div = ''
+        if previous_timestamp != metadata['timestamp']:
+            previous_timestamp = metadata['timestamp']
+            timestamp_div = f'<div class="message-timestamp">{metadata["timestamp"]}</div>'
+        else:
+            timestamp_div = ''
+        if role == 'assistant' and previous_answer_model != metadata['answer_model']:
+            previous_answer_model = metadata['answer_model']
+            answer_model_div = f'<div class="message-answer-model">{metadata["answer_model"]}</div>'
+        else:
+            answer_model_div = ''
+            
+        html += f'<div class="{html_class}">{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
     return utils.render('chat.html', message_history=html)
 
 

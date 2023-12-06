@@ -1,5 +1,7 @@
 import logging
 import json
+import zlib
+import time
 from pathlib import Path
 from .model import model
 from . import prompt
@@ -8,15 +10,18 @@ from langchain.schema import HumanMessage, AIMessage, SystemMessage
 logger = logging.getLogger('heymans')
 
 
-
-
 class Messages:
     
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
         self._condensed_text = None
-        self._message_history = [('assistant', self.welcome_message())]
-        self._condensed_message_history = self._message_history[:]
+        metadata = self._metadata()
+        metadata['search_model'] = 'Welcome message'
+        self._message_history = [('assistant', self.welcome_message(), 
+                                  metadata)]
+        self._condensed_message_history = [
+            (role, content) for role, content, metadata
+            in self._message_history[:]]
         self._session_path = Path(f'sessions/{heymans.user_id}.json')
         self._persistent = persistent
         if self._persistent:
@@ -28,14 +33,23 @@ class Messages:
     def __iter__(self):
         for msg in self._message_history:
             yield msg
+            
+    def _metadata(self):
+        return {'timestamp': time.strftime('%a %d %b %Y %H:%M'),
+                'sources': self._heymans.documentation.to_json(),
+                'search_model': config.search_model,
+                'condense_model': config.condense_model,
+                'answer_model': config.answer_model}
         
     def append(self, role, message):
-        self._message_history.append((role, message))
+        metadata = self._metadata()
+        self._message_history.append((role, message, metadata))
         self._condensed_message_history.append((role, message))
         self._condense_message_history()
         if self._persistent:
             self._save()
-        
+        return metadata
+    
     def prompt(self):
         prompt = [SystemMessage(content=self._system_prompt())]
         for role, content in self._condensed_message_history:
@@ -108,12 +122,18 @@ class Messages:
         self._message_history = session.get('message_history', [])
         self._condensed_message_history = session.get(
             'condensed_message_history', [])
+        self._message_metadata = session.get('message_metadata', [])
     
     def _save(self):
         session = {
             'condensed_text': self._condensed_text,
             'message_history': self._message_history,
-            'condensed_message_history': self._condensed_message_history
+            'condensed_message_history': self._condensed_message_history,
         }
         logger.info(f'saving session file: {self._session_path}')
         self._session_path.write_text(json.dumps(session))
+
+
+def adler32(data):
+    """Compute the Adler32 checksum of the file specified by `path`."""
+    return zlib.adler32(data.encode('utf-8')) & 0xffffffff

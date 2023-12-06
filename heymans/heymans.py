@@ -35,10 +35,9 @@ class Heymans:
             logger.info(f'tool action: {reply}')
             self._run_tools(message, reply)
             self.documentation.strip_irrelevant(message)
-        self.messages.append('assistant', reply)
-        sources = self.documentation.to_json()
+        metadata = self.messages.append('assistant', reply)
         self.documentation.clear()
-        return reply, sources
+        return reply, metadata
 
     def _run_tools(self, message, reply):
         if not isinstance(reply, dict):

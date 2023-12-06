@@ -106,13 +106,6 @@ a:visited {
     padding: 10px;
 }
 
-.message-sources {
-    color: gray;
-    font-size: 0.7em;
-    font-family: 'Roboto Condensed';
-    margin-top: 10px;
-}
-
 #message-box {
     display: flex;
     justify-content: space-between;
@@ -246,5 +239,11 @@ button#start {
     margin-bottom: -10px;
 }
 
-#message-sources {
+.message-timestamp,
+.message-answer-model,
+.message-sources {
+    font-family: "Roboto Condensed";
+    font-size: 0.6em;
+    text-align: right;
+    color: #90A4AE;
 }
