@@ -31,18 +31,15 @@ def init_testlog():
 
 
 def read_testcases():
-    md_content = Path('tests/testcases.md').read_text()
-    test_case_pattern = re.compile(r'# (.*)\n')
-    test_cases = test_case_pattern.split(md_content)[1:]
     output = {}
-    for i in range(0, len(test_cases), 2):
-        title = test_cases[i]
-        body = test_cases[i+1]
-        question, requirements = re.split(r'The answer should:', body)
-        output[title] = {
+    for path in Path('tests/testcases').glob('*.md'):
+        test_case = path.read_text()
+        question, requirements = test_case.split('\n', 1)
+        output[path.name] = {
             'question': question.strip(),
-            'requirements': 'The answer should:' + requirements.strip(),
+            'requirements': requirements.strip()
         }
+    logger.info(f'read {len(output)} testcases')
     return output
 
 
@@ -52,12 +49,12 @@ def score_testcase(heymans, validation_model, description, question,
     answer = heymans.send_user_message(question)
     validation_response = validation_model.predict(
         VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
-    logger.debug('Question:')
-    logger.debug(question)
-    logger.debug('Answer:')
-    logger.debug(answer)
-    logger.debug('Validation response:')
-    logger.debug(validation_response)
+    logger.info('Question:')
+    logger.info(question)
+    logger.info('Answer:')
+    logger.info(answer)
+    logger.info('Validation response:')
+    logger.info(validation_response)
     score = float(validation_response.lower().split('score:')[-1].strip(' .')[0])
     with testlog.open('a') as fd:
         fd.write(f'*********\n\n# {description}\n\nQuestion:\n{question}\n\nAnswer:\n\n{answer}\n\nValidation response:\n\n{validation_response}\n\n')
