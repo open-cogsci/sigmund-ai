@@ -34,7 +34,17 @@ anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 search_model = 'gpt-3.5'
 condense_model = 'gpt-3.5'
 answer_model = 'gpt-4'
-welcome_message = 'Hi, my name is Sigmund. How can I help you?'
+welcome_message = 'I am your friendly OpenSesame assistant! I can help you best if you ask me specific questions that I can look up in the documentation. Would you like to learn more about how to ask me questions?'
+login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
+
+<ul>
+<li>Sigmund is better at answering questions about OpenSesame than other chatbots.</li>
+<li>Log in using your account from <a href="forum.cogsci.nl">forum.cogsci.nl</a>.</li>
+<li>All messages are encrypted so that no-one can listen in on your conversation.</li>
+</ul>
+
+Sigmund is currently in limited beta and by invitation only.
+'''
 
 
 def validate_user(username, password):
@@ -57,4 +67,5 @@ topic_sources = {
     'osweb': 'sources/topics/inline_javascript.js',
     'javascript': 'sources/topics/inline_javascript.js',
     'inline_javascript': 'sources/topics/inline_javascript.js',
+    'questions_how_to': 'sources/topics/questions-how-to.md',
 }

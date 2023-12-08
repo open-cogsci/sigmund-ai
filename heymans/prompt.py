@@ -11,7 +11,8 @@ Do not answer the user's question. Instead, request documentation by replying wi
         "python",
         "javascript",
         "inline_script",
-        "inline_javascript"
+        "inline_javascript",
+        "questions_howto"
     ],
     "search", [
         "search query 1",

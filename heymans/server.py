@@ -112,6 +112,7 @@ def logout():
     logout_user()
     return redirect('/login')
 
+
 @app.route('/clear')
 def clear():
     clear_message_history()

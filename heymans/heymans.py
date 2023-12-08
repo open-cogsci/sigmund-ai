@@ -14,10 +14,10 @@ class Heymans:
         self.user_id = user_id
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
-        self.messages = Messages(self, persistent)
         self.search_model = model(self, config.search_model)
         self.answer_model = model(self, config.answer_model)
         self.condense_model = model(self, config.condense_model)
+        self.messages = Messages(self, persistent)
         self._tools = {'topics': TopicsTool(self),
                        'search': SearchTool(self)}
     
