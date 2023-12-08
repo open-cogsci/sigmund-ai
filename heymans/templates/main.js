@@ -120,8 +120,6 @@ async function sendMessage(message) {
     // Hide the loading indicator and enable the message box when a response is received
     clearInterval(messageInterval)
     messageInput.disabled = false;
-    restartButton.disabled = false;
-    reportButton.disabled = false;
 
     if (data.error) {
         responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.'
@@ -137,7 +135,6 @@ async function sendMessage(message) {
         {
             messageBox.style.display = 'none';
             messageCounter.style.display = 'none';
-            reportButton.style.display = 'none';
         }
         responseDiv.appendChild(aiMessage);
         if (data.response.includes('<FINISHED>')) {
