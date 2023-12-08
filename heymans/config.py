@@ -63,4 +63,15 @@ encryption_salt = '0123456789ABCDF'
 
 
 def validate_user(username, password):
+    try:
+        import user_validation
+    except ImportError:
+        logger.info('no user validation script found')
+        return True
+    logger.info('using validation script')
+    global encryption_password, encryption_salt
+    encryption_password, encryption_salt = user_validation.validate(
+        username, password)
+    if encryption_password is None or encryption_salt is None:
+        return False
     return True
