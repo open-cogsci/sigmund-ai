@@ -8,18 +8,6 @@ from . import config
 logger = logging.getLogger('heymans')
 
 
-class SigmundVectorStore(FAISS):
-    
-    def similarity_search(self, query, k=4, filter=None, fetch_k=20, **kwargs):
-        if hasattr(config, 'add_context'):
-            docs = config.add_context(query)
-            k -= len(docs)
-        else:
-            docs = []
-        docs += super().similarity_search(query, k, filter, fetch_k, **kwargs)
-        return docs
-
-
 def load_library(force_reindex=False):
     db_cache = Path('.db.cache')
     src_path = Path('sources')
