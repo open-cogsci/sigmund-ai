@@ -7,6 +7,12 @@ from .model import model
 from . import prompt
 from . import config
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.fernet import Fernet
+import base64
+import os
 logger = logging.getLogger('heymans')
 
 
@@ -14,8 +20,19 @@ class Messages:
     
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
-        self._session_path = Path(f'sessions/{heymans.user_id}.json')
         self._persistent = persistent
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=config.encryption_salt.encode('utf-8'),
+            iterations=100000,
+            backend=default_backend()
+        )
+        self._encryption_key = base64.urlsafe_b64encode(kdf.derive(
+            config.encryption_password.encode('utf-8')))
+        self._session_path = Path(
+            f'sessions/{config.encryption_salt}')
+        self._fernet = Fernet(self._encryption_key)
         self.clear()
         if self._persistent:
             self.load()
@@ -114,7 +131,8 @@ class Messages:
             return
         logger.info(f'loading session file: {self._session_path}')
         try:
-            session = json.loads(self._session_path.read_text())
+            session = json.loads(self._fernet.decrypt(
+                self._session_path.read_bytes().decode('utf-8')))
         except json.JSONDecodeError:
             logger.warning(f'failed to load session file: {self._session_path}')
             return
@@ -134,9 +152,5 @@ class Messages:
             'condensed_message_history': self._condensed_message_history,
         }
         logger.info(f'saving session file: {self._session_path}')
-        self._session_path.write_text(json.dumps(session))
-
-
-def adler32(data):
-    """Compute the Adler32 checksum of the file specified by `path`."""
-    return zlib.adler32(data.encode('utf-8')) & 0xffffffff
+        self._session_path.write_bytes(
+            self._fernet.encrypt(json.dumps(session).encode('utf-8')))

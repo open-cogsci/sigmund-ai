@@ -26,7 +26,6 @@ condense_chunk_length = 10000
 
 chunk_size = 100
 chunk_throttle = .1
-max_chat_length = 8
 max_message_length = 1000
 max_source_tokens = 6000
 openai_api_key = os.environ.get('OPENAI_API_KEY', None)
@@ -34,7 +33,7 @@ anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 search_model = 'gpt-3.5'
 condense_model = 'gpt-3.5'
 answer_model = 'gpt-4'
-welcome_message = 'I am your friendly OpenSesame assistant! I can help you best if you ask me specific questions that I can look up in the documentation. Would you like to learn more about how to ask me questions?'
+welcome_message = 'I am your friendly OpenSesame assistant! I can help you best if you ask me specific questions that I can look up in the documentation. What is your name? And would you like to learn more about how to ask me questions?'
 login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 
 <ul>
@@ -46,20 +45,6 @@ login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 Sigmund is currently in limited beta and by invitation only.
 '''
 
-
-def validate_user(username, password):
-    return True
-
-
-def user_info(username):
-    return {
-        'username': username,
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'email': 'user@domain.com'
-    }
-
-
 topic_sources = {
     'opensesame': 'sources/topics/opensesame.md',
     'python': 'sources/topics/inline_script.py',
@@ -67,5 +52,15 @@ topic_sources = {
     'osweb': 'sources/topics/inline_javascript.js',
     'javascript': 'sources/topics/inline_javascript.js',
     'inline_javascript': 'sources/topics/inline_javascript.js',
-    'questions_how_to': 'sources/topics/questions-how-to.md',
+    'questions_howto': 'sources/topics/questions-how-to.md',
 }
+
+
+# In production, the password and encryption should be set to the user password
+# and salt by validate_user() 
+encryption_password = 'some password'
+encryption_salt = '0123456789ABCDF'
+
+
+def validate_user(username, password):
+    return True

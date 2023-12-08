@@ -83,6 +83,8 @@ https://127.0.0.1:5000/library
 
 ## Dependencies
 
+- anthropic
+- cryptography
 - faiss (or faiss-cpu)
 - flask
 - flask-login
