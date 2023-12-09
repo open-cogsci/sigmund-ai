@@ -58,6 +58,15 @@ topic_sources = {
 }
 
 
+def process_ai_message(msg):
+    """Allows for processing of the AI message before it is passed to Python
+    markdown. This allows for some common formatting issues to be resolved, 
+    such as the fact that the AI often forgets to put a blank line between
+    the colon and the start of the enumeration.
+    """
+    return msg.replace(':\n-', ':\n\n-')
+    
+
 # In production, the password and encryption should be set to the user password
 # and salt by validate_user() 
 encryption_password = 'some password'
@@ -65,6 +74,13 @@ encryption_salt = '0123456789ABCDF'
 
 
 def validate_user(username, password):
+    """Should validate the user. Ideally the validation is implemented in a
+    separate script called `user_validation`, which should contain a single
+    function `validate()` that takes a username and a password as argument and
+    returns an encryption password (which can simply be the password itself)
+    and an encryption salt if the user can be validated, and returns None, None
+    if the user cannot be validated.
+    """
     try:
         import user_validation
     except ImportError:

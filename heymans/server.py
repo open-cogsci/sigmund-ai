@@ -38,8 +38,10 @@ def api_chat():
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True)
     reply, metadata = heymans.send_user_message(message)
-    return jsonify({'response': utils.md(f'{config.ai_name}: {reply}'),
-                    'metadata': metadata})
+    return jsonify(
+        {'response': \
+            utils.md(f'{config.ai_name}: {config.process_ai_message(reply)}'),
+         'metadata': metadata})
     
     
 def clear_message_history():
@@ -57,7 +59,8 @@ def chat_page():
     previous_answer_model = None
     for role, message, metadata in heymans.messages:
         if role == 'assistant':
-            html_body = utils.md(f'{config.ai_name}: {message}')
+            html_body = utils.md(
+                f'{config.ai_name}: {config.process_ai_message(message)}')
             html_class = 'message-ai'
         else:
             html_body = '<p>' + utils.clean(f'You: {message}') + '</p>'
