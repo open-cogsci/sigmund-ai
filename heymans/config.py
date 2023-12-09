@@ -33,7 +33,9 @@ anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 search_model = 'gpt-3.5'
 condense_model = 'gpt-3.5'
 answer_model = 'gpt-4'
-welcome_message = 'I am your friendly OpenSesame assistant! I can help you best if you ask me specific questions that I can look up in the documentation. What is your name? And would you like to learn more about how to ask me questions?'
+welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
+
+I am best at answering questions that are specific and that I can look up in the documentation. Would you like to learn more about how to work with me?'''
 login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 
 <ul>
