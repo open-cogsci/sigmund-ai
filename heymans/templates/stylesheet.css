@@ -247,3 +247,7 @@ button#start {
     text-align: right;
     color: #90A4AE;
 }
+
+.message-answer-model {
+    display: none;
+}
