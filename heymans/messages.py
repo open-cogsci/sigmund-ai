@@ -30,8 +30,10 @@ class Messages:
         )
         self._encryption_key = base64.urlsafe_b64encode(kdf.derive(
             config.encryption_password.encode('utf-8')))
-        self._session_path = Path(
-            f'sessions/{config.encryption_salt}')
+        self._session_folder = Path('sessions')
+        if not self._session_folder.exists():
+            self._session_folder.mkdir()
+        self._session_path = self._session_folder / config.encryption_salt
         self._fernet = Fernet(self._encryption_key)
         self.clear()
         if self._persistent:
@@ -132,7 +134,7 @@ class Messages:
         logger.info(f'loading session file: {self._session_path}')
         try:
             session = json.loads(self._fernet.decrypt(
-                self._session_path.read_bytes().decode('utf-8')))
+                self._session_path.read_bytes()).decode('utf-8'))
         except json.JSONDecodeError:
             logger.warning(f'failed to load session file: {self._session_path}')
             return
