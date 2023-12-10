@@ -48,6 +48,6 @@ def load_library(force_reindex=False):
 
 
 def _extract_metadata(record, metadata):
-    metadata['url'] = record['source']
+    metadata['url'] = record.get('url', record.get('source', None))
     metadata['title'] = record['title']
     return metadata
