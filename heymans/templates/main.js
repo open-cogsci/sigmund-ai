@@ -179,7 +179,7 @@ async function sendMessage(message) {
         
         // Append the AI message div to the response div
         responseDiv.appendChild(aiMessage);
-        window.scrollT(0, document.body.scrollHeight);
+        window.scrollTo(0, document.body.scrollHeight);
     }
 }
 
