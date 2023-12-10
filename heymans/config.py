@@ -32,7 +32,7 @@ openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 search_model = 'gpt-3.5'
 condense_model = 'gpt-3.5'
-answer_model = 'claude-2.1'
+answer_model = 'gpt-4'
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
 
 I am best at answering questions that are specific and that I can look up in the documentation. Would you like to learn more about how to work with me?'''
