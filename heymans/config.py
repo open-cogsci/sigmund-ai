@@ -1,4 +1,5 @@
 import os
+from . import utils
 import logging
 logger = logging.getLogger('heymans')
 page_title = 'Sigmund AI'
@@ -28,7 +29,7 @@ chunk_throttle = .1
 
 # MESSAGES
 # The maximum length of a user message
-max_message_length = 1000
+max_message_length = 5000
 # A fixed welcome message
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
 
@@ -75,9 +76,10 @@ def process_ai_message(msg):
     """Allows for processing of the AI message before it is passed to Python
     markdown. This allows for some common formatting issues to be resolved, 
     such as the fact that the AI often forgets to put a blank line between
-    the colon and the start of the enumeration.
+    the colon and the start of the enumeration, and that fenced code blocks
+    are sometimes indented.
     """
-    return msg.replace(':\n-', ':\n\n-')
+    return utils.deindent_code_blocks(msg.replace(':\n-', ':\n\n-'))
     
 
 # In production, the password, encryption, and user id should be set by 
