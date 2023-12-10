@@ -18,7 +18,7 @@ logger = logging.getLogger('heymans')
 
 class User(UserMixin):
     def __init__(self, username):
-        self.id = config.encryption_user_id
+        self.id = username
         logger.info(f'initializing user id: {self.id}')
 
 
