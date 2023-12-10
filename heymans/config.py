@@ -67,10 +67,12 @@ def process_ai_message(msg):
     return msg.replace(':\n-', ':\n\n-')
     
 
-# In production, the password and encryption should be set to the user password
-# and salt by validate_user() 
+# In production, the password, encryption, and user id should be set by 
+# user_validation.validate_user(), which is site-specific function that 
+# connects to an authentication system.
 encryption_password = 'some password'
 encryption_salt = '0123456789ABCDF'
+encryption_user_id = 'default-user'
 
 
 def validate_user(username, password):
@@ -81,15 +83,16 @@ def validate_user(username, password):
     and an encryption salt if the user can be validated, and returns None, None
     if the user cannot be validated.
     """
+    global encryption_password, encryption_salt, encryption_user_id
     try:
         import user_validation
     except ImportError:
         logger.info('no user validation script found')
+        encryption_user_id = username
         return True
     logger.info('using validation script')
-    global encryption_password, encryption_salt
-    encryption_password, encryption_salt = user_validation.validate(
-        username, password)
+    encryption_password, encryption_salt, encryption_user_id = \
+        user_validation.validate(username, password)
     if encryption_password is None or encryption_salt is None:
         return False
     return True

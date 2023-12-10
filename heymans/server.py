@@ -13,11 +13,13 @@ import time
 from . import config
 from . import utils
 from .heymans import Heymans
+logger = logging.getLogger('heymans')
 
 
 class User(UserMixin):
     def __init__(self, username):
-        self.id = username
+        self.id = config.encryption_user_id
+        logger.info(f'initializing user id: {self.id}')
 
 
 logger = logging.getLogger('heymans')
@@ -30,6 +32,7 @@ def load_user(user_id):
     return User(user_id)
 login_manager.init_app(app)
 
+
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     data = request.get_json()
@@ -39,8 +42,8 @@ def api_chat():
     heymans = Heymans(user_id=user_id, persistent=True)
     reply, metadata = heymans.send_user_message(message)
     return jsonify(
-        {'response': \
-            utils.md(f'{config.ai_name}: {config.process_ai_message(reply)}'),
+        {'response': utils.md(
+            f'{config.ai_name}: {config.process_ai_message(reply)}'),
          'metadata': metadata})
     
     
