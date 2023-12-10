@@ -44,3 +44,15 @@ class TopicsTool(BaseTool):
                 page_content=Path(config.topic_sources[topic]).read_text())
             doc.metadata['important'] = True
             self._heymans.documentation.append(doc)
+
+
+class CodeInterpreterTool(BaseTool):
+    
+    def use(self, message, args):
+        if not isinstance(args, dict):
+            logger.warning('code-interpreter tool expects a dict, not {args}')
+            return
+        language = args.get('language', 'Python')
+        code = args.get('code', '')
+        if language and code:
+            exec(code, {})

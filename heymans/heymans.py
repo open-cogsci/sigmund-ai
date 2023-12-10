@@ -4,7 +4,7 @@ from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
-from .tools import TopicsTool, SearchTool
+from .tools import TopicsTool, SearchTool, CodeInterpreterTool
 logger = logging.getLogger('heymans')
 
 
@@ -23,7 +23,8 @@ class Heymans:
         self.condense_model = model(self, config.condense_model)
         self.messages = Messages(self, persistent)
         self._tools = {'topics': TopicsTool(self),
-                       'search': SearchTool(self)}
+                       'search': SearchTool(self),
+                       'code_interpreter': CodeInterpreterTool(self)}
     
     def send_user_message(self, message):
         self.messages.append('user', message)
@@ -39,6 +40,9 @@ class Heymans:
             logger.info(f'tool action: {reply}')
             self._run_tools(message, reply)
             self.documentation.strip_irrelevant(message)
+            if 'reply' in reply:
+                reply = reply['reply']
+                break
         metadata = self.messages.append('assistant', reply)
         self.documentation.clear()
         return reply, metadata
