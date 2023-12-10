@@ -1,63 +1,23 @@
-# Heymans AI tutor
+# Heymans/ Sigmund AI tutor
 
 Copyright 2023 Sebastiaan Mathôt
 
-This is a working prototype of an AI-based tutor that offers two chat modes:
 
-- In __practice__ mode, Heymans asks open-ended questions to students based on sections from a textbook. The AI gives feedback until the student answers the question correctly. This is intended as formative testing.
-- In __Q&A__ mode, students can ask questions, which Heymans attempts to answer based on the sources in its library.
+This is a working prototype of an AI-based chatbot that provides sensible answers based on documentation.
 
-Heymans uses OpenAI chat models and requires an OpenAI API key.
+Features:
 
+- Privacy: all messages are encrypted so that no-one can listen in on your conversation
+- Knowledge: access to OpenSesame documentation 
+- Cpntinuous conversation: the conversation is held in a continuous thread
 
-## Configuring
+Heymans uses OpenAI (gpt3.5, gpt4) and/ or Anthropic (claude 2.1) chat models and requires API keys.
 
-Download the source code and create a `config.py` in the `heymans` package folder. See `config.example.py` for a commented example.
+**Note: for the Q&A and practice bot for teaching, checkout `release/0.3.0`. The current codebase focuses on a conversational chatbot for user support.**
 
+## Configuration
 
-### Adding courses for practice mode
-
-Next, for each chapter, organize `.txt` files with sections from that chapter in the following way:
-
-```
-sources/course_code_1/1/1.1.txt
-sources/course_code_1/1/1.2.txt
-sources/course_code_1/1/1.3.txt
-...
-sources/course_code_2/2/2.1.txt
-sources/course_code_2/2/2.2.txt
-sources/course_code_2/2/2.3.txt
-```
-
-Each course also needs a template for the system prompt, which contains general instructions for the model. This should be organized as follows:
-
-```
-sources/course_code_1/prompt_template.txt
-```
-
-The prompt template is a ninja2 template that contains various placeholders that will be filled in based on the configuration and user identity. See `prompt_template.example.txt` for an example.
-
-In practice mode, for each conversation, one section is sampled at random based on the selected course and chapter.
-
-
-### Adding PDF sources
-
-You can add PDF sources to:
-
-```
-sources/pdf/
-```
-
-Each PDF source should have a human-readable name in the config file.
-
-
-### Adding JSONL sources
-
-You can also add `.jsonl` sources:
-
-```
-sources/jsonl/
-```
+See `heymans/config.py` for configutation instructions.
 
 
 ## Running
@@ -69,15 +29,10 @@ Once Heymans is properly configured, you can start the app in development mode t
 python app.py
 ```
 
-You can then open any of the end points:
+Next open:
 
 ```
 https://127.0.0.1:5000/
-https://127.0.0.1:5000/practice
-https://127.0.0.1:5000/qa
-https://127.0.0.1:5000/login
-https://127.0.0.1:5000/logout
-https://127.0.0.1:5000/library
 ```
 
 
