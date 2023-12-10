@@ -30,15 +30,17 @@ class Heymans:
         self.messages.append('user', message)
         while True:
             if len(self.documentation) == 0:
-                model = self.search_model
+                reply = self.search_model.predict(self.messages.prompt())
             else:
-                model = self.answer_model
-            reply = model.predict(self.messages.prompt())
-            if isinstance(reply, str):
-                logger.info(f'reply: {reply}')
-                break
-            logger.info(f'tool action: {reply}')
-            self._run_tools(message, reply)
+                reply = self.answer_model.predict(self.messages.prompt())
+                if isinstance(reply, str):
+                    logger.info(f'reply: {reply}')
+                    break
+            if isinstance(reply, dict):
+                logger.info(f'tool action: {reply}')
+                self._run_tools(message, reply)
+            else:
+                logger.info(f'expecting tool action but received reply')
             self.documentation.strip_irrelevant(message)
             if 'reply' in reply:
                 reply = reply['reply']
