@@ -93,6 +93,6 @@ def validate_user(username, password):
     logger.info('using validation script')
     encryption_password, encryption_salt, encryption_user_id = \
         user_validation.validate(username, password)
-    if encryption_password is None or encryption_salt is None:
+    if None in (encryption_password, encryption_salt, encryption_user_id):
         return False
     return True
