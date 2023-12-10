@@ -10,8 +10,12 @@ logger = logging.getLogger('heymans')
 
 class Heymans:
     
-    def __init__(self, user_id, persistent=False):
+    def __init__(self, user_id, persistent=False, encryption_key=None):
         self.user_id = user_id
+        self.encryption_key = encryption_key
+        if isinstance(self.encryption_key, str):
+            self.encryption_key = self.encryption_key.encode()
+        logger.info(f'user {user_id} with encryption_key {encryption_key}')
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
         self.search_model = model(self, config.search_model)

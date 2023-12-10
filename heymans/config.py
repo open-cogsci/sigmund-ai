@@ -17,6 +17,9 @@ flask_host = os.environ.get('FLASK_HOST', '0.0.0.0')
 # The secret key is used for logging in. This should be a long and arbitrary
 # string that is hard to guess. This should not be shared
 flask_secret_key = os.environ.get('FLASK_SECRET_KEY', None)
+# A secret salt that is used to encrypt the messages on disk in combination
+# with the user password
+encryption_salt = os.environ.get('HEYMANS_ENCRYPTION_SALT', '0123456789ABCDEF').encode()
 
 max_prompt_length = 20000
 condense_chunk_length = 10000
@@ -82,32 +85,14 @@ def process_ai_message(msg):
     return utils.deindent_code_blocks(msg.replace(':\n-', ':\n\n-'))
     
 
-# In production, the password, encryption, and user id should be set by 
-# user_validation.validate_user(), which is site-specific function that 
-# connects to an authentication system.
-encryption_password = 'some password'
-encryption_salt = '0123456789ABCDF'
-encryption_user_id = 'default-user'
-
-
 def validate_user(username, password):
-    """Should validate the user. Ideally the validation is implemented in a
-    separate script called `user_validation`, which should contain a single
-    function `validate()` that takes a username and a password as argument and
-    returns an encryption password (which can simply be the password itself)
-    and an encryption salt if the user can be validated, and returns None, None
-    if the user cannot be validated.
+    """user_validation.validate() should connect to an authentication system
+    that verifies the account.
     """
-    global encryption_password, encryption_salt, encryption_user_id
     try:
         import user_validation
     except ImportError:
         logger.info('no user validation script found')
-        encryption_user_id = username
         return True
     logger.info('using validation script')
-    encryption_password, encryption_salt, encryption_user_id = \
-        user_validation.validate(username, password)
-    if None in (encryption_password, encryption_salt, encryption_user_id):
-        return False
-    return True
+    return user_validation.validate(username, password)

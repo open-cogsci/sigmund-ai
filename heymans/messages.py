@@ -7,12 +7,7 @@ from .model import model
 from . import prompt
 from . import config
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
 from cryptography.fernet import Fernet
-import base64
-import os
 logger = logging.getLogger('heymans')
 
 
@@ -21,20 +16,11 @@ class Messages:
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
         self._persistent = persistent
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=config.encryption_salt.encode('utf-8'),
-            iterations=100000,
-            backend=default_backend()
-        )
-        self._encryption_key = base64.urlsafe_b64encode(kdf.derive(
-            config.encryption_password.encode('utf-8')))
         self._session_folder = Path('sessions')
         if not self._session_folder.exists():
             self._session_folder.mkdir()
         self._session_path = self._session_folder / self._heymans.user_id
-        self._fernet = Fernet(self._encryption_key)
+        self._fernet = Fernet(self._heymans.encryption_key)
         self.clear()
         if self._persistent:
             self.load()
