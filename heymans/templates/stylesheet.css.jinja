@@ -1,0 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&display=swap');
+
+body {
+    background-color: #ECEFF1;
+    font-family: "Roboto Light", sans-serif;
+}
+
+a {
+    color: {{ link_color }}
+}
+
+a:visited {
+    color: {{ visited_link_color }}
+}
+
+.body-finished {
+    background-color: {{ finished_color }}!important;
+}
+
+.body-reported {
+    background-color: {{ reported_color }}!important;
+}
+
+#container select,
+#container button,
+#container input {
+    font-family: "Roboto Light", sans-serif;
+}
+
+.codehilite pre {
+    overflow: auto;
+    line-height: 150%;
+}
+
+#message-counter,
+#footer-bar {
+    color: gray;
+    font-size: 0.7em;
+    text-align: right;
+    font-family: '{{ secondary_font }}';
+    margin-top: 5px;
+}
+
+#footer-bar a {
+    color: gray;
+}
+
+#container {
+    margin: auto;
+}
+
+#header-bar {
+    display: flex;
+    justify-content: center;
+    max-width: 599px;
+    margin: 0 auto
+}
+
+#header-logo {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: solid 1px black;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+}
+
+#container {
+    max-width: 600px;
+    /** background-color: #fff; **/
+}
+
+#container select,
+#container input[type="text"],
+#container input[type="password"] {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.message-user {
+    color: {{ user_message_color }};
+}
+
+.message-loading {
+    color: gray;
+}
+
+.message-loading,
+.message-user,
+.message-ai {
+    margin-bottom: 10px;
+}
+
+.codehilite pre {
+    padding: 10px;
+}
+
+#message-box {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    min-height: 100px;
+    position: sticky;
+    bottom: 0;
+    padding: 10px;
+    background-color: #FFFDE7;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#message-box textarea {
+    width: 85%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#message-box button {
+    width: 14%;
+    padding: 10px;
+    border: none;
+    color: #fff;
+    background-color: {{ send_button_color }};
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#message-box button:disabled {
+    background-color: #cccccc;
+}
+
+input#submit,
+button#start {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: #fff;
+    background-color: {{ start_button_color }};
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#response {
+    margin-bottom: 10px; 
+    word-wrap: break-word;
+}
+
+#start-text p,
+#response p {
+    margin: 0px;
+    margin-block-end: 10px;
+}
+
+#loading {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#start-info button {
+    width: 100%;
+}
+
+#control-box {
+    margin-bottom: 10px;
+}
+
+#control-box button {
+    font-size: 0.6em;
+    padding: 5px;
+    border: none;
+    color: black;
+    background-color: #eeeeec;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#control-box button:hover {
+    text-decoration: underline;
+}
+
+#start-text {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+#library {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#example-queries {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.example-query {
+    flex: 1 0 30%;
+    margin: 10px;
+    font-size: 0.6em;
+    padding: 10px;
+    color: black;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.example-query:hover {
+    color: #fff;
+    background-color: {{ send_button_color }};
+}
+
+#user-message {
+    border-top: solid 1px;
+    padding-top: 10px;
+    font-size: 0.6em;
+    margin-bottom: -10px;
+}
+
+.message-timestamp,
+.message-answer-model,
+.message-sources {
+    font-family: "Roboto Condensed";
+    font-size: 0.6em;
+    text-align: right;
+    color: #90A4AE;
+}
+
+.message-answer-model {
+    display: none;
+}
+
+.message-ai,
+.message-user {
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.message-ai {
+    margin-right: 10%;
+    background-color: #ffffff;
+}
+
+.message-user {
+    margin-left: 10%;
+    background-color: #FFFDE7;
+}
