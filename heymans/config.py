@@ -5,16 +5,6 @@ logger = logging.getLogger('heymans')
 page_title = 'Sigmund AI'
 ai_name = 'Sigmund'
 header_logo = 'static/sofa.png'
-primary_font = 'Poppins'
-secondary_font = 'Roboto Condensed'
-background_color = '#d7d7d7'
-user_message_color = '#00796b'
-send_button_color = '#00796b'
-start_button_color = '#00796b'
-finished_color = '#388e3c'
-reported_color = '#e64a19'
-link_color = '#0288d1'
-visited_link_color = '#0288d1'
 
 flask_port = 5000
 server_url = 'http://127.0.0.1:5000'
