@@ -1,8 +1,6 @@
-let sessionId = null;
-const api_endpoint = 'api/chat'
-
 function globalElements(event) {
-    // Generate a unique session ID
+    // Generate a unique session ID. This is not currently used because each
+    // user has one continuous conversation.
     sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
     window.responseDiv = document.getElementById('response');
     window.documentationDiv = document.getElementById('documentation');
@@ -19,6 +17,7 @@ function globalElements(event) {
     window.courseGroup = document.getElementById("courseGroup");
     window.chapterGroup = document.getElementById("chapterGroup");
     window.exampleQueries = document.getElementById("example-queries");
+    window.scrollTo(0, document.body.scrollHeight);
 }
 
 function initMain(event) {
@@ -100,11 +99,12 @@ async function sendMessage(message) {
     let messageInterval = setInterval(updateMessage, 1000);
     messageInput.disabled = true;
     sendButton.disabled = true;
+    window.scrollTo(0, document.body.scrollHeight);
 
     let res;
     let data;
     try {
-        res = await fetchWithRetry('{{ server_url }}/' + api_endpoint, {
+        res = await fetchWithRetry('{{ server_url }}/api/chat', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: requestBody(message, sessionId)
@@ -179,6 +179,7 @@ async function sendMessage(message) {
         
         // Append the AI message div to the response div
         responseDiv.appendChild(aiMessage);
+        window.scrollT(0, document.body.scrollHeight);
     }
 }
 

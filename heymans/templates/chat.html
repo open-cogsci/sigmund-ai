@@ -3,19 +3,29 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ page_title }}</title>
-        <link rel="stylesheet" href="stylesheet.css">
+        <style>{% include 'stylesheet.css.jinja' %}</style>
         <link rel="stylesheet" href="static/pygments.css">
         <link rel="icon" type="image/svg" href="static/favicon.svg">
-        <script src="main.js"></script>
+        <script>{% include 'main.js' %}</script>
     </head>
 <body>
     {% include 'header.html' %}
     <div id="container">
-        {% include 'logout.html' %}
         <div id="chat-area">
-        {% include 'chat-area.html' %}
+            <div id="response">{{ message_history | safe }}</div>
+            <div id="message-box">
+                <textarea id="message" placeholder="Enter your message"></textarea>
+                <button id="send" disabled>Send</button>
+            </div>
+            <div id="message-counter" style="text-align: right;"></div>
         </div>
-        {% include 'footer.html' %}
+        <div id="footer-bar">
+            v{{ version}}
+            // Copyright 2023 Sebastiaan Mathôt
+            // <a href='https://github.com/smathot/heymans-ai-tutor'>Open source GPL3</a>
+            // <a href="/clear">Clear message history</a>
+            // <a href="/logout">Log out</a>
+        </div>
     </div>
 </body>
 </html>

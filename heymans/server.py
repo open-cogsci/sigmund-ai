@@ -135,18 +135,3 @@ def main():
 @login_required
 def chat():
     return chat_page()
-
-
-@app.route('/library')
-def library():
-    return utils.render('library.html')
-
-
-@app.route('/main.js')
-def main_js():
-    return utils.render('main.js')
-
-    
-@app.route('/stylesheet.css')
-def stylesheet():
-    return Response(utils.render('stylesheet.css'), mimetype='text/css')
