@@ -22,14 +22,20 @@ See `heymans/config.py` for configutation instructions.
 
 ## Running
 
+First, you need to create a library index:
 
-Once Heymans is properly configured, you can start the app in development mode through:
+```
+python index_library.py
+```
+
+
+Next, you can start the app in development mode through:
 
 ```
 python app.py
 ```
 
-Next open:
+And access it (by default) through:
 
 ```
 https://127.0.0.1:5000/
