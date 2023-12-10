@@ -34,5 +34,4 @@ def render(path, **kwargs):
         login_text=config.login_text,
         max_message_length=config.max_message_length,
         version=__version__,
-        header_logo=config.header_logo,
         **kwargs)

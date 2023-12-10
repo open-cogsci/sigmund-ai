@@ -1,28 +1,35 @@
 import os
 import logging
-
 logger = logging.getLogger('heymans')
 page_title = 'Sigmund AI'
 ai_name = 'Sigmund'
-header_logo = 'static/sofa.png'
 
-flask_port = 5000
+# SERVER
+# The external server address, that is, the URL that users visit
 server_url = 'http://127.0.0.1:5000'
+# The port at which the flask server is running internally. This can be
+# different from the server URL if the app is running behind a proxy that
+# redirects
+flask_port = 5000
+# The flask host arhument where all 0s means listen to all incoming addresses
 flask_host = '0.0.0.0'
+# The secret key is used for logging in. This should be a long and arbitrary
+# string that is hard to guess. This should not be shared
 flask_secret_key = os.environ.get('FLASK_SECRET_KEY', None)
 
 max_prompt_length = 20000
 condense_chunk_length = 10000
 
+# LIBRARY INDEXING
+# The number of documents that are indexed at once and the delay after each
+# chunk. This is to avoid exceeded the rate limits of the OpenAI API
 chunk_size = 100
 chunk_throttle = .1
+
+# MESSAGES
+# The maximum length of a user message
 max_message_length = 1000
-max_source_tokens = 6000
-openai_api_key = os.environ.get('OPENAI_API_KEY', None)
-anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
-search_model = 'gpt-3.5'
-condense_model = 'gpt-3.5'
-answer_model = 'gpt-4'
+# A fixed welcome message
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
 
 I am best at answering questions that are specific and that I can look up in the documentation. Would you like to learn more about how to work with me?'''
@@ -37,6 +44,22 @@ login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 Sigmund is currently in limited beta and by invitation only.
 '''
 
+# MODELS
+# The API keys should not be shared
+openai_api_key = os.environ.get('OPENAI_API_KEY', None)
+anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
+# The search model is used to formulate search queries and evaluate whether
+# documents are relevant
+search_model = 'gpt-3.5'
+# The condense model is used to summarize message history when the conversation
+# becomes too long
+condense_model = 'gpt-3.5'
+# The answermodel generates the actual answer
+answer_model = 'gpt-4'
+
+# DOCUMENTATION
+# Topic sources are used to feed in specific chunks of documentation that are
+# relevant to a topic.
 topic_sources = {
     'opensesame': 'sources/topics/opensesame.md',
     'python': 'sources/topics/inline_script.py',
