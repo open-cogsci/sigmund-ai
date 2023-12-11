@@ -71,6 +71,8 @@ topic_sources = {
     'osweb': 'sources/topics/inline_javascript.js',
     'javascript': 'sources/topics/inline_javascript.js',
     'inline_javascript': 'sources/topics/inline_javascript.js',
+    'datamatrix': 'sources/topics/datamatrix.py',
+    'data_analysis': 'sources/topics/datamatrix.py',
     'questions_howto': 'sources/topics/questions-how-to.md',
 }
 

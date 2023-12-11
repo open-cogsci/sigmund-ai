@@ -12,6 +12,8 @@ Do not answer the user's question. Instead, request documentation by replying wi
         "javascript",
         "inline_script",
         "inline_javascript",
+        "datamatrix",
+        "data_analysis",
         "questions_howto"
     ],
     "search", [
