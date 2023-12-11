@@ -2,6 +2,7 @@ import jinja2
 import json
 import logging
 import textwrap
+import time
 from flask import render_template, render_template_string
 from datetime import datetime
 from pathlib import Path
@@ -57,3 +58,7 @@ def deindent_code_blocks(text):
         else:
             lines.append(line)
     return '\n'.join(lines)
+
+
+def current_datetime():
+    return time.strftime('%a %d %b %Y %H:%M')

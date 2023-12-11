@@ -32,6 +32,8 @@ You have retrieved the following documentation to answer the user's question:
 <documentation>
 {{ documentation }}
 </documentation>
+
+The current time and date is: {{ current_datetime }}
 '''
 
 SYSTEM_PROMPT_CONDENSED = '''

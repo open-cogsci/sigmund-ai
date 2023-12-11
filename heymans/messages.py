@@ -1,11 +1,11 @@
 import logging
 import json
 import zlib
-import time
 from pathlib import Path
 from .model import model
 from . import prompt
 from . import config
+from . import utils
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from cryptography.fernet import Fernet
 logger = logging.getLogger('heymans')
@@ -43,7 +43,7 @@ class Messages:
             in self._message_history[:]]        
             
     def metadata(self):
-        return {'timestamp': time.strftime('%a %d %b %Y %H:%M'),
+        return {'timestamp': utils.current_datetime(),
                 'sources': self._heymans.documentation.to_json(),
                 'search_model': config.search_model,
                 'condense_model': config.condense_model,
@@ -102,7 +102,8 @@ class Messages:
             logger.info('using system prompt with documentation')
             system_prompt = prompt.render(
                 prompt.SYSTEM_PROMPT_WITH_DOC,
-                documentation=str(self._heymans.documentation))
+                documentation=str(self._heymans.documentation),
+                current_datetime=utils.current_datetime())
         else:
             logger.info('using system prompt without documentation')
             system_prompt = prompt.SYSTEM_PROMPT_NO_DOC
