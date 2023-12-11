@@ -3,6 +3,7 @@ from . import config
 from pathlib import Path
 import logging
 from langchain_core.documents import Document
+import requests
 logger = logging.getLogger('heymans')
 
 
@@ -52,7 +53,35 @@ class CodeInterpreterTool(BaseTool):
         if not isinstance(args, dict):
             logger.warning('code-interpreter tool expects a dict, not {args}')
             return
-        language = args.get('language', 'Python')
+        language = args.get('language', 'python').lower()
         code = args.get('code', '')
-        if language and code:
-            exec(code, {})
+        if not language or not code:
+            return
+        result = self._execute(language, code)
+        result_msg = f'Result:\n```\n{result}\n```'
+        self._heymans.reply_extras.append(result_msg)
+        self._heymans.send_feedback_message(result_msg)
+
+    def _execute(self, language, script):
+        url = "https://emkc.org/api/v2/piston/execute"
+        language_versions = {'python': '3.10', 'r': '4.1.1'}
+        language_files = {'python': 'main.py', 'r': 'main.R'}
+        data = {
+            "language": "python",
+            "version": language_versions[language],
+            "files": [{"name": language_files[language], "content": script}],
+            "stdin": "",
+            "args": [],
+            "compile_timeout": 10000,
+            "run_timeout": 3000,
+            "compile_memory_limit": -1,
+            "run_memory_limit": -1
+        }
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            response_data = response.json()
+            result = response_data.get("run", {}).get("output", "")
+            logger.info(f'result: {result}')
+            return result
+        logger.error(f"Error: {response.status_code} with message: {response.content}")
+        return 'Failed to execute code'
