@@ -26,11 +26,39 @@ class BaseTool:
         if self.json_pattern is None:
             logger.warning(f'no JSON pattern or key defined for {self}')
             return
+        spans = []
         for match in self.json_pattern.finditer(message):
             logger.info(f'executing tool {self}')
             args = {self.as_json_value(key) : self.as_json_value(val)
                     for key, val in match.groupdict().items()}
             self.use(message, **args)
+            spans.append((match.start(), match.end()))
+        # We now loop through all spans that correspond to JSON code blocks.
+        # We find the first preceding { and succeeding } because the matching
+        # only occurs within a block, and then we remove this. The goal of this
+        # is to strip the JSON blocks from the reply.
+        if spans:
+            for span in spans[::-1]:
+                for start in range(span[0], -1, -1):
+                    ch = message[start]
+                    if ch == '{':
+                        break
+                    if not ch.isspace():
+                        start = None
+                        break
+                for end in range(span[1], len(message) + 1):
+                    ch = message[end]
+                    if ch == '}':
+                        break
+                    if not ch.isspace():
+                        start = None
+                        break
+            if start and end:
+                message = message[:start] + message[end + 1:]
+            # Remove empty JSON code blocks in case the JSON was embedded in
+            # blocks
+            message = re.sub(r'```json\s*```', '', message)
+        return message
         
     def as_json_value(self, s):
         try:

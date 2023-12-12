@@ -38,7 +38,7 @@ class Heymans:
             while len(self.documentation) == 0:
                 reply = self.search_model.predict(self.messages.prompt())
                 logger.info(f'[search state] reply: {reply}')
-                self._run_tools(reply)
+                reply = self._run_tools(reply)
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] documentation length: {len(self.documentation._documents)}')
@@ -47,7 +47,7 @@ class Heymans:
         reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'[answer state] reply: {reply}')
         metadata = self.messages.append('assistant', reply)
-        self._run_tools(reply)
+        reply = self._run_tools(reply)
         reply = '\n\n'.join([reply] + self.reply_extras)
         return reply, metadata
     
@@ -64,4 +64,5 @@ class Heymans:
     def _run_tools(self, reply):
         logger.info(f'running tools')
         for tool in self._tools.values():
-            tool.run(reply)
+            reply = tool.run(reply)
+        return reply
