@@ -20,9 +20,9 @@ class Messages:
         if not self._session_folder.exists():
             self._session_folder.mkdir()
         self._session_path = self._session_folder / self._heymans.user_id
-        self._fernet = Fernet(self._heymans.encryption_key)
         self.clear()
         if self._persistent:
+            self._fernet = Fernet(self._heymans.encryption_key)
             self.load()
         
     def __len__(self):

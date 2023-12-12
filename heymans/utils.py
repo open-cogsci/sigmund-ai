@@ -62,27 +62,3 @@ def deindent_code_blocks(text):
 
 def current_datetime():
     return time.strftime('%a %d %b %Y %H:%M')
-
-
-def extract_embedded_json(message):
-    lines = message.strip().splitlines()
-    json_string = ""
-    # Iterate over the lines in reverse to find where the JSON starts
-    for i in range(len(lines) - 1, -1, -1):
-        line = lines[i].strip()
-        if line == '```':
-            continue
-        json_string = line + json_string
-        try:
-            json_data = json.loads(json_string)
-        except json.JSONDecodeError:
-            continue
-        break
-    else:
-        # No JSON was found
-        return message, None
-    # JSON was found
-    # Remove the opening backticks if any
-    if lines[i - 1].startswith('```'):
-        i -= 1
-    return '\n'.join(lines[:i]), json_data

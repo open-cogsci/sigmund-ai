@@ -25,7 +25,7 @@ class BaseModel:
         dt = time.time() - t0
         msg_len = sum([len(m.content) for m in messages])
         logger.info(f'predicting {len(reply) + msg_len} took {dt} s')
-        return utils.extract_embedded_json(reply)
+        return reply
     
     def predict_multiple(self, prompts):
         """Predicts multiple simple (non-message history) prompts using asyncio

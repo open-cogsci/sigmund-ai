@@ -10,8 +10,10 @@ logger = logging.getLogger('heymans')
 
 class Heymans:
     
-    def __init__(self, user_id, persistent=False, encryption_key=None):
+    def __init__(self, user_id, persistent=False, encryption_key=None,
+                 search_first=True):
         self.user_id = user_id
+        self._search_first = search_first
         self.encryption_key = encryption_key
         if isinstance(self.encryption_key, str):
             self.encryption_key = self.encryption_key.encode()
@@ -31,28 +33,21 @@ class Heymans:
         self.messages.append('user', message)
         # Documentation search. This state continues until a tool action has
         # been replied.
-        self.documentation.clear()
-        while True:
-            reply, json_data = self.search_model.predict(
-                self.messages.prompt())
-            logger.info(f'[search state] reply: {reply}')
-            logger.info(f'[search state] tool action: {json_data}')
-            if isinstance(json_data, dict):
-                break
-            logger.info('[search state] invalid tool action, retrying')
-        self._run_tools(message, json_data)
+        if self._search_first:
+            self.documentation.clear()
+            while len(self.documentation) == 0:
+                reply = self.search_model.predict(self.messages.prompt())
+                logger.info(f'[search state] reply: {reply}')
+                self._run_tools(reply)
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] documentation length: {len(self.documentation._documents)}')
         # Answer. This state continues until a regular (str) reply has been
         # replied or a tool action with a reply field has been replied.
-        reply, json_data = self.answer_model.predict(
-            self.messages.prompt())
+        reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'[answer state] reply: {reply}')
         metadata = self.messages.append('assistant', reply)
-        if isinstance(json_data, dict):
-            logger.info(f'[answer state] tool action: {json_data}')
-            self._run_tools(message, json_data)
+        self._run_tools(reply)
         reply = '\n\n'.join([reply] + self.reply_extras)
         return reply, metadata
     
@@ -60,20 +55,13 @@ class Heymans:
         self.messages.append('assistant', message)
         logger.info(
             f'[feedback state] documentation length: {len(self.documentation._documents)}')
-        reply, json_data = self.answer_model.predict(
-            self.messages.prompt())
+        reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'[feedback state] reply: {reply}')
-        metadata = self.messages.append('assistant', reply)
-        if isinstance(json_data, dict):
-            logger.info(f'[feedback state] tool action: {json_data}')
-            self._run_tools(message, json_data)
+        self.messages.append('assistant', reply)
+        self._run_tools(reply)
         self.reply_extras.append(reply)
 
-    def _run_tools(self, message, reply):
-        if not isinstance(reply, dict):
-            logger.warning(f'expecting dict, not {reply}')
-            return
+    def _run_tools(self, reply):
         logger.info(f'running tools')
-        for key, value in reply.items():
-            if key in self._tools:
-                self._tools[key].use(message, value)
+        for tool in self._tools.values():
+            tool.run(reply)

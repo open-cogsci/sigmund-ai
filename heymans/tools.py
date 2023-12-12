@@ -2,6 +2,8 @@ from .model import model
 from . import config
 from pathlib import Path
 import logging
+import re
+import json
 from langchain_core.documents import Document
 import requests
 logger = logging.getLogger('heymans')
@@ -9,34 +11,50 @@ logger = logging.getLogger('heymans')
 
 class BaseTool:
     
+    json_pattern = None
+    
     def __init__(self, heymans):
+        self.json_pattern = re.compile(self.json_pattern,
+                                       re.VERBOSE | re.DOTALL)
         self._heymans = heymans
         
-    def use(self, message, args):
+    def use(self, message):
         pass
     
     
+    def run(self, message):
+        if self.json_pattern is None:
+            logger.warning(f'no JSON pattern or key defined for {self}')
+            return
+        for match in self.json_pattern.finditer(message):
+            logger.info(f'executing tool {self}')
+            args = {self.as_json_value(key) : self.as_json_value(val)
+                    for key, val in match.groupdict().items()}
+            self.use(message, **args)
+        
+    def as_json_value(self, s):
+        try:
+            return json.loads(s)
+        except json.JSONDecodeError:
+            return json.loads(f'"{s}"')
+    
 class SearchTool(BaseTool):
     
-    def use(self, message, args):
+    json_pattern = r'"search"\s*:\s*(?P<queries>\[\s*"(?:[^"\\]|\\.)*"(?:\s*,\s*"(?:[^"\\]|\\.)*")*\s*\])'
+    
+    def use(self, message, queries):
         if len(self._heymans.documentation) == 0:
             logger.info('no topics were added, so skipping search')
             return
-        if not isinstance(args, list):
-            logger.warning(f'search tool expects a list, not {args}')
-            args = [message]
-        else:
-            args = [message] + args
-        self._heymans.documentation.search(args)
+        self._heymans.documentation.search(queries)
 
 
 class TopicsTool(BaseTool):
     
-    def use(self, message, args):
-        if not isinstance(args, list):
-            logger.warning('topics tool expects a list, not {args}')
-            return
-        for topic in args:
+    json_pattern = r'"topics"\s*:\s*(?P<topics>\[\s*"(?:[^"\\]|\\.)*"(?:\s*,\s*"(?:[^"\\]|\\.)*")*\s*\])'
+    
+    def use(self, message, topics):
+        for topic in topics:
             if topic not in config.topic_sources:
                 logger.warning(f'unknown topic: {topic}')
                 continue
@@ -49,27 +67,22 @@ class TopicsTool(BaseTool):
 
 class CodeInterpreterTool(BaseTool):
     
-    def use(self, message, args):
-        if not isinstance(args, dict):
-            logger.warning('code-interpreter tool expects a dict, not {args}')
-            return
-        language = args.get('language', 'python').lower()
-        code = args.get('code', '')
-        if not language or not code:
-            return
-        result = self._execute(language, code)
-        result_msg = f'Result:\n```\n{result}\n```'
-        self._heymans.reply_extras.append(result_msg)
-        self._heymans.send_feedback_message(result_msg)
-
-    def _execute(self, language, script):
+    json_pattern = r"""
+\s*"execute_code"\s*:\s*\{
+\s*"language"\s*:\s*"(?P<language>.+?)"
+\s*,\s*"code"\s*:\s*"(?P<code>.+?)"
+\s*\}
+"""
+    
+    def use(self, message, language, code):
+        logger.info(f'executing {language} code: {code}')
         url = "https://emkc.org/api/v2/piston/execute"
         language_versions = {'python': '3.10', 'r': '4.1.1'}
         language_files = {'python': 'main.py', 'r': 'main.R'}
         data = {
             "language": "python",
             "version": language_versions[language],
-            "files": [{"name": language_files[language], "content": script}],
+            "files": [{"name": language_files[language], "content": code}],
             "stdin": "",
             "args": [],
             "compile_timeout": 10000,
@@ -82,6 +95,9 @@ class CodeInterpreterTool(BaseTool):
             response_data = response.json()
             result = response_data.get("run", {}).get("output", "")
             logger.info(f'result: {result}')
+            result_msg = f'Result:\n```\n{result}\n```'
+            self._heymans.reply_extras.append(result_msg)
+            self._heymans.send_feedback_message(result_msg)
             return result
         logger.error(f"Error: {response.status_code} with message: {response.content}")
         return 'Failed to execute code'
