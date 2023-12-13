@@ -6,6 +6,7 @@ import re
 import json
 from langchain_core.documents import Document
 import requests
+from typing import Optional
 logger = logging.getLogger('heymans')
 
 
@@ -19,7 +20,7 @@ class BaseTool:
                                        re.VERBOSE | re.DOTALL)
         self._heymans = heymans
         
-    def use(self, message: str) -> tuple[str | None, bool]:
+    def use(self, message: str) -> tuple[Optional[str], bool]:
         """Should be implemented in a tool with additional arguments that
         match the names of the fields from the json_pattern. 
         """
