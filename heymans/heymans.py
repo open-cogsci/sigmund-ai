@@ -4,6 +4,7 @@ from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
+from . import prompt
 from .tools import TopicsTool, SearchTool, CodeInterpreterTool
 logger = logging.getLogger('heymans')
 
@@ -13,6 +14,7 @@ class Heymans:
     def __init__(self, user_id, persistent=False, encryption_key=None,
                  search_first=True):
         self.user_id = user_id
+        self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self._search_first = search_first
         self.encryption_key = encryption_key
         if isinstance(self.encryption_key, str):
@@ -36,21 +38,21 @@ class Heymans:
         self.messages.append('user', message)
         if self._search_first:
             self._search(message)
-        self.documentation.strip_irrelevant(message)
         return self._answer()
     
     def _search(self, message):
-        # Documentation search. This state continues until a tool action has
-        # been replied.
+        self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
         self.documentation.clear()
         if self._search_first:
             reply = self.search_model.predict(self.messages.prompt())
             logger.info(f'[search state] reply: {reply}')
             self._run_tools(reply)
+        self.documentation.strip_irrelevant(message)
         logger.info(
-            f'[search state] documentation length: {len(self.documentation._documents)}')
+            f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
     
     def _answer(self, state='answer'):
+        self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'{state} state] reply: {reply}')
         metadata = self.messages.append('assistant', reply)

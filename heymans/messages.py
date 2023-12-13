@@ -98,15 +98,10 @@ class Messages:
             condense_prompt)
         
     def _system_prompt(self):
-        if len(self._heymans.documentation):
-            logger.info('using system prompt with documentation')
-            system_prompt = prompt.render(
-                prompt.SYSTEM_PROMPT_WITH_DOC,
-                documentation=str(self._heymans.documentation),
-                current_datetime=utils.current_datetime())
-        else:
-            logger.info('using system prompt without documentation')
-            system_prompt = prompt.SYSTEM_PROMPT_NO_DOC
+        system_prompt = prompt.render(
+            self._heymans.system_prompt,
+            documentation=str(self._heymans.documentation),
+            current_datetime=utils.current_datetime())
         if self._condensed_text:
             logger.info('appending condensed text to system prompt')
             system_prompt += prompt.render(

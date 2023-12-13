@@ -17,6 +17,8 @@ class Documentation:
         self._sources = sources
         
     def __str__(self):
+        if not self._documents:
+            return ''
         return '\n\n'.join(
             f"<document>{doc.page_content}</document>\n" for doc in self._documents)
         
@@ -55,10 +57,6 @@ class Documentation:
             else:
                 logger.info(f'stripping irrelevant documentation')
         self._documents = important
-        if not self._documents:
-            logger.info(f'adding placeholder docs')
-            self._documents = [
-                Document(page_content='No relevant documentation was found')]
     
     def clear(self):
         logger.info('clearing documentation')
