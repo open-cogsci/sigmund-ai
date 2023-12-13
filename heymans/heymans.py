@@ -1,5 +1,6 @@
 import logging
 import jinja2
+from typing import Tuple
 from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
@@ -76,7 +77,7 @@ class Heymans:
             for reply, metadata in self._answer(state='feedback'):
                 yield reply, metadata
 
-    def _run_tools(self, reply: str) -> tuple[str, str, bool]:
+    def _run_tools(self, reply: str) -> Tuple[str, str, bool]:
         """Runs all tools on a reply. Returns the modified reply, a string
         that concatenates all output (an empty string if no output was 
         produced) and a bool indicating whether the AI should in turn repond
