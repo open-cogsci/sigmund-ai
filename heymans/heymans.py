@@ -37,8 +37,11 @@ class Heymans:
         """
         self.messages.append('user', message)
         if self._search_first:
-            self._search(message)
-        return self._answer()
+            yield {'action': 'set_loading_indicator',
+                   'message': f'{config.ai_name} is searching '}, {}
+            yield self._search(message)
+        for reply, metadata in self._answer():
+            yield reply, metadata
     
     def _search(self, message):
         self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
@@ -50,19 +53,22 @@ class Heymans:
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
+        return {'action': 'set_loading_indicator',
+                'message': f'{config.ai_name} is thinking and typing '}, {}
     
     def _answer(self, state='answer'):
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'{state} state] reply: {reply}')
-        metadata = self.messages.append('assistant', reply)
         reply, result, needs_feedback = self._run_tools(reply)
+        metadata = self.messages.append('assistant', reply)
+        yield reply, metadata
         if result:
-            reply += '\n\n' + result
+            yield result, metadata
         if needs_feedback:
             self.messages.append('assistant', result)
-            reply += '\n\n' + self._answer(state='feedback')[0]
-        return reply, metadata
+            for reply, metadata in self._answer(state='feedback'):
+                yield reply, metadata
 
     def _run_tools(self, reply: str) -> tuple[str, str, bool]:
         """Runs all tools on a reply. Returns the modified reply, a string

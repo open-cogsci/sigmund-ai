@@ -1,7 +1,4 @@
 function globalElements(event) {
-    // Generate a unique session ID. This is not currently used because each
-    // user has one continuous conversation.
-    sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
     window.responseDiv = document.getElementById('response');
     window.documentationDiv = document.getElementById('documentation');
     window.courseInput = document.getElementById('course');
@@ -70,12 +67,6 @@ async function fetchWithRetry(url, options, retries = 3) {
 
 async function sendMessage(message) {
     console.log('user message: ' + message)
-    if (message !== "" && exampleQueries !== null) {
-        exampleQueries.style.display = 'none';
-    }
-    if (document.getElementById("user-message") !== null) {
-        document.getElementById("user-message").style.display = 'none';
-    }
     messageCounter.innerText = ''
     // Show the user's message
     if (message) {
@@ -84,8 +75,9 @@ async function sendMessage(message) {
         userMessageBox.className = 'message-user';
         responseDiv.appendChild(userMessageBox);
     }
+    // Show the loading indicator and animate it
     const loadingMessageBox = document.createElement('div');
-    let baseMessage = "{{ ai_name }} is searching, thinking, and typing ";
+    let baseMessage = "{{ ai_name }} is reading your message ";
     loadingMessageBox.id = 'loading-message';
     loadingMessageBox.className = 'message-loading';
     loadingMessageBox.innerText = baseMessage;
@@ -97,51 +89,46 @@ async function sendMessage(message) {
         loadingMessageBox.innerText = newMessage;
     }
     let messageInterval = setInterval(updateMessage, 1000);
+    // Disable the message input (will be reenabled when everything has been
+    // received) and scroll down to the pge
     messageInput.disabled = true;
     sendButton.disabled = true;
     window.scrollTo(0, document.body.scrollHeight);
-
-    let res;
-    let data;
-    try {
-        res = await fetchWithRetry('{{ server_url }}/api/chat', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: requestBody(message, sessionId)
-        });
-        console.log(res)
-        data = await res.json();
-        responseDiv.removeChild(loadingMessageBox)
-    } catch (e) {
-        responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.'
-        console.log(e)
-    }
-
-    // Hide the loading indicator and enable the message box when a response is received
-    clearInterval(messageInterval)
-    messageInput.disabled = false;
-
-    if (data.error) {
-        responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.'
-        console.log(data.error)
-    } else {
+    
+    // Start the chat streaming. We need to do this through a separate endpoint
+    // because the user message may be too long to fit into the URL that we use
+    // for streaming.
+    await fetchWithRetry('{{ server_url }}/api/chat/start', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: requestBody(message)
+    }).catch(e => {
+        console.error('Failed to start chat session:', e);
+    });    
+    // Now start streaming
+    const eventSource = new EventSource('{{ server_url }}/api/chat/stream');
+    eventSource.onmessage = function(event) {
+        // Parse the JSON message data
+        const data = JSON.parse(event.data);
+        console.log(data)
+        // If the message reflects an action, we process it separately.
+        if (typeof data.action !== 'undefined') {
+            if (data.action == 'close') {
+                clearInterval(messageInterval);
+                messageInput.disabled = false;
+                responseDiv.removeChild(loadingMessageBox);
+                eventSource.close();
+            } else if (data.action == 'set_loading_indicator') {
+                baseMessage = data.message;
+            }
+            return
+        }
+        // If the message is an actual message, we add it to the chat window
+        // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');
         aiMessage.className = 'message-ai';
         aiMessage.innerHTML = data.response;
-        console.log('ai message: ' + data.response)
-        if (data.response.includes('<FINISHED>') 
-                || data.response.includes('<REPORTED>')
-                || data.response.includes('<TOO_LONG>')) 
-        {
-            messageBox.style.display = 'none';
-            messageCounter.style.display = 'none';
-        }
         responseDiv.appendChild(aiMessage);
-        if (data.response.includes('<FINISHED>')) {
-            document.getElementsByTagName('body')[0].classList.add('body-finished');
-        } else if (data.response.includes('<REPORTED>')) {
-            document.getElementsByTagName('body')[0].classList.add('body-reported');
-        }
         // Parse the JSON string to an object
         const metadata = data.metadata
         // Create a div for timestamp
@@ -160,7 +147,7 @@ async function sendMessage(message) {
         sourcesDiv.className = 'message-sources';
         // Iterate over the sources and create clickable links for non-null sources
         // Flag to track if there are any valid sources
-        console.log(metadata['sources']);
+        // console.log(metadata['sources']);
         let hasValidSources = false;
         sources.forEach(sourceObj => {
             if (sourceObj.url) {
@@ -176,18 +163,24 @@ async function sendMessage(message) {
         if (hasValidSources) {
             aiMessage.appendChild(sourcesDiv);
         }
-        
-        // Append the AI message div to the response div
-        responseDiv.appendChild(aiMessage);
+        // Append the AI message div to the response div, just before the 
+        // loading message.
+        responseDiv.insertBefore(aiMessage, responseDiv.lastElementChild);
         window.scrollTo(0, document.body.scrollHeight);
-    }
+    };
+
+    eventSource.onerror = function(error) {
+        console.error('EventSource failed:', error);
+        eventSource.close(); // Close the connection on error
+        responseDiv.removeChild(loadingMessageBox)
+        clearInterval(messageInterval);
+        messageInput.disabled = false; // Re-enable the message input
+        responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.';
+    };
 }
 
 function requestBody(message, session_id) {
-    return JSON.stringify({
-        message: message, 
-        session_id: sessionId
-    })
+    return JSON.stringify({message: message})
 }
 
 document.addEventListener('DOMContentLoaded', globalElements)

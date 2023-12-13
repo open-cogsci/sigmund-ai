@@ -143,9 +143,7 @@ class CodeInterpreterTool(BaseTool):
             response_data = response.json()
             result = response_data.get("run", {}).get("output", "")
             logger.info(f'result: {result}')
-            result_msg = f'''---
-            
-I executed the following code:
+            result_msg = f'''I executed the following code:
 
 ```{language}
 {code}

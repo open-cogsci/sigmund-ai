@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, jsonify, Response, render_template, \
-    redirect, url_for, session
+    redirect, url_for, session, stream_with_context
 from flask_login import login_user, LoginManager, UserMixin, login_required, \
     current_user, logout_user
 from .forms import LoginForm
@@ -104,19 +104,32 @@ def login_handler(form, html):
     return utils.render(html, form=form)
     
     
-@app.route('/api/chat', methods=['POST'])
-def api_chat():
-    data = request.get_json()
-    message = data['message']
-    session_id = data.get('session_id', 'default')
+@app.route('/api/chat/start', methods=['POST'])
+def api_chat_start():
+    data = request.json
+    session['user_message'] = data.get('message', '')
+    return '{}'
+
+
+@app.route('/api/chat/stream', methods=['GET'])
+def api_chat_stream():
+    message = session['user_message']
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True,
                       encryption_key=session['encryption_key'])
-    reply, metadata = heymans.send_user_message(message)
-    return jsonify(
-        {'response': utils.md(
-            f'{config.ai_name}: {config.process_ai_message(reply)}'),
-         'metadata': metadata})
+    def generate():
+        for reply, metadata in heymans.send_user_message(message):
+            if isinstance(reply, dict):
+                reply = json.dumps(reply)
+            else:
+                reply = json.dumps(
+                    {'response': utils.md(
+                        f'{config.ai_name}: {config.process_ai_message(reply)}'),
+                     'metadata': metadata})
+            logger.debug(f'ai message: {reply}')
+            yield f'data: {reply}\n\n'
+        yield 'data: {"action": "close"}\n\n'
+    return Response(generate(), mimetype='text/event-stream')
 
 
 @app.route('/login', methods=['GET', 'POST'])
