@@ -26,7 +26,7 @@ class Heymans:
         self.answer_model = model(self, config.answer_model)
         self.condense_model = model(self, config.condense_model)
         self.messages = Messages(self, persistent)
-        self._tools = {'topics': TopicsTool(self),
+        self.tools = {'topics': TopicsTool(self),
                        'search': SearchTool(self),
                        'execute_code': CodeInterpreterTool(self)}
     
@@ -79,7 +79,7 @@ class Heymans:
         logger.info(f'running tools')
         results = []
         needs_reply = []
-        for tool in self._tools.values():
+        for tool in self.tools.values():
             reply, tool_results, tool_needs_reply = tool.run(reply)
             results += tool_results
             needs_reply.append(tool_needs_reply)

@@ -12,6 +12,7 @@ logger = logging.getLogger('heymans')
 class BaseTool:
     
     json_pattern = None
+    prompt = None
     
     def __init__(self, heymans):
         self.json_pattern = re.compile(self.json_pattern,
@@ -23,7 +24,6 @@ class BaseTool:
         match the names of the fields from the json_pattern. 
         """
         raise NotImplementedError()
-    
     
     def run(self, message: str) -> tuple[str, list, bool]:
         """Takes a message and uses the tool if the messages contains relevant
@@ -118,6 +118,16 @@ class CodeInterpreterTool(BaseTool):
 \s*,\s*"code"\s*:\s*"(?P<code>.+?)"
 \s*\}
 """
+    prompt = '''# Code execution
+
+You are also a brilliant programmer. To execute Python and R code, use JSON in the format shown below, in which case you will receive the output in the next message. Example code that is included elsewhere in your reply will not be executed.
+
+{
+    "execute_code": {
+        "language": "python",
+        "code": "print('your code here')"
+    }
+}'''
     
     def use(self, message, language, code):
         logger.info(f'executing {language} code: {code}')

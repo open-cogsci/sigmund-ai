@@ -20,7 +20,7 @@ class Documentation:
         if not self._documents:
             return ''
         return '\n\n'.join(
-            f"<document>{doc.page_content}</document>\n" for doc in self._documents)
+            f"<document>{doc.page_content}</document>" for doc in self._documents)
         
     def to_json(self):
         return json.dumps([{'page_content': doc.page_content,
@@ -35,6 +35,17 @@ class Documentation:
         
     def __contains__(self, doc):
         return doc in self._documents
+    
+    def prompt(self):
+        if not self._documents:
+            return None
+        return f'''# Documentation
+
+You have retrieved the following documentation to answer the user's question:
+
+<documentation>
+{str(self)}
+</documentation>'''
     
     def append(self, doc):
         if any(doc.page_content == d.page_content for d in self):

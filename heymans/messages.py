@@ -98,16 +98,20 @@ class Messages:
             condense_prompt)
         
     def _system_prompt(self):
-        system_prompt = prompt.render(
+        system_prompt = [prompt.render(
             self._heymans.system_prompt,
-            documentation=str(self._heymans.documentation),
-            current_datetime=utils.current_datetime())
+            current_datetime=utils.current_datetime())]
+        for tool in self._heymans.tools.values():
+            if tool.prompt:
+                system_prompt.append(tool.prompt)
+        if len(self._heymans.documentation):
+            system_prompt.append(self._heymans.documentation.prompt())
         if self._condensed_text:
             logger.info('appending condensed text to system prompt')
-            system_prompt += prompt.render(
+            system_prompt.append(prompt.render(
                 prompt.SYSTEM_PROMPT_CONDENSED,
-                summary=self._condensed_text)
-        return system_prompt
+                summary=self._condensed_text))
+        return '\n\n'.join(system_prompt)
 
     def load(self):
         if not self._session_path.exists():
