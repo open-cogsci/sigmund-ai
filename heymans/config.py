@@ -34,9 +34,11 @@ chunk_throttle = .1
 # The maximum length of a user message
 max_message_length = 5000
 # A fixed welcome message
-welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
+welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant!
 
-I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities. Would you like to learn more about how to work with me?'''
+I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, and I can look up scientific articles on Google Scholar.
+
+ What is your name? And would you like to learn more about how to work with me?'''
 login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 
 <ul>
@@ -44,6 +46,7 @@ login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 <li>Log in using your account from <a href="forum.cogsci.nl">forum.cogsci.nl</a>.</li>
 <li>All messages are encrypted so that no-one can listen in on your conversation.</li>
 <li>Basic Python and R execution abilities.</li>
+<li>Search for scientific articles.</li>
 </ul>
 
 Sigmund is currently in limited beta and by invitation only.

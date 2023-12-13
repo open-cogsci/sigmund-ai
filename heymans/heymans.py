@@ -5,7 +5,8 @@ from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
 from . import prompt
-from .tools import TopicsTool, SearchTool, CodeInterpreterTool
+from .tools import TopicsTool, SearchTool, CodeInterpreterTool, \
+    GoogleScholarTool
 logger = logging.getLogger('heymans')
 
 
@@ -26,9 +27,11 @@ class Heymans:
         self.answer_model = model(self, config.answer_model)
         self.condense_model = model(self, config.condense_model)
         self.messages = Messages(self, persistent)
-        self.tools = {'topics': TopicsTool(self),
-                       'search': SearchTool(self),
-                       'execute_code': CodeInterpreterTool(self)}
+        self.search_tools = {'topics': TopicsTool(self),
+                             'search': SearchTool(self)}
+        self.answer_tools = {'execute_code': CodeInterpreterTool(self),
+                             'search_google_scholar': GoogleScholarTool(self)}
+        self.tools = self.answer_tools
     
     def send_user_message(self, message):
         """The main function that takes a user message and returns a reply.
@@ -44,12 +47,13 @@ class Heymans:
             yield reply, metadata
     
     def _search(self, message):
-        self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
+        logger.info('[search state] entering')
         self.documentation.clear()
-        if self._search_first:
-            reply = self.search_model.predict(self.messages.prompt())
-            logger.info(f'[search state] reply: {reply}')
-            self._run_tools(reply)
+        self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
+        self.tools = self.search_tools
+        reply = self.search_model.predict(self.messages.prompt())
+        logger.info(f'[search state] reply: {reply}')
+        self._run_tools(reply)
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
@@ -57,7 +61,9 @@ class Heymans:
                 'message': f'{config.ai_name} is thinking and typing '}, {}
     
     def _answer(self, state='answer'):
+        logger.info(f'[{state} state] entering')
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
+        self.tools = self.answer_tools
         reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'{state} state] reply: {reply}')
         reply, result, needs_feedback = self._run_tools(reply)
