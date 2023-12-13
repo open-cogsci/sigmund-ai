@@ -120,7 +120,7 @@ class CodeInterpreterTool(BaseTool):
 """
     prompt = '''# Code execution
 
-You are also a brilliant programmer. To execute Python and R code, use JSON in the format shown below, in which case you will receive the output in the next message. Example code that is included elsewhere in your reply will not be executed.
+You are also a brilliant programmer. To execute Python and R code, use JSON in the format below. You will receive the output in the next message. Example code included elsewhere in your reply will not be executed. Never execute OpenSesame inline scripts.
 
 {
     "execute_code": {

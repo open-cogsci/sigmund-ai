@@ -36,7 +36,7 @@ max_message_length = 5000
 # A fixed welcome message
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! What is your name? 
 
-I am best at answering questions that are specific and that I can look up in the documentation. Would you like to learn more about how to work with me?'''
+I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities. Would you like to learn more about how to work with me?'''
 login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 
 <ul>
