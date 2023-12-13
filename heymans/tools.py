@@ -54,11 +54,11 @@ class BaseTool:
         # is to strip the JSON blocks from the reply.
         if spans:
             for span in spans[::-1]:
-                for start in range(span[0] - 1, -1, -1):
+                for start in range(span[0], -1, -1):
                     ch = message[start]
                     if ch == '{':
                         break
-                    if not ch.isspace():
+                    if start is not span[0] and not ch.isspace():
                         start = None
                         break
                 for end in range(span[1], len(message) + 1):
