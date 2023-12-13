@@ -43,6 +43,7 @@ login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
 <li>Sigmund is better at answering questions about OpenSesame than other chatbots.</li>
 <li>Log in using your account from <a href="forum.cogsci.nl">forum.cogsci.nl</a>.</li>
 <li>All messages are encrypted so that no-one can listen in on your conversation.</li>
+<li>Basic Python and R execution abilities.</li>
 </ul>
 
 Sigmund is currently in limited beta and by invitation only.
