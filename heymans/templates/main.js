@@ -1,5 +1,6 @@
 function globalElements(event) {
     window.responseDiv = document.getElementById('response');
+    window.loadingMessageDiv = document.getElementById('loading-message');
     window.documentationDiv = document.getElementById('documentation');
     window.courseInput = document.getElementById('course');
     window.chapterInput = document.getElementById('chapter');
@@ -81,7 +82,7 @@ async function sendMessage(message) {
     loadingMessageBox.id = 'loading-message';
     loadingMessageBox.className = 'message-loading';
     loadingMessageBox.innerText = baseMessage;
-    responseDiv.appendChild(loadingMessageBox);
+    loadingMessageDiv.appendChild(loadingMessageBox);
     let dotCount = 0;
     function updateMessage() {
         dotCount = (dotCount % 3) + 1;
@@ -116,7 +117,7 @@ async function sendMessage(message) {
             if (data.action == 'close') {
                 clearInterval(messageInterval);
                 messageInput.disabled = false;
-                responseDiv.removeChild(loadingMessageBox);
+                loadingMessageDiv.removeChild(loadingMessageBox);
                 eventSource.close();
             } else if (data.action == 'set_loading_indicator') {
                 baseMessage = data.message;
@@ -172,7 +173,7 @@ async function sendMessage(message) {
     eventSource.onerror = function(error) {
         console.error('EventSource failed:', error);
         eventSource.close(); // Close the connection on error
-        responseDiv.removeChild(loadingMessageBox)
+        loadingMessageDiv.removeChild(loadingMessageBox)
         clearInterval(messageInterval);
         messageInput.disabled = false; // Re-enable the message input
         responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.';
