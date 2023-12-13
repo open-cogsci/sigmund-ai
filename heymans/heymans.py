@@ -29,40 +29,50 @@ class Heymans:
                        'execute_code': CodeInterpreterTool(self)}
     
     def send_user_message(self, message):
-        self.reply_extras = []
+        """The main function that takes a user message and returns a reply.
+        The reply also has metadata which is a dict that contains information
+        about time, sources, etc.
+        """
         self.messages.append('user', message)
+        if self._search_first:
+            self._search(message)
+        self.documentation.strip_irrelevant(message)
+        return self._answer()
+    
+    def _search(self, message):
         # Documentation search. This state continues until a tool action has
         # been replied.
+        self.documentation.clear()
         if self._search_first:
-            self.documentation.clear()
-            while len(self.documentation) == 0:
-                reply = self.search_model.predict(self.messages.prompt())
-                logger.info(f'[search state] reply: {reply}')
-                reply = self._run_tools(reply)
-        self.documentation.strip_irrelevant(message)
+            reply = self.search_model.predict(self.messages.prompt())
+            logger.info(f'[search state] reply: {reply}')
+            self._run_tools(reply)
         logger.info(
             f'[search state] documentation length: {len(self.documentation._documents)}')
-        # Answer. This state continues until a regular (str) reply has been
-        # replied or a tool action with a reply field has been replied.
-        reply = self.answer_model.predict(self.messages.prompt())
-        logger.info(f'[answer state] reply: {reply}')
-        metadata = self.messages.append('assistant', reply)
-        reply = self._run_tools(reply)
-        reply = '\n\n'.join([reply] + self.reply_extras)
-        return reply, metadata
     
-    def send_feedback_message(self, message):
-        self.messages.append('assistant', message)
-        logger.info(
-            f'[feedback state] documentation length: {len(self.documentation._documents)}')
+    def _answer(self, state='answer'):
         reply = self.answer_model.predict(self.messages.prompt())
-        logger.info(f'[feedback state] reply: {reply}')
-        self.messages.append('assistant', reply)
-        self._run_tools(reply)
-        self.reply_extras.append(reply)
+        logger.info(f'{state} state] reply: {reply}')
+        metadata = self.messages.append('assistant', reply)
+        reply, result, needs_feedback = self._run_tools(reply)
+        if result:
+            reply += '\n\n' + result
+        if needs_feedback:
+            self.messages.append('assistant', result)
+            reply += '\n\n' + self._answer(state='feedback')[0]
+        return reply, metadata
 
-    def _run_tools(self, reply):
+    def _run_tools(self, reply: str) -> tuple[str, str, bool]:
+        """Runs all tools on a reply. Returns the modified reply, a string
+        that concatenates all output (an empty string if no output was 
+        produced) and a bool indicating whether the AI should in turn repond
+        to the produced output.
+        """
         logger.info(f'running tools')
+        results = []
+        needs_reply = []
         for tool in self._tools.values():
-            reply = tool.run(reply)
-        return reply
+            reply, tool_results, tool_needs_reply = tool.run(reply)
+            results += tool_results
+            needs_reply.append(tool_needs_reply)
+        return reply, '\n\n'.join(results), any(needs_reply)

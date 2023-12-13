@@ -18,20 +18,34 @@ class BaseTool:
                                        re.VERBOSE | re.DOTALL)
         self._heymans = heymans
         
-    def use(self, message):
-        pass
+    def use(self, message: str) -> tuple[str | None, bool]:
+        """Should be implemented in a tool with additional arguments that
+        match the names of the fields from the json_pattern. 
+        """
+        raise NotImplementedError()
     
     
-    def run(self, message):
-        if self.json_pattern is None:
-            logger.warning(f'no JSON pattern or key defined for {self}')
-            return
+    def run(self, message: str) -> tuple[str, list, bool]:
+        """Takes a message and uses the tool if the messages contains relevant
+        JSON instructions. Returns the updated message, which can be changed by
+        the tool notably by string the tool JSON instructions, a list of result
+        strings, and a boolean indicating whether the model should reply to the
+        result.
+        
+        Since there can be multiple instructions for one tool in a single
+        message, the result is a list, rather than a single string.
+        """
         spans = []
+        results = []
+        needs_reply = []
         for match in self.json_pattern.finditer(message):
             logger.info(f'executing tool {self}')
             args = {self.as_json_value(key) : self.as_json_value(val)
                     for key, val in match.groupdict().items()}
-            self.use(message, **args)
+            match_result, match_needs_reply = self.use(message, **args)
+            if match_result is not None:
+                results.append(match_result)
+            needs_reply.append(match_needs_reply)
             spans.append((match.start(), match.end()))
         # We now loop through all spans that correspond to JSON code blocks.
         # We find the first preceding { and succeeding } because the matching
@@ -53,19 +67,20 @@ class BaseTool:
                     if not ch.isspace():
                         start = None
                         break
-            if start and end:
-                message = message[:start] + message[end + 1:]
+                if start and end:
+                    message = message[:start] + message[end + 1:]
             # Remove empty JSON code blocks in case the JSON was embedded in
             # blocks
             message = re.sub(r'```json\s*```', '', message)
-        return message
+        return message, results, any(needs_reply)
         
     def as_json_value(self, s):
         try:
             return json.loads(s)
         except json.JSONDecodeError:
             return json.loads(f'"{s}"')
-    
+
+
 class SearchTool(BaseTool):
     
     json_pattern = r'"search"\s*:\s*(?P<queries>\[\s*"(?:[^"\\]|\\.)*"(?:\s*,\s*"(?:[^"\\]|\\.)*")*\s*\])'
@@ -73,8 +88,9 @@ class SearchTool(BaseTool):
     def use(self, message, queries):
         if len(self._heymans.documentation) == 0:
             logger.info('no topics were added, so skipping search')
-            return
-        self._heymans.documentation.search(queries)
+        else:
+            self._heymans.documentation.search(queries)
+        return None, False
 
 
 class TopicsTool(BaseTool):
@@ -91,6 +107,7 @@ class TopicsTool(BaseTool):
                 page_content=Path(config.topic_sources[topic]).read_text())
             doc.metadata['important'] = True
             self._heymans.documentation.append(doc)
+        return None, False
 
 
 class CodeInterpreterTool(BaseTool):
@@ -105,10 +122,13 @@ class CodeInterpreterTool(BaseTool):
     def use(self, message, language, code):
         logger.info(f'executing {language} code: {code}')
         url = "https://emkc.org/api/v2/piston/execute"
+        language_aliases = {'python': 'python',
+                            'r': 'r'}
+        language = language_aliases[language.lower()]
         language_versions = {'python': '3.10', 'r': '4.1.1'}
         language_files = {'python': 'main.py', 'r': 'main.R'}
         data = {
-            "language": "python",
+            "language": language,
             "version": language_versions[language],
             "files": [{"name": language_files[language], "content": code}],
             "stdin": "",
@@ -123,9 +143,19 @@ class CodeInterpreterTool(BaseTool):
             response_data = response.json()
             result = response_data.get("run", {}).get("output", "")
             logger.info(f'result: {result}')
-            result_msg = f'Result:\n```\n{result}\n```'
-            self._heymans.reply_extras.append(result_msg)
-            self._heymans.send_feedback_message(result_msg)
-            return result
+            result_msg = f'''---
+            
+I executed the following code:
+
+```{language}
+{code}
+```
+
+And got the following output:
+
+```
+{result}
+```'''
+            return result_msg, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
-        return 'Failed to execute code'
+        return 'Failed to execute code', True
