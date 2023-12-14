@@ -6,7 +6,7 @@ from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
 from . import prompt
-from .tools import TopicsTool, SearchTool, CodeInterpreterTool, \
+from .tools import TopicsTool, SearchTool, CodeExcutionTool, \
     GoogleScholarTool
 logger = logging.getLogger('heymans')
 
@@ -30,7 +30,7 @@ class Heymans:
         self.messages = Messages(self, persistent)
         self.search_tools = {'topics': TopicsTool(self),
                              'search': SearchTool(self)}
-        self.answer_tools = {'execute_code': CodeInterpreterTool(self),
+        self.answer_tools = {'execute_code': CodeExcutionTool(self),
                              'search_google_scholar': GoogleScholarTool(self)}
         self.tools = self.answer_tools
     

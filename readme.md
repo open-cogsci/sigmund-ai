@@ -58,6 +58,8 @@ https://127.0.0.1:5000/
 - pygments
 - pypdf
 - python
+- requests
+- scholarly
 - tiktoken
 
 
