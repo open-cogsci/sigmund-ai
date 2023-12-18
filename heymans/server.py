@@ -130,7 +130,8 @@ def api_chat_stream():
             logger.debug(f'ai message: {reply}')
             yield f'data: {reply}\n\n'
         yield 'data: {"action": "close"}\n\n'
-    return Response(generate(), mimetype='text/event-stream')
+    return Response(stream_with_context(generate()),
+                    mimetype='text/event-stream')
 
 
 @app.route('/login', methods=['GET', 'POST'])
