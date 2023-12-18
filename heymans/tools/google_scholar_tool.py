@@ -1,5 +1,6 @@
 from . import BaseTool
 import logging
+import json
 from scholarly import scholarly
 logger = logging.getLogger('heymans')
 
