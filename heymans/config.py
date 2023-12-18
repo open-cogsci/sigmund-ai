@@ -93,7 +93,8 @@ def process_ai_message(msg):
 
 def validate_user(username, password):
     """user_validation.validate() should connect to an authentication system
-    that verifies the account.
+    that verifies the account. Whitespace has been stripped from both the
+    username and the password. The username is converted to lowercase.
     """
     try:
         import user_validation

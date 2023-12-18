@@ -87,17 +87,18 @@ def chat_page():
 
 def login_handler(form, html):
     if form.validate_on_submit():
-        if not config.validate_user(form.username.data,
-                                    form.password.data):
+        username = form.username.data.strip().lower()
+        password = form.password.data.strip()
+        if not config.validate_user(username, password):
             return redirect('/login_failed')
         kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
                          length=32,
                          salt=config.encryption_salt,
                          iterations=100000,
                          backend=default_backend())
-        session['encryption_key'] = base64.urlsafe_b64encode(kdf.derive(
-            form.password.data.encode()))
-        user = User(form.username.data)
+        session['encryption_key'] = base64.urlsafe_b64encode(
+            kdf.derive(password.encode()))
+        user = User(username)
         login_user(user)
         logger.info(f'initializing encryption key: {session["encryption_key"]}')
         return redirect('/')
