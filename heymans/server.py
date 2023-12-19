@@ -50,7 +50,7 @@ def chat_page():
     user_id = current_user.get_id()
     heymans = Heymans(user_id=user_id, persistent=True,
                       encryption_key=session['encryption_key'])
-    html = ''
+    html_content = ''
     previous_timestamp = None
     previous_answer_model = None
     for role, message, metadata in heymans.messages:
@@ -59,7 +59,8 @@ def chat_page():
                 f'{config.ai_name}: {config.process_ai_message(message)}')
             html_class = 'message-ai'
         else:
-            html_body = '<p>' + utils.clean(f'You: {message}') + '</p>'
+            html_body = '<p>' + utils.clean(f'You: {message}', 
+                                            escape_html=True) + '</p>'
             html_class = 'message-user'
         if 'sources' in metadata:
             sources_div = '<div class="message-sources">'
@@ -81,8 +82,8 @@ def chat_page():
         else:
             answer_model_div = ''
             
-        html += f'<div class="{html_class}">{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
-    return utils.render('chat.html', message_history=html)
+        html_content += f'<div class="{html_class}">{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
+    return utils.render('chat.html', message_history=html_content)
 
 
 def login_handler(form, html):

@@ -1,5 +1,6 @@
 import jinja2
 import json
+import html
 import logging
 import textwrap
 import time
@@ -25,8 +26,11 @@ def md(text):
                                          CodeHiliteExtension()])
 
 
-def clean(text):
-    return render_template_string(text)
+def clean(text, escape_html=True):
+    text = render_template_string(text)
+    if escape_html:
+        text = html.escape(text).replace('\n', '<br>\n')
+    return text
     
 
 def render(path, **kwargs):
