@@ -39,7 +39,6 @@ def render(path, **kwargs):
         ai_name=config.ai_name,
         page_title=config.page_title,
         server_url=config.server_url,
-        login_text=config.login_text,
         max_message_length=config.max_message_length,
         version=__version__,
         **kwargs)

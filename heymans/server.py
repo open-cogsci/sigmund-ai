@@ -103,7 +103,9 @@ def login_handler(form, html):
         login_user(user)
         logger.info(f'initializing encryption key: {session["encryption_key"]}')
         return redirect('/')
-    return utils.render(html, form=form)
+    return utils.render(
+        html, form=form,
+        login_text=utils.md(Path('heymans/static/login.md').read_text()))
     
     
 @app.route('/api/chat/start', methods=['POST'])
@@ -133,6 +135,13 @@ def api_chat_stream():
         yield 'data: {"action": "close"}\n\n'
     return Response(stream_with_context(generate()),
                     mimetype='text/event-stream')
+
+
+@app.route('/about')
+def about():
+    return utils.render(
+        'about.html',
+        about_text=utils.md(Path('heymans/static/about.md').read_text()))
 
 
 @app.route('/login', methods=['GET', 'POST'])

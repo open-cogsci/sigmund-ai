@@ -49,18 +49,6 @@ welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame as
 I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, and I can look up scientific articles on Google Scholar.
 
  What is your name? And would you like to learn more about how to work with me?'''
-login_text = '''Welcome to Sigmund, your friendly OpenSesame assistant!
-
-<ul>
-<li>Sigmund is better at answering questions about OpenSesame than other chatbots.</li>
-<li>Log in using your account from <a href="forum.cogsci.nl">forum.cogsci.nl</a>.</li>
-<li>All messages are encrypted so that no-one can listen in on your conversation.</li>
-<li>Basic Python and R execution abilities.</li>
-<li>Search for scientific articles.</li>
-</ul>
-
-Sigmund is currently in limited beta and by invitation only.
-'''
 
 # MODELS
 # The API keys should not be shared
