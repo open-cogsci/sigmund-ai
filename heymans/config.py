@@ -21,7 +21,17 @@ flask_secret_key = os.environ.get('FLASK_SECRET_KEY', None)
 # with the user password
 encryption_salt = os.environ.get('HEYMANS_ENCRYPTION_SALT', '0123456789ABCDEF').encode()
 
+# FILES AND FOLDERS
+# Contains the encrypted message history
+sessions_folder = 'sessions'
+# Contains the encrypted uploads
+uploads_folder = 'uploads'
+
+# PROMPT HISTORY
+# The maximum length of a prompt in characters. If the prompt exceeds this 
+# length, the start will be summarized.
 max_prompt_length = 20000
+# The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
 # LIBRARY INDEXING

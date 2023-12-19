@@ -16,7 +16,7 @@ class Messages:
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
         self._persistent = persistent
-        self._session_folder = Path('sessions')
+        self._session_folder = Path(config.sessions_folder)
         if not self._session_folder.exists():
             self._session_folder.mkdir()
         self._session_path = self._session_folder / self._heymans.user_id
