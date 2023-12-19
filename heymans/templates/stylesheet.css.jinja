@@ -103,26 +103,37 @@ a:visited {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-#message-box textarea {
-    width: 85%;
+#message-container {
+    width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: white;
 }
 
-#message-box button {
-    width: 14%;
-    padding: 10px;
+textarea#message {
+    border: none;
+    width: 80%;
+    height: 100%;
+}
+
+textarea#message:focus {
+    outline: none;
+}
+
+button#send {
+    font-size: 1.2em;
+    float:right;
+    height:100%;
     border: none;
     color: #fff;
-    background-color: #00796b;
-    margin-left: 10px;
-    border-radius: 4px;
+    color: #00796b;
+    background: none;
     cursor: pointer;
 }
 
-#message-box button:disabled {
-    background-color: #cccccc;
+button#send:disabled {
+    color: #cccccc;
 }
 
 input#submit,
