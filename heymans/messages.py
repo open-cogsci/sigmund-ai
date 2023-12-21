@@ -9,7 +9,7 @@ from . import prompt
 from . import config
 from . import utils
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 logger = logging.getLogger('heymans')
 
 
@@ -197,8 +197,8 @@ class Messages:
         try:
             self._session = json.loads(self._fernet.decrypt(
                 self._session_path.read_bytes()).decode('utf-8'))
-        except json.JSONDecodeError:
-            logger.warning(f'failed to load session file: {self._session_path}')
+        except (json.JSONDecodeError, InvalidToken) as e:
+            logger.warning(f'failed to load session file: {self._session_path}: {e}')
             return
         if not isinstance(self._session, dict):
             logger.warning(f'session file invalid: {self._session_path}')
