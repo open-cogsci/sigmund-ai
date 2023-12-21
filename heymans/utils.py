@@ -13,6 +13,7 @@ import hashlib
 import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
+from markdown.extensions.toc import TocExtension
 from . import config
 from . import __version__
 logger = logging.getLogger('heymans')
@@ -23,7 +24,8 @@ def md(text):
         return text
     return markdown.markdown(text,
                              extensions=[FencedCodeExtension(),
-                                         CodeHiliteExtension()])
+                                         CodeHiliteExtension(),
+                                         TocExtension()])
 
 
 def clean(text, escape_html=True):
