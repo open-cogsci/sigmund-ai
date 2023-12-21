@@ -40,7 +40,8 @@ login_manager.init_app(app)
 
 def get_heymans():
     return Heymans(user_id=current_user.get_id(), persistent=True,
-                   encryption_key=session['encryption_key'])
+                   encryption_key=session['encryption_key'],
+                   search_first=session.get('search_first', True))
 
 
 def chat_page():
@@ -107,6 +108,7 @@ def login_handler(form, html):
 def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
+    session['search_first'] = data.get('search_first', True)
     return '{}'
 
 

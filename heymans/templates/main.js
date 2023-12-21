@@ -102,7 +102,7 @@ async function sendMessage(message) {
     await fetchWithRetry('{{ server_url }}/api/chat/start', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: requestBody(message)
+        body: requestBody(message, searchFirst)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
     });    
@@ -180,8 +180,8 @@ async function sendMessage(message) {
     };
 }
 
-function requestBody(message, session_id) {
-    return JSON.stringify({message: message})
+function requestBody(message, searchFirst) {
+    return JSON.stringify({message: message, search_first: searchFirst})
 }
 
 document.addEventListener('DOMContentLoaded', globalElements)

@@ -93,6 +93,7 @@
 }
 </style>
 
+{% raw %}
 <div id="app">
   <div class="menu-icon" @click="toggleMenu">☰</div>
   <div class="menu" v-bind:class="{ 'active': menuVisible }">
@@ -100,6 +101,7 @@
     <div @click="navigateTo('/conversation/new')">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/conversation/clear')">Clear conversation</div>
+    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Read documentation</div>
     <div @click="navigateTo('/logout')">Log out</div>
   </div>
   <!-- Modal for browsing conversations -->
@@ -108,7 +110,6 @@
       <div id='conversation-heading'>Conversations
         <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
       </div>
-      {% raw %}
       <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
         <span @click="activateConversation(conversation.id)" class="conversation-title">
           {{ conversation.title }}
@@ -117,27 +118,36 @@
           <i class="fas fa-trash-alt"></i>
         </span>
       </div>
-      {% endraw %}
     </div>
   </div>
 </div>
+{% endraw %}
 
 <script>
+window.searchFirst = true
 new Vue({
   el: '#app',
   data: {
     menuVisible: false,
     showModal: false,
-    conversations: {}
+    conversations: {},
+    isDocsToggled: true
   },
   computed: {
     sortedConversations() {
       return Object.entries(this.conversations)
         .map(([id, [title, timestamp]]) => ({ id, title, timestamp }))
         .sort((a, b) => b.timestamp - a.timestamp);
-    }
+    },
+    toggleDocsIcon() {
+      return this.isDocsToggled ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+    },
   },
   methods: {
+    toggleDocs: function() {
+      this.isDocsToggled = !this.isDocsToggled;
+      window.searchFirst = this.isDocsToggled
+    },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;
     },
