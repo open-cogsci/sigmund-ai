@@ -48,7 +48,9 @@ welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame as
 
 I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, and I can look up scientific articles on Google Scholar.
 
- What is your name? And would you like to learn more about how to work with me?'''
+What is your name? And would you like to learn more about how to work with me?'''
+# The default title of a new conversation
+default_conversation_title = 'New conversation'
 
 # MODELS
 # The API keys should not be shared
@@ -61,7 +63,7 @@ search_model = 'gpt-3.5'
 # becomes too long
 condense_model = 'gpt-3.5'
 # The answermodel generates the actual answer
-answer_model = 'gpt-4'
+answer_model = 'gpt-3.5'
 
 # DOCUMENTATION
 # Topic sources are used to feed in specific chunks of documentation that are

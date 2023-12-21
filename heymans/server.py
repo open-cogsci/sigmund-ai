@@ -38,18 +38,13 @@ def load_user(user_id):
 login_manager.init_app(app)
 
 
-def clear_message_history():
-    user_id = current_user.get_id()
-    heymans = Heymans(user_id=user_id, persistent=True,
-                      encryption_key=session['encryption_key'])
-    heymans.messages.clear()
-    heymans.messages.save()
-    
-    
+def get_heymans():
+    return Heymans(user_id=current_user.get_id(), persistent=True,
+                   encryption_key=session['encryption_key'])
+
+
 def chat_page():
-    user_id = current_user.get_id()
-    heymans = Heymans(user_id=user_id, persistent=True,
-                      encryption_key=session['encryption_key'])
+    heymans = get_heymans()
     html_content = ''
     previous_timestamp = None
     previous_answer_model = None
@@ -118,9 +113,7 @@ def api_chat_start():
 @app.route('/api/chat/stream', methods=['GET'])
 def api_chat_stream():
     message = session['user_message']
-    user_id = current_user.get_id()
-    heymans = Heymans(user_id=user_id, persistent=True,
-                      encryption_key=session['encryption_key'])
+    heymans = get_heymans()
     def generate():
         for reply, metadata in heymans.send_user_message(message):
             if isinstance(reply, dict):
@@ -160,12 +153,6 @@ def logout():
     return redirect('/login')
 
 
-@app.route('/clear')
-def clear():
-    clear_message_history()
-    return redirect('/chat')
-
-
 @app.route('/')
 def main():
     if current_user.is_authenticated:
@@ -176,3 +163,47 @@ def main():
 @login_required
 def chat():
     return chat_page()
+
+@app.route('/conversation/new')
+@login_required
+def new_conversation():
+    heymans = get_heymans()
+    heymans.messages.new_conversation()
+    heymans.messages.save()
+    return redirect('/chat')
+
+
+@app.route('/conversation/clear')
+@login_required
+def clear_conversation():
+    heymans = get_heymans()
+    heymans.messages.clear()
+    heymans.messages.save()
+    return redirect('/chat')
+
+
+@app.route('/conversation/activate/<conversation_id>', methods=['GET', 'POST'])
+@login_required
+def activate_conversation(conversation_id):
+    if conversation_id:
+        heymans = get_heymans()
+        heymans.messages.activate_conversation(conversation_id)
+        heymans.messages.save()
+    logger.info('redirecting to chat')
+    return redirect('/chat')
+
+
+@app.route('/conversation/list', methods=['GET', 'POST'])
+@login_required
+def list_conversations():
+    heymans = get_heymans()
+    return jsonify(heymans.messages.list_conversations())
+    
+
+@app.route('/conversation/delete/<conversation_id>', methods=['DELETE'])
+@login_required
+def delete_conversation(conversation_id):
+    heymans = get_heymans()
+    heymans.messages.delete_conversation(conversation_id)
+    heymans.messages.save()
+    return '', 204

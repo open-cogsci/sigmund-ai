@@ -42,30 +42,142 @@
 .menu div:hover {
   background-color: #e8e8e8; /* Change to your preferred hover color */
 }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal.active {
+  display: block; /* This will display the modal when the 'active' class is applied */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.delete-convo,
+.close {
+  color: #aaa;
+  float: right;
+}
+
+.delete-convo:hover,
+.delete-convo:focus,
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#conversation-heading {
+  min-height: 40px;
+}
+
+.conversation-title {
+  color: #0077cc; /* or any color you prefer */
+  cursor: pointer;
+  text-decoration: underline; /* Optional: to make it look more like a link */
+}
 </style>
 
 <div id="app">
   <div class="menu-icon" @click="toggleMenu">☰</div>
   <div class="menu" v-bind:class="{ 'active': menuVisible }">
     <div @click="navigateTo('/about')">About</div>
-    <div @click="navigateTo('/clear')">Clear message history</div>
+    <div @click="navigateTo('/conversation/new')">New conversation</div>
+    <div @click="showConversations">Browse conversations</div>
+    <div @click="navigateTo('/conversation/clear')">Clear conversation</div>
     <div @click="navigateTo('/logout')">Log out</div>
+  </div>
+  <!-- Modal for browsing conversations -->
+  <div class="modal" v-if="showModal" v-bind:class="{ 'active': showModal }">
+    <div class="modal-content">
+      <div id='conversation-heading'>Conversations
+        <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
+      </div>
+      {% raw %}
+      <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
+        <span @click="activateConversation(conversation.id)" class="conversation-title">
+          {{ conversation.title }}
+        </span>
+        <span v-if="index !== 0" class="delete-convo" @click="deleteConversation(conversation.id)">
+          <i class="fas fa-trash-alt"></i>
+        </span>
+      </div>
+      {% endraw %}
+    </div>
   </div>
 </div>
 
 <script>
-  new Vue({
-    el: '#app',
-    data: {
-      menuVisible: false,
-    },
-    methods: {
-      toggleMenu: function() {
-        this.menuVisible = !this.menuVisible;
-      },
-      navigateTo: function(path) {
-        window.location.href = path;
-      }
+new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+    showModal: false,
+    conversations: {}
+  },
+  computed: {
+    sortedConversations() {
+      return Object.entries(this.conversations)
+        .map(([id, [title, timestamp]]) => ({ id, title, timestamp }))
+        .sort((a, b) => b.timestamp - a.timestamp);
     }
-  });
+  },
+  methods: {
+    toggleMenu: function() {
+      this.menuVisible = !this.menuVisible;
+    },
+    navigateTo: function(path) {
+      window.location.href = path;
+    },
+    showConversations: function() {
+      this.fetchConversations();
+      this.showModal = true;
+      console.log('showing conversations')
+    },
+    closeModal: function() {
+      this.showModal = false;
+    },
+    fetchConversations: function() {
+      fetch('/conversation/list')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          this.conversations = data;
+        })
+        .catch(error => {
+          console.error('Error fetching conversations:', error);
+        });
+    },
+    activateConversation: function(conversationId) {
+      this.navigateTo(`/conversation/activate/${conversationId}`);
+    },
+    deleteConversation: function(conversationId) {
+      // Optimistically remove the conversation from the list
+      Vue.delete(this.conversations, conversationId);
+      // Make delete request to server
+      fetch(`/conversation/delete/${conversationId}`, { method: 'DELETE' })
+        .then(response => {
+          if (!response.ok) {
+            // If the delete failed, add it back to the list
+            this.fetchConversations();
+          }
+        });
+    }
+  }
+});
 </script>

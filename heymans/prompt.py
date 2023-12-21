@@ -53,6 +53,7 @@ Documentation:
 {{ documentation }}
 '''
 
+TITLE_PROMPT = '''Can you provide a brief title that desribes the topic of the conversation below? Reply only with the title, do not add any additional text.'''
 
 def render(tmpl, **kwargs):
     return jinja2.Template(tmpl).render(**kwargs)
