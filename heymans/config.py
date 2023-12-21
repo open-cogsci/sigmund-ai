@@ -63,7 +63,7 @@ search_model = 'gpt-3.5'
 # becomes too long
 condense_model = 'gpt-3.5'
 # The answermodel generates the actual answer
-answer_model = 'gpt-3.5'
+answer_model = 'gpt-4'
 
 # DOCUMENTATION
 # Topic sources are used to feed in specific chunks of documentation that are
