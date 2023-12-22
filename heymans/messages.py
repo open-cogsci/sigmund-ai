@@ -186,7 +186,9 @@ class Messages:
         title_prompt = [SystemMessage(content=prompt.TITLE_PROMPT)]
         title_prompt += self.prompt()[2:]
         self._conversation_title = self._heymans.condense_model.predict(
-            title_prompt).strip('"\'')[:200]
+            title_prompt).strip('"\'')
+        if len(self._conversation_title) > 100:
+            self._conversation_title = self._conversation_title[:100] + '…'
         print(f'new conversation title: {self._conversation_title}')
 
     def load(self):
