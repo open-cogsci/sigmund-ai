@@ -101,7 +101,7 @@
     <div @click="navigateTo('/conversation/new')">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/conversation/clear')">Clear conversation</div>
-    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Read documentation</div>
+    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Use documentation</div>
     <div @click="navigateTo('/logout')">Log out</div>
   </div>
   <!-- Modal for browsing conversations -->
@@ -124,14 +124,17 @@
 {% endraw %}
 
 <script>
-window.searchFirst = true
+window.searchFirst = JSON.parse(localStorage.getItem('searchFirst'));
+if (window.searchFirst === null) {
+  window.searchFirst = true;
+}
 new Vue({
   el: '#app',
   data: {
     menuVisible: false,
     showModal: false,
     conversations: {},
-    isDocsToggled: true
+    isDocsToggled: window.searchFirst
   },
   computed: {
     sortedConversations() {
@@ -146,7 +149,8 @@ new Vue({
   methods: {
     toggleDocs: function() {
       this.isDocsToggled = !this.isDocsToggled;
-      window.searchFirst = this.isDocsToggled
+      window.searchFirst = this.isDocsToggled;
+      localStorage.setItem('searchFirst', JSON.stringify(window.searchFirst));
     },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;
