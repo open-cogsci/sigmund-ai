@@ -58,21 +58,23 @@ class BaseTool:
                     ch = message[start]
                     if ch == '{':
                         break
-                    if start is not span[0] and not ch.isspace():
+                    if start is not span[0] and not ch.isspace() and ch != '"':
                         start = None
                         break
                 for end in range(span[1], len(message) + 1):
                     ch = message[end]
                     if ch == '}':
                         break
-                    if not ch.isspace():
+                    if not ch.isspace() and ch != '"':
                         start = None
                         break
                 if start is not None and end is not None:
                     message = message[:start] + message[end + 1:]
             # Remove empty JSON code blocks in case the JSON was embedded in
             # blocks
-            message = re.sub(r'```json\s*```', '', message)
+            message = re.sub(r'```json\s*```', '', message).strip()
+            if not message:
+                message = f'Running `{self.__class__.__name__}` …'
         return message, results, any(needs_reply)
         
     def as_json_value(self, s):
