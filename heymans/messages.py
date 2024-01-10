@@ -121,15 +121,26 @@ class Messages:
         return metadata
     
     def prompt(self):
-        prompt = [SystemMessage(content=self._system_prompt())]
-        for role, content in self._condensed_message_history:
+        """The prompt consists of the system prompt followed by a sequence of
+        AI and user messages. Transient messages are special messages that are
+        hidden except when they are the last message. This allows the AI to 
+        feed some information to itself to respond to without confounding the
+        rest of the conversation.
+        """
+        model_prompt = [SystemMessage(content=self._system_prompt())]
+        for i, (role, content) in enumerate(self._condensed_message_history):
+            transient = prompt.TRANSIENT_MARKER in content
+            last_message = i + 1 == len(self._condensed_message_history)
+            if transient and not last_message:
+                logger.info('hiding transient message in prompt')
+                continue
             if role == 'assistant':
-                prompt.append(AIMessage(content=content))
+                model_prompt.append(AIMessage(content=content))
             elif role == 'user':
-                prompt.append(HumanMessage(content=content))
+                model_prompt.append(HumanMessage(content=content))
             else:
                 raise ValueError(f'Invalid role: {role}')
-        return prompt
+        return model_prompt
 
     def welcome_message(self):
         return config.welcome_message

@@ -74,7 +74,7 @@ class BaseTool:
             # blocks
             message = re.sub(r'```json\s*```', '', message).strip()
             if not message:
-                message = f'Running `{self.__class__.__name__}` …'
+                message = f'Running `{self.__class__.__name__}` … <TRANSIENT>'''
         return message, results, any(needs_reply)
         
     def as_json_value(self, s):

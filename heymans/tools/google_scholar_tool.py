@@ -34,4 +34,4 @@ You are also a brilliant researcher. To search for articles on Google Scholar, u
 
 <div class='json-references'>
 {json.dumps(results)}
-</div>''', True
+</div> <TRANSIENT>''', True

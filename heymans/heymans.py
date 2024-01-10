@@ -65,15 +65,35 @@ class Heymans:
         logger.info(f'[{state} state] entering')
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self.tools = self.answer_tools
+        # We first collect a regular reply to the user message
         reply = self.answer_model.predict(self.messages.prompt())
         logger.info(f'{state} state] reply: {reply}')
+        # We then run tools based on the AI reply. This may modify the reply,
+        # mainly by stripping out any JSON commands in the reply
         reply, result, needs_feedback = self._run_tools(reply)
-        metadata = self.messages.append('assistant', reply)
-        yield reply, metadata
+        # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
+        # to indicate that it wants to perform additional actions. This makes 
+        # it easier to perform tasks consisting of multiple responses and 
+        # actions. The marker is stripped from the reply so that it's hidden
+        # from the user.
+        if prompt.NOT_DONE_YET_MARKER in reply:
+            reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
+            needs_feedback = True
+        # If there is still a non-empty reply after running the tools (i.e.
+        # stripping the JSON hasn't cleared the reply entirely, then yield and
+        # remember it.
+        if reply:
+            metadata = self.messages.append('assistant', reply)
+            yield reply, metadata
+        else:
+            metadata = self.messages.metadata()
+        # If the tools have a result, yield and remember it
         if result:
-            yield result, metadata
-        if needs_feedback:
             self.messages.append('assistant', result)
+            yield result, metadata
+        # If feedback is required, either because the tools require it or 
+        # because the AI sent a NOT_DONE_YET marker, go for another round.
+        if needs_feedback:
             for reply, metadata in self._answer(state='feedback'):
                 yield reply, metadata
 
@@ -88,6 +108,7 @@ class Heymans:
         needs_reply = []
         for tool in self.tools.values():
             reply, tool_results, tool_needs_reply = tool.run(reply)
-            results += tool_results
+            if tool_results:
+                results += tool_results
             needs_reply.append(tool_needs_reply)
         return reply, '\n\n'.join(results), any(needs_reply)

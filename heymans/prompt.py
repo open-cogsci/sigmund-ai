@@ -25,7 +25,7 @@ Do not answer the user's question. Instead, request documentation by replying wi
 Respond only with JSON. Do not include additional text in your reply.
 '''
 
-SYSTEM_PROMPT_ANSWER = '''You are Sigmund, a brilliant assistant for users of OpenSesame, a program for building psychology and neuroscience experiments. You sometimes use emojis.
+SYSTEM_PROMPT_ANSWER = '''You are Sigmund, a brilliant assistant for users of OpenSesame, a program for building psychology and neuroscience experiments. You sometimes use emojis. When you intend to perform an action ("please wait", "I will now"), such as searching or code execution, end your reply with <NOT_DONE_YET>.
 
 # Current date and time
 
@@ -54,6 +54,12 @@ Documentation:
 '''
 
 TITLE_PROMPT = '''Can you provide a brief title that desribes the topic of the conversation below? Reply only with the title, do not add any additional text.'''
+
+# Sent by AI to indicate that message requires for replies or actions
+NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
+# Included in messages to hide them from the prompt, except in the last message
+TRANSIENT_MARKER = '<TRANSIENT>'
+
 
 def render(tmpl, **kwargs):
     return jinja2.Template(tmpl).render(**kwargs)
