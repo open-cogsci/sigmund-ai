@@ -75,8 +75,12 @@ class Heymans:
         # to indicate that it wants to perform additional actions. This makes 
         # it easier to perform tasks consisting of multiple responses and 
         # actions. The marker is stripped from the reply so that it's hidden
-        # from the user.
-        if prompt.NOT_DONE_YET_MARKER in reply:
+        # from the user. We also check for a number of common linguistic 
+        # indicators that the AI isn't done yet, such "I will now". This is
+        # necessary because the explicit marker isn't reliably sent.
+        if prompt.NOT_DONE_YET_MARKER in reply or any(
+                indicator in reply.lower()
+                for indicator in prompt.NOT_DONE_YET_INDICATORS):
             reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
             needs_feedback = True
         # If there is still a non-empty reply after running the tools (i.e.
