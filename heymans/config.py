@@ -83,10 +83,11 @@ topic_sources = {
 
 
 def process_ai_message(msg):
-    # This pattern matches a colon followed by optional whitespace, zero or 
-    # more HTML tags, and then a dash
-    pattern = r':\s*(<[^>]+>\s*)*\s*-'
-    replacement = r':\n\n-'
+    # This pattern looks for a colon possibly followed by any number of whitespaces
+    # and/or HTML tags, followed by a newline and a dash, and replaces it with
+    # a colon, newline, newline, and dash
+    pattern = r':\s*(<[^>]+>\s*)?\n-'
+    replacement = ':\n\n-'
     return re.sub(pattern, replacement, msg)
     
 
