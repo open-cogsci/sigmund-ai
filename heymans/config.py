@@ -1,4 +1,5 @@
 import os
+import re
 from . import utils
 import logging
 logger = logging.getLogger('heymans')
