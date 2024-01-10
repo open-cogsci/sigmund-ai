@@ -1,6 +1,6 @@
 # Sigmund AI
 
-Copyright 2023 Sebastiaan Mathôt
+Copyright 2023-2024 Sebastiaan Mathôt
 
 This is a working prototype of <https://sigmundai.eu>, an AI-based chatbot that provides sensible answers based on documentation.
 
