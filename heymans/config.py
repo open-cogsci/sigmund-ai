@@ -82,13 +82,11 @@ topic_sources = {
 
 
 def process_ai_message(msg):
-    """Allows for processing of the AI message before it is passed to Python
-    markdown. This allows for some common formatting issues to be resolved, 
-    such as the fact that the AI often forgets to put a blank line between
-    the colon and the start of the enumeration, and that fenced code blocks
-    are sometimes indented.
-    """
-    return utils.deindent_code_blocks(msg.replace(':\n-', ':\n\n-'))
+    # This pattern matches a colon followed by optional whitespace, zero or 
+    # more HTML tags, and then a dash
+    pattern = r':\s*(<[^>]+>\s*)*\s*-'
+    replacement = r':\n\n-'
+    return re.sub(pattern, replacement, msg)
     
 
 def validate_user(username, password):
