@@ -57,7 +57,7 @@ TITLE_PROMPT = '''Can you provide a brief title that desribes the topic of the c
 
 # Sent by AI to indicate that message requires for replies or actions
 NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
-NOT_DONE_YET_INDICATORS = ['please wait', 'please hold on', 'i will now',
+NOT_DONE_YET_INDICATORS = ['please wait while i', 'please hold on while i', 'i will now',
                            'i am going to']
 # Included in messages to hide them from the prompt, except in the last message
 TRANSIENT_MARKER = '<TRANSIENT>'
