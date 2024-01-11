@@ -146,6 +146,8 @@ class Messages:
         self._conversation_title = conversation['title']
         self._message_history = conversation['message_history']
         self._condensed_text = conversation['condensed_text']
+        self._condensed_message_history = \
+            conversation['condensed_message_history']
     
     def save(self):
         self._update_title()
