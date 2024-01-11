@@ -35,6 +35,11 @@ max_prompt_length = 20000
 # The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
+# ATTACHMENTS
+# The maximum length of the text representation of an attachment that is used
+# to generate a description
+max_text_representation_length = 16000
+
 # LIBRARY INDEXING
 # The number of documents that are indexed at once and the delay after each
 # chunk. This is to avoid exceeded the rate limits of the OpenAI API
@@ -64,7 +69,7 @@ search_model = 'gpt-3.5'
 # becomes too long
 condense_model = 'gpt-3.5'
 # The answermodel generates the actual answer
-answer_model = 'gpt-4'
+answer_model = 'gpt-3.5'
 
 # DOCUMENTATION
 # Topic sources are used to feed in specific chunks of documentation that are

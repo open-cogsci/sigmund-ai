@@ -100,8 +100,7 @@
 
 .attachment-upload {
   position: relative;
-  margin-top: 30px;
-  margin-bottom: -20px;
+  margin-top: 20px;
 }
 .file-upload-wrapper {
   overflow: hidden;
@@ -126,14 +125,8 @@
 .file-upload-button .fa-cloud-upload-alt {
   margin-right: 8px;
 }
-progress {
-  width: 100%;
-  height: 20px;
-  display: block;
-  visibility: hidden; /* Hide progress bar initially */
-}
-progress.visible {
-  visibility: visible;
+#uploadMessage {
+  margin-bottom: 20px;
 }
 </style>
 
@@ -156,11 +149,11 @@ progress.visible {
         <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
       </div>
       <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
-        <span @click="activateConversation(conversation.id)" class="conversation-title">
-          {{ conversation.title }}
-        </span>
         <span v-if="index !== 0" class="delete-convo" @click="deleteConversation(conversation.id)">
           <i class="fas fa-trash-alt"></i>
+        </span>
+        <span @click="activateConversation(conversation.id)" class="conversation-title">
+          {{ conversation.title }}
         </span>
       </div>
     </div>
@@ -175,22 +168,25 @@ progress.visible {
         No attachments
       </div>
       <div v-else v-for="(attachment, id) in attachments" :key="id">
-        <span class="attachment-filename" @click="downloadAttachment(id)">
-          {{ attachment.filename }} - {{ attachment.description }}
-        </span>
         <span class="delete-attachment" @click="deleteAttachment(id)">
           <i class="fas fa-trash-alt"></i>
+        </span>
+        <span class="attachment-filename" @click="downloadAttachment(id)">
+          {{ attachment.filename }}
+        </span>
+        <span class="attachment-description" @click="downloadAttachment(id)">
+          {{ attachment.description }}
         </span>
       </div>
       <!-- Upload section -->
       <div class="attachment-upload">
+        <div id="uploadMessage" v-show="isUploading">Uploading, please wait …</div>
         <div class="file-upload-wrapper">
           <button class="file-upload-button">
             <i class="fas fa-cloud-upload-alt"></i> Upload File
           </button>
           <input type="file" class="file-upload-input" id="fileInput" @change="uploadAttachment" />
         </div>
-        <progress id="uploadProgress" v-bind:class="{ 'visible': isUploading }" value="0" max="100"></progress>
       </div>
     </div>
   </div>
@@ -210,7 +206,7 @@ new Vue({
     conversations: {},
     showAttachmentsModal: false,
     attachments: {},
-    uploadProgress: 0,
+    isUploading: false,
     isDocsToggled: window.searchFirst
   },
   computed: {
@@ -316,28 +312,18 @@ new Vue({
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', '/attachments/add', true);
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          this.uploadProgress = (e.loaded / e.total) * 100;
-        }
-      };
-
       xhr.onload = () => {
         if (xhr.status === 200) {
           const response = JSON.parse(xhr.responseText);
           if (response.success) {
             this.fetchAttachments(); // Refresh the list after upload
-            this.uploadProgress = 0; // Reset progress bar
           } else {
             // Handle error
             console.error('Upload failed:', response.message);
-            this.uploadProgress = 0; // Reset progress bar
           }
         } else {
           // Handle error
           console.error('Error during upload:', xhr.statusText);
-          this.uploadProgress = 0; // Reset progress bar
         }
         this.isUploading = false;
       };

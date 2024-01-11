@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 from datetime import datetime
+import tempfile
 from flask import Flask, request, jsonify, Response, render_template, \
     redirect, url_for, session, stream_with_context, make_response
 from flask_login import login_user, LoginManager, UserMixin, login_required, \
@@ -244,9 +245,13 @@ def add_attachment():
     if file.filename == '':
         return jsonify(success=False, message="No selected file"), 400
     filename = secure_filename(file.filename)
-    file_content = file.read()
-    encoded_content = base64.b64encode(file_content).decode('utf-8')
-    attachment_data = {'filename': filename, 'content': encoded_content}
+    content = file.read()
+    file.seek(0)
+    description = utils.describe_file(filename, content,
+                                      heymans.condense_model)
+    attachment_data = {'filename': filename,
+                       'content': base64.b64encode(content).decode('utf-8'),
+                       'description': description}
     attachment_id = heymans.database.add_attachment(attachment_data)
     if attachment_id == -1:
         return jsonify(success=False, message="Failed to add attachment"), 500
