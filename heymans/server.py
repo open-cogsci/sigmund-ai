@@ -18,6 +18,7 @@ import time
 from . import config
 from . import utils
 from .heymans import Heymans
+from .database.models import db
 logger = logging.getLogger('heymans')
 
 
@@ -31,6 +32,14 @@ logger = logging.getLogger('heymans')
 logging.basicConfig(level=logging.INFO, force=True)
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = config.flask_secret_key
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heymans.db'
+
+# Initialize the database
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+
+# Initialize login manager
 login_manager = LoginManager()
 @login_manager.user_loader
 def load_user(user_id):
@@ -170,8 +179,7 @@ def chat():
 @login_required
 def new_conversation():
     heymans = get_heymans()
-    heymans.messages.new_conversation()
-    heymans.messages.save()
+    heymans.database.new_conversation()
     return redirect('/chat')
 
 
@@ -179,7 +187,7 @@ def new_conversation():
 @login_required
 def clear_conversation():
     heymans = get_heymans()
-    heymans.messages.clear()
+    heymans.messages.init_conversation()
     heymans.messages.save()
     return redirect('/chat')
 
@@ -189,8 +197,7 @@ def clear_conversation():
 def activate_conversation(conversation_id):
     if conversation_id:
         heymans = get_heymans()
-        heymans.messages.activate_conversation(conversation_id)
-        heymans.messages.save()
+        heymans.database.set_active_conversation(conversation_id)
     logger.info('redirecting to chat')
     return redirect('/chat')
 
@@ -199,13 +206,12 @@ def activate_conversation(conversation_id):
 @login_required
 def list_conversations():
     heymans = get_heymans()
-    return jsonify(heymans.messages.list_conversations())
+    return jsonify(heymans.database.list_conversations())
     
 
 @app.route('/conversation/delete/<conversation_id>', methods=['DELETE'])
 @login_required
 def delete_conversation(conversation_id):
     heymans = get_heymans()
-    heymans.messages.delete_conversation(conversation_id)
-    heymans.messages.save()
+    heymans.database.delete_conversation(conversation_id)
     return '', 204

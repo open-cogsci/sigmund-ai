@@ -9,7 +9,6 @@ from . import prompt
 from . import config
 from . import utils
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from cryptography.fernet import Fernet, InvalidToken
 logger = logging.getLogger('heymans')
 
 
@@ -18,30 +17,10 @@ class Messages:
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
         self._persistent = persistent
-        self._session_folder = Path(config.sessions_folder)
-        if not self._session_folder.exists():
-            self._session_folder.mkdir()
-        self._session_path = self._session_folder / self._heymans.user_id
-        self._conversation_id = str(uuid.uuid4())
-        self._conversation_title = config.default_conversation_title
-        self._message_history = []
-        self._message_metadata = []
-        self._condensed_text = None
-        self._session = {
-            'conversations': {
-                self._conversation_id: {
-                    'title': self._conversation_title,
-                    'condensed_text': self._condensed_text,
-                    'message_history': self._message_history,
-                    'message_metadata': self._message_metadata,
-                    'last_updated': time.time()
-                }
-            },
-            'active_conversation': self._conversation_id}
-        self.clear()
         if self._persistent:
-            self._fernet = Fernet(self._heymans.encryption_key)
             self.load()
+        else:
+            self.init_conversation()
         
     def __len__(self):
         return len(self._message_history)
@@ -50,54 +29,11 @@ class Messages:
         for msg in self._message_history:
             yield msg
             
-    def list_conversations(self):
-        return {conversation_id: [conversation['title'],
-                                  conversation['last_updated']]
-                for conversation_id, conversation
-                in self._session['conversations'].items()}
-    
-    def new_conversation(self):
-        self._conversation_id = str(uuid.uuid4())
-        self._conversation_title = config.default_conversation_title
-        self._message_history = []
-        self._message_metadata = []
-        self._condensed_text = None
-        self._session['active_conversation'] = self._conversation_id
-        logger.info(f'new conversation {self._conversation_id}')
-        self.clear()
-
-    def activate_conversation(self, conversation_id):
-        if conversation_id not in self._session['conversations']:
-            logger.info(
-                f'cannot activate non-existing conversation {conversation_id}')
-            return
-        self._load_conversation(conversation_id)
-        
-    def delete_conversation(self, conversation_id):
-        if conversation_id not in self._session['conversations']:
-            logger.info(
-                f'cannot delete non-existing conversation {conversation_id}')
-            return
-        del self._session['conversations'][conversation_id]
-        
-    def _load_conversation(self, conversation_id):
-        self._conversation_id = conversation_id
-        logger.info(f'loading conversation {self._conversation_id}')
-        conversation = self._session['conversations'].get(
-            self._conversation_id, {})
-        self._condensed_text = conversation.get('condensed_text', None)
-        self._message_history = conversation.get('message_history', [])
-        self._conversation_title = conversation.get(
-            'title', 'Untitled conversation')
-        self._condensed_message_history = conversation.get(
-            'condensed_message_history', [])
-        self._message_metadata = conversation.get('message_metadata', [])
-        self._session['active_conversation'] = conversation_id
-            
-    def clear(self):
+    def init_conversation(self):
         self._condensed_text = None
         metadata = self.metadata()
         metadata['search_model'] = 'Welcome message'
+        self._conversation_title = config.default_conversation_title
         self._message_history = [('assistant', self.welcome_message(), 
                                   metadata)]
         self._condensed_message_history = [
@@ -203,23 +139,14 @@ class Messages:
         print(f'new conversation title: {self._conversation_title}')
 
     def load(self):
-        if not self._session_path.exists():
-            logger.info(f'starting new session: {self._session_path}')
+        conversation = self._heymans.database.get_active_conversation()
+        print(conversation)
+        if not conversation['message_history']:
+            self.init_conversation()
             return
-        logger.info(f'loading session file: {self._session_path}')
-        try:
-            self._session = json.loads(self._fernet.decrypt(
-                self._session_path.read_bytes()).decode('utf-8'))
-        except (json.JSONDecodeError, InvalidToken) as e:
-            logger.warning(f'failed to load session file: {self._session_path}: {e}')
-            return
-        if not isinstance(self._session, dict):
-            logger.warning(f'session file invalid: {self._session_path}')
-            return
-        if 'active_conversation' not in self._session:
-            logger.warning('no active conversation to load')
-            return
-        self._load_conversation(self._session['active_conversation'])
+        self._conversation_title = conversation['title']
+        self._message_history = conversation['message_history']
+        self._condensed_text = conversation['condensed_text']
     
     def save(self):
         self._update_title()
@@ -228,9 +155,5 @@ class Messages:
             'message_history': self._message_history,
             'condensed_message_history': self._condensed_message_history,
             'title': self._conversation_title,
-            'last_updated': time.time()
         }
-        self._session['conversations'][self._conversation_id] = conversation
-        logger.info(f'saving session file: {self._session_path}')
-        self._session_path.write_bytes(
-            self._fernet.encrypt(json.dumps(self._session).encode('utf-8')))
+        self._heymans.database.update_active_conversation(conversation)

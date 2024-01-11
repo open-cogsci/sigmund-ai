@@ -5,6 +5,7 @@ from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
+from .database.manager import DatabaseManager
 from . import prompt
 from .tools import TopicsTool, SearchTool, CodeExcutionTool, \
     GoogleScholarTool
@@ -18,10 +19,7 @@ class Heymans:
         self.user_id = user_id
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self._search_first = search_first
-        self.encryption_key = encryption_key
-        if isinstance(self.encryption_key, str):
-            self.encryption_key = self.encryption_key.encode()
-        logger.info(f'user {user_id} with encryption_key {encryption_key}')
+        self.database = DatabaseManager(user_id, encryption_key)
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
         self.search_model = model(self, config.search_model)
