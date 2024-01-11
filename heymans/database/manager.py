@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from .models import db, User, Conversation
+from .models import db, User, Conversation, Attachment
 from .encryption import EncryptionManager
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -42,7 +42,7 @@ class DatabaseManager:
                 f"No active conversation found for user {self.user_id}")
             return {}
 
-    def set_active_conversation(self, conversation_id) -> bool:
+    def set_active_conversation(self, conversation_id: int) -> bool:
         try:
             conversation = Conversation.query.filter_by(
                 conversation_id=conversation_id, user_id=self.user_id).one()
@@ -72,7 +72,7 @@ class DatabaseManager:
                 f"No active conversation to update for user {self.user_id}")
             return False
 
-    def list_conversations(self) -> list:
+    def list_conversations(self) -> dict:
         
         conversations = {}
         for conversation in \
@@ -109,7 +109,7 @@ class DatabaseManager:
             logger.error(f"Error creating new conversation: {e}")
             return False
 
-    def delete_conversation(self, conversation_id) -> bool:
+    def delete_conversation(self, conversation_id: int) -> bool:
         try:
             user = User.query.filter_by(user_id=self.user_id).one()
             conversation = Conversation.query.filter_by(
@@ -126,3 +126,63 @@ class DatabaseManager:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
             return False
+
+    def list_attachments(self) -> dict:
+        attachments = Attachment.query.filter_by(user_id=self.user_id).all()
+        attachment_dict = {}
+        for attachment in attachments:
+            try:
+                decrypted_data = self.encryption_manager.decrypt_data(
+                    attachment.data)
+                attachment_data = json.loads(decrypted_data)
+                attachment_dict[attachment.attachment_id] = {
+                    'filename' : attachment_data.get(
+                        'filename', 'No filename'),
+                    'description' : attachment_data.get(
+                        'description', 'No description')
+                }
+            except Exception as e:
+                logger.error(f"Error decrypting attachment data for "
+                             f"attachment_id {attachment.attachment_id}: {e}")
+        return attachment_dict
+
+    def delete_attachment(self, attachment_id: int) -> bool:
+        try:
+            attachment = Attachment.query.filter_by(
+                attachment_id=attachment_id, user_id=self.user_id).one()
+            db.session.delete(attachment)
+            db.session.commit()
+            return True
+        except NoResultFound:
+            logger.warning(f"Attachment {attachment_id} not found or does not "
+                           f"belong to user {self.user_id}")
+            return False
+
+    def add_attachment(self, attachment_data: dict) -> int:
+        try:
+            json_data = json.dumps(attachment_data)
+            encrypted_data = self.encryption_manager.encrypt_data(
+                json_data.encode('utf-8'))
+            attachment = Attachment(user_id=self.user_id, data=encrypted_data)
+            db.session.add(attachment)
+            db.session.commit()
+            return attachment.attachment_id
+        except Exception as e:
+            logger.error(f"Error adding attachment: {e}")
+            return -1
+
+    def get_attachment(self, attachment_id: int) -> dict:
+        try:
+            attachment = Attachment.query.filter_by(
+                attachment_id=attachment_id, user_id=self.user_id).one()
+            decrypted_data = self.encryption_manager.decrypt_data(
+                attachment.data)
+            return json.loads(decrypted_data)
+        except NoResultFound:
+            logger.warning(f"Attachment {attachment_id} not found or does not "
+                           f"belong to user {self.user_id}")
+            return {}
+        except Exception as e:
+            logger.error(f"Error decrypting attachment data for attachment_id "
+                         f"{attachment_id}: {e}")
+            return {}

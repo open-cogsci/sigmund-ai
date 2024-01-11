@@ -1,13 +1,15 @@
 import random
 import markdown
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, jsonify, Response, render_template, \
-    redirect, url_for, session, stream_with_context
+    redirect, url_for, session, stream_with_context, make_response
 from flask_login import login_user, LoginManager, UserMixin, login_required, \
     current_user, logout_user
 from .forms import LoginForm
+from werkzeug.utils import secure_filename
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -192,7 +194,7 @@ def clear_conversation():
     return redirect('/chat')
 
 
-@app.route('/conversation/activate/<conversation_id>', methods=['GET', 'POST'])
+@app.route('/conversation/activate/<int:conversation_id>', methods=['GET', 'POST'])
 @login_required
 def activate_conversation(conversation_id):
     if conversation_id:
@@ -209,9 +211,60 @@ def list_conversations():
     return jsonify(heymans.database.list_conversations())
     
 
-@app.route('/conversation/delete/<conversation_id>', methods=['DELETE'])
+@app.route('/conversation/delete/<int:conversation_id>', methods=['DELETE'])
 @login_required
 def delete_conversation(conversation_id):
     heymans = get_heymans()
     heymans.database.delete_conversation(conversation_id)
     return '', 204
+
+
+@app.route('/attachments/list', methods=['GET', 'POST'])
+@login_required
+def list_attachments():
+    heymans = get_heymans()
+    return jsonify(heymans.database.list_attachments())
+
+
+@app.route('/attachments/delete/<int:attachment_id>', methods=['DELETE'])
+@login_required
+def delete_attachment(attachment_id):
+    heymans = get_heymans()
+    success = heymans.database.delete_attachment(attachment_id)
+    return jsonify(success=success)
+    
+
+@app.route('/attachments/add', methods=['POST'])
+@login_required
+def add_attachment():
+    heymans = get_heymans()
+    if 'file' not in request.files:
+        return jsonify(success=False, message="No file part"), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify(success=False, message="No selected file"), 400
+    filename = secure_filename(file.filename)
+    file_content = file.read()
+    encoded_content = base64.b64encode(file_content).decode('utf-8')
+    attachment_data = {'filename': filename, 'content': encoded_content}
+    attachment_id = heymans.database.add_attachment(attachment_data)
+    if attachment_id == -1:
+        return jsonify(success=False, message="Failed to add attachment"), 500
+    else:
+        return jsonify(success=True, attachment_id=attachment_id)
+
+
+@app.route('/attachments/get/<int:attachment_id>', methods=['GET'])
+@login_required
+def get_attachment(attachment_id):
+    heymans = get_heymans()
+    attachment_data = heymans.database.get_attachment(attachment_id)
+    if attachment_data:
+        decoded_content = base64.b64decode(attachment_data['content'])
+        response = make_response(decoded_content)
+        response.headers['Content-Type'] = 'application/octet-stream'
+        response.headers['Content-Disposition'] = \
+            f'attachment; filename={attachment_data["filename"]}'
+        return response
+    return jsonify(success=False,
+                   message="Attachment not found or access denied"), 404

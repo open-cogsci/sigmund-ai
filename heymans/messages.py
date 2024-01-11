@@ -140,7 +140,6 @@ class Messages:
 
     def load(self):
         conversation = self._heymans.database.get_active_conversation()
-        print(conversation)
         if not conversation['message_history']:
             self.init_conversation()
             return

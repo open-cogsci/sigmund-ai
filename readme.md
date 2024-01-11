@@ -50,6 +50,7 @@ https://127.0.0.1:5000/
 - faiss (or faiss-cpu)
 - flask
 - flask-login
+- flask-sqlalchemy
 - flask-wtf
 - jinja2
 - jq

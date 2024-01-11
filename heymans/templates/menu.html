@@ -64,10 +64,12 @@
   margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
+  border-radius: 4px;
   width: 80%;
 }
 
 .delete-convo,
+.delete-attachment,
 .close {
   color: #aaa;
   float: right;
@@ -75,6 +77,8 @@
 
 .delete-convo:hover,
 .delete-convo:focus,
+.delete-attachment:hover,
+.delete-attachment:focus,
 .close:hover,
 .close:focus {
   color: black;
@@ -82,14 +86,54 @@
   cursor: pointer;
 }
 
+#attachment-heading,
 #conversation-heading {
   min-height: 40px;
 }
 
+.attachment-filename,
 .conversation-title {
   color: #0077cc; /* or any color you prefer */
   cursor: pointer;
   text-decoration: underline; /* Optional: to make it look more like a link */
+}
+
+.attachment-upload {
+  position: relative;
+  margin-top: 30px;
+  margin-bottom: -20px;
+}
+.file-upload-wrapper {
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+}
+.file-upload-input {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-upload-button {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.file-upload-button .fa-cloud-upload-alt {
+  margin-right: 8px;
+}
+progress {
+  width: 100%;
+  height: 20px;
+  display: block;
+  visibility: hidden; /* Hide progress bar initially */
+}
+progress.visible {
+  visibility: visible;
 }
 </style>
 
@@ -101,6 +145,7 @@
     <div @click="navigateTo('/conversation/new')">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/conversation/clear')">Clear conversation</div>
+    <div @click="showAttachments">Browse attachments</div>
     <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Use documentation</div>
     <div @click="navigateTo('/logout')">Log out</div>
   </div>
@@ -120,6 +165,35 @@
       </div>
     </div>
   </div>
+  <!-- Modal for browsing attachments -->
+  <div class="modal" v-if="showAttachmentsModal" v-bind:class="{ 'active': showAttachmentsModal }">
+    <div class="modal-content">
+      <div id='attachment-heading'>Attachments
+        <div class="close" @click="closeAttachmentsModal"><i class="fas fa-window-close"></i></div>
+      </div>
+      <div v-if="Object.keys(attachments).length === 0" class="no-attachments">
+        No attachments
+      </div>
+      <div v-else v-for="(attachment, id) in attachments" :key="id">
+        <span class="attachment-filename" @click="downloadAttachment(id)">
+          {{ attachment.filename }} - {{ attachment.description }}
+        </span>
+        <span class="delete-attachment" @click="deleteAttachment(id)">
+          <i class="fas fa-trash-alt"></i>
+        </span>
+      </div>
+      <!-- Upload section -->
+      <div class="attachment-upload">
+        <div class="file-upload-wrapper">
+          <button class="file-upload-button">
+            <i class="fas fa-cloud-upload-alt"></i> Upload File
+          </button>
+          <input type="file" class="file-upload-input" id="fileInput" @change="uploadAttachment" />
+        </div>
+        <progress id="uploadProgress" v-bind:class="{ 'visible': isUploading }" value="0" max="100"></progress>
+      </div>
+    </div>
+  </div>
 </div>
 {% endraw %}
 
@@ -134,6 +208,9 @@ new Vue({
     menuVisible: false,
     showModal: false,
     conversations: {},
+    showAttachmentsModal: false,
+    attachments: {},
+    uploadProgress: 0,
     isDocsToggled: window.searchFirst
   },
   computed: {
@@ -192,6 +269,80 @@ new Vue({
             this.fetchConversations();
           }
         });
+    },
+    showAttachments: function() {
+      this.fetchAttachments();
+      this.showAttachmentsModal = true;
+      this.menuVisible = false;
+      console.log('showing attachments');
+    },
+    closeAttachmentsModal: function() {
+      this.showAttachmentsModal = false;
+    },
+    fetchAttachments: function() {
+      fetch('/attachments/list')
+        .then(response => response.json())
+        .then(data => {
+          this.attachments = data;
+        })
+        .catch(error => {
+          console.error('Error fetching attachments:', error);
+        });
+    },
+    downloadAttachment: function(attachmentId) {
+      window.location.href = `/attachments/get/${attachmentId}`;
+    },
+    deleteAttachment: function(attachmentId) {
+      // Optimistically remove the attachment from the list
+      Vue.delete(this.attachments, attachmentId);
+      // Make delete request to server
+      fetch(`/attachments/delete/${attachmentId}`, { method: 'DELETE' })
+        .then(response => {
+          if (!response.ok) {
+            // If the delete failed, add it back to the list
+            this.fetchAttachments();
+          }
+        });
+    },
+    uploadAttachment: function(event) {
+      this.isUploading = true;
+      const fileInput = event.target;
+      if (fileInput.files.length === 0) {
+        return;
+      }
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/attachments/add', true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          this.uploadProgress = (e.loaded / e.total) * 100;
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            this.fetchAttachments(); // Refresh the list after upload
+            this.uploadProgress = 0; // Reset progress bar
+          } else {
+            // Handle error
+            console.error('Upload failed:', response.message);
+            this.uploadProgress = 0; // Reset progress bar
+          }
+        } else {
+          // Handle error
+          console.error('Error during upload:', xhr.statusText);
+          this.uploadProgress = 0; // Reset progress bar
+        }
+        this.isUploading = false;
+      };
+
+      xhr.send(formData);
     }
   }
 });
