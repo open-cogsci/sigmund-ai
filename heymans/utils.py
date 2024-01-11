@@ -107,6 +107,7 @@ def file_to_text(name, content):
         return 'No description'
     return text_representation
 
+
 def describe_file(name, content, model):
     text_representation = file_to_text(name, content)
     description = model.predict(

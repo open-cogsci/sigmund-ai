@@ -8,7 +8,7 @@ from .model import model
 from .database.manager import DatabaseManager
 from . import prompt
 from .tools import TopicsTool, SearchTool, CodeExcutionTool, \
-    GoogleScholarTool
+    GoogleScholarTool, AttachmentsTool
 logger = logging.getLogger('heymans')
 
 
@@ -29,7 +29,8 @@ class Heymans:
         self.search_tools = {'topics': TopicsTool(self),
                              'search': SearchTool(self)}
         self.answer_tools = {'execute_code': CodeExcutionTool(self),
-                             'search_google_scholar': GoogleScholarTool(self)}
+                             'search_google_scholar': GoogleScholarTool(self),
+                             'attachments_tool': AttachmentsTool(self)}
         self.tools = self.answer_tools
     
     def send_user_message(self, message):
