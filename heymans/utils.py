@@ -98,6 +98,9 @@ def file_to_text(name, content):
             except subprocess.CalledProcessError as e:
                 logger.error(f'failed to extract text: {e}')
                 return 'No description'
+            except FileNotFoundError as e:
+                logger.error(f'pandoc is not available: {e}')
+                return 'No description'
         text_representation = output.stdout
     if not text_representation:
         text_representation = content.decode('utf-8', errors='ignore')
