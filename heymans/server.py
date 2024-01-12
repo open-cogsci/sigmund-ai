@@ -2,7 +2,7 @@ import logging
 from flask import Flask, Config
 from flask_login import LoginManager
 from . import config
-from .routes import api_blueprint, app_blueprint
+from .routes import api_blueprint, app_blueprint, User
 
 from .database.models import db
 logger = logging.getLogger('heymans')
@@ -19,7 +19,7 @@ def create_app(config_class=HeymansConfig):
     app.config.from_object(config_class)
     app.register_blueprint(app_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
-    # Initialize the database
+    # Initialize the databasea
     db.init_app(app)
     with app.app_context():
         db.create_all()
