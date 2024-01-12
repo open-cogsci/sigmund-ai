@@ -17,7 +17,7 @@ flask_port = int(os.environ.get('FLASK_PORT', 5000))
 flask_host = os.environ.get('FLASK_HOST', '0.0.0.0')
 # The secret key is used for logging in. This should be a long and arbitrary
 # string that is hard to guess. This should not be shared
-flask_secret_key = os.environ.get('FLASK_SECRET_KEY', None)
+flask_secret_key = os.environ.get('FLASK_SECRET_KEY', '0123456789ABCDEF')
 # A secret salt that is used to encrypt the messages on disk in combination
 # with the user password
 encryption_salt = os.environ.get('HEYMANS_ENCRYPTION_SALT', '0123456789ABCDEF').encode()
