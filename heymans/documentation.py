@@ -93,6 +93,10 @@ class FAISSDocumentationSource(BaseDocumentationSource):
     
     def __init__(self, heymans):
         super().__init__(heymans)
+        if config.openai_api_key is None:
+            logger.warning(
+                'No OpenAI API key provided, no documentation available')
+            return
         self._embeddings_model = OpenAIEmbeddings(
             openai_api_key=config.openai_api_key)
         logger.info('reading FAISS documentation cache')
@@ -100,6 +104,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         self._retriever = self._db.as_retriever()
     
     def search(self, queries):
+        if config.openai_api_key is None:
+            return []
         docs = []
         for query in queries:
             logger.info(f'retrieving from FAISS: {query}')
