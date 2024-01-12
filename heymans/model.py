@@ -90,6 +90,11 @@ class Claude21Model(BaseModel):
             logger.info('removing first assistant mesage')
             messages.pop(1)
         return super().predict(messages)
+        
+        
+class DummyModel(BaseModel):
+    def predict(self, messages):
+        return 'dummy reply'
             
         
 def model(heymans, model):
@@ -100,4 +105,6 @@ def model(heymans, model):
         return GPT35Model(heymans)
     if model == 'claude-2.1':
         return Claude21Model(heymans)
+    if model == 'dummy':
+        return DummyModel(heymans)
     raise ValueError(f'Unknown model: {model}')

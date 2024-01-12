@@ -135,9 +135,9 @@
   <div class="menu-icon" @click="toggleMenu">☰</div>
   <div class="menu" v-bind:class="{ 'active': menuVisible }">
     <div @click="navigateTo('/about')">About</div>
-    <div @click="navigateTo('/conversation/new')">New conversation</div>
+    <div @click="navigateTo('/api/conversation/new')">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
-    <div @click="navigateTo('/conversation/clear')">Clear conversation</div>
+    <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <div @click="showAttachments">Browse attachments</div>
     <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Use documentation</div>
     <div @click="navigateTo('/logout')">Log out</div>
@@ -241,7 +241,7 @@ new Vue({
       this.showModal = false;
     },
     fetchConversations: function() {
-      fetch('/conversation/list')
+      fetch('/api/conversation/list')
         .then(response => response.json())
         .then(data => {
           console.log(data);
@@ -252,13 +252,13 @@ new Vue({
         });
     },
     activateConversation: function(conversationId) {
-      this.navigateTo(`/conversation/activate/${conversationId}`);
+      this.navigateTo(`/api/conversation/activate/${conversationId}`);
     },
     deleteConversation: function(conversationId) {
       // Optimistically remove the conversation from the list
       Vue.delete(this.conversations, conversationId);
       // Make delete request to server
-      fetch(`/conversation/delete/${conversationId}`, { method: 'DELETE' })
+      fetch(`/api/conversation/delete/${conversationId}`, { method: 'DELETE' })
         .then(response => {
           if (!response.ok) {
             // If the delete failed, add it back to the list
@@ -276,7 +276,7 @@ new Vue({
       this.showAttachmentsModal = false;
     },
     fetchAttachments: function() {
-      fetch('/attachments/list')
+      fetch('/api/attachments/list')
         .then(response => response.json())
         .then(data => {
           this.attachments = data;
@@ -286,13 +286,13 @@ new Vue({
         });
     },
     downloadAttachment: function(attachmentId) {
-      window.location.href = `/attachments/get/${attachmentId}`;
+      window.location.href = `/api/attachments/get/${attachmentId}`;
     },
     deleteAttachment: function(attachmentId) {
       // Optimistically remove the attachment from the list
       Vue.delete(this.attachments, attachmentId);
       // Make delete request to server
-      fetch(`/attachments/delete/${attachmentId}`, { method: 'DELETE' })
+      fetch(`/api/attachments/delete/${attachmentId}`, { method: 'DELETE' })
         .then(response => {
           if (!response.ok) {
             // If the delete failed, add it back to the list
@@ -311,7 +311,7 @@ new Vue({
       formData.append('file', file);
 
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/attachments/add', true);
+      xhr.open('POST', '/api/attachments/add', true);
       xhr.onload = () => {
         if (xhr.status === 200) {
           const response = JSON.parse(xhr.responseText);

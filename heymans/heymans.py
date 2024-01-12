@@ -42,7 +42,7 @@ class Heymans:
         if self._search_first:
             yield {'action': 'set_loading_indicator',
                    'message': f'{config.ai_name} is searching '}, {}
-            yield self._search(message)
+            self._search(message)
         for reply, metadata in self._answer():
             yield reply, metadata
     
@@ -57,10 +57,10 @@ class Heymans:
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
-        return {'action': 'set_loading_indicator',
-                'message': f'{config.ai_name} is thinking and typing '}, {}
     
     def _answer(self, state='answer'):
+        yield {'action': 'set_loading_indicator',
+               'message': f'{config.ai_name} is thinking and typing '}, {}        
         logger.info(f'[{state} state] entering')
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self.tools = self.answer_tools
