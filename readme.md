@@ -45,24 +45,7 @@ https://127.0.0.1:5000/
 
 ## Dependencies
 
-- anthropic
-- cryptography
-- faiss (or faiss-cpu)
-- flask
-- flask-login
-- flask-sqlalchemy
-- flask-wtf
-- jinja2
-- jq
-- langchain
-- markdown
-- openai
-- pygments
-- pypdf
-- python
-- requests
-- scholarly
-- tiktoken
+See `pyproject.toml`.
 
 
 ## License

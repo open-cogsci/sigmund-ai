@@ -1,0 +1,40 @@
+[build-system]
+requires = ["flit_core >=3.4"]
+build-backend = "flit_core.buildapi"
+[project]
+name = "heymans"
+authors = [
+    {name = "Sebastiaan Mathôt", email = "s.mathot@cogsci.nl"}
+]
+readme = "readme.md"
+license = {file = "COPYING"}
+requires-python = ">=3.8"
+dynamic = ["version", "description"]
+dependencies = [
+    "anthropic",
+    "cryptography",
+    "faiss-cpu",
+    "flask",
+    "flask-login",
+    "flask-sqlalchemy",
+    "flask-wtf",
+    "jinja2",
+    "jq",
+    "langchain",
+    "markdown",
+    "openai",
+    "pdfminer.six",
+    "pygments",
+    "requests",
+    "scholarly",
+    "tiktoken"
+]
+keywords = ["ai", "chatbot", "llm"]
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+[project.urls]
+Documentation = "https://sigmundai.eu"
+Source = "https://github.com/smathot/sigmundai"
