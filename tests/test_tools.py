@@ -35,7 +35,7 @@ def test_json_matching():
 '''
     target_message, results, needs_reply = tool.run(message)
     assert target_message.strip() == target
-    target = 'Running `TestTool` …'
+    target = 'Running `TestTool` … <TRANSIENT>'
     message = '''{
     "execute_code":
         {
