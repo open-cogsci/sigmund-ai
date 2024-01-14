@@ -1,6 +1,7 @@
 from heymans.tools import BaseTool, CodeExcutionTool, GoogleScholarTool
 
-def test_json_matching():
+
+def test_tools_json():
     
     class TestTool(BaseTool):
         json_pattern = CodeExcutionTool.json_pattern
