@@ -1,6 +1,5 @@
 import json
 import base64
-import logging
 from pathlib import Path
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
@@ -12,6 +11,7 @@ from .. import config
 from .. import utils
 from ..forms import LoginForm
 from ..heymans import Heymans
+import logging
 logger = logging.getLogger('heymans')
 app_blueprint = Blueprint('app', __name__)
 

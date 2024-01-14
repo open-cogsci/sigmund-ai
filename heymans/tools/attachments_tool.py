@@ -2,7 +2,7 @@ from . import BaseTool
 import logging
 import json
 import base64
-from .. import utils
+from .. import utils, attachments
 logger = logging.getLogger('heymans')
 
 
@@ -12,28 +12,19 @@ class AttachmentsTool(BaseTool):
 
     @property
     def prompt(self):
-        info = {"read_attachments": []}
-        description = []
+        info = {'read_attachments': []}
         for attachment in self._heymans.database.list_attachments().values():
             info['read_attachments'].append(attachment['filename'])
-            description.append(
-                f'- {attachment["filename"]}: {attachment["description"]}')
-        if not description:
+        if not info['read_attachments']:
             logger.info('no attachments for tool')
             return ''
-        description = '\n'.join(description)
         info = json.dumps(info)
-        prompt = f'''# Attachments
+        return f'''# Attachments
 
-You have access to the following attached documents:
-
-{description}
-
-To read them, use JSON in the format below. You will receive the attachment in the next message.
+To read attachments, use JSON in the format below. You will receive the attachments in the next message.
 
 {info}
 '''
-        return prompt
     
     def use(self, message, attachments):
         
@@ -43,7 +34,7 @@ To read them, use JSON in the format below. You will receive the attachment in t
             if attachment['filename'] not in attachments:
                 continue
             attachment = self._heymans.database.get_attachment(attachment_id)
-            content = utils.file_to_text(
+            content = attachments.file_to_text(
                 attachment['filename'],
                 base64.b64decode(attachment['content']))
             text = f'File name: {attachment["filename"]}\n\nFile content:\n{content}'

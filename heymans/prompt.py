@@ -31,6 +31,20 @@ SYSTEM_PROMPT_ANSWER = '''You are Sigmund, a brilliant assistant for users of Op
 
 {{ current_datetime }}'''
 
+ATTACHMENTS_PROMPT = '''# Attachments
+
+You have access to the following attached files.
+
+{{ description }}
+'''
+
+TOOLS_PROMPT = '''# Tools
+
+You can use the following tools. Each tool is described in more detail below.
+
+{{ description }}
+'''
+
 SYSTEM_PROMPT_CONDENSED = '''Here is a summary of the start of the conversation. The rest of the messages follow up on this.
 
 <summary>
@@ -53,7 +67,14 @@ Documentation:
 {{ documentation }}
 '''
 
-TITLE_PROMPT = '''Can you provide a brief title that desribes the topic of the conversation below? Reply only with the title, do not add any additional text.'''
+TITLE_PROMPT = '''Provide a brief title that desribes the topic of the conversation below. Reply only with the title, do not add any additional text.'''
+DESCRIBE_PROMPT = '''Provide a brief description of the following text:
+        
+Filename: {{ name }}
+        
+<TEXT>
+{{ text_representation }}
+</TEXT>'''
 
 # Sent by AI to indicate that message requires for replies or actions
 NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'

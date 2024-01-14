@@ -5,8 +5,7 @@ from werkzeug.utils import secure_filename
 from flask import request, jsonify, Response, redirect, session, \
     stream_with_context, make_response, Blueprint
 from flask_login import login_required
-from .. import config
-from .. import utils
+from .. import config, utils, attachments
 from .app import get_heymans
 logger = logging.getLogger('heymans')
 api_blueprint = Blueprint('api', __name__)
@@ -114,8 +113,8 @@ def add_attachment():
     filename = secure_filename(file.filename)
     content = file.read()
     file.seek(0)
-    description = utils.describe_file(filename, content,
-                                      heymans.condense_model)
+    description = attachments.describe_file(filename, content,
+                                            heymans.condense_model)
     attachment_data = {'filename': filename,
                        'content': base64.b64encode(content).decode('utf-8'),
                        'description': description}

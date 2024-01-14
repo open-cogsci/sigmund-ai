@@ -5,9 +5,7 @@ import uuid
 import time
 from pathlib import Path
 from .model import model
-from . import prompt
-from . import config
-from . import utils
+from . import prompt, config, utils, attachments
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 logger = logging.getLogger('heymans')
 
@@ -113,6 +111,8 @@ class Messages:
         for tool in self._heymans.tools.values():
             if tool.prompt:
                 system_prompt.append(tool.prompt)
+        system_prompt.append(
+            attachments.attachments_prompt(self._heymans.database))
         if len(self._heymans.documentation):
             system_prompt.append(self._heymans.documentation.prompt())
         if self._condensed_text:
