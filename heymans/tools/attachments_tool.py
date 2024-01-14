@@ -2,7 +2,8 @@ from . import BaseTool
 import logging
 import json
 import base64
-from .. import utils, attachments
+from .. import utils
+from ..attachments import file_to_text
 logger = logging.getLogger('heymans')
 
 
@@ -34,7 +35,7 @@ To read attachments, use JSON in the format below. You will receive the attachme
             if attachment['filename'] not in attachments:
                 continue
             attachment = self._heymans.database.get_attachment(attachment_id)
-            content = attachments.file_to_text(
+            content = file_to_text(
                 attachment['filename'],
                 base64.b64decode(attachment['content']))
             text = f'File name: {attachment["filename"]}\n\nFile content:\n{content}'
@@ -45,5 +46,5 @@ To read attachments, use JSON in the format below. You will receive the attachme
         return f'''I am going to read the attached file(s) now.
         
 <div class='json-references'>
-texts
+{texts}
 </div> <TRANSIENT>''', True
