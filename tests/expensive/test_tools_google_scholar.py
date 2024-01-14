@@ -1,9 +1,6 @@
-import unittest
-import os
 from .expensive_test_utils import BaseExpensiveTest
 
 
-# @unittest.skipIf(not os.getenv('EXPENSIVE_TESTS'), 'Skipped')
 class TestToolsGoogleScholar(BaseExpensiveTest):
     
     def test_tools_google_scholar(self):

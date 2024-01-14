@@ -1,10 +1,7 @@
-import unittest
 import base64
-import os
 from .expensive_test_utils import BaseExpensiveTest
 
 
-# @unittest.skipIf(not os.getenv('EXPENSIVE_TESTS'), 'Skipped')
 class TestToolsAttachments(BaseExpensiveTest):
     
     def test_tools_attachments(self):

@@ -1,5 +1,4 @@
 import unittest
-import os
 from heymans.heymans import Heymans
 
 
