@@ -159,6 +159,10 @@ class DatabaseManager:
             return False
 
     def add_attachment(self, attachment_data: dict) -> int:
+        """Adds an attachment and returns the attachment_id or -1 if an error
+        occurred. attachment_data should be a dict with filename, content,
+        and description keys, where content is a base64-encoded str.
+        """
         try:
             json_data = json.dumps(attachment_data)
             encrypted_data = self.encryption_manager.encrypt_data(

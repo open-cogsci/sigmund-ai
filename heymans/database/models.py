@@ -24,7 +24,7 @@ else:
     from sqlalchemy.orm import scoped_session, sessionmaker
     import logging
     logger.info('using standalone_sqlachemy')
-    engine = create_engine('sqlite:///:memory:', echo=True)
+    engine = create_engine('sqlite:///:memory:')
     session = scoped_session(sessionmaker(autocommit=False, autoflush=False,
                                           bind=engine))
     Base = declarative_base()
