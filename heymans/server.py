@@ -1,10 +1,11 @@
-import logging
+import os
+os.environ['USE_FLASK_SQLALCHEMY'] = '1'
 from flask import Flask, Config
 from flask_login import LoginManager
 from . import config
 from .routes import api_blueprint, app_blueprint, User
-
 from .database.models import db
+import logging
 logger = logging.getLogger('heymans')
 logging.basicConfig(level=logging.INFO, force=True)
 
