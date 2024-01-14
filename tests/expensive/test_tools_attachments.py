@@ -1,16 +1,11 @@
 import unittest
 import base64
 import os
-from heymans.heymans import Heymans
+from .expensive_test_utils import BaseExpensiveTest
 
 
-@unittest.skipIf(not os.getenv('EXPENSIVE_TESTS'), 'Skipped')
-class TestToolsAttachments(unittest.TestCase):
-    
-    def setUp(self):
-        from heymans.database.models import init_db
-        init_db()
-        self.heymans = Heymans(user_id='pytest', search_first=False)
+# @unittest.skipIf(not os.getenv('EXPENSIVE_TESTS'), 'Skipped')
+class TestToolsAttachments(BaseExpensiveTest):
     
     def test_tools_attachments(self):
         attachment_data = {
