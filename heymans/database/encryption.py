@@ -19,10 +19,10 @@ class EncryptionManager:
 
     def encrypt_data(self, data) -> bytes:
         if self.fernet is None:
-            return data.encode('utf-8')
+            return data.encode('utf-8') if isinstance(data, str) else data
         return self.fernet.encrypt(data)
 
     def decrypt_data(self, data: bytes):
         if self.fernet is None:
-            return data.decode('utf-8')
+            return data.decode('utf-8') if isinstance(data, bytes) else data
         return self.fernet.decrypt(data)
