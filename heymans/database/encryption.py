@@ -1,5 +1,6 @@
 from cryptography.fernet import Fernet
 import types
+import typing
 import logging
 logger = logging.getLogger('heymans')
 
@@ -8,7 +9,7 @@ class EncryptionManager:
     """Handles encryption and decryption of messages and attachments. The
     encryption key is derived from the user's password.
     """
-    def __init__(self, encryption_key: [str, bytes, types.NoneType]):
+    def __init__(self, encryption_key: typing.Union[str, bytes, None] = None):
         if encryption_key is None:
             logger.warning('no encryption key provided')
             self.fernet = None
