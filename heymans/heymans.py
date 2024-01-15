@@ -1,5 +1,6 @@
 import logging
 import jinja2
+from types import GeneratorType
 from typing import Tuple, Optional
 from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
@@ -12,7 +13,22 @@ logger = logging.getLogger('heymans')
 
 
 class Heymans:
+    """The main chatbot class.
     
+    Parameters
+    ----------
+    user_id: A user name
+    persistent: Indicates whether the current session should be persistent in
+        the sense of using the database.
+    search_first: Indicates whether the answer phase should be preceded by a
+        documentation search phase. If None, the config default will be used.
+    search_tools: A list of tools to be used by the documentation search (if
+        enabled). Values are class names from heymans.tools. If None, the
+        config default will be used.
+    answer_tools: A list of tools to be used during the answer phase (if
+        enabled). Values are class names from heymans.tools. If None, the
+        config default will be used.
+    """
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: Optional[str] = None,
                  search_first: Optional[bool] = None,
@@ -39,20 +55,27 @@ class Heymans:
         self.answer_tools = [getattr(tools, t)(self) for t in answer_tools]
         self.tools = self.answer_tools
     
-    def send_user_message(self, message):
-        """The main function that takes a user message and returns a reply.
-        The reply also has metadata which is a dict that contains information
-        about time, sources, etc.
+    def send_user_message(self, message: str) -> GeneratorType:
+        """The main function that takes a user message and returns one or 
+        replies. This is a generator function where each yield gives a tuple.
+        
+        This tuple can be (dict, dict) in which case the first dict contains an 
+        action and a message key. This communicates to the client that an 
+        action should be taking, such that the loading indicator should change.
+        This tuple can also be (str, dict) in which case the str contains an
+        AI message and the dict contains metadata for the message.
         """
         self.messages.append('user', message)
         if self._search_first:
-            yield {'action': 'set_loading_indicator',
-                   'message': f'{config.ai_name} is searching '}, {}
-            self._search(message)
+            for reply, metadata in self._search(message):
+                yield reply, metadata
         for reply, metadata in self._answer():
             yield reply, metadata
     
-    def _search(self, message):
+    def _search(self, message: str) -> GeneratorType:
+        """Implements the documentation search phase."""
+        yield {'action': 'set_loading_indicator',
+               'message': f'{config.ai_name} is searching '}, {}
         logger.info('[search state] entering')
         self.documentation.clear()
         self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
@@ -64,7 +87,8 @@ class Heymans:
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
     
-    def _answer(self, state='answer'):
+    def _answer(self, state: str = 'answer') -> GeneratorType:
+        """Implements the answer phase."""
         yield {'action': 'set_loading_indicator',
                'message': f'{config.ai_name} is thinking and typing '}, {}        
         logger.info(f'[{state} state] entering')
