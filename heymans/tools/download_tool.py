@@ -25,13 +25,13 @@ You have access to the internet. To download a file, use JSON in the format belo
         """Download URL and return a filename, content tuple."""
         try:
             response = requests.get(url, stream=True)
-            response.raise_for_status()  # Raises an HTTPError for bad responses
-    
+            response.raise_for_status()
             # Attempt to get the filename from the Content-Disposition header
             content_disposition = response.headers.get('Content-Disposition')
             if content_disposition:
                 # If there's a filename in the header, extract it
-                filename = re.findall('filename="?(.+)"?', content_disposition)[0]
+                filename = re.findall('filename="?(.+)"?', 
+                                      content_disposition)[0]
             else:
                 # Parse the URL to get a base filename
                 parsed_url = urlparse(url)
@@ -40,16 +40,16 @@ You have access to the internet. To download a file, use JSON in the format belo
                     filename = unquote(os.path.basename(parsed_url.path))
                 else:
                     # Use the domain name and a timestamp as the filename
-                    filename = parsed_url.netloc.replace('.', '_') + '_' + datetime.now().strftime('%Y%m%d%H%M%S')
-    
-            # Check if the filename is empty or just a slash, assign a default name
+                    filename = parsed_url.netloc.replace('.', '_') + '_' \
+                        + datetime.now().strftime('%Y%m%d%H%M%S')
+            # Check if the filename is empty or just a slash, use default name
             if not filename or filename == '/':
-                filename = 'download_' + datetime.now().strftime('%Y%m%d%H%M%S')
-    
+                filename = 'download_' \
+                    + datetime.now().strftime('%Y%m%d%H%M%S')
             # Add an appropriate file extension if missing
             if not os.path.splitext(filename)[1]:
-                filename += '.html'  # Default to .html for web pages without a clear file type
-    
+                # Default to .html for web pages without a clear file type
+                filename += '.html'  
             content = response.content
             return filename, content
         except Exception as e:
@@ -60,7 +60,8 @@ You have access to the internet. To download a file, use JSON in the format belo
         try:
             filename, content = self._download(url)
         except Exception as e:
-            return f'I failed to download the file for the following reason: {e}', True
+            return f'I failed to download the file for the following reason: {e}', \
+                True
         description = attachments.describe_file(filename, content,
                                                 self._heymans.condense_model)
         attachment_data = {
