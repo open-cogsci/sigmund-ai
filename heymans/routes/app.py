@@ -115,7 +115,7 @@ def logout():
 def main():
     if current_user.is_authenticated:
         return chat_page()
-    return redirect(url_for('login'))
+    return redirect(url_for('app.login'))
     
 @app_blueprint.route('/chat')
 @login_required
