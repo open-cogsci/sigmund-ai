@@ -4,7 +4,7 @@ import requests
 logger = logging.getLogger('heymans')
 
 
-class CodeExcutionTool(BaseTool):
+class CodeExecutionTool(BaseTool):
     
     json_pattern = r"""
 \s*"execute_code"\s*:\s*\{

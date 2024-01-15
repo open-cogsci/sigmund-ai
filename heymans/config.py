@@ -7,6 +7,7 @@ page_title = 'Sigmund AI'
 ai_name = 'Sigmund'
 
 # SERVER
+#
 # The external server address, that is, the URL that users visit
 server_url = os.environ.get('FLASK_SERVER_URL', 'http://127.0.0.1:5000')
 # The port at which the flask server is running internally. This can be
@@ -23,12 +24,14 @@ flask_secret_key = os.environ.get('FLASK_SECRET_KEY', '0123456789ABCDEF')
 encryption_salt = os.environ.get('HEYMANS_ENCRYPTION_SALT', '0123456789ABCDEF').encode()
 
 # FILES AND FOLDERS
+#
 # Contains the encrypted message history
 sessions_folder = 'sessions'
 # Contains the encrypted uploads
 uploads_folder = 'uploads'
 
 # PROMPT HISTORY
+#
 # The maximum length of a prompt in characters. If the prompt exceeds this 
 # length, the start will be summarized.
 max_prompt_length = 20000
@@ -36,11 +39,13 @@ max_prompt_length = 20000
 condense_chunk_length = 10000
 
 # ATTACHMENTS
+#
 # The maximum length of the text representation of an attachment that is used
 # to generate a description
 max_text_representation_length = 16000
 
 # LIBRARY INDEXING
+#
 # The number of documents that are indexed at once and the delay after each
 # chunk. This is to avoid exceeded the rate limits of the OpenAI API
 chunk_size = 100
@@ -59,6 +64,7 @@ What is your name? And would you like to learn more about how to work with me?''
 default_conversation_title = 'New conversation'
 
 # MODELS
+#
 # The API keys should not be shared
 openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
@@ -80,7 +86,20 @@ condense_model = 'gpt-3.5'
 # The answermodel generates the actual answer
 answer_model = 'gpt-4'
 
+# TOOLS
+# 
+# Tools should match the names of classes from heymans.tools
+# Search tools are executed in the first documentation-search phase
+search_tools = ['TopicsTool', 'SearchTool']
+# Answer tools are executed during the answer phase
+answer_tools = ['CodeExecutionTool', 'GoogleScholarTool', 'AttachmentsTool',
+                'DownloadTool']
+
 # DOCUMENTATION
+#
+# Indicates whether documentation should be searched before answering the 
+# question.
+search_first = True
 # Topic sources are used to feed in specific chunks of documentation that are
 # relevant to a topic.
 topic_sources = {

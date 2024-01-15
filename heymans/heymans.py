@@ -1,24 +1,27 @@
 import logging
 import jinja2
-from typing import Tuple
+from typing import Tuple, Optional
 from . import config, library
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
 from .database.manager import DatabaseManager
 from . import prompt
-from .tools import TopicsTool, SearchTool, CodeExcutionTool, \
-    GoogleScholarTool, AttachmentsTool, DownloadTool
+from . import tools
 logger = logging.getLogger('heymans')
 
 
 class Heymans:
     
-    def __init__(self, user_id, persistent=False, encryption_key=None,
-                 search_first=True):
+    def __init__(self, user_id: str, persistent: bool = False,
+                 encryption_key: Optional[str] = None,
+                 search_first: Optional[bool] = None,
+                 search_tools: Optional[list] = None,
+                 answer_tools: Optional[list] = None):
         self.user_id = user_id
         self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
-        self._search_first = search_first
+        self._search_first = \
+            config.search_first if search_first is None else search_first
         self.database = DatabaseManager(user_id, encryption_key)
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
@@ -26,12 +29,14 @@ class Heymans:
         self.answer_model = model(self, config.answer_model)
         self.condense_model = model(self, config.condense_model)
         self.messages = Messages(self, persistent)
-        self.search_tools = {'topics': TopicsTool(self),
-                             'search': SearchTool(self)}
-        self.answer_tools = {'execute_code': CodeExcutionTool(self),
-                             'search_google_scholar': GoogleScholarTool(self),
-                             'attachments_tool': AttachmentsTool(self),
-                             'download_tool': DownloadTool(self)}
+        if search_tools is None:
+            search_tools = config.search_tools
+        if answer_tools is None:
+            answer_tools = config.answer_tools
+        # Tools are class names from the tools module, which need to be
+        # instantiated with heymans (self) as first argument
+        self.search_tools = [getattr(tools, t)(self) for t in search_tools]
+        self.answer_tools = [getattr(tools, t)(self) for t in answer_tools]
         self.tools = self.answer_tools
     
     def send_user_message(self, message):
@@ -110,7 +115,7 @@ class Heymans:
         logger.info(f'running tools')
         results = []
         needs_reply = []
-        for tool in self.tools.values():
+        for tool in self.tools:
             reply, tool_results, tool_needs_reply = tool.run(reply)
             if tool_results:
                 results += tool_results

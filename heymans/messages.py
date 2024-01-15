@@ -108,7 +108,7 @@ class Messages:
         system_prompt = [prompt.render(
             self._heymans.system_prompt,
             current_datetime=utils.current_datetime())]
-        for tool in self._heymans.tools.values():
+        for tool in self._heymans.tools:
             if tool.prompt:
                 system_prompt.append(tool.prompt)
         system_prompt.append(

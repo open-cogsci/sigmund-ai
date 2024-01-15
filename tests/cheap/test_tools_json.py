@@ -1,10 +1,10 @@
-from heymans.tools import BaseTool, CodeExcutionTool, GoogleScholarTool
+from heymans.tools import BaseTool, CodeExecutionTool, GoogleScholarTool
 
 
 def test_tools_json():
     
     class TestTool(BaseTool):
-        json_pattern = CodeExcutionTool.json_pattern
+        json_pattern = CodeExecutionTool.json_pattern
         def use(self, message, language, code):
             return '', False
     
