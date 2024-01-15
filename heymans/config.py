@@ -62,6 +62,15 @@ default_conversation_title = 'New conversation'
 # The API keys should not be shared
 openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
+mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
+# Supported models are currently:
+# - gpt-3.5
+# - gpt-4
+# - claude-2.1
+# - mistral-tiny
+# - mistral-small
+# - mistral-medium
+# - dummy
 # The search model is used to formulate search queries and evaluate whether
 # documents are relevant
 search_model = 'gpt-3.5'

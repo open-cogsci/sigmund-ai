@@ -21,7 +21,7 @@ class BaseModel:
             dt = time.time() - t0
             logger.info(f'predicting {len(reply) + len(messages)} took {dt} s')
             return reply
-        reply = self._model.predict_messages(messages).content
+        reply = self._model.invoke(messages).content
         dt = time.time() - t0
         msg_len = sum([len(m.content) for m in messages])
         logger.info(f'predicting {len(reply) + msg_len} took {dt} s')
@@ -57,39 +57,49 @@ class BaseModel:
         return loop.run_until_complete(wrap_gather())
 
 
-class GPT4Model(BaseModel):
+class OpenAIModel(BaseModel):
 
-    def __init__(self, heymans):
-        from langchain.chat_models import ChatOpenAI
+    def __init__(self, heymans, model):
+        from langchain_openai.chat_models import ChatOpenAI
         super().__init__(heymans)
         self._model = ChatOpenAI(
-            model='gpt-4-1106-preview',
+            model=model,
             openai_api_key=config.openai_api_key)
         
         
-class GPT35Model(BaseModel):
-
-    def __init__(self, heymans):
-        from langchain.chat_models import ChatOpenAI
-        super().__init__(heymans)
-        self._model = ChatOpenAI(
-            model='gpt-3.5-turbo-1106',
-            openai_api_key=config.openai_api_key)
-        
-        
-class Claude21Model(BaseModel):
+class ClaudeModel(BaseModel):
     
-    def __init__(self, heymans):
-        from langchain.chat_models import ChatAnthropic
+    def __init__(self, heymans, model):
+        from langchain_community.chat_models import ChatAnthropic
         super().__init__(heymans)
         self._model = ChatAnthropic(
-            model='claude-2.1', anthropic_api_key=config.anthropic_api_key)
+            model=model, anthropic_api_key=config.anthropic_api_key)
         
     def predict(self, messages):
         if isinstance(messages, list) and isinstance(messages[1], AIMessage):
             logger.info('removing first assistant mesage')
             messages.pop(1)
         return super().predict(messages)
+        
+        
+class MistralTinyModel(BaseModel):
+
+    def __init__(self, heymans):
+        from langchain_mistralai.chat_models import ChatMistralAI
+        super().__init__(heymans)
+        self._model = ChatMistralAI(
+            model='mistral-tiny',
+            openai_api_key=config.mistral_api_key)
+        
+
+class MistralModel(BaseModel):
+
+    def __init__(self, heymans, model):
+        from langchain_mistralai.chat_models import ChatMistralAI
+        super().__init__(heymans)
+        self._model = ChatMistralAI(
+            model=model,
+            openai_api_key=config.mistral_api_key)
         
         
 class DummyModel(BaseModel):
@@ -100,11 +110,13 @@ class DummyModel(BaseModel):
 def model(heymans, model):
     
     if model == 'gpt-4':
-        return GPT4Model(heymans)
+        return OpenAIModel(heymans, 'gpt-4-1106-preview')
     if model == 'gpt-3.5':
-        return GPT35Model(heymans)
+        return OpenAIModel(heymans, 'gpt-3.5-turbo-1106')
     if model == 'claude-2.1':
-        return Claude21Model(heymans)
+        return ClaudeModel(heymans, 'claude-2.1')
+    if model.startswith('mistral-'):
+        return MistralModel(heymans, model)
     if model == 'dummy':
         return DummyModel(heymans)
     raise ValueError(f'Unknown model: {model}')
