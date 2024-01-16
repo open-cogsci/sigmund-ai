@@ -62,6 +62,10 @@ I am best at answering questions that are specific and that I can look up in the
 What is your name? And would you like to learn more about how to work with me?'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
+# The number of previous messages for which transient content should be 
+# retained. Transient content are large chunks of information that are included
+# in AI messages, usually as the result of tool use.
+keep_transient = 4
 
 # MODELS
 #

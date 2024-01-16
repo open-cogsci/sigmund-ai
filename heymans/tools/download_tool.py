@@ -70,8 +70,4 @@ You have access to the internet. To download a file, use JSON in the format belo
             'description': description
         }
         self._heymans.database.add_attachment(attachment_data)
-        return f'''I have downloaded {filename} and added it to my attachments.
-        
-<div class='json-references'>
-Note to self: In my next reply I can 1) read {filename} by replying with `{{"read_attachment": "{filename}"}}`, or 2) ask the user what to do with the downloaded file.
-</div> <TRANSIENT>''', True
+        return f'''I have downloaded {filename} and added it to my attachments.''', True

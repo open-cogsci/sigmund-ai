@@ -35,7 +35,6 @@ class Heymans:
                  search_tools: Optional[list] = None,
                  answer_tools: Optional[list] = None):
         self.user_id = user_id
-        self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self._search_first = \
             config.search_first if search_first is None else search_first
         self.database = DatabaseManager(user_id, encryption_key)
@@ -78,9 +77,9 @@ class Heymans:
                'message': f'{config.ai_name} is searching '}, {}
         logger.info('[search state] entering')
         self.documentation.clear()
-        self.system_prompt = prompt.SYSTEM_PROMPT_SEARCH
         self.tools = self.search_tools
-        reply = self.search_model.predict(self.messages.prompt())
+        reply = self.search_model.predict(self.messages.prompt(
+            system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
         logger.info(f'[search state] reply: {reply}')
         self._run_tools(reply)
         self.documentation.strip_irrelevant(message)
@@ -92,14 +91,15 @@ class Heymans:
         yield {'action': 'set_loading_indicator',
                'message': f'{config.ai_name} is thinking and typing '}, {}        
         logger.info(f'[{state} state] entering')
-        self.system_prompt = prompt.SYSTEM_PROMPT_ANSWER
         self.tools = self.answer_tools
         # We first collect a regular reply to the user message
         reply = self.answer_model.predict(self.messages.prompt())
-        logger.info(f'{state} state] reply: {reply}')
+        logger.info(f'[{state} state] reply: {reply}')
         # We then run tools based on the AI reply. This may modify the reply,
         # mainly by stripping out any JSON commands in the reply
         reply, result, needs_feedback = self._run_tools(reply)
+        if needs_feedback:
+            logger.info('[{state} state] tools need feedback')
         # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
         # to indicate that it wants to perform additional actions. This makes 
         # it easier to perform tasks consisting of multiple responses and 
@@ -107,10 +107,10 @@ class Heymans:
         # from the user. We also check for a number of common linguistic 
         # indicators that the AI isn't done yet, such "I will now". This is
         # necessary because the explicit marker isn't reliably sent.
-        if prompt.NOT_DONE_YET_MARKER in reply or any(
-                indicator in reply.lower()
-                for indicator in prompt.NOT_DONE_YET_INDICATORS):
+        if self.answer_model.supports_not_done_yet and \
+                prompt.NOT_DONE_YET_MARKER in reply:
             reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
+            logger.info(f'[{state} state] not-done-yet marker received')
             needs_feedback = True
         # If there is still a non-empty reply after running the tools (i.e.
         # stripping the JSON hasn't cleared the reply entirely, then yield and

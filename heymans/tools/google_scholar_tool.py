@@ -32,6 +32,6 @@ You are also a brilliant researcher. To search for articles on Google Scholar, u
                     break
         return f'''I found {len(results)} articles. I am going to read them now.
 
-<div class='json-references'>
+<div class='hidden-data transient'>
 {json.dumps(results)}
-</div> <TRANSIENT>''', True
+</div>''', True

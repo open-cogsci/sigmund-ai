@@ -67,5 +67,5 @@ def attachments_prompt(db) -> str:
             f'- {attachment["filename"]}: {attachment["description"]}')
     if not description:
         return ''
-    return prompt.render(prompt.ATTACHMENTS_PROMPT,
+    return prompt.render(prompt.SYSTEM_PROMPT_ATTACHMENTS,
                          description='\n'.join(description))

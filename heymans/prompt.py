@@ -1,5 +1,6 @@
 import jinja2
 
+# The system prompt during documentation search consists of the prompt below
 SYSTEM_PROMPT_SEARCH = '''You are Sigmund, an assistant for users of OpenSesame, a program for building psychology and neuroscience experiments.
 
 Do not answer the user's question. Instead, request documentation by replying with JSON in the format shown below. Use the "topics" field to indicate which topics are related to the question. Only use topics shown in the example. Do not make up your own topics. Use the "search" field to specify additional search queries that you feel are relevant.
@@ -25,31 +26,27 @@ Do not answer the user's question. Instead, request documentation by replying wi
 Respond only with JSON. Do not include additional text in your reply.
 '''
 
-SYSTEM_PROMPT_ANSWER = '''You are Sigmund, a brilliant assistant for users of OpenSesame, a program for building psychology and neuroscience experiments. You sometimes use emojis. When you intend to perform an action ("please wait", "I will now"), such as searching or code execution, end your reply with <NOT_DONE_YET>.
-
-# Current date and time
+# The system prompt used during question answering is composed of the fragments
+# below
+SYSTEM_PROMPT_IDENTITY = '''You are Sigmund, a brilliant assistant for users of OpenSesame, a program for building psychology and neuroscience experiments. You sometimes use emojis.'''
+# Sent by AI to indicate that message requires for replies or actions
+NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
+SYSTEM_PROMPT_NOT_DONE_YET = f'''When you intend to perform an action ("please wait", "I will now"), such as searching or code execution, end your reply with {NOT_DONE_YET_MARKER}.'''
+SYSTEM_PROMPT_DATETIME = '''# Current date and time
 
 {{ current_datetime }}'''
+SYSTEM_PROMPT_ATTACHMENTS = '''# Attachments
 
-ATTACHMENTS_PROMPT = '''# Attachments
-
-You have access to the following attached files.
-
-{{ description }}
-'''
-
-TOOLS_PROMPT = '''# Tools
-
-You can use the following tools. Each tool is described in more detail below.
+You have access to the following attached files:
 
 {{ description }}
 '''
-
-SYSTEM_PROMPT_CONDENSED = '''Here is a summary of the start of the conversation. The rest of the messages follow up on this.
+SYSTEM_PROMPT_CONDENSED = '''Below is a summary of the start of the conversation:
 
 <summary>
 {{ summary }}
 </summary>'''
+
 
 CONDENSE_HISTORY = '''Summarize the following conversation:
 
@@ -75,13 +72,6 @@ Filename: {{ name }}
 <TEXT>
 {{ text_representation }}
 </TEXT>'''
-
-# Sent by AI to indicate that message requires for replies or actions
-NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
-NOT_DONE_YET_INDICATORS = ['please wait while i', 'please hold on while i', 'i will now',
-                           'i am going to']
-# Included in messages to hide them from the prompt, except in the last message
-TRANSIENT_MARKER = '<TRANSIENT>'
 
 
 def render(tmpl, **kwargs):

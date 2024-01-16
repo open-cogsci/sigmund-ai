@@ -45,6 +45,6 @@ To read attachments, use JSON in the format below. You will receive the attachme
         texts = '\n\n'.join(texts)
         return f'''I am going to read the attached file(s) now.
         
-<div class='json-references'>
+<div class='hidden-data transient'>
 {texts}
-</div> <TRANSIENT>''', True
+</div>''', True

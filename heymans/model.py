@@ -3,12 +3,14 @@ import re
 import json
 import logging
 import asyncio
-from langchain.schema import AIMessage
+from langchain.schema import AIMessage, HumanMessage
 import time
 logger = logging.getLogger('heymans')
 
 
 class BaseModel:
+    
+    supports_not_done_yet = False
     
     def __init__(self, heymans):
         self._heymans = heymans
@@ -59,6 +61,8 @@ class BaseModel:
 
 class OpenAIModel(BaseModel):
 
+    supports_not_done_yet = True
+
     def __init__(self, heymans, model):
         from langchain_openai.chat_models import ChatOpenAI
         super().__init__(heymans)
@@ -82,16 +86,6 @@ class ClaudeModel(BaseModel):
         return super().predict(messages)
         
         
-class MistralTinyModel(BaseModel):
-
-    def __init__(self, heymans):
-        from langchain_mistralai.chat_models import ChatMistralAI
-        super().__init__(heymans)
-        self._model = ChatMistralAI(
-            model='mistral-tiny',
-            openai_api_key=config.mistral_api_key)
-        
-
 class MistralModel(BaseModel):
 
     def __init__(self, heymans, model):
@@ -100,6 +94,12 @@ class MistralModel(BaseModel):
         self._model = ChatMistralAI(
             model=model,
             openai_api_key=config.mistral_api_key)
+        
+    def predict(self, messages):
+        if isinstance(messages, list) and isinstance(messages[-1], AIMessage):
+            logger.info('adding continue message')
+            messages.append(HumanMessage(content='Please continue!'))
+        return super().predict(messages)
         
         
 class DummyModel(BaseModel):
