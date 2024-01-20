@@ -75,7 +75,7 @@ class Heymans:
                 yield reply, metadata
         for reply, metadata in self._answer():
             yield reply, metadata
-        
+            
     def _rate_limit_exceeded(self):
         tokens_consumed_past_hour = self.database.get_activity()
         logger.info(

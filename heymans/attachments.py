@@ -14,7 +14,7 @@ def file_to_text(name: str, content: bytes) -> str:
     'No description' is returned. The representation is limited to the maximum
     length as specified in the config.
     """
-    suffix = os.path.splitext(name)[1]
+    suffix = os.path.splitext(name)[1].lower()
     if suffix == '.pdf':
         try:
             text_representation = extract_text(io.BytesIO(content))
@@ -38,7 +38,7 @@ def file_to_text(name: str, content: bytes) -> str:
             except FileNotFoundError as e:
                 logger.error(f'pandoc is not available: {e}')
                 return 'No description'
-        text_representation = output.stdout
+        text_representation = output.stdout.strip()
     if not text_representation:
         text_representation = content.decode('utf-8', errors='ignore')
     text_representation = text_representation.strip()[

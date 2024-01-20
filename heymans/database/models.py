@@ -82,3 +82,5 @@ class Subscription(Model):
     user_id = Column(Integer, ForeignKey('user.user_id'))
     from_date = Column(DateTime)
     to_date = Column(DateTime)
+    stripe_subscription_id = Column(String(80))
+    stripe_customer_id = Column(String(80))

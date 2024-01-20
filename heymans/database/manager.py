@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
-from .models import db, User, Conversation, Attachment, Activity
+from .models import db, User, Conversation, Attachment, Activity, Subscription
 from .encryption import EncryptionManager
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -224,3 +224,69 @@ class DatabaseManager:
             .filter(Activity.time >= after_time) \
             .scalar()
         return total_tokens if total_tokens is not None else 0
+
+    def update_subscription(self, stripe_customer_id: str,
+                            stripe_subscription_id: str, from_date=None,
+                            to_date=None):
+        """Updates a subscription. By default the subscriptions starts 
+        immediately and ends exactly one month from the current time. A user
+        has only one subscription, which means that a subscription should be
+        added if it doesn't exist, and updated if it already exists.
+        """
+        now = datetime.utcnow()
+        from_date = from_date or now
+        to_date = to_date or now + timedelta(days=31)
+        subscription = Subscription.query.filter_by(
+            user_id=self.user_id).first()
+        if subscription:
+            subscription.from_date = from_date
+            subscription.to_date = to_date
+        else:
+            subscription = Subscription(
+                user_id=self.user_id, from_date=from_date, to_date=to_date,
+                stripe_customer_id=stripe_customer_id,
+                stripe_subscription_id=stripe_subscription_id)
+            db.session.add(subscription)
+        db.session.commit()
+
+    def check_subscription(self) -> bool:
+        """Returns a bool indicating whether the user is currently subscribed.
+        """
+        now = datetime.utcnow()
+        subscription = Subscription.query.filter_by(
+            user_id=self.user_id).first()
+        return subscription and \
+                subscription.from_date <= now < subscription.to_date
+
+    def cancel_subscription(self):
+        """Sets the to_date of the subscription to the current time if the user
+        is currently subscribed.
+        """
+        if not self.check_subscription():
+            return
+        subscription = Subscription.query.filter_by(
+            user_id=self.user_id).first()
+        subscription.to_date = datetime.utcnow()
+        db.session.commit()
+
+    def get_stripe_customer_id(self) -> str:
+        subscription_record = Subscription.query.filter(
+            Subscription.user_id == self.user_id
+        ).order_by(Subscription.from_date.desc()).first()
+        if subscription_record:
+            return subscription_record.stripe_customer_id
+        return None
+
+    @staticmethod
+    def from_stripe_customer_id(stripe_customer_id: str) -> str:
+        subscription_record = Subscription.query.filter(
+            Subscription.stripe_customer_id == stripe_customer_id
+        ).order_by(Subscription.from_date.desc()).first()
+        if not subscription_record:
+            return None
+        user_record = User.query.filter(
+            User.user_id == subscription_record.user_id
+        ).order_by(Subscription.from_date.desc()).first()
+        if not user_record:
+            return None
+        return DatabaseManager(username=user_record.username)

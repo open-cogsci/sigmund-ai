@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    {% include 'header.html' %}
+    <div id="container">
+        <div id="about">
+            <div id="start-text">
+            <p>You're almost ready to start using Sigmund, but you still need a subscription!</p>
+            <p>
+                A subscription to Sigmund AI is only €9 per month.
+                Payment is handled securely through Stripe.
+                You can cancel your subscription on a monthly basis.
+            </p>
+            <p>
+            <a href="/subscribe/create-checkout-session" class="link-button">
+                <i class="fab fa-cc-stripe"></i> Subscribe now!
+            </a>
+            </p>
+            <p><a href="/about">Read more about Sigmund</a></p>
+            <p><a href="/logout">Log out</a></p>
+        </div>
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

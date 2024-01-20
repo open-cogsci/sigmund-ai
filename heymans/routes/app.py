@@ -26,10 +26,12 @@ def get_heymans():
     return Heymans(user_id=current_user.get_id(), persistent=True,
                    encryption_key=session['encryption_key'],
                    search_first=session.get('search_first', True))
-
+    
 
 def chat_page():
     heymans = get_heymans()
+    if not heymans.database.check_subscription():
+        return redirect(url_for('subscribe.subscribe'), code=303)
     html_content = ''
     previous_timestamp = None
     previous_answer_model = None

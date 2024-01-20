@@ -1,18 +1,63 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ page_title }}</title>
-        <style>{% include 'stylesheet.css.jinja' %}</style>
-        <link rel="stylesheet" href="static/pygments.css">
-        <link rel="icon" type="image/svg" href="static/favicon.svg">
-    </head>
+{% include 'head.html' %}
 <body>
     {% include 'header.html' %}
+    <script>
+    function signin() {
+        document.getElementById("login-form").style.display = "block"
+        document.getElementById("sign-in-button").style.display = "none"
+    }
+    </script>
+<style>
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            padding-top: 50px;
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%; /* Could be more or less, depending on screen size */
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>    
     <div id="container">
         <div id="login">
             <div id="start-text">{{ login_text|safe }}</div>
-            <form method="POST">
+            <div id="login-modal" class="modal">
+
+            <!-- Modal Content -->
+            <div class="modal-content">
+            <span class="close">&times;</span>
+            <form method="POST" id="login-form">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                 {{ form.username.label }} {{ form.username() }}
@@ -24,12 +69,10 @@
                 {{ form.submit() }}
                 </div>
             </form>
+            </div>
+            </div>
         </div>
-        <div id="footer-bar">
-            v{{ version}}
-            // Copyright 2023-2024 Sebastiaan Mathôt
-            // <a href='https://github.com/open-cogsci/sigmund-ai'>Open source GPL3</a>
-        </div>
+        {% include 'footer.html' %}
     </div>
 </body>
 </html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    {% include 'header.html' %}
+    <div id="container">
+        <div id="about">
+            <div id="start-text">
+            <p>Thank you for subscribing to Sigmund!</p>
+            <p>
+            <a href="/subscribe/customer-portal" class="link-button">
+                <i class="fab fa-cc-stripe"></i> Manage your subscription
+            </a>
+            </p>
+            <p><a href="/">Chat</a></p>
+            <p><a href="/about">Read more about Sigmund</a></p>
+            <p><a href="/logout">Log out</a></p>
+        </div>
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

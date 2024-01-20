@@ -154,3 +154,19 @@ def validate_user(username, password):
         return True
     logger.info('using validation script')
     return user_validation.validate(username, password)
+
+
+# STRIPE
+#
+# Stripe is a payment portal. The information below should not be shared
+#
+# The Price ID identifies the product. You can find it in the product catalog
+# of the Stripe dashboard.
+stripe_price_id = os.environ.get('STRIPE_PRICE_ID', None)
+# The publishable key is the API keys section of the Developers dashboard
+stripe_publishable_key = os.environ.get('STRIPE_PUBLISHABLE_KEY', None)
+# The secret (API) key is the API keys section of the Developers dashboard
+stripe_secret_key = os.environ.get('STRIPE_SECRET_KEY', None)
+# The webhook secret is used to ensure that webhook calls actually come from
+# stripe
+stripe_webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET', None)
