@@ -34,6 +34,8 @@ def chat_page():
     previous_timestamp = None
     previous_answer_model = None
     for role, message, metadata in heymans.messages:
+        message_id = metadata.get('message_id', 0)
+        delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role == 'assistant':
             html_body = utils.md(
                 f'{config.ai_name}: {config.process_ai_message(message)}')
@@ -62,7 +64,7 @@ def chat_page():
         else:
             answer_model_div = ''
             
-        html_content += f'<div class="{html_class}">{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
+        html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
     return utils.render('chat.html', message_history=html_content)
 
 

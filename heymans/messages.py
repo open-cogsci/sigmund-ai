@@ -33,27 +33,53 @@ class Messages:
         metadata = self.metadata()
         metadata['search_model'] = 'Welcome message'
         self._conversation_title = config.default_conversation_title
-        self._message_history = [('assistant', self.welcome_message(), 
-                                  metadata)]
+        self._message_history = [['assistant', self.welcome_message(), 
+                                  metadata]]
         self._condensed_message_history = [
-            (role, content) for role, content, metadata
+            [role, content] for role, content, metadata
             in self._message_history[:]]        
             
-    def metadata(self):
-        return {'timestamp': utils.current_datetime(),
+    def metadata(self, message_id=None):
+        return {'message_id': str(uuid.uuid4()) 
+                    if message_id is None else message_id,
+                'timestamp': utils.current_datetime(),
                 'sources': self._heymans.documentation.to_json(),
                 'search_model': config.search_model,
                 'condense_model': config.condense_model,
                 'answer_model': config.answer_model}
         
-    def append(self, role, message):
-        metadata = self.metadata()
-        self._message_history.append((role, message, metadata))
-        self._condensed_message_history.append((role, message))
+    def append(self, role, message, message_id=None):
+        metadata = self.metadata(message_id=message_id)
+        self._message_history.append([role, message, metadata])
+        self._condensed_message_history.append([role, message])
         self._condense_message_history()
         if self._persistent:
             self.save()
         return metadata
+    
+    def delete(self, message_id):
+        message_to_remove = None
+        condensed_message_to_remove = None
+        for role, message, metadata in self._message_history:
+            if metadata['message_id'] == message_id:
+                message_to_remove = [role, message, metadata]
+                condensed_message_to_remove = [role, message]
+                break
+        else:
+            logger.info(f'message not found for deletion: {message_id}')
+            return
+        if message_to_remove:
+            logger.info(f'deleting message: {message_id}')
+            self._message_history.remove(message_to_remove)
+        if condensed_message_to_remove:
+            try:
+                self._condensed_message_history.remove(
+                    condensed_message_to_remove)
+            except ValueError:
+                logger.error(
+                    f'Could not find condensed message to remove for {message_id}')
+        if self._persistent:
+            self.save()
     
     def prompt(self, system_prompt=None):
         """The prompt consists of the system prompt followed by a sequence of
@@ -171,11 +197,18 @@ class Messages:
         if not conversation['message_history']:
             self.init_conversation()
             return
+        modified = False
+        for _, _, metadata in conversation['message_history']:
+            if 'message_id' not in metadata:
+                metadata['message_id'] = str(uuid.uuid4())
+                modified = True
         self._conversation_title = conversation['title']
         self._message_history = conversation['message_history']
         self._condensed_text = conversation['condensed_text']
         self._condensed_message_history = \
             conversation['condensed_message_history']
+        if self._persistent and modified:
+            self.save()
     
     def save(self):
         self._update_title()

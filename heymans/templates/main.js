@@ -56,6 +56,12 @@ function initMain(event) {
     });
 }
 
+function generateUUID() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
 async function fetchWithRetry(url, options, retries = 3) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -69,13 +75,21 @@ async function fetchWithRetry(url, options, retries = 3) {
 
 async function sendMessage(message) {
     console.log('user message: ' + message)
+    const user_message_id = generateUUID()
     messageCounter.innerText = ''
     // Show the user's message
     if (message) {
         const userMessageBox = document.createElement('div');
         userMessageBox.innerText = 'You: ' + message;
-        userMessageBox.className = 'message-user';
+        userMessageBox.className = 'message-user message';
+        userMessageBox.setAttribute('data-message-id', user_message_id);
         responseDiv.appendChild(userMessageBox);
+        // Create a div for the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'message-delete';
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteButton.onclick = () => deleteMessage(user_message_id);
+        userMessageBox.prepend(deleteButton);
     }
     // Show the loading indicator and animate it
     const loadingMessageBox = document.createElement('div');
@@ -105,7 +119,7 @@ async function sendMessage(message) {
     await fetchWithRetry('{{ server_url }}/api/chat/start', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: requestBody(message, searchFirst)
+        body: requestBody(message, searchFirst, user_message_id)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
     });
@@ -132,14 +146,20 @@ async function sendMessage(message) {
             }
             return
         }
+        const metadata = data.metadata
         // If the message is an actual message, we add it to the chat window
         // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');
-        aiMessage.className = 'message-ai';
+        aiMessage.className = 'message-ai message';
+        aiMessage.setAttribute('data-message-id', metadata['message_id']);
         aiMessage.innerHTML = data.response;
         responseDiv.appendChild(aiMessage);
-        // Parse the JSON string to an object
-        const metadata = data.metadata
+        // Create a div for the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'message-delete';
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteButton.onclick = () => deleteMessage(metadata['message_id']);
+        aiMessage.prepend(deleteButton);
         // Create a div for timestamp
         const timestampDiv = document.createElement('div');
         timestampDiv.className = 'message-timestamp';
@@ -206,8 +226,30 @@ async function sendMessage(message) {
     cancelButton.onclick = cancelStreaming;
 }
 
-function requestBody(message, searchFirst) {
-    return JSON.stringify({message: message, search_first: searchFirst})
+function deleteMessage(messageId) {
+    fetch(`/api/message/delete/${messageId}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.remove();
+            }
+        } else {
+            console.error('Failed to delete message:', data.error);
+        }
+    }) .catch(error => console.error('Error deleting message:', error)); }
+
+
+
+function requestBody(message, searchFirst, user_message_id) {
+    return JSON.stringify({
+        message: message,
+        search_first: searchFirst,
+        message_id:user_message_id
+    })
 }
 
 document.addEventListener('DOMContentLoaded', globalElements)

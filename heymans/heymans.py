@@ -54,7 +54,8 @@ class Heymans:
         self.answer_tools = [getattr(tools, t)(self) for t in answer_tools]
         self.tools = self.answer_tools
     
-    def send_user_message(self, message: str) -> GeneratorType:
+    def send_user_message(self, message: str,
+                          message_id: str=None) -> GeneratorType:
         """The main function that takes a user message and returns one or 
         replies. This is a generator function where each yield gives a tuple.
         
@@ -68,7 +69,7 @@ class Heymans:
             yield config.max_tokens_per_hour_exceeded_message, \
                     self.messages.metadata()
             return
-        self.messages.append('user', message)
+        self.messages.append('user', message, message_id)
         if self._search_first:
             for reply, metadata in self._search(message):
                 yield reply, metadata

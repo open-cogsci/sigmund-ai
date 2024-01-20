@@ -19,6 +19,7 @@ def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
     session['search_first'] = data.get('search_first', True)
+    session['message_id'] = data.get('message_id', None)
     heymans = get_heymans()
     redis_client.delete(f'stream_cancel_{heymans.user_id}')
     return '{}'
@@ -37,10 +38,11 @@ def api_chat_cancel_stream():
 @login_required
 def api_chat_stream():
     message = session['user_message']
+    message_id = session['message_id']
     heymans = get_heymans()
     logger.info(f'starting stream for {heymans.user_id}')
     def generate():
-        for reply, metadata in heymans.send_user_message(message):
+        for reply, metadata in heymans.send_user_message(message, message_id):
             if isinstance(reply, dict):
                 reply = json.dumps(reply)
             else:
@@ -156,3 +158,11 @@ def get_attachment(attachment_id):
         return response
     return jsonify(success=False,
                    message="Attachment not found or access denied"), 404
+
+
+@api_blueprint.route('/message/delete/<message_id>', methods=['DELETE'])
+@login_required
+def delete_message(message_id):
+    heymans = get_heymans()
+    heymans.messages.delete(message_id)
+    return jsonify(success=True)
