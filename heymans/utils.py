@@ -21,8 +21,9 @@ def md(text):
                                          TocExtension()])
 
 
-def clean(text, escape_html=True):
-    text = render_template_string(text)
+def clean(text, escape_html=True, render=True):
+    if render:
+        text = render_template_string(text)
     if escape_html:
         text = html.escape(text).replace('\n', '<br>\n')
     return text

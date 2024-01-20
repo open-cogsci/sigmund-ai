@@ -42,7 +42,8 @@ def chat_page():
             html_class = 'message-ai'
         else:
             html_body = '<p>' + utils.clean(f'You: {message}', 
-                                            escape_html=True) + '</p>'
+                                            escape_html=True,
+                                            render=False) + '</p>'
             html_class = 'message-user'
         if 'sources' in metadata:
             sources_div = '<div class="message-sources">'
