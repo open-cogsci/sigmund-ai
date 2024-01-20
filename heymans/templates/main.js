@@ -6,6 +6,7 @@ function globalElements(event) {
     window.chapterInput = document.getElementById('chapter');
     window.chatmodeInput = document.getElementById('chatmode');
     window.sendButton = document.getElementById('send');
+    window.cancelButton = document.getElementById('cancel');
     window.messageInput = document.getElementById('message');
     window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
@@ -94,6 +95,8 @@ async function sendMessage(message) {
     // received) and scroll down to the pge
     messageInput.disabled = true;
     sendButton.disabled = true;
+    sendButton.style.display = 'none';
+    cancelButton.style.display = 'block';
     window.scrollTo(0, document.body.scrollHeight);
     
     // Start the chat streaming. We need to do this through a separate endpoint
@@ -105,7 +108,15 @@ async function sendMessage(message) {
         body: requestBody(message, searchFirst)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
-    });    
+    });
+    function endStream() {
+        clearInterval(messageInterval);
+        messageInput.disabled = false;
+        sendButton.style.display = 'block';
+        cancelButton.style.display = 'none';
+        loadingMessageDiv.removeChild(loadingMessageBox);
+        eventSource.close();    
+    }
     // Now start streaming
     const eventSource = new EventSource('{{ server_url }}/api/chat/stream');
     eventSource.onmessage = function(event) {
@@ -115,10 +126,7 @@ async function sendMessage(message) {
         // If the message reflects an action, we process it separately.
         if (typeof data.action !== 'undefined') {
             if (data.action == 'close') {
-                clearInterval(messageInterval);
-                messageInput.disabled = false;
-                loadingMessageDiv.removeChild(loadingMessageBox);
-                eventSource.close();
+                endStream();
             } else if (data.action == 'set_loading_indicator') {
                 baseMessage = data.message;
             }
@@ -178,6 +186,24 @@ async function sendMessage(message) {
         messageInput.disabled = false; // Re-enable the message input
         responseDiv.innerText = 'Heymans: An error occurred, sorry! Please restart the conversation and try again.';
     };
+    
+    function cancelStreaming() {
+        fetch('{{ server_url }}/api/chat/cancel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cancel: true })
+        }).then(response => {
+            if (response.ok) {
+                console.log('Streaming cancelled by the client.');
+                endStream()
+            }
+        });
+        cancelButton.onclick = null;
+        cancelButton.style.display = 'none';
+    }
+    cancelButton.onclick = cancelStreaming;
 }
 
 function requestBody(message, searchFirst) {

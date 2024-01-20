@@ -7,8 +7,10 @@ from flask import request, jsonify, Response, redirect, session, \
 from flask_login import login_required
 from .. import config, utils, attachments
 from .app import get_heymans
+from redis import Redis
 logger = logging.getLogger('heymans')
 api_blueprint = Blueprint('api', __name__)
+redis_client = Redis()
 
 
 @api_blueprint.route('/chat/start', methods=['POST'])
@@ -17,7 +19,18 @@ def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
     session['search_first'] = data.get('search_first', True)
+    heymans = get_heymans()
+    redis_client.delete(f'stream_cancel_{heymans.user_id}')
     return '{}'
+    
+
+@api_blueprint.route('/chat/cancel', methods=['POST'])
+@login_required
+def api_chat_cancel_stream():
+    heymans = get_heymans()
+    logger.info(f'cancelling stream for {heymans.user_id}')
+    redis_client.set(f'stream_cancel_{heymans.user_id}', '1')
+    return jsonify({'status': 'cancelled'}), 200
 
 
 @api_blueprint.route('/chat/stream', methods=['GET'])
@@ -25,6 +38,7 @@ def api_chat_start():
 def api_chat_stream():
     message = session['user_message']
     heymans = get_heymans()
+    logger.info(f'starting stream for {heymans.user_id}')
     def generate():
         for reply, metadata in heymans.send_user_message(message):
             if isinstance(reply, dict):
@@ -36,6 +50,9 @@ def api_chat_stream():
                      'metadata': metadata})
             logger.debug(f'ai message: {reply}')
             yield f'data: {reply}\n\n'
+            if redis_client.get(f'stream_cancel_{heymans.user_id}'):
+                logger.info(f'stream cancelled for {heymans.user_id}')
+                break
         yield 'data: {"action": "close"}\n\n'
     return Response(stream_with_context(generate()),
                     mimetype='text/event-stream')
