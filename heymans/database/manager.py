@@ -46,8 +46,20 @@ class DatabaseManager:
 
     def set_active_conversation(self, conversation_id: int) -> bool:
         try:
+            # We first get the active conversation
             conversation = Conversation.query.filter_by(
                 conversation_id=conversation_id, user_id=self.user_id).one()
+            # And then update the current time for that conversation so that
+            # it ends on top
+            decrypted_data = self.encryption_manager.decrypt_data(
+                conversation.data)
+            conversation_data = json.loads(decrypted_data)
+            conversation_data['last_updated'] = time.time()
+            json_data = json.dumps(conversation_data)
+            encrypted_data = self.encryption_manager.encrypt_data(
+                json_data.encode('utf-8'))
+            conversation.data = encrypted_data
+            # Finally we change the active conversation for the user
             user = User.query.filter_by(user_id=self.user_id).one()
             user.active_conversation_id = conversation.conversation_id
             db.session.commit()
