@@ -4,6 +4,7 @@ import json
 import logging
 import asyncio
 from langchain.schema import AIMessage, HumanMessage
+from langchain_community.callbacks import get_openai_callback
 import time
 logger = logging.getLogger('heymans')
 
@@ -14,6 +15,9 @@ class BaseModel:
     
     def __init__(self, heymans):
         self._heymans = heymans
+        self.total_tokens_consumed = 0
+        self.prompt_tokens_consumed = 0
+        self.completion_tokens_consumed = 0
 
     def predict(self, messages):
         t0 = time.time()
@@ -69,6 +73,24 @@ class OpenAIModel(BaseModel):
         self._model = ChatOpenAI(
             model=model,
             openai_api_key=config.openai_api_key)
+        
+    def predict(self, messages):
+        with get_openai_callback() as cb:
+            retval = super().predict(messages)
+        logger.info(cb)
+        self.total_tokens_consumed += cb.total_tokens
+        self.prompt_tokens_consumed += cb.prompt_tokens
+        self.completion_tokens_consumed += cb.completion_tokens
+        return retval
+    
+    def predict_multiple(self, prompts):
+        with get_openai_callback() as cb:
+            retval = super().predict_multiple(prompts)
+        logger.info(cb)
+        self.total_tokens_consumed += cb.total_tokens
+        self.prompt_tokens_consumed += cb.prompt_tokens
+        self.completion_tokens_consumed += cb.completion_tokens
+        return retval
         
         
 class ClaudeModel(BaseModel):

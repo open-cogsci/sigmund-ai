@@ -67,6 +67,20 @@ default_conversation_title = 'New conversation'
 # in AI messages, usually as the result of tool use.
 keep_transient = 4
 
+# RATE LIMITS
+#
+# The maximum number of tokens that can be consumed per hour by the answer
+# model.
+max_tokens_per_hour = 50000
+max_tokens_per_hour_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
+
+
+# LOGGING
+#
+# When set to True, replies will be logged. This should disabled during 
+# production for privacy.
+log_replies = False
+
 # MODELS
 #
 # The API keys should not be shared

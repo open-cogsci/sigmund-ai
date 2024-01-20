@@ -64,12 +64,22 @@ class Heymans:
         This tuple can also be (str, dict) in which case the str contains an
         AI message and the dict contains metadata for the message.
         """
+        if self._rate_limit_exceeded():
+            yield config.max_tokens_per_hour_exceeded_message, \
+                    self.messages.metadata()
+            return
         self.messages.append('user', message)
         if self._search_first:
             for reply, metadata in self._search(message):
                 yield reply, metadata
         for reply, metadata in self._answer():
             yield reply, metadata
+        
+    def _rate_limit_exceeded(self):
+        tokens_consumed_past_hour = self.database.get_activity()
+        logger.info(
+            f'tokens consumed in past hour: {tokens_consumed_past_hour}')
+        return tokens_consumed_past_hour > config.max_tokens_per_hour
     
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
@@ -80,7 +90,8 @@ class Heymans:
         self.tools = self.search_tools
         reply = self.search_model.predict(self.messages.prompt(
             system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
-        logger.info(f'[search state] reply: {reply}')
+        if config.log_replies:
+            logger.info(f'[search state] reply: {reply}')
         self._run_tools(reply)
         self.documentation.strip_irrelevant(message)
         logger.info(
@@ -92,9 +103,16 @@ class Heymans:
                'message': f'{config.ai_name} is thinking and typing '}, {}        
         logger.info(f'[{state} state] entering')
         self.tools = self.answer_tools
-        # We first collect a regular reply to the user message
+        # We first collect a regular reply to the user message. While doing so
+        # we also keep track of the number of tokens consumed.
+        tokens_consumed_before = self.answer_model.total_tokens_consumed
         reply = self.answer_model.predict(self.messages.prompt())
-        logger.info(f'[{state} state] reply: {reply}')
+        tokens_consumed = self.answer_model.total_tokens_consumed \
+            - tokens_consumed_before
+        logger.info(f'tokens consumed: {tokens_consumed}')
+        self.database.add_activity(tokens_consumed)        
+        if config.log_replies:
+            logger.info(f'[{state} state] reply: {reply}')
         # We then run tools based on the AI reply. This may modify the reply,
         # mainly by stripping out any JSON commands in the reply
         reply, result, needs_feedback = self._run_tools(reply)
@@ -126,7 +144,7 @@ class Heymans:
             yield result, metadata
         # If feedback is required, either because the tools require it or 
         # because the AI sent a NOT_DONE_YET marker, go for another round.
-        if needs_feedback:
+        if needs_feedback and not self._rate_limit_exceeded():
             for reply, metadata in self._answer(state='feedback'):
                 yield reply, metadata
 

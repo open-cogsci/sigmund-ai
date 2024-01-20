@@ -1,8 +1,10 @@
 import json
 import logging
 import time
-from .models import db, User, Conversation, Attachment
+from datetime import datetime, timedelta
+from .models import db, User, Conversation, Attachment, Activity
 from .encryption import EncryptionManager
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 logger = logging.getLogger('heymans')
@@ -190,3 +192,23 @@ class DatabaseManager:
             logger.error(f"Error decrypting attachment data for attachment_id "
                          f"{attachment_id}: {e}")
             return {}
+
+    def add_activity(self, tokens_consumed: int):
+        """Adds the number of tokens consumed using the current time."""
+        new_activity = Activity(user_id=self.user_id, time=datetime.utcnow(),
+                                tokens_consumed=tokens_consumed)
+        db.session.add(new_activity)
+        db.session.commit()
+
+    def get_activity(self, after_time=None) -> int:
+        """Retrieves the total number of tokens consumed since a particular 
+        time, using the past hour as a default if no after_time is provided.
+        """
+        if after_time is None:
+            after_time = datetime.utcnow() - timedelta(hours=1)
+
+        total_tokens = db.session.query(func.sum(Activity.tokens_consumed)) \
+            .filter(Activity.user_id == self.user_id) \
+            .filter(Activity.time >= after_time) \
+            .scalar()
+        return total_tokens if total_tokens is not None else 0
