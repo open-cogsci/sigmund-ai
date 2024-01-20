@@ -32,7 +32,7 @@ See `heymans/config.py` for configuration instructions.
 
 ## Dependencies
 
-For Python dependencies, see `pyproject.toml`. In addition to these, `pandoc` is required for the ability to read attachments.
+For Python dependencies, see `pyproject.toml`. In addition to these, `pandoc` is required for the ability to read attachments, and a local `redis` server needs to run for persistent data between sessions.
 
 
 ## Running (development)

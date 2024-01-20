@@ -28,6 +28,7 @@ dependencies = [
     "openai",
     "pdfminer.six",
     "pygments",
+    "redis",
     "requests",
     "scholarly",
     "tiktoken"
