@@ -116,8 +116,10 @@ def main():
     if current_user.is_authenticated:
         return chat_page()
     return redirect(url_for('app.login'))
-    
+
+
 @app_blueprint.route('/chat')
-@login_required
 def chat():
-    return chat_page()
+    if current_user.is_authenticated:
+        return chat_page()
+    return redirect(url_for('app.login'))
