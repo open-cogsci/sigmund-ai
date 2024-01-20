@@ -3,13 +3,7 @@
 {% include 'head.html' %}
 <body>
     {% include 'header.html' %}
-    <script>
-    function signin() {
-        document.getElementById("login-form").style.display = "block"
-        document.getElementById("sign-in-button").style.display = "none"
-    }
-    </script>
-<style>
+    <style>
         /* The Modal (background) */
         .modal {
             display: none; /* Hidden by default */
@@ -40,6 +34,7 @@
             float: right;
             font-size: 28px;
             font-weight: bold;
+            margin-top: -15px;
         }
 
         .close:hover,
@@ -48,6 +43,27 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
+        /* Style the input fields to match modal width */
+        #login-form input[type="text"],
+        #login-form input[type="password"],
+        #login-form input[type="submit"] {
+            width: 100%; /* 100% width minus padding */
+            box-sizing: border-box; /* Include padding and border in the element's width */
+            padding: 10px; /* Add some padding for aesthetic spacing */
+        }
+    
+        /* Style the labels for a cleaner look */
+        #login-form label {
+            display: block; /* Makes the label take the width of the container */
+            margin-bottom: 5px; /* Space between the label and the input field */
+            text-align: left; /* Aligns the text to the left */
+        }
+        
+        #login-form input[type="submit"] {
+            margin-top: 10px;
+        }
+    
     </style>    
     <div id="container">
         <div id="login">
@@ -74,5 +90,31 @@
         </div>
         {% include 'footer.html' %}
     </div>
+    <script>
+    var modal = document.getElementById("login-modal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("sign-in-button");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }    
+    </script>    
 </body>
 </html>
