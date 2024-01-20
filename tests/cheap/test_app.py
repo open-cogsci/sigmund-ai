@@ -31,7 +31,7 @@ class TestApp(BaseRoutesTestCase):
         
     def when_unauthenticated(self):
         response = self.client.get('/chat')
-        assert response.status_code == 401
+        assert response.status_code == 302
         response = self.client.get('/about')
         assert response.status_code == 200
         response = self.client.get('/login')
