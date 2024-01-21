@@ -31,6 +31,7 @@ dependencies = [
     "redis",
     "requests",
     "scholarly",
+    "stripe",
     "tiktoken"
 ]
 keywords = ["ai", "chatbot", "llm"]

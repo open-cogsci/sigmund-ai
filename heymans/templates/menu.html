@@ -8,7 +8,8 @@
   top: 10px;
   right: 10px;
   padding: 5px;
-  border-radius: 50%; /* Optional: Adds rounded corners */
+  border-radius: 4px;
+  border: 1px solid #ccc;
   transition: background-color 0.3s ease; /* Smooth transition for the background color */
 }
 
@@ -25,7 +26,7 @@
   border: 1px solid #ccc;
   background: #fff;
   padding: 10px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Optional: Adds a shadow for depth */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1000; /* Ensure the menu is above other content */
 }
 
@@ -128,18 +129,29 @@
 #uploadMessage {
   margin-bottom: 20px;
 }
+
+.menu-divider {
+  border: none;
+  height: 1px;
+  background-color: #e8e8e8;
+  margin: 8px 0;
+}
 </style>
 
 {% raw %}
 <div id="app">
   <div class="menu-icon" @click="toggleMenu">☰</div>
   <div class="menu" v-bind:class="{ 'active': menuVisible }">
-    <div @click="navigateTo('/about')">About</div>
-    <div @click="navigateTo('/api/conversation/new')">New conversation</div>
+    <div @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <div @click="showAttachments">Browse attachments</div>
-    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; Use documentation</div>
+    <hr class="menu-divider">
+    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; {{ toggleDocsLabel }}</div>
+    <hr class="menu-divider">
+    <div @click="navigateTo('/about')">About</div>
+    <div @click="navigateTo('/terms')">Terms and conditions</div>
+    <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
     <div @click="navigateTo('/logout')">Log out</div>
   </div>
   <!-- Modal for browsing conversations -->
@@ -205,6 +217,8 @@ new Vue({
     showModal: false,
     conversations: {},
     showAttachmentsModal: false,
+    showManageSubscriptions: {{ subscription_required|lower }},
+    toggleDocsLabel: "{{ search_first_menu_label }}",
     attachments: {},
     isUploading: false,
     isDocsToggled: window.searchFirst
@@ -220,6 +234,9 @@ new Vue({
     },
   },
   methods: {
+  getNewConversationUrl() {
+      return '/api/conversation/new/' + Number(searchFirst);
+    },
     toggleDocs: function() {
       this.isDocsToggled = !this.isDocsToggled;
       window.searchFirst = this.isDocsToggled;

@@ -35,7 +35,7 @@ class Heymans:
                  search_tools: Optional[list] = None,
                  answer_tools: Optional[list] = None):
         self.user_id = user_id
-        self._search_first = \
+        self.search_first = \
             config.search_first if search_first is None else search_first
         self.database = DatabaseManager(user_id, encryption_key)
         self.documentation = Documentation(
@@ -70,7 +70,7 @@ class Heymans:
                     self.messages.metadata()
             return
         self.messages.append('user', message, message_id)
-        if self._search_first:
+        if self.search_first:
             for reply, metadata in self._search(message):
                 yield reply, metadata
         for reply, metadata in self._answer():

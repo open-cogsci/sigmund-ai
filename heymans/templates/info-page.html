@@ -4,9 +4,9 @@
 <body>
     {% include 'header.html' %}
     <div id="container">
-        <div id="about">
-            <p><a href="/">Go back</a></p>
-            <div id="start-text">{{ about_text |safe }}</div>
+        <div id="start-text">
+            <p><a href="/"><i class="fas fa-home"></i> Back to main page</a></p>
+        {{ content|safe }}
         </div>
         {% include 'footer.html' %}
     </div>

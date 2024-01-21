@@ -116,7 +116,9 @@ class Messages:
         return model_prompt
 
     def welcome_message(self):
-        return config.welcome_message
+        if self._heymans.search_first:
+            return config.welcome_message_with_search
+        return config.welcome_message_without_search
         
     def _condense_message_history(self):
         system_prompt = self._system_prompt()
@@ -150,12 +152,15 @@ class Messages:
         """
         # There is always and identity, information about the current time,
         # and a list of attached files
-        system_prompt = [
-            prompt.SYSTEM_PROMPT_IDENTITY,
+        if self._heymans.search_first:
+            system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITH_SEARCH]
+        else:
+            system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
+        system_prompt.append(
             prompt.render(prompt.SYSTEM_PROMPT_DATETIME,
-                          current_datetime=utils.current_datetime()),
-            attachments.attachments_prompt(self._heymans.database)
-        ]
+                          current_datetime=utils.current_datetime()))
+        system_prompt.append(
+            attachments.attachments_prompt(self._heymans.database))
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.

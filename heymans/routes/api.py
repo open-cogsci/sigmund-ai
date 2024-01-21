@@ -60,9 +60,10 @@ def api_chat_stream():
                     mimetype='text/event-stream')
     
     
-@api_blueprint.route('/conversation/new')
+@api_blueprint.route('/conversation/new/<int:search_first>')
 @login_required
-def new_conversation():
+def new_conversation(search_first):
+    session['search_first'] = bool(search_first)
     heymans = get_heymans()
     heymans.database.new_conversation()
     return redirect('/chat')

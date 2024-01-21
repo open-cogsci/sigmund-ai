@@ -1,8 +1,6 @@
-[TOC]
-
-
 Sigmund implements several techniques to be a helpful assistant that provides useful answers.
 
+[TOC]
 
 ## Step 1: Documentation search
 

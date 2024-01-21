@@ -55,11 +55,21 @@ chunk_throttle = .1
 # The maximum length of a user message
 max_message_length = 5000
 # A fixed welcome message
-welcome_message = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant!
+welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant!
 
-I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, and I can look up scientific articles on Google Scholar.
+I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, can read attachments, and can look up scientific articles on Google Scholar.
 
-What is your name? And would you like to learn more about how to work with me?'''
+What is your name? And would you like to learn more about how to work with me?
+
+<small style="color:gray;">PS. If you want to discuss things that are unrelated to OpenSesame, disable "OpenSesame expert" mode in the menu. That will make me a better general-purpose chatbot.</small>'''
+welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant!
+
+I have basic code execution abilities, I can read attachments, and I can look up scientific articles on Google Scholar.
+
+Let\'s get started! What would like you to disuss?
+
+<small style="color:gray;">PS. If you want help with OpenSesame, enable "OpenSesame expert" mode in the menu. That will give me access to the OpenSesame documentation.</small>
+'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 # The number of previous messages for which transient content should be 
@@ -118,6 +128,8 @@ answer_tools = ['CodeExecutionTool', 'GoogleScholarTool', 'AttachmentsTool',
 # Indicates whether documentation should be searched before answering the 
 # question.
 search_first = True
+# Jow the search-first option appears in the menu
+search_first_menu_label = 'OpenSesame expert'
 # Topic sources are used to feed in specific chunks of documentation that are
 # relevant to a topic.
 topic_sources = {
@@ -134,9 +146,9 @@ topic_sources = {
 
 
 def process_ai_message(msg):
-    # This pattern looks for a colon possibly followed by any number of whitespaces
-    # and/or HTML tags, followed by a newline and a dash, and replaces it with
-    # a colon, newline, newline, and dash
+    # This pattern looks for a colon possibly followed by any number of 
+    # whitespaces # and/or HTML tags, followed by a newline and a dash, and 
+    # replaces it with a colon, newline, newline, and dash
     pattern = r':\s*(<[^>]+>\s*)?\n-'
     replacement = ':\n\n-'
     return re.sub(pattern, replacement, msg)
@@ -156,7 +168,16 @@ def validate_user(username, password):
     return user_validation.validate(username, password)
 
 
-# STRIPE
+login_failed_message = '__User name or password incorrect. Please try again.__'
+
+
+# SUBSCRIPTIONS
+#
+# Enable this to activate the Stripe-based subscription functionality.
+subscription_required = True
+# This is the duration of the subscription in days. This should be set to a bit
+# longer than a month to provide a grace period in case of payment issues.
+subscription_length = 40
 #
 # Stripe is a payment portal. The information below should not be shared
 #

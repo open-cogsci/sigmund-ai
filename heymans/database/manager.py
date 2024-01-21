@@ -2,6 +2,7 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
+from .. import config
 from .models import db, User, Conversation, Attachment, Activity, Subscription
 from .encryption import EncryptionManager
 from sqlalchemy import func
@@ -12,7 +13,7 @@ logger = logging.getLogger('heymans')
 
 class DatabaseManager:
     
-    def __init__(self, username: str, encryption_key: [str, bytes]):
+    def __init__(self, username: str, encryption_key: [str, bytes]=None):
         self.username = username
         self.encryption_manager = EncryptionManager(encryption_key)
         self.ensure_user_exists()
@@ -235,7 +236,7 @@ class DatabaseManager:
         """
         now = datetime.utcnow()
         from_date = from_date or now
-        to_date = to_date or now + timedelta(days=31)
+        to_date = to_date or now + timedelta(days=config.subscription_length)
         subscription = Subscription.query.filter_by(
             user_id=self.user_id).first()
         if subscription:
@@ -286,7 +287,7 @@ class DatabaseManager:
             return None
         user_record = User.query.filter(
             User.user_id == subscription_record.user_id
-        ).order_by(Subscription.from_date.desc()).first()
+        ).first()
         if not user_record:
             return None
         return DatabaseManager(username=user_record.username)

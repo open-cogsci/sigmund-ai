@@ -30,7 +30,8 @@ def get_heymans():
 
 def chat_page():
     heymans = get_heymans()
-    if not heymans.database.check_subscription():
+    if config.subscription_required and \
+            not heymans.database.check_subscription():
         return redirect(url_for('subscribe.subscribe'), code=303)
     html_content = ''
     previous_timestamp = None
@@ -68,10 +69,13 @@ def chat_page():
             answer_model_div = ''
             
         html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
-    return utils.render('chat.html', message_history=html_content)
+    return utils.render('chat.html', message_history=html_content,
+                        subscription_required=config.subscription_required,
+                        username=heymans.user_id,
+                        search_first_menu_label=config.search_first_menu_label)
 
 
-def login_handler(form, html):
+def login_handler(form, failed=False):
     if form.validate_on_submit():
         username = form.username.data.strip().lower()
         password = form.password.data.strip()
@@ -88,32 +92,44 @@ def login_handler(form, html):
         login_user(user)
         logger.info(f'initializing encryption key: {session["encryption_key"]}')
         return redirect('/')
+    login_text = Path('heymans/static/login.md').read_text()
+    if failed:
+        login_text = f'{config.login_failed_message}\n\n{login_text}'
     return utils.render(
-        html, form=form,
-        login_text=utils.md(Path('heymans/static/login.md').read_text()))
+        'login.html', form=form,
+        login_text=utils.md(login_text))
     
     
 @app_blueprint.route('/about')
 def about():
     return utils.render(
-        'about.html',
-        about_text=utils.md(Path('heymans/static/about.md').read_text()))
+        'info-page.html',
+        content=utils.md(Path('heymans/static/about.md').read_text()))
+    
+
+@app_blueprint.route('/terms')
+def terms():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('heymans/static/terms.md').read_text()))
 
 
 @app_blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-    return login_handler(LoginForm(), 'login.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('app.chat'))
+    return login_handler(LoginForm())
 
 
 @app_blueprint.route('/login_failed', methods=['GET', 'POST'])
 def login_failed():
-    return login_handler(LoginForm(), 'login_failed.html')
+    return login_handler(LoginForm(), failed=True)
 
 
 @app_blueprint.route('/logout')
 def logout():
     logout_user()
-    return redirect('/login')
+    return redirect(url_for('app.login'))
 
 
 @app_blueprint.route('/')
