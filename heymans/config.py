@@ -120,8 +120,9 @@ answer_model = 'gpt-4'
 # Search tools are executed in the first documentation-search phase
 search_tools = ['TopicsTool', 'SearchTool']
 # Answer tools are executed during the answer phase
-answer_tools = ['CodeExecutionTool', 'GoogleScholarTool', 'AttachmentsTool',
-                'DownloadTool']
+answer_tools_with_search = []
+answer_tools_without_search = ['CodeExecutionTool', 'GoogleScholarTool',
+                               'AttachmentsTool', 'DownloadTool']
 
 # DOCUMENTATION
 #

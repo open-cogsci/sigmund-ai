@@ -47,7 +47,10 @@ class Heymans:
         if search_tools is None:
             search_tools = config.search_tools
         if answer_tools is None:
-            answer_tools = config.answer_tools
+            if self.search_first:
+                answer_tools = config.answer_tools_with_search
+            else:
+                answer_tools = config.answer_tools_without_search
         # Tools are class names from the tools module, which need to be
         # instantiated with heymans (self) as first argument
         self.search_tools = [getattr(tools, t)(self) for t in search_tools]
