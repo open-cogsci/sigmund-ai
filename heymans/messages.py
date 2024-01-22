@@ -5,6 +5,7 @@ import uuid
 import time
 import re
 from pathlib import Path
+from cryptography.fernet import InvalidToken
 from .model import model
 from . import prompt, config, utils, attachments
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
@@ -198,7 +199,13 @@ class Messages:
             self._conversation_title = self._conversation_title[:100] + '…'
 
     def load(self):
-        conversation = self._heymans.database.get_active_conversation()
+        try:
+            conversation = self._heymans.database.get_active_conversation()
+        except InvalidToken as e:
+            self.init_conversation()
+            self.save()
+            logger.error(f'failed to get active conversation: {e}')
+            return
         if not conversation['message_history']:
             self.init_conversation()
             return
