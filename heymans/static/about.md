@@ -1,41 +1,77 @@
-Sigmund implements several techniques to be a helpful assistant that provides useful answers.
+Sigmund is a powerful, privacy-focused AI assistant (or chatbot). Sigmund is a web app that provides access to state-of-the-art large language models (LLMs).
+
 
 [TOC]
 
-## Step 1: Documentation search
 
-If *Use documentation* is enabled (in the menu), then, before answering a user question, Sigmund searches for relevant sections in the documentation, which are by default related to [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu). 
+## Sigmund is an OpenSesame expert
 
-Unlike most documentation-enabled chatbots, Sigmund does not simply perform a vector search to retrieve documents that are similar to the question. Instead, Sigmund formulates a number of search queries that are used to perform a vector search. Once a set of seemingly relevant documents have been retrieved, each of them is evaluated to determine whether it is indeed relevant to the user question. If not, the document is discarded.
+If *OpenSesame expert* is enabled (in the menu), Sigmund searches for relevant sections in the documentation of [OpenSesame](https://osdoc.cogsci.nl/), a program for developing psychology and cognitive-neuroscience experiments. In addition, Sigmund receives a set of fixed instructions designed to enhance its general knowledge of OpenSesame. Sigmund subsequently uses this information to answer questions, and to provide links to relevant pages from the documentation. This technique, often referred to as Retrieval-Augmented Generation, allows Sigmund to answer questions about OpenSesame much better than other chatbots.
 
-The documentation-search phase consists of several steps, which may sound time-consuming and expensive. However, it is performed with a cheap and fast model (by default GPT 3.5 turbo), which keeps it manageable.
+Sigmund is especially good at generating code for (Python) inline_script or inline_javascript items. Try it!
+
+<blockquote>
+I want to create a stimulus display in OpenSesame, using a canvas in a Python inline script. It's a bit complex, so read carefully! There should be:
+
+- A central fixation dot.
+- Six shapes in a circular arrangement around the central dot (like in a Theeuwes attentional-capture paradigm).
+- One of these shapes, randomly selected, should be a square. The other shapes should be circles.
+- One of these shapes, again randomly selected, should be green. The other shapes should be red.
+- Inside each shape there should be a line segment that is tilted 45 degrees clockwise or counterclockwise.
+</blockquote>
 
 
-## Step 2: Question answering
+## Sigmund respects your privacy
 
-Relevant documents (if any) are subsequently included in the system prompt (context), so that Sigmund is able to provide accurate answers about things that it does not know very well. Because of this, Sigmund is much better at answering questions about OpenSesame and DataMatrix than other chatbots are.
+Your messages and attachments are encrypted based on a key that is linked to your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
 
-Sigmund is also able to do the following:
+Sigmund uses the large-language-model API provided by OpenAI. OpenAI does not use data that they receive through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, [see their terms of service](https://openai.com/enterprise-privacy).
 
-- Search for scientific articles on Google Scholar
-- Execute Python and R code
-- Download files and web pages and store them as attachments
-- Read attachments
 
-Sigmund does this by including specific JSON syntax (hidden from the user) in its reply. When a JSON command is detected in a reply, the corresponding tool is executed, and the result of the tool is included in the conversation in the form of an AI message. Sigmund continues to reply and execute tools until it feels that its reply is finished.
+## Things Sigmund can do
 
-Question answering is handled by an expensive and slow model (by default GPT 4 turbo) for the highest quality.
+The following capabilities are only available when OpenSesame-expert mode is disabled. (This is to avoid overwhelming the model with instructions.)
+
+### Search Google Scholar
+
+Sigmund can search Google Scholar for scientific literature. Try it!
+
+> Do your pupils constrict when you think of something bright, such as a sunny beach? Please base your answer on scientific literature.
+
+
+### Execute Python and R code
+
+Sigmund can not only write Python and R code, but also execute it. Try it!
+
+> Can you write a Python function that returns the number of words in a sentence? Please also write some test cases and execute them to make sure that the function is correct.
+
+Limitation: Sigmund cannot use or generate attachments during code execution and cannot display figures. This will be improved in future versions.
+
+
+### Download files and web pages
+
+Sigmund can download files and web pages and save them as attachments (see below). Try it!
+
+> Can you download this page for me? https://journalofcognition.org/articles/10.5334/joc.18
+
+Limitation: Sometimes Sigmund gets confused when trying to download something. Some friendly guidance can help.
+
+### Read attachments
+
+Sigmund can read attachments, which can be uploaded by the user (Menu → Attachments) or downloaded by Sigmund itself (see above). Let's assume you've downloaded the file above and try it!
+
+> Can you summarize the attached joc.18 file?
+
+Limitation: Sometimes Sigmund gets confused when trying to read attachments. Some friendly guidance can help.
+
+
+## Sigmund is open source
+
+The source code of Sigmund is available on GitHub:
+
+- <https://github.com/open-cogsci/sigmund-ai>
 
 
 ## How can I get an account?
 
 Sigmund is currently in limited beta and by invitation only. If you have received an invitation, you can log in using your account from <https://forum.cogsci.nl/>. 
-
-
-## Privacy
-
-Sigmund encrypts all messages and attachments using a key that is based on your password. This means that no-one, including the system administrators, can read your messages.
-
-By default, Sigmund uses the large-language-model API provided by OpenAI. OpenAI does not use data that they receive through the API for any purposes other than replying to the request. Notably, your data will not be used to train their models. For more information, see their terms of service:
-
-- <https://openai.com/enterprise-privacy>
