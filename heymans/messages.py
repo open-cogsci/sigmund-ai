@@ -14,6 +14,9 @@ logger = logging.getLogger('heymans')
 
 class Messages:
     
+    regex_transient = re.compile(r"<div class=['\"]+.*?transient.*?>.*?</div>",
+                                 re.DOTALL)    
+    
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
         self._persistent = persistent
@@ -81,6 +84,9 @@ class Messages:
                     f'Could not find condensed message to remove for {message_id}')
         if self._persistent:
             self.save()
+            
+    def _message_is_transient(self, content):
+        return self.regex_transient.search(content)
     
     def prompt(self, system_prompt=None):
         """The prompt consists of the system prompt followed by a sequence of
@@ -93,8 +99,6 @@ class Messages:
         Typically, an explicit system_prompt is provided during the search
         phase, but not during the answer phase.
         """
-        regex = re.compile(r"<div class=['\"]+.*?transient.*?>.*?</div>",
-                           re.DOTALL)
         if system_prompt is None:
             system_prompt = self._system_prompt()
         model_prompt = [SystemMessage(content=system_prompt)]
@@ -105,8 +109,7 @@ class Messages:
             # which are removed if they are a few messages away in the history.
             # This avoid the prompt from becoming too large.
             if msg_nr + config.keep_transient < msg_len:
-                match = regex.search(content)
-                if match:
+                if self._message_is_transient(content):
                     content = '<!--THIS MESSAGE IS NO LONGER AVAILABLE-->'
             if role == 'assistant':
                 model_prompt.append(AIMessage(content=content))
@@ -125,7 +128,8 @@ class Messages:
         system_prompt = self._system_prompt()
         messages = [{"role": "system", "content": system_prompt}]
         prompt_length = sum(len(content) for role, content
-                            in self._condensed_message_history)
+                            in self._condensed_message_history
+                            if not self._message_is_transient(content))
         logger.info(f'system prompt length: {len(system_prompt)}')
         logger.info(f'prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
