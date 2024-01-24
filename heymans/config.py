@@ -42,7 +42,7 @@ condense_chunk_length = 10000
 #
 # The maximum length of the text representation of an attachment that is used
 # to generate a description
-max_text_representation_length = 16000
+max_text_representation_length = 30000
 
 # LIBRARY INDEXING
 #
