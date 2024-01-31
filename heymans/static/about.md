@@ -6,15 +6,15 @@ Sigmund is a powerful, privacy-focused AI assistant (or chatbot). Sigmund is a w
 
 ## Sigmund is an OpenSesame expert
 
-If *OpenSesame expert* is enabled (in the menu), Sigmund searches for relevant sections in the documentation of [OpenSesame](https://osdoc.cogsci.nl/), a program for developing psychology and cognitive-neuroscience experiments. In addition, Sigmund receives a set of fixed instructions designed to enhance its general knowledge of OpenSesame. Sigmund subsequently uses this information to answer questions, and to provide links to relevant pages from the documentation. This technique, often referred to as Retrieval-Augmented Generation, allows Sigmund to answer questions about OpenSesame much better than other chatbots.
+If OpenSesame-expert mode is enabled (in the menu), Sigmund searches for relevant sections in the documentation of [OpenSesame](https://osdoc.cogsci.nl/), a program for developing psychology and cognitive-neuroscience experiments. Sigmund also receives a set of fixed instructions designed to enhance its general knowledge of OpenSesame. Sigmund subsequently uses this information to answer questions, and to provide links to relevant pages from the documentation. This technique, which is a variation of so-called Retrieval-Augmented Generation, allows Sigmund to answer questions about OpenSesame much better than other chatbots.
 
 Sigmund is especially good at generating code for (Python) inline_script or inline_javascript items. Try it!
 
 <blockquote>
-I want to create a stimulus display in OpenSesame, using a canvas in a Python inline script. It's a bit complex, so read carefully! There should be:
+I want to create a stimulus display in OpenSesame, using a canvas in a Python inline script. It's a bit complex, so please read carefully! There should be:
 
 - A central fixation dot.
-- Six shapes in a circular arrangement around the central dot (like in a Theeuwes attentional-capture paradigm).
+- Six shapes in a circular arrangement around the central dot.
 - One of these shapes, randomly selected, should be a square. The other shapes should be circles.
 - One of these shapes, again randomly selected, should be green. The other shapes should be red.
 - Inside each shape there should be a line segment that is tilted 45 degrees clockwise or counterclockwise.
@@ -25,7 +25,7 @@ I want to create a stimulus display in OpenSesame, using a canvas in a Python in
 
 Your messages and attachments are encrypted based on a key that is linked to your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
 
-Sigmund uses the large-language-model API provided by OpenAI. OpenAI does not use data that they receive through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, [see their terms of service](https://openai.com/enterprise-privacy).
+Sigmund uses the large-language-model API provided by OpenAI. OpenAI does not use data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, [see their terms of service](https://openai.com/enterprise-privacy).
 
 
 ## Things Sigmund can do
@@ -37,6 +37,8 @@ The following capabilities are only available when OpenSesame-expert mode is dis
 Sigmund can search Google Scholar for scientific literature. Try it!
 
 > Do your pupils constrict when you think of something bright, such as a sunny beach? Please base your answer on scientific literature.
+
+Limitation: Sigmund reads abstracts, titles, author lists, etc. but does not spontaneously read the complete article. To have Sigmund read complete articles, you can either encourage Sigmund to download the article (see below) or upload the article as an attachment yourself.
 
 
 ### Execute Python and R code
