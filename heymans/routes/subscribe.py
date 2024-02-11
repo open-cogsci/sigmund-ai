@@ -41,6 +41,7 @@ def create_checkout_session():
             success_url=f'{config.server_url}/subscribe/success/{{CHECKOUT_SESSION_ID}}',
             cancel_url=f'{config.server_url}/',
             client_reference_id=heymans.user_id,
+            allow_promotion_codes=True,
             mode='subscription',
             line_items=[{'price': config.stripe_price_id, 'quantity': 1}],
         )
