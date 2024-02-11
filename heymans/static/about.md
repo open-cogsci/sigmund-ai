@@ -1,4 +1,4 @@
-Sigmund is a powerful, privacy-focused AI assistant (or chatbot). Sigmund is a web app that provides access to state-of-the-art large language models (LLMs).
+Sigmund is a powerful, privacy-focused AI assistant (or chatbot). It is a web app that built on state-of-the-art large language models (LLMs).
 
 
 [TOC]
@@ -38,7 +38,7 @@ Sigmund can search Google Scholar for scientific literature. Try it!
 
 > Do your pupils constrict when you think of something bright, such as a sunny beach? Please base your answer on scientific literature.
 
-Limitation: Sigmund reads abstracts, titles, author lists, etc. but does not spontaneously read the complete article. To have Sigmund read complete articles, you can either encourage Sigmund to download the article (see below) or upload the article as an attachment yourself.
+Limitation: Sigmund reads abstracts, titles, author lists, etc. but does not spontaneously reads complete articles. To have Sigmund read complete articles, you can either encourage Sigmund to download the article (see below) or upload the article as an attachment yourself.
 
 
 ### Execute Python and R code

@@ -5,7 +5,7 @@
 
 ## Does Sigmund use cookies and trackers?
 
-Sigmund uses cookies to manage your log in. No third-party trackers are used. JavaScript libraries 
+Sigmund uses cookies to manage your log in. jsdelivr.net is used as a content-delivery-network (CDN) service. No third-party trackers are used.
 
 
 ## Where is the Sigmund server located?
@@ -25,15 +25,15 @@ Sigmund does *not* guarantee that data will be preserved. We do not have the cap
 
 ## What user data is stored on Sigmund?
 
-A user account on sigmund only contains a username, encrypted message and attachment data, and limited information necessary for subscriptions.
+A user account on Sigmund only contains a username, encrypted message and attachment data, and limited information necessary for subscriptions.
 
 
-## Who owns user data on MindProbe?
+## Who owns user data on Sigmund?
 
 The user owns his or her own data.
 
 
-## How do I delete user data on Sigmund?
+## How do I delete my user data on Sigmund?
 
 A user can delete all conversations and attachments on Sigmund through the Conversations and Attachments option in the user menu.
 
@@ -52,7 +52,7 @@ As electronic services are subject to interruption or breakdown, access to  Sigm
 
 ## Communication of changes
 
-We will make a reasonable effort to notify users in advance of any changes related to availability, terms of use, or privacy and ethics. However, we cannot guarantee this. Specifically, in the future, we may impose restrictions on the use of Sigmund. Furthermore, for security, technical, maintenance, legal or regulatory reasons, or due to any breach of the terms of use, we may withdraw this service at any time and without advance notice.
+We will make a reasonable effort to notify users in advance of any changes related to availability, terms of use, or privacy and ethics. However, we cannot guarantee this. Specifically, for security, technical, maintenance, legal or regulatory reasons, or due to any breach of the terms of use, we may withdraw this service at any time and without advance notice, or impose restrictions on the use of Sigmund. If such changes negatively impact user experience, users will be offered a refund for the remaining period (after the change) of their subscription.
 
 
 ## Limitation of liability
@@ -74,4 +74,4 @@ Subscriptions and payments are handled through Stripe. If the monthly subscripti
 
 ## Who runs Sigmund?
 
-Sigmund is a product of CogSci (KvK 67290965), which is registered in The Netherlands.
+Sigmund is a product of CogSci (KvK 67290965), which is registered in The Netherlands. You can reach us by email at <a href="mailto:professional@cogsci.nl">professional@cogsci.nl</a>. 

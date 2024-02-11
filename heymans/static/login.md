@@ -7,7 +7,7 @@ Welcome to Sigmund, your friendly, privacy-minded AI assistant!
 - Search for scientific articles through Google Scholar
 - Upload and download attachments
 - Only €9 per month
-- [Read more](/about)
+- Read more about [what Sigmund can do](/about) and [our terms of service](/terms)
 
 Sigmund is linked to your <a href="https://forum.cogsci.nl/">forum.cogsci.nl</a> account.
 
