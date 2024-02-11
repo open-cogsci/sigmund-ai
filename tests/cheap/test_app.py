@@ -1,5 +1,6 @@
 import unittest
 from heymans.server import create_app, HeymansConfig
+from heymans import config
 
 
 class UnitTestConfig(HeymansConfig):
@@ -11,6 +12,7 @@ class UnitTestConfig(HeymansConfig):
 class BaseRoutesTestCase(unittest.TestCase):
 
     def setUp(self):
+        config.subscription_required = False
         self.app = create_app(config_class=UnitTestConfig)
         self.client = self.app.test_client(use_cookies=True)
         self.app_context = self.app.app_context()

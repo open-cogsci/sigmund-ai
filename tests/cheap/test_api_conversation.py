@@ -15,7 +15,7 @@ class TestApi(BaseRoutesTestCase):
     def test_new_conversation(self):
         response = self.client.get('/api/conversation/list')
         original_count = len(response.json)
-        response = self.client.get('/api/conversation/new',
+        response = self.client.get('/api/conversation/new/0',
                                    follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/api/conversation/list')
@@ -28,8 +28,7 @@ class TestApi(BaseRoutesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete_conversation(self):
-        create_resp = self.client.get('/api/conversation/new',
-                                      follow_redirects=True)
+        self.client.get('/api/conversation/new/0', follow_redirects=True)
         list_resp = self.client.get('/api/conversation/list')
         conversation_id = list(list_resp.json)[0]
         original_count = len(list_resp.json)
