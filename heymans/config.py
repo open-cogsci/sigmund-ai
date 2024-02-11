@@ -191,3 +191,7 @@ stripe_secret_key = os.environ.get('STRIPE_SECRET_KEY', None)
 # The webhook secret is used to ensure that webhook calls actually come from
 # stripe
 stripe_webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET', None)
+# Additional keywords passed to stripe.checkout.Session.create to customize
+# the checkout process
+stripe_checkout_keywords = dict(allow_promotion_codes=True,
+                                payment_method_types=['card', 'paypal'])
