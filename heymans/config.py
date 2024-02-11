@@ -55,20 +55,19 @@ chunk_throttle = .1
 # The maximum length of a user message
 max_message_length = 5000
 # A fixed welcome message
-welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant!
+welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! I am best at answering questions that are specific and that I can look up in the documentation.
 
-I am best at answering questions that are specific and that I can look up in the documentation. I also have basic code execution abilities, can read attachments, and can look up scientific articles on Google Scholar.
+If you want to discuss things that are unrelated to OpenSesame, disable "OpenSesame expert" mode in the menu (it is currently enabled). That will make me a better general-purpose chatbot.
 
 What is your name? And would you like to learn more about how to work with me?
-
-<small style="color:gray;">PS. If you want to discuss things that are unrelated to OpenSesame, disable "OpenSesame expert" mode in the menu. That will make me a better general-purpose chatbot.</small>'''
+'''
 welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant!
 
 I have basic code execution abilities, I can read attachments, and I can look up scientific articles on Google Scholar.
 
-Let\'s get started! What would like you to disuss?
+If you want help with OpenSesame, enable "OpenSesame expert" mode in the menu (it is currently disabled). That will give me access to the OpenSesame documentation.
 
-<small style="color:gray;">PS. If you want help with OpenSesame, enable "OpenSesame expert" mode in the menu. That will give me access to the OpenSesame documentation.</small>
+Let\'s get started! What would like you to disuss?
 '''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
