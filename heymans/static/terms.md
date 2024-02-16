@@ -5,7 +5,7 @@
 
 ## Does Sigmund use cookies and trackers?
 
-Sigmund uses cookies to manage your log in. jsdelivr.net is used as a content-delivery-network (CDN) service. No third-party trackers are used.
+Sigmund uses cookies to manage your log in. jsdelivr.net and cloudfare.com are used as content-delivery-network (CDN) services. No third-party trackers are used.
 
 
 ## Where is the Sigmund server located?
