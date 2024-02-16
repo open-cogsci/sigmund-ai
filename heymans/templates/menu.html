@@ -240,6 +240,7 @@ new Vue({
     toggleDocs: function() {
       this.isDocsToggled = !this.isDocsToggled;
       window.searchFirst = this.isDocsToggled;
+      console.log('documentation search enabled: ' + this.isDocsToggled);
       localStorage.setItem('searchFirst', JSON.stringify(window.searchFirst));
     },
     toggleMenu: function() {
