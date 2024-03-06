@@ -100,6 +100,8 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 # - gpt-3.5
 # - gpt-4
 # - claude-2.1
+# - claude-3-sonnet
+# - claude-3-opus
 # - mistral-tiny
 # - mistral-small
 # - mistral-medium

@@ -169,7 +169,8 @@ class Messages:
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.
-        if self._heymans.answer_model.supports_not_done_yet:
+        if self._heymans.answer_model.supports_not_done_yet and \
+                self._heymans.tools:
             system_prompt.append(prompt.SYSTEM_PROMPT_NOT_DONE_YET)
         # Each tool has an explanation
         for tool in self._heymans.tools:

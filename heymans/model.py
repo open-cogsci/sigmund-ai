@@ -23,7 +23,7 @@ class BaseModel:
         t0 = time.time()
         logger.info(f'predicting with {self.__class__} model')
         if isinstance(messages, str):
-            reply = self._model.predict(messages)
+            reply = self._model.invoke(messages).content
             dt = time.time() - t0
             logger.info(f'predicting {len(reply) + len(messages)} took {dt} s')
             return reply
@@ -53,11 +53,12 @@ class BaseModel:
             
         if not use_async:
             logger.info('predicting multiple without async')
-            return [self._model.predict(prompt) for prompt in prompts]
+            return [self._model.invoke(prompt).content for prompt in prompts]
             
         async def wrap_gather():
-            tasks = [self._model.apredict(prompt) for prompt in prompts]
-            return await asyncio.gather(*tasks)
+            tasks = [self._model.ainvoke(prompt) for prompt in prompts]
+            predictions = await asyncio.gather(*tasks)
+            return [p.content for p in predictions]
             
         logger.info('predicting multiple using async')
         return loop.run_until_complete(wrap_gather())
@@ -95,16 +96,33 @@ class OpenAIModel(BaseModel):
         
 class ClaudeModel(BaseModel):
     
+    max_retry = 3
+    
     def __init__(self, heymans, model):
-        from langchain_community.chat_models import ChatAnthropic
+        from langchain_anthropic import ChatAnthropic
         super().__init__(heymans)
         self._model = ChatAnthropic(
             model=model, anthropic_api_key=config.anthropic_api_key)
         
     def predict(self, messages):
-        if isinstance(messages, list) and isinstance(messages[1], AIMessage):
-            logger.info('removing first assistant mesage')
-            messages.pop(1)
+        if isinstance(messages, list):
+            # Make sure the first message is human
+            if isinstance(messages[1], AIMessage):
+                logger.info('removing first assistant mesage')
+                messages.pop(1)
+            # Remove duplicate messages
+            messages = utils.merge_messages(messages)
+            # Make sure the last message is human
+            if isinstance(messages[-1], AIMessage):
+                logger.info('adding continue message')
+                messages.append(HumanMessage(content='Please continue!'))
+        # Claude seems to crash occasionally, in which case a retry will do the
+        # trick
+        for i in range(self.max_retry):
+            try:
+                return super().predict(messages)
+            except Exception as e:
+                logger.warning(f'error in prediction (retrying): {e}')
         return super().predict(messages)
         
         
@@ -137,6 +155,10 @@ def model(heymans, model):
         return OpenAIModel(heymans, 'gpt-3.5-turbo-1106')
     if model == 'claude-2.1':
         return ClaudeModel(heymans, 'claude-2.1')
+    if model == 'claude-3-opus':
+        return ClaudeModel(heymans, 'claude-3-opus-20240229')
+    if model == 'claude-3-sonnet':
+        return ClaudeModel(heymans, 'claude-3-sonnet-20240229')
     if model.startswith('mistral-'):
         return MistralModel(heymans, model)
     if model == 'dummy':

@@ -59,6 +59,27 @@ def deindent_code_blocks(text):
         else:
             lines.append(line)
     return '\n'.join(lines)
+    
+    
+def merge_messages(messages, separator='\n'):
+    """Takes a list of Message objects and merges consecutive AI and human 
+    messages into a single message. This is required by some models, such as
+    Claude.
+    """
+    if not messages:
+        return []
+    if len(messages) < 2:
+        return messages
+    merged_messages = []
+    current_message = messages[0]
+    for next_message in messages[1:]:
+        if current_message.type == next_message.type:
+            current_message.content += separator + next_message.content
+        else:
+            merged_messages.append(current_message)
+            current_message = next_message
+    merged_messages.append(current_message)
+    return merged_messages
 
 
 def current_datetime():
