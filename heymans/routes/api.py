@@ -19,6 +19,7 @@ def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
     session['search_first'] = data.get('search_first', True)
+    session['model'] = data.get('model', None)
     session['message_id'] = data.get('message_id', None)
     heymans = get_heymans()
     redis_client.delete(f'stream_cancel_{heymans.user_id}')

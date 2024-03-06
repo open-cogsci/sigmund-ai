@@ -149,6 +149,16 @@
     <hr class="menu-divider">
     <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; {{ toggleDocsLabel }}</div>
     <hr class="menu-divider">
+    <!-- Model selection -->
+    <div>
+      <label for="model-selection">Model: </label>
+      <select id="model-selection" v-model="selectedModel" @change="onModelChange">
+        <option value="gpt4">OpenAI (GPT4)</option>
+        <option value="claude">Anthropic (Claude 3)</option>
+        <option value="mistral">Mistral</option>
+      </select>
+    </div>
+    <hr class="menu-divider">
     <div @click="navigateTo('/about')">About</div>
     <div @click="navigateTo('/terms')">Terms and conditions</div>
     <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
@@ -210,6 +220,10 @@ window.searchFirst = JSON.parse(localStorage.getItem('searchFirst'));
 if (window.searchFirst === null) {
   window.searchFirst = true;
 }
+window.selectedModel = JSON.parse(localStorage.getItem('selectedModel'));
+if (window.selectedModel == null) {
+  window.selectedModel = 'gpt4';
+}
 new Vue({
   el: '#app',
   data: {
@@ -221,7 +235,8 @@ new Vue({
     toggleDocsLabel: "{{ search_first_menu_label }}",
     attachments: {},
     isUploading: false,
-    isDocsToggled: window.searchFirst
+    isDocsToggled: window.searchFirst,
+    selectedModel: window.selectedModel
   },
   computed: {
     sortedConversations() {
@@ -234,7 +249,7 @@ new Vue({
     },
   },
   methods: {
-  getNewConversationUrl() {
+    getNewConversationUrl() {
       return '/api/conversation/new/' + Number(searchFirst);
     },
     toggleDocs: function() {
@@ -242,6 +257,11 @@ new Vue({
       window.searchFirst = this.isDocsToggled;
       console.log('documentation search enabled: ' + this.isDocsToggled);
       localStorage.setItem('searchFirst', JSON.stringify(window.searchFirst));
+    },
+    onModelChange() {
+      console.log('model changed:', this.selectedModel);
+      window.selectedModel = this.selectedModel;
+      localStorage.setItem('selectedModel', JSON.stringify(window.selectedModel));
     },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;

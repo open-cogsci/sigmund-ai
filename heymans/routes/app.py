@@ -23,6 +23,23 @@ class User(UserMixin):
 
 
 def get_heymans():
+    model = session.get('model', None)
+    logger.info(f'model: {model}')
+    if model is not None:
+        if model == 'gpt4':
+            config.search_model = 'gpt-3.5'
+            config.condense_model = 'gpt-3.5'
+            config.answer_model = 'gpt-4'
+        elif model == 'claude':
+            config.search_model = 'claude-3-sonnet'
+            config.condense_model = 'claude-3-sonnet'
+            config.answer_model = 'claude-3-opus'
+        elif model == 'mistral':
+            config.search_model = 'mistral-small'
+            config.condense_model = 'mistral-small'
+            config.answer_model = 'mistral-medium'
+        else:
+            logger.warning('unknown model, using default')
     return Heymans(user_id=current_user.get_id(), persistent=True,
                    encryption_key=session['encryption_key'],
                    search_first=session.get('search_first', True))
