@@ -108,32 +108,26 @@ def score_testcases(select_cases=None):
             
 
 def test_gpt4():
+    config.search_model = 'gpt-3.5'
+    config.condense_model = 'gpt-3.5'
     config.answer_model = 'gpt-4'
     init_testlog()
     score_testcases()
-    
-
-def test_gpt35():
-    config.answer_model = 'gpt-3.5'
-    init_testlog()
-    score_testcases()
-    
 
 def test_mistral():
+    config.search_model = 'mistral-small'
+    config.condense_model = 'mistral-small'
     config.answer_model = 'mistral-medium'
     init_testlog()
     score_testcases()
-    
-    
-def test_claude21():
-    config.answer_model = 'claude-2.1'
+
+
+def test_claude3opus():
+    config.search_model = 'claude-3-sonnet'
+    config.condense_model = 'claude-3-sonnet'
+    config.answer_model = 'claude-3-opus'
     init_testlog()
     score_testcases()
 
 
-if __name__ == '__main__':
-    import logging; logging.basicConfig(level=logging.INFO, force=True)
-    test_claude21()
-    test_mistral()
-    test_gpt35()
-    test_gpt4()
+config.max_tokens_per_hour = float('inf')

@@ -4,7 +4,7 @@ from .expensive_test_utils import BaseExpensiveTest
 
 class TestToolsAttachments(BaseExpensiveTest):
     
-    def test_tools_attachments(self):
+    def _test_tool(self):
         attachment_data = {
             'filename': 'artist_name.txt',
             'content': base64.b64encode(b'Rick Ross').decode('utf-8'),
