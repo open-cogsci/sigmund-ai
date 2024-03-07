@@ -81,5 +81,8 @@ class BaseTool:
         try:
             return json.loads(s)
         except json.JSONDecodeError:
-            s = s.replace('\n', r'\n')
-            return json.loads(f'"{s}"')
+            try:
+                s = s.replace('\n', r'\n')
+                return json.loads(f'"{s}"')
+            except json.JSONDecodeError:
+                return json.loads('"failed to parse JSON"')
