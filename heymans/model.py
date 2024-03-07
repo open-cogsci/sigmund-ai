@@ -3,7 +3,6 @@ import re
 import json
 import logging
 import asyncio
-from langchain.schema import AIMessage, HumanMessage
 from langchain_community.callbacks import get_openai_callback
 import time
 logger = logging.getLogger('heymans')
@@ -118,16 +117,9 @@ class ClaudeModel(BaseModel):
         
     def predict(self, messages):
         if isinstance(messages, list):
-            # Make sure the first message is human
-            if isinstance(messages[1], AIMessage):
-                logger.info('removing first assistant mesage')
-                messages.pop(1)
-            # Remove duplicate messages
-            messages = utils.merge_messages(messages)
-            # Make sure the last message is human
-            if isinstance(messages[-1], AIMessage):
-                logger.info('adding continue message')
-                messages.append(HumanMessage(content='Please continue!'))
+            messages = utils.prepare_messages(messages, allow_ai_first=False,
+                                              allow_ai_last=False,
+                                              merge_consecutive=True)
         # Claude seems to crash occasionally, in which case a retry will do the
         # trick
         for i in range(self.max_retry):
@@ -148,9 +140,10 @@ class MistralModel(BaseModel):
             openai_api_key=config.mistral_api_key)
         
     def predict(self, messages):
-        if isinstance(messages, list) and isinstance(messages[-1], AIMessage):
-            logger.info('adding continue message')
-            messages.append(HumanMessage(content='Please continue!'))
+        if isinstance(messages, list):
+            messages = utils.prepare_messages(messages, allow_ai_first=False,
+                                              allow_ai_last=False,
+                                              merge_consecutive=True)
         return super().predict(messages)
         
         

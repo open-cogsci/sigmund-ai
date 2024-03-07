@@ -7,6 +7,7 @@ import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.toc import TocExtension
+from langchain.schema import HumanMessage
 from . import config
 from . import __version__
 logger = logging.getLogger('heymans')
@@ -61,25 +62,60 @@ def deindent_code_blocks(text):
     return '\n'.join(lines)
     
     
-def merge_messages(messages, separator='\n'):
-    """Takes a list of Message objects and merges consecutive AI and human 
-    messages into a single message. This is required by some models, such as
-    Claude.
+def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
+                     merge_consecutive=False, merge_separator='\n'):
+    """Takes a list of Message objects formats them to meet the requirements
+    of specific models.
+    
+    Parameters
+    ----------
+    messages : list
+        A list of messages, where each message object has a type property that
+        is either 'system', 'ai', or ;'human'
+    allow_ai_first : bool, optional
+        Indicates whether the first message (after the system message) can be
+        an AI message. If not, then it is removed.
+    allow_ai_last : bool, optional
+        Indicates whether the last message (after the system message) can be
+        an AI message. If not, then a human message is appended after it.
+    merge_consecutive : bool, optional
+        Indicates whether multiple messages of the same class should be merged
+        into a single message.
+    merge_separator : str, optional
+        If messages are merged, the separator that is used to join their 
+        content.
+        
+    Returns
+    -------
+    list
     """
+    if not isinstance(messages, list):
+        return messages
     if not messages:
         return []
-    if len(messages) < 2:
-        return messages
-    merged_messages = []
-    current_message = messages[0]
-    for next_message in messages[1:]:
-        if current_message.type == next_message.type:
-            current_message.content += separator + next_message.content
-        else:
-            merged_messages.append(current_message)
-            current_message = next_message
-    merged_messages.append(current_message)
-    return merged_messages
+    # Check whether first message after the system message is an AI message, 
+    # and remove this if not allowed
+    if not allow_ai_first and messages[1].type == 'ai':
+        logger.info('removing first assistant mesage')
+        messages.pop(1)        
+    # Merge consecutive messages of the same class totether
+    if len(messages) > 1 and merge_consecutive:
+        merged_messages = []
+        current_message = messages[0]
+        for next_message in messages[1:]:
+            if current_message.type == next_message.type:
+                logger.info('merging consecutive messages')
+                current_message.content += merge_separator + next_message.content
+            else:
+                merged_messages.append(current_message)
+                current_message = next_message
+        merged_messages.append(current_message)
+        messages = merged_messages
+    # Make sure the last message is human if this is required
+    if not allow_ai_last and messages[-1].type == 'ai':
+        logger.info('adding continue message')
+        messages.append(HumanMessage(content='Please continue!'))
+    return messages
 
 
 def current_datetime():
