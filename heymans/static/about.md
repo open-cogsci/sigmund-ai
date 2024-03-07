@@ -25,7 +25,7 @@ I want to create a stimulus display in OpenSesame, using a canvas in a Python in
 
 Your messages and attachments are encrypted based on a key that is linked to your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
 
-Sigmund uses large-language-model APIs provided by third parties. You can choose which model you want to use in the menu. Importantly, none of these third parties uses data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, see the terms of service of [OpenAI](https://openai.com/enterprise-privacy), [Mistral](https://mistral.ai/terms/), and [Anthropic](https://cdn.sanity.io/files/4zrzovbb/website/786ea99408c7b0c14684b6cf4e1b31d34b7a77aa.pdf).
+Sigmund uses large-language-model APIs provided by third parties. You can choose which model you want to use in the menu. Importantly, none of these third parties uses data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, see the terms of service of [OpenAI](https://openai.com/enterprise-privacy), [Mistral](https://mistral.ai/terms/), and [Anthropic](https://www.anthropic.com/legal/commercial-terms).
 
 
 ## Things Sigmund can do
