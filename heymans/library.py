@@ -16,8 +16,8 @@ def load_library(force_reindex=False):
         logger.info('loading library from cache')
         db = FAISS.load_local(db_cache, embeddings_model)
     else:
-        from langchain.document_loaders import TextLoader, PyPDFLoader, \
-            JSONLoader
+        from langchain_community.document_loaders import TextLoader, \
+            PyPDFLoader, JSONLoader
         logger.info('initializing library')
         data = []
         # PDF files are unstructured. They can be named through config.sources
