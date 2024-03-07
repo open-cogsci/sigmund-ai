@@ -35,9 +35,9 @@ def get_heymans():
             config.condense_model = 'claude-3-sonnet'
             config.answer_model = 'claude-3-opus'
         elif model == 'mistral':
-            config.search_model = 'mistral-small'
-            config.condense_model = 'mistral-small'
-            config.answer_model = 'mistral-medium'
+            config.search_model = 'mistral-medium'
+            config.condense_model = 'mistral-medium'
+            config.answer_model = 'mistral-large'
         else:
             logger.warning('unknown model, using default')
     return Heymans(user_id=current_user.get_id(), persistent=True,
