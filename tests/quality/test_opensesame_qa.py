@@ -114,6 +114,7 @@ def test_gpt4():
     init_testlog()
     score_testcases()
 
+
 def test_mistral():
     config.search_model = 'mistral-medium'
     config.condense_model = 'mistral-medium'
