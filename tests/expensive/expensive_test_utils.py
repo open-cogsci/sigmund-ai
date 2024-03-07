@@ -9,7 +9,8 @@ logging.basicConfig(level=logging.INFO, force=True)
 class BaseExpensiveTest(unittest.TestCase):
     
     def setUp(self):
-        from heymans.database.models import init_db
+        from heymans.database.models import drop_db, init_db
+        drop_db()
         init_db()
         self.heymans = Heymans(user_id='pytest', search_first=False)
         config.max_tokens_per_hour = float('inf')
@@ -30,7 +31,7 @@ class BaseExpensiveTest(unittest.TestCase):
         self._test_tool()
     
     def test_mistral(self):
-        config.search_model = 'mistral-small'
-        config.condense_model = 'mistral-small'
-        config.answer_model = 'mistral-medium'
+        config.search_model = 'mistral-medium'
+        config.condense_model = 'mistral-medium'
+        config.answer_model = 'mistral-large'
         self._test_tool()

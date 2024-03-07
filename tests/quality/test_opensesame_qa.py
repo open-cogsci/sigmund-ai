@@ -115,9 +115,9 @@ def test_gpt4():
     score_testcases()
 
 def test_mistral():
-    config.search_model = 'mistral-small'
-    config.condense_model = 'mistral-small'
-    config.answer_model = 'mistral-medium'
+    config.search_model = 'mistral-medium'
+    config.condense_model = 'mistral-medium'
+    config.answer_model = 'mistral-large'
     init_testlog()
     score_testcases()
 
