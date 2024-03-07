@@ -121,7 +121,7 @@ class Heymans:
         # mainly by stripping out any JSON commands in the reply
         reply, result, needs_feedback = self._run_tools(reply)
         if needs_feedback:
-            logger.info('[{state} state] tools need feedback')
+            logger.info(f'[{state} state] tools need feedback')
         # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
         # to indicate that it wants to perform additional actions. This makes 
         # it easier to perform tasks consisting of multiple responses and 
