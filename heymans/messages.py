@@ -35,7 +35,7 @@ class Messages:
     def init_conversation(self):
         self._condensed_text = None
         metadata = self.metadata()
-        metadata['search_model'] = 'Welcome message'
+        metadata['answer_model'] = 'welcome-bot'
         self._conversation_title = config.default_conversation_title
         self._message_history = [['assistant', self.welcome_message(), 
                                   metadata]]
