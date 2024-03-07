@@ -78,11 +78,22 @@ class BaseTool:
         return message, results, any(needs_reply)
         
     def as_json_value(self, s):
+        orig_s = s
         try:
             return json.loads(s)
         except json.JSONDecodeError:
             try:
-                s = s.replace('\n', r'\n')
-                return json.loads(f'"{s}"')
+                # Sometimes the JSON is broken by having backslashes in there,
+                # for example 'inline\_script'. We try to patch this here
+                return json.loads(s.replace('\\', ''))
             except json.JSONDecodeError:
-                return json.loads('"failed to parse JSON"')
+                try:
+                    # If this still doesn't work we treat the string as string
+                    # rather than some other structure, in which case newlines
+                    # need to be recoded to literal \n
+                    s = s.replace('\n', r'\n')
+                    return json.loads(f'"{s}"')
+                except json.JSONDecodeError:
+                    # If this still doesn't work we consider the parsing failed
+                    logger.warning(f'failed to parse JSON: {orig_s}')
+                    return json.loads('"failed to parse JSON"')
