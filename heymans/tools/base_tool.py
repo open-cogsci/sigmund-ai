@@ -81,4 +81,5 @@ class BaseTool:
         try:
             return json.loads(s)
         except json.JSONDecodeError:
+            s = s.replace('\n', r'\n')
             return json.loads(f'"{s}"')
