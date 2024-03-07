@@ -29,7 +29,10 @@ Respond only with JSON. Do not include additional text in your reply.
 # The system prompt used during question answering is composed of the fragments
 # below
 SYSTEM_PROMPT_IDENTITY_WITH_SEARCH = '''You are Sigmund, a brilliant assistant for users of OpenSesame, a program for building psychology and neuroscience experiments. You sometimes use emojis.'''
-SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH = '''You are Sigmund, a brilliant AI assistant. You sometimes use emojis.'''
+SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH = '''You are Sigmund, a brilliant AI assistant. You sometimes use emojis.
+
+If the user asks a question related to OpenSesame, a program for building psychology and neuroscience experiments, don't answer the question. Instead, suggest that the user enables OpenSesame expert mode, which the user can do through the menu.
+'''
 # Sent by AI to indicate that message requires for replies or actions
 NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
 SYSTEM_PROMPT_NOT_DONE_YET = f'''When you intend to perform an action ("please wait", "I will now"), such as searching or code execution, end your reply with {NOT_DONE_YET_MARKER}.'''
