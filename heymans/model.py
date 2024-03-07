@@ -12,6 +12,7 @@ logger = logging.getLogger('heymans')
 class BaseModel:
     
     supports_not_done_yet = False
+    characters_per_token = 4
     
     def __init__(self, heymans):
         self._heymans = heymans
@@ -19,18 +20,29 @@ class BaseModel:
         self.prompt_tokens_consumed = 0
         self.completion_tokens_consumed = 0
 
-    def predict(self, messages):
+    def predict(self, messages, track_tokens=True):
         t0 = time.time()
         logger.info(f'predicting with {self.__class__} model')
         if isinstance(messages, str):
+            prompt_tokens = len(messages) // self.characters_per_token
             reply = self._model.invoke(messages).content
             dt = time.time() - t0
             logger.info(f'predicting {len(reply) + len(messages)} took {dt} s')
-            return reply
-        reply = self._model.invoke(messages).content
-        dt = time.time() - t0
-        msg_len = sum([len(m.content) for m in messages])
-        logger.info(f'predicting {len(reply) + msg_len} took {dt} s')
+        else:
+            reply = self._model.invoke(messages).content
+            dt = time.time() - t0
+            msg_len = sum([len(m.content) for m in messages])
+            prompt_tokens = msg_len // self.characters_per_token
+            logger.info(f'predicting {len(reply) + msg_len} took {dt} s')
+        if track_tokens:
+            completion_tokens = len(reply) // self.characters_per_token
+            total_tokens = prompt_tokens + completion_tokens
+            self.total_tokens_consumed += total_tokens
+            self.prompt_tokens_consumed += prompt_tokens
+            self.completion_tokens_consumed += completion_tokens
+            logger.info(f'total tokens (approx.): {total_tokens}')
+            logger.info(f'prompt tokens (approx.): {prompt_tokens}')
+            logger.info(f'completion tokens (approx.): {completion_tokens}')
         return reply
     
     def predict_multiple(self, prompts):
@@ -77,7 +89,7 @@ class OpenAIModel(BaseModel):
         
     def predict(self, messages):
         with get_openai_callback() as cb:
-            retval = super().predict(messages)
+            retval = super().predict(messages, track_tokens=False)
         logger.info(cb)
         self.total_tokens_consumed += cb.total_tokens
         self.prompt_tokens_consumed += cb.prompt_tokens
@@ -160,6 +172,8 @@ def model(heymans, model):
     if model == 'claude-3-sonnet':
         return ClaudeModel(heymans, 'claude-3-sonnet-20240229')
     if model.startswith('mistral-'):
+        if not model.endswith('-latest'):
+            model += '-latest'
         return MistralModel(heymans, model)
     if model == 'dummy':
         return DummyModel(heymans)
