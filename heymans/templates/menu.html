@@ -262,16 +262,18 @@ new Vue({
     },
     searchFirst: {
       get() {
+        this.menuVisible;  // depend on this to force update
         return sigmundSettings.search_first;
       },
       set(value) {
         sigmundSettings.search_first = value;
-        this.searchFirstIcon = value ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+        this.searchFirstIcon = (value === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
         setSetting('search_first', value);
       }
     },
     modelConfig: {
       get() {
+        this.menuVisible;  // depend on this to force update
         return sigmundSettings.model_config;
       },
       set(value) {
@@ -285,7 +287,7 @@ new Vue({
       return '/api/conversation/new';
     },
     toggleSearchFirst: function() {
-      this.searchFirst = !sigmundSettings.search_first;
+      this.searchFirst = (sigmundSettings.search_first === 'true' ? 'false' : 'true')
     },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;
