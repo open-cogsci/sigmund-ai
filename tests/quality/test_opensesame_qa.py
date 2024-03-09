@@ -38,7 +38,7 @@ def init_testlog():
     testlog_folder = Path(__file__).parent / 'testlog'
     if not testlog_folder.exists():
         testlog_folder.mkdir()
-    testlog = Path(testlog_folder) / f'testlog.{str(datetime.now())}.{config.answer_model}.log'
+    testlog = Path(testlog_folder) / f'testlog.{str(dtetime.now())}.{config.model_config}.log'
 
 
 def read_testcases():
@@ -107,34 +107,20 @@ def score_testcases(select_cases=None):
             fd.write(s + '\n')
             
 
-def test_gpt4():
-    config.search_model = 'gpt-3.5'
-    config.condense_model = 'gpt-3.5'
-    config.answer_model = 'gpt-4'
+def test_openai():
+    config.settings_default['model_config'] = 'openai'
     init_testlog()
     score_testcases()
     
 
-def test_gpt4mistral():
-    config.search_model = 'mistral-medium'
-    config.condense_model = 'mistral-medium'
-    config.answer_model = 'gpt-4'
-    init_testlog()
-    score_testcases()
-
-
 def test_mistral():
-    config.search_model = 'mistral-medium'
-    config.condense_model = 'mistral-medium'
-    config.answer_model = 'mistral-large'
+    config.settings_default['model_config'] = 'mistral'
     init_testlog()
     score_testcases()
 
 
-def test_claude3opus():
-    config.search_model = 'mistral-medium'
-    config.condense_model = 'claude-3-sonnet'
-    config.answer_model = 'claude-3-opus'
+def test_anthropic():
+    config.settings_default['model_config'] = 'anthropic'
     init_testlog()
     score_testcases()
 

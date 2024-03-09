@@ -7,21 +7,18 @@ class TestApiChat(BaseRoutesTestCase):
     
     def setUp(self):
         super().setUp()
-        config.answer_model = 'dummy'
-        config.search_model = 'dummy'
-        config.condense_model = 'dummy'
+        config.settings_default['model_config'] = 'dummy'
         # Check that before login we are not allowed to use the API
         response = self.client.post('/api/chat/start', json={
-            'message': 'hello',
-            'search_first': False
+            'message': 'hello'
         })
         assert response.status_code == 401
         self.login()
         
     def test_chat_without_search(self):
+        self.client.post('/api/setting/set', json={'search_first': 'false'})
         response = self.client.post('/api/chat/start', json={
-            'message': 'hello',
-            'search_first': False
+            'message': 'hello'
         })
         assert response.status_code == 200
         response = self.client.get('/api/chat/stream')
@@ -36,9 +33,9 @@ class TestApiChat(BaseRoutesTestCase):
                 assert data['action'] == 'close'
                 
     def test_chat_with_search(self):
+        self.client.post('/api/setting/set', json={'search_first': 'true'})
         response = self.client.post('/api/chat/start', json={
-            'message': 'hello',
-            'search_first': True
+            'message': 'hello'
         })
         assert response.status_code == 200
         response = self.client.get('/api/chat/stream')

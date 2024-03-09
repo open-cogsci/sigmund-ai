@@ -114,15 +114,26 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 # - The answermodel generates the actual answer. This should be a very capable
 #   model
 model_config = {
-    'openai': {'search_model': 'gpt-3.5',
-               'condense_model': 'gpt-3.5',
-               'answer_model': 'gpt-4'},
-    'anthropic': {'search_model': 'claude-3-sonnet',
-                  'condense_model': 'claude-3-sonnet',
-                  'answer_model': 'claude-3-opus'},
-    'mistral': {'search_model': 'mistral-medium',
-                'condense_model': 'mistral-medium',
-                'answer_model': 'mistral-large'}
+    'openai': {
+        'search_model': 'gpt-3.5',
+        'condense_model': 'gpt-3.5',
+        'answer_model': 'gpt-4'
+    },
+    'anthropic': {
+        'search_model': 'claude-3-sonnet',
+        'condense_model': 'claude-3-sonnet',
+        'answer_model': 'claude-3-opus'
+    },
+    'mistral': {
+        'search_model': 'mistral-medium',
+        'condense_model': 'mistral-medium',
+        'answer_model': 'mistral-large'
+    },
+    'dummy': {
+        'search_model': 'dummy',
+        'condense_model': 'dummy',
+        'answer_model': 'dummy'
+    }
 }
 
 # TOOLS

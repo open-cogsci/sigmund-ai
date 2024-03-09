@@ -8,9 +8,7 @@ class TestApiAttachments(BaseRoutesTestCase):
     
     def setUp(self):
         super().setUp()
-        config.answer_model = 'dummy'
-        config.search_model = 'dummy'
-        config.condense_model = 'dummy'
+        config.settings_default['model_config'] = 'dummy'
         self.login()
         
     def add_attachment(self):
