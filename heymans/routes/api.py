@@ -18,8 +18,6 @@ redis_client = Redis()
 def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
-    session['search_first'] = data.get('search_first', True)
-    session['model'] = data.get('model', None)
     session['message_id'] = data.get('message_id', None)
     heymans = get_heymans()
     redis_client.delete(f'stream_cancel_{heymans.user_id}')
@@ -61,10 +59,9 @@ def api_chat_stream():
                     mimetype='text/event-stream')
     
     
-@api_blueprint.route('/conversation/new/<int:search_first>')
+@api_blueprint.route('/conversation/new')
 @login_required
-def new_conversation(search_first):
-    session['search_first'] = bool(search_first)
+def new_conversation():
     heymans = get_heymans()
     heymans.database.new_conversation()
     return redirect('/chat')
@@ -168,3 +165,32 @@ def delete_message(message_id):
     heymans = get_heymans()
     heymans.messages.delete(message_id)
     return jsonify(success=True)
+
+
+@api_blueprint.route('/setting/set', methods=['POST'])
+@login_required
+def set_setting():
+    data = request.json
+    if not isinstance(data, dict):
+        logger.warning(f'invalid setting data: {data}')
+        return jsonify(success=False, message='invalid setting data')
+    heymans = get_heymans()
+    logger.info(f'setting: {data}')
+    for key, value in data.items():
+        heymans.database.set_setting(key, value)
+    return jsonify(success=True)
+    
+
+@api_blueprint.route('/setting/get/<key>')
+@login_required
+def get_setting(key):
+    heymans = get_heymans()
+    value = heymans.database.get_setting(key)
+    if value is None:
+        if key in config.settings_default:
+            value = config.settings_default[key]
+            logger.info(f'using default setting for {key}: {value}')
+        else:
+            return jsonify(success=False, value=value)
+    logger.info(f'get setting: {key} = {value}')
+    return jsonify(success=True, value=value)

@@ -48,9 +48,9 @@ class Messages:
                     if message_id is None else message_id,
                 'timestamp': utils.current_datetime(),
                 'sources': self._heymans.documentation.to_json(),
-                'search_model': config.search_model,
-                'condense_model': config.condense_model,
-                'answer_model': config.answer_model}
+                'search_model': self._heymans.model_config['search_model'],
+                'condense_model': self._heymans.model_config['condense_model'],
+                'answer_model': self._heymans.model_config['answer_model']}
         
     def append(self, role, message, message_id=None):
         metadata = self.metadata(message_id=message_id)

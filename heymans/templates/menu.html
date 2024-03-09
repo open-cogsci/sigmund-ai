@@ -21,8 +21,9 @@
   border-radius: 4px;
   display: none;
   position: fixed; /* Changed from absolute to fixed */
-  top: 50px; /* Adjusted to accommodate the fixed position */
-  right: 10px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   border: 1px solid #ccc;
   background: #fff;
   padding: 10px;
@@ -140,22 +141,21 @@
 
 {% raw %}
 <div id="app">
-  <div class="menu-icon" @click="toggleMenu">☰</div>
   <div class="menu" v-bind:class="{ 'active': menuVisible }">
     <div @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <div @click="showAttachments">Browse attachments</div>
     <hr class="menu-divider">
-    <div @click="toggleDocs"><i :class="toggleDocsIcon"></i>&nbsp; {{ toggleDocsLabel }}</div>
+    <div @click="toggleSearchFirst"><i :class="searchFirstIcon"></i>&nbsp; {{ searchFirstLabel }}</div>
     <hr class="menu-divider">
     <!-- Model selection -->
     <div>
       <label for="model-selection">Model: </label>
-      <select id="model-selection" v-model="selectedModel" @change="onModelChange">
-        <option value="gpt4">OpenAI (GPT4)</option>
-        <option value="claude">Anthropic (Claude 3)</option>
-        <option value="mistral">Mistral</option>
+      <select id="model-selection" v-model="modelConfig">
+        <option value="openai">OpenAI (GPT4)</option>
+        <option value="anthropic">Anthropic (Claude 3)</option>
+        <option value="mistral">Mistral (Large)</option>
       </select>
     </div>
     <hr class="menu-divider">
@@ -216,14 +216,31 @@
 {% endraw %}
 
 <script>
-window.searchFirst = JSON.parse(localStorage.getItem('searchFirst'));
-if (window.searchFirst === null) {
-  window.searchFirst = true;
+function setSetting(key, value) {
+  const data = {};
+  data[key] = String(value);
+  console.log('setting:', key, ' = ', data);
+  fetch('/api/setting/set', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to set ${key} setting: ${response.statusText}`);
+    }
+    return response.json();
+  })
+  .then((json) => {
+    if (!json.success) {
+      throw new Error(`Failed to set ${key} setting: ${json.message}`);
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 }
-window.selectedModel = JSON.parse(localStorage.getItem('selectedModel'));
-if (window.selectedModel == null) {
-  window.selectedModel = 'gpt4';
-}
+
 new Vue({
   el: '#app',
   data: {
@@ -232,11 +249,10 @@ new Vue({
     conversations: {},
     showAttachmentsModal: false,
     showManageSubscriptions: {{ subscription_required|lower }},
-    toggleDocsLabel: "{{ search_first_menu_label }}",
     attachments: {},
     isUploading: false,
-    isDocsToggled: window.searchFirst,
-    selectedModel: window.selectedModel
+    searchFirstLabel: "{{ search_first_menu_label }}",
+    searchFirstIcon: (sigmundSettings.search_first === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off'
   },
   computed: {
     sortedConversations() {
@@ -244,24 +260,32 @@ new Vue({
         .map(([id, [title, timestamp]]) => ({ id, title, timestamp }))
         .sort((a, b) => b.timestamp - a.timestamp);
     },
-    toggleDocsIcon() {
-      return this.isDocsToggled ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+    searchFirst: {
+      get() {
+        return sigmundSettings.search_first;
+      },
+      set(value) {
+        sigmundSettings.search_first = value;
+        this.searchFirstIcon = value ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+        setSetting('search_first', value);
+      }
     },
+    modelConfig: {
+      get() {
+        return sigmundSettings.model_config;
+      },
+      set(value) {
+        sigmundSettings.model_config = value;
+        setSetting('model_config', value);
+      }
+    }
   },
   methods: {
     getNewConversationUrl() {
-      return '/api/conversation/new/' + Number(searchFirst);
+      return '/api/conversation/new';
     },
-    toggleDocs: function() {
-      this.isDocsToggled = !this.isDocsToggled;
-      window.searchFirst = this.isDocsToggled;
-      console.log('documentation search enabled: ' + this.isDocsToggled);
-      localStorage.setItem('searchFirst', JSON.stringify(window.searchFirst));
-    },
-    onModelChange() {
-      console.log('model changed:', this.selectedModel);
-      window.selectedModel = this.selectedModel;
-      localStorage.setItem('selectedModel', JSON.stringify(window.selectedModel));
+    toggleSearchFirst: function() {
+      this.searchFirst = !sigmundSettings.search_first;
     },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;

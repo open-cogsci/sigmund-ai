@@ -22,6 +22,8 @@ class Heymans:
         the sense of using the database.
     search_first: Indicates whether the answer phase should be preceded by a
         documentation search phase. If None, the config default will be used.
+    model_config: Indicates the model configuration. If none, the config
+        default will be used.
     search_tools: A list of tools to be used by the documentation search (if
         enabled). Values are class names from heymans.tools. If None, the
         config default will be used.
@@ -32,17 +34,23 @@ class Heymans:
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: Optional[str] = None,
                  search_first: Optional[bool] = None,
+                 model_config: Optional[str] = None,
                  search_tools: Optional[list] = None,
                  answer_tools: Optional[list] = None):
         self.user_id = user_id
-        self.search_first = \
-            config.search_first if search_first is None else search_first
         self.database = DatabaseManager(user_id, encryption_key)
+        # Search first is stored as a str but should be a bool here
+        self.search_first = (self.database.get_setting('search_first') \
+            if search_first is None else search_first) == 'true'
+        self.model_config = config.model_config[
+            self.database.get_setting('model_config')
+            if model_config is None else model_config
+        ]
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
-        self.search_model = model(self, config.search_model)
-        self.answer_model = model(self, config.answer_model)
-        self.condense_model = model(self, config.condense_model)
+        self.search_model = model(self, self.model_config['search_model'])
+        self.answer_model = model(self, self.model_config['answer_model'])
+        self.condense_model = model(self, self.model_config['condense_model'])
         self.messages = Messages(self, persistent)
         if search_tools is None:
             search_tools = config.search_tools

@@ -23,26 +23,8 @@ class User(UserMixin):
 
 
 def get_heymans():
-    model = session.get('model', None)
-    logger.info(f'model: {model}')
-    if model is not None:
-        if model == 'gpt4':
-            config.search_model = 'gpt-3.5'
-            config.condense_model = 'gpt-3.5'
-            config.answer_model = 'gpt-4'
-        elif model == 'claude':
-            config.search_model = 'claude-3-sonnet'
-            config.condense_model = 'claude-3-sonnet'
-            config.answer_model = 'claude-3-opus'
-        elif model == 'mistral':
-            config.search_model = 'mistral-medium'
-            config.condense_model = 'mistral-medium'
-            config.answer_model = 'mistral-large'
-        else:
-            logger.warning('unknown model, using default')
     return Heymans(user_id=current_user.get_id(), persistent=True,
-                   encryption_key=session['encryption_key'],
-                   search_first=session.get('search_first', True))
+                   encryption_key=session['encryption_key'])
     
 
 def chat_page():
@@ -89,7 +71,8 @@ def chat_page():
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=heymans.user_id,
-                        search_first_menu_label=config.search_first_menu_label)
+                        search_first_menu_label=config.search_first_menu_label,
+                        settings=json.dumps(heymans.database.list_settings()))
 
 
 def login_handler(form, failed=False):

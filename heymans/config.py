@@ -106,14 +106,24 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 # - mistral-small
 # - mistral-medium
 # - dummy
-# The search model is used to formulate search queries and evaluate whether
-# documents are relevant
-search_model = 'gpt-3.5'
-# The condense model is used to summarize message history when the conversation
-# becomes too long
-condense_model = 'gpt-3.5'
-# The answermodel generates the actual answer
-answer_model = 'gpt-4'
+# Model configuations are combinations of models that can be used together
+# - The search model is used to formulate search queries and evaluate whether
+#   documents are relevant. This can be a cheap model.
+# - The condense model is used to summarize message history when the 
+#   conversation becomes too long. This can also be a cheap model.
+# - The answermodel generates the actual answer. This should be a very capable
+#   model
+model_config = {
+    'openai': {'search_model': 'gpt-3.5',
+               'condense_model': 'gpt-3.5',
+               'answer_model': 'gpt-4'},
+    'anthropic': {'search_model': 'claude-3-sonnet',
+                  'condense_model': 'claude-3-sonnet',
+                  'answer_model': 'claude-3-opus'},
+    'mistral': {'search_model': 'mistral-medium',
+                'condense_model': 'mistral-medium',
+                'answer_model': 'mistral-large'}
+}
 
 # TOOLS
 # 
@@ -125,11 +135,18 @@ answer_tools_with_search = []
 answer_tools_without_search = ['CodeExecutionTool', 'GoogleScholarTool',
                                'AttachmentsTool', 'DownloadTool']
 
+# SETTINGS
+#
+# These are default values for settings, which are stored in the database.
+settings_default = {
+    # Indicates whether documentation should be searched before answering the 
+    'search_first': 'true',
+    # Indicates the model configuration as specified above
+    'model_config': 'openai'
+}
+
 # DOCUMENTATION
 #
-# Indicates whether documentation should be searched before answering the 
-# question.
-search_first = True
 # Jow the search-first option appears in the menu
 search_first_menu_label = 'OpenSesame expert'
 # Topic sources are used to feed in specific chunks of documentation that are

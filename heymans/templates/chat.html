@@ -2,6 +2,9 @@
 <html>
 {% include 'head.html' %}
 <body>
+    <script>
+    window.sigmundSettings = {{ settings | safe }}
+    </script>
     <script>{% include 'main.js' %}</script>
     {% include 'header.html' %}
     {% include 'sign-out.html' %}
@@ -15,6 +18,8 @@
                     <textarea id="message" placeholder="Enter your message"></textarea>
                     <button id="send" disabled><i class="fas fa-paper-plane"></i></button>
                     <button id="cancel"><i class="fas fa-stop-circle"></i></button>
+                    <button id="expand" onclick="app.__vue__.toggleMenu()"><i class="fas fa-bars"></i></button>
+                    <button id="expand" onclick="expandMessageBox()"><i class="fas fa-expand"></i></button>
                 </div>
             </div>
             <div id="message-counter" style="text-align: right;"></div>

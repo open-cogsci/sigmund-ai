@@ -119,7 +119,7 @@ async function sendMessage(message) {
     await fetchWithRetry('{{ server_url }}/api/chat/start', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: requestBody(message, searchFirst, selectedModel, user_message_id)
+        body: requestBody(message, user_message_id)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
     });
@@ -244,14 +244,18 @@ function deleteMessage(messageId) {
 
 
 
-function requestBody(message, searchFirst, selectedModel, user_message_id) {
+function requestBody(message, user_message_id) {
     return JSON.stringify({
         message: message,
-        search_first: searchFirst,
-        model: selectedModel,
         message_id: user_message_id
     })
 }
+
+
+function expandMessageBox() {
+    document.getElementById('message-box').classList.toggle('expanded-message-box');
+};
+
 
 document.addEventListener('DOMContentLoaded', globalElements)
 document.addEventListener('DOMContentLoaded', initMain)

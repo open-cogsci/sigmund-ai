@@ -3,7 +3,8 @@ import logging
 import time
 from datetime import datetime, timedelta
 from .. import config
-from .models import db, User, Conversation, Attachment, Activity, Subscription
+from .models import db, User, Conversation, Attachment, Activity, \
+    Subscription, Setting
 from .encryption import EncryptionManager
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -257,7 +258,7 @@ class DatabaseManager:
         subscription = Subscription.query.filter_by(
             user_id=self.user_id).first()
         return subscription and \
-                subscription.from_date <= now < subscription.to_date
+            subscription.from_date <= now < subscription.to_date
 
     def cancel_subscription(self):
         """Sets the to_date of the subscription to the current time if the user
@@ -291,3 +292,37 @@ class DatabaseManager:
         if not user_record:
             return None
         return DatabaseManager(username=user_record.username)
+
+    def get_setting(self, key: str) -> str:
+        """Retrieve a setting value for the current user, which is available
+        as self.user_id. If the setting does not exist, return the default
+        value as specified in the config or None if no default has been 
+        specified.
+        """
+        setting = db.session.query(Setting).filter_by(
+            user_id=self.user_id, key=key).first()
+        return setting.value if setting \
+            else config.settings_default.get(key, None)
+
+    def set_setting(self, key: str, value: str):
+        """Set a setting to specified value for the current user. If the
+        setting already exists, overwrite it.
+        """
+        setting = Setting.query.filter_by(
+            user_id=self.user_id, key=key).first()
+        if setting:
+            setting.value = value
+        else:
+            new_setting = Setting(user_id=self.user_id, key=key,
+                                  value=value)
+            db.session.add(new_setting)
+        db.session.commit()
+
+    def list_settings(self) -> dict:
+        """Returns a dict of all settings for the current user."""
+        settings = {}
+        setting_objs = db.session.query(Setting).filter_by(
+            user_id=self.user_id).all()
+        for setting in setting_objs:
+            settings[setting.key] = setting.value
+        return settings

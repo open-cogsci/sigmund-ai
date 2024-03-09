@@ -84,3 +84,12 @@ class Subscription(Model):
     to_date = Column(DateTime)
     stripe_subscription_id = Column(String(80))
     stripe_customer_id = Column(String(80))
+
+
+class Setting(Model):
+    __tablename__ = 'setting'
+
+    setting_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    key = Column(String(80))
+    value = Column(String(80))
