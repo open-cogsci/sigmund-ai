@@ -113,6 +113,14 @@ def test_gpt4():
     config.answer_model = 'gpt-4'
     init_testlog()
     score_testcases()
+    
+
+def test_gpt4mistral():
+    config.search_model = 'mistral-medium'
+    config.condense_model = 'mistral-medium'
+    config.answer_model = 'gpt-4'
+    init_testlog()
+    score_testcases()
 
 
 def test_mistral():
@@ -124,7 +132,7 @@ def test_mistral():
 
 
 def test_claude3opus():
-    config.search_model = 'claude-3-sonnet'
+    config.search_model = 'mistral-medium'
     config.condense_model = 'claude-3-sonnet'
     config.answer_model = 'claude-3-opus'
     init_testlog()

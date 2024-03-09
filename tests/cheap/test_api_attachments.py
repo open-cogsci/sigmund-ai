@@ -4,7 +4,7 @@ from .test_app import BaseRoutesTestCase
 from heymans import config
 
 
-class TestApi(BaseRoutesTestCase):
+class TestApiAttachments(BaseRoutesTestCase):
     
     def setUp(self):
         super().setUp()
