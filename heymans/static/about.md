@@ -25,7 +25,7 @@ I want to create a stimulus display in OpenSesame, using a canvas in a Python in
 
 Your messages and attachments are encrypted based on a key that is linked to your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
 
-Sigmund uses large-language-model APIs provided by third parties. You can choose which model you want to use in the menu. Importantly, none of these third parties uses data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, see the terms of service of [OpenAI](https://openai.com/enterprise-privacy), [Mistral](https://mistral.ai/terms/), and [Anthropic](https://www.anthropic.com/legal/commercial-terms).
+Sigmund uses large-language-model APIs provided by third parties. You can choose which model you want to use in the menu. Importantly, none of these third parties uses data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, see the terms of service of [OpenAI](https://openai.com/enterprise-privacy) and [Mistral](https://mistral.ai/terms/).
 
 
 ## Things Sigmund can do
@@ -76,4 +76,4 @@ The source code of Sigmund is available on GitHub:
 
 ## How can I get an account?
 
-Sigmund is currently in limited beta and by invitation only. If you have received an invitation, you can log in using your account from <https://forum.cogsci.nl/>. 
+First, create an account on <https://forum.cogsci.nl/>. Next, use this account to login to Sigmund.

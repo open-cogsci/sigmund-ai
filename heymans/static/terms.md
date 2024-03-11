@@ -45,6 +45,11 @@ Nothing. User data is stored solely for the purpose of providing the intended se
 
 # Terms of use
 
+## Usage limits
+
+There is currently an hourly limit on 50,000 tokens per user. If this limit is exceeded, you need to wait for (at most) an hour until you can use Sigmund again. The hourly limit may be adjusted once we get a better picture of what kind of limits are needed to avoid excessive use.
+
+
 ## Availability
 
 As electronic services are subject to interruption or breakdown, access to  Sigmund is provided on an “as is” and “as available” basis only.
