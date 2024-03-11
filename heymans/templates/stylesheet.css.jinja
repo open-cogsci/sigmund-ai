@@ -174,15 +174,23 @@ a:visited {
 
 #message-container {
     width: 100%;
+    display: flex;
+    align-items: stretch;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: white;
 }
 
+#button-container {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+
 textarea#message {
     border: none;
-    width: 80%;
+    flex-grow: 1;
     height: 100%;
 }
 
@@ -198,7 +206,6 @@ button#cancel,
 button#expand,
 button#send {
     font-size: 1.2em;
-    float:right;
     height:100%;
     border: none;
     color: #fff;
