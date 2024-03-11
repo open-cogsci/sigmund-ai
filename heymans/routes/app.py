@@ -79,7 +79,8 @@ def login_handler(form, failed=False):
     if form.validate_on_submit():
         username = form.username.data.strip().lower()
         password = form.password.data.strip()
-        if not config.validate_user(username, password):
+        username = config.validate_user(username, password)
+        if username is None:
             return redirect('/login_failed')
         kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
                          length=32,

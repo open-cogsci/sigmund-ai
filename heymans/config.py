@@ -186,14 +186,28 @@ def process_ai_message(msg):
 
 def validate_user(username, password):
     """user_validation.validate() should connect to an authentication system
-    that verifies the account. Whitespace has been stripped from both the
-    username and the password. The username is converted to lowercase.
+    that verifies the account. 
+    
+    Parameters
+    ----------
+    username : str
+        Lowercase. Whitespace has been stripped.
+    password : str
+        Whitespace has been stripped.
+        
+    Returns
+    -------
+    str or None:
+        If the user is validated, the username is returned. This is typically
+        equal to the `username` parameter, but in some cases it may differ, for
+        example if the user logs in with an email address instead of the actual
+        username. If the user is not validated, None is returned.
     """
     try:
         import user_validation
     except ImportError:
         logger.info('no user validation script found')
-        return True
+        return username
     logger.info('using validation script')
     return user_validation.validate(username, password)
 
