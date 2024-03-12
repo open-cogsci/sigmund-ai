@@ -63,10 +63,12 @@ You have retrieved the following documentation to answer the user's question:
                    for doc in optional]
         replies = self._heymans.condense_model.predict_multiple(prompts)
         for reply, doc in zip(replies, optional):
+            doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
             if not reply.lower().startswith('no'):
                 important.append(doc)
+                logger.info(f'keeping {doc_desc}')
             else:
-                logger.info(f'stripping irrelevant documentation')
+                logger.info(f'stripping {doc_desc}')
         self._documents = important
     
     def clear(self):
@@ -101,19 +103,24 @@ class FAISSDocumentationSource(BaseDocumentationSource):
             openai_api_key=config.openai_api_key)
         logger.info('reading FAISS documentation cache')
         self._db = FAISS.load_local(Path('.db.cache'), self._embeddings_model)
-        self._retriever = self._db.as_retriever()
+        self._retriever = self._db.as_retriever(
+            search_kwargs={'k': config.search_docs_per_query})
     
     def search(self, queries):
         if config.openai_api_key is None:
             return []
         docs = []
         for query in queries:
-            logger.info(f'retrieving from FAISS: {query}')
+            logger.info(f'searching FAISS: {query}')
             for doc in self._retriever.invoke(query):
+                doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
+                if any(doc.page_content == ref.page_content for ref in docs):
+                    logger.info(f'duplicate {doc_desc}')
+                    continue
                 if doc.page_content not in self._heymans.documentation and \
                         doc.page_content not in docs:
-                    logger.info(
-                        f'Retrieving {doc.metadata["url"]} (length={len(doc.page_content)})')
+                    logger.info(f'adding {doc_desc}')
                     docs.append(doc)
-                    break
+                else:
+                    logger.info(f'skipping {doc_desc}')
         return docs

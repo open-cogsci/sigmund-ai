@@ -40,8 +40,9 @@ class Heymans:
         self.user_id = user_id
         self.database = DatabaseManager(user_id, encryption_key)
         # Search first is stored as a str but should be a bool here
-        self.search_first = (self.database.get_setting('search_first') \
-            if search_first is None else search_first) == 'true'
+        self.search_first = (
+            self.database.get_setting('search_first') == 'true'
+            if search_first is None else search_first)
         self.model_config = config.model_config[
             self.database.get_setting('model_config')
             if model_config is None else model_config

@@ -173,6 +173,9 @@ topic_sources = {
     'data_analysis': 'sources/topics/datamatrix.py',
     'questions_howto': 'sources/topics/questions-how-to.md',
 }
+# The number of documents that is added to the documentation for each search
+# query
+search_docs_per_query = 2
 
 
 def process_ai_message(msg):
