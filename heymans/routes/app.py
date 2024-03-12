@@ -68,11 +68,15 @@ def chat_page():
             answer_model_div = ''
             
         html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
+    # The user's settings are the defaults updated with the user-specific 
+    # settings from the database
+    settings = config.settings_default.copy()
+    settings.update(heymans.database.list_settings())
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=heymans.user_id,
                         search_first_menu_label=config.search_first_menu_label,
-                        settings=json.dumps(heymans.database.list_settings()))
+                        settings=json.dumps(settings))
 
 
 def login_handler(form, failed=False):
