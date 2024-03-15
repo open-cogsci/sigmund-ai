@@ -38,7 +38,7 @@ def init_testlog():
     testlog_folder = Path(__file__).parent / 'testlog'
     if not testlog_folder.exists():
         testlog_folder.mkdir()
-    testlog = Path(testlog_folder) / f'testlog.{str(dtetime.now())}.{config.model_config}.log'
+    testlog = Path(testlog_folder) / f'testlog.{datetime.now().strftime("%Y-%m-%d %H:%M")}.{config.settings_default["model_config"]}.log'
 
 
 def read_testcases():
