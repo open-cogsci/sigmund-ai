@@ -7,6 +7,7 @@ import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.toc import TocExtension
+from markdown.extensions.attr_list import AttrListExtension
 from langchain.schema import HumanMessage
 from . import config
 from . import __version__
@@ -19,7 +20,8 @@ def md(text):
     return markdown.markdown(text,
                              extensions=[FencedCodeExtension(),
                                          CodeHiliteExtension(),
-                                         TocExtension()])
+                                         TocExtension(),
+                                         AttrListExtension()])
 
 
 def clean(text, escape_html=True, render=True):

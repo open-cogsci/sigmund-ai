@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&family=Lobster+Two&family=Madimi+One&display=swap');
 
 body {
     background-color: #ECEFF1;
@@ -7,27 +7,27 @@ body {
 
 h1 {
     font-size: 1.4em;
-    font-family: "Roboto Slab", serif;
 }
 
 h2 {
     font-size: 1.2em;
-    font-family: "Roboto Slab", serif;
 }
 
 h3 {
     font-size: 1em;
-    font-family: "Roboto Slab", serif;
+}
+    
+h1, h2, h3 {
+    font-family: "Madimi One", serif;
+    font-weight: normal;
+    color: #bf360c;
 }
 
 blockquote {
     font-style: italic;
 }
 
-a {
-    color: #0288d1;
-}
-
+a,
 a:visited {
     color: #0288d1;
 }
@@ -244,6 +244,10 @@ button#start {
     margin-block-end: 10px;
 }
 
+#start-text  ul {
+    padding-left: 18px;
+}
+
 #loading {
     margin-bottom: 10px;
 }
@@ -279,7 +283,7 @@ button#start {
 #start-text {
     margin-top: 0px;
     margin-bottom: 20px;
-    padding: 10px;
+    padding: 10px 20px 10px 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: white;
@@ -363,4 +367,13 @@ button#start {
 .message-user:hover .message-delete,
 .message-ai:hover .message-delete {
     display: block;
+}
+
+.pretty-text {
+    font-family: "Lobster Two";
+    background-color: #ffd600;
+    border-radius: 4px;
+    padding: 8px;
+    float: right;
+    margin: 0px 0px 20px 20px!important;
 }

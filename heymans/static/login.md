@@ -1,5 +1,8 @@
 ## Sigmund: your friendly, privacy-minded AI assistant!
 
+&#128150; Your subscription<br>supports open source
+{: .pretty-text }
+
 - Better at answering questions about [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu) than other chatbots
 - Built on state-of-the-art language models (OpenAI's GPT4 and Mistral Large), and therefore also an excellent general-purpose chatbot
 - Messages and attachments are encrypted so that no-one can listen in on your conversation
