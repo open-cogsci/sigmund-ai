@@ -9,10 +9,9 @@
 - Basic Python and R execution abilities
 - Search for scientific articles through Google Scholar
 - Upload and download attachments
-- Only €9 per month
 - Read more about [what Sigmund can do](/about) and [our terms of service](/terms)
 
-Sigmund is linked to your <a href="https://forum.cogsci.nl/">forum.cogsci.nl</a> account
+Sigmund requires a subscription (€9 /month). You can subscribe after signing in. A variety of international payment methods are available. Subscribing is easy and secure. 
 
 <a id="sign-in-button" class="link-button" onclick="signin()">
     <i class="fas fa-sign-in-alt"></i> Sign in with your forum account
