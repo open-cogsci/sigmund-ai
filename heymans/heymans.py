@@ -100,6 +100,11 @@ class Heymans:
                'message': f'{config.ai_name} is searching '}, {}
         logger.info('[search state] entering')
         self.documentation.clear()
+        # First seach based on the user question
+        logger.info('[search state] searching based on user message')
+        self.documentation.search([message])
+        # Then search based on the search-model queries derived from the user
+        # question
         self.tools = self.search_tools
         reply = self.search_model.predict(self.messages.prompt(
             system_prompt=prompt.SYSTEM_PROMPT_SEARCH))

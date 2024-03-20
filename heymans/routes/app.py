@@ -50,9 +50,9 @@ def chat_page():
         if 'sources' in metadata:
             sources_div = '<div class="message-sources">'
             sources = json.loads(metadata['sources'])
-            for source in sources:
-                if source['url']:
-                    sources_div += f'<a href="{source["url"]}">{source["url"]}</a><br />'
+            urls = {source['url'] for source in sources if source['url']}
+            for url in urls:
+                sources_div += f'<a href="{url}">{url}</a><br />'
             sources_div += '</div>'
         else:
             sources_div = ''

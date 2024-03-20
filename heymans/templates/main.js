@@ -178,9 +178,13 @@ async function sendMessage(message) {
         // Flag to track if there are any valid sources
         // console.log(metadata['sources']);
         let hasValidSources = false;
+        let uniqueURLs = new Set();
+        
         sources.forEach(sourceObj => {
-            if (sourceObj.url) {
+            if (sourceObj.url && !uniqueURLs.has(sourceObj.url)) {
                 hasValidSources = true;
+                uniqueURLs.add(sourceObj.url);
+        
                 const sourceLink = document.createElement('a');
                 sourceLink.href = sourceObj.url;
                 sourceLink.textContent = sourceObj.url;

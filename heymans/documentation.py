@@ -111,7 +111,7 @@ class FAISSDocumentationSource(BaseDocumentationSource):
             return []
         docs = []
         for query in queries:
-            logger.info(f'searching FAISS: {query}')
+            logger.info(f'searching FAISS')
             for doc in self._retriever.invoke(query):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
                 if any(doc.page_content == ref.page_content for ref in docs):
