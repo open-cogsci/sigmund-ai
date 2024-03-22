@@ -252,7 +252,8 @@ new Vue({
     attachments: {},
     isUploading: false,
     searchFirstLabel: "{{ search_first_menu_label }}",
-    searchFirstIcon: (sigmundSettings.search_first === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off'
+    searchFirstIcon: (sigmundSettings.search_first === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off',
+    forceModelConfigUpdate: 0
   },
   computed: {
     sortedConversations() {
@@ -269,11 +270,13 @@ new Vue({
         sigmundSettings.search_first = value;
         this.searchFirstIcon = (value === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
         setSetting('search_first', value);
+        this.forceModelConfigUpdate += 1;
       }
     },
     modelConfig: {
       get() {
         this.menuVisible;  // depend on this to force update
+        this.forceModelConfigUpdate;  // depend on this to force update
         return sigmundSettings.model_config;
       },
       set(value) {
