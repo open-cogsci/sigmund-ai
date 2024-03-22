@@ -141,7 +141,7 @@
 
 {% raw %}
 <div id="app">
-  <div class="menu" v-bind:class="{ 'active': menuVisible }">
+  <div ref="menu" class="menu" v-bind:class="{ 'active': menuVisible }">
     <div @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
@@ -286,6 +286,13 @@ new Vue({
     }
   },
   methods: {
+    closeMenu(event) {
+      // Only close the menu if the click was not inside the menu
+      if (!this.$refs.menu.contains(event.target)) {
+        this.menuVisible = false;
+        window.removeEventListener('click', this.closeMenu);
+      }
+    },
     getNewConversationUrl() {
       return '/api/conversation/new';
     },
@@ -294,6 +301,14 @@ new Vue({
     },
     toggleMenu: function() {
       this.menuVisible = !this.menuVisible;
+      // Attach an event handler to close the menu when the window is clicked.
+      // This is done in a timeout to avoid it from being invoked directly as
+      // a result of the current click
+      setTimeout(() => {
+        if (this.menuVisible) {
+          window.addEventListener('click', this.closeMenu);
+        }
+      }, 100);
     },
     navigateTo: function(path) {
       window.location.href = path;
