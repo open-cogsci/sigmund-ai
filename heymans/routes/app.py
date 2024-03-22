@@ -95,7 +95,7 @@ def login_handler(form, failed=False):
             kdf.derive(password.encode()))
         user = User(username)
         login_user(user)
-        logger.info(f'initializing encryption key: {session["encryption_key"]}')
+        logger.info(f'initializing encryption key')
         return redirect('/')
     login_text = Path('heymans/static/login.md').read_text()
     if failed:
