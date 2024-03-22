@@ -120,8 +120,8 @@ model_config = {
         'answer_model': 'gpt-4'
     },
     'anthropic': {
-        'search_model': 'claude-3-sonnet',
-        'condense_model': 'claude-3-sonnet',
+        'search_model': 'mistral-medium',
+        'condense_model': 'mistral-medium',
         'answer_model': 'claude-3-opus'
     },
     'mistral': {
