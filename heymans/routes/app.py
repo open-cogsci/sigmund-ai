@@ -85,7 +85,9 @@ def login_handler(form, failed=False):
         password = form.password.data.strip()
         username = config.validate_user(username, password)
         if username is None:
+            logger.info(f'log-in failed (username)')
             return redirect('/login_failed')
+        logger.info(f'log-in successful (username)')
         kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
                          length=32,
                          salt=config.encryption_salt,
@@ -100,6 +102,7 @@ def login_handler(form, failed=False):
     login_text = Path('heymans/static/login.md').read_text()
     if failed:
         login_text = f'{config.login_failed_message}\n\n{login_text}'
+    logger.info('log-in screen')
     return utils.render(
         'login.html', form=form,
         login_text=utils.md(login_text))
