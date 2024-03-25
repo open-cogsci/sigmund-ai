@@ -1,6 +1,6 @@
 import os
 os.environ['USE_FLASK_SQLALCHEMY'] = '1'
-from flask import Flask, Config
+from flask import Flask, Config, request
 from flask_login import LoginManager
 from . import config
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint
@@ -33,4 +33,10 @@ def create_app(config_class=HeymansConfig):
         return User(user_id)
         
     login_manager.init_app(app)
+
+    @app.after_request
+    def log_request(response):
+        logger.info(f'request from {request.remote_addr}: {request.full_path}')
+        return response
+
     return app
