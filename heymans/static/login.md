@@ -4,7 +4,8 @@
 {: .pretty-text }
 
 - Better at answering questions about [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu) than other chatbots
-- Built on state-of-the-art language models and therefore also an excellent general-purpose chatbot. You can select OpenAI GPT4, Anthropic Claude 3, or Mistral Large--your choice!
+- Built on state-of-the-art language models and therefore also an excellent general-purpose chatbot.
+- Select OpenAI GPT4, Anthropic Claude 3, or Mistral Large. Your choice!
 - Messages and attachments are encrypted so that no-one can listen in on your conversation
 - Basic Python and R execution abilities
 - Search for scientific articles through Google Scholar
