@@ -8,8 +8,9 @@ from . import config
 logger = logging.getLogger('heymans')
 
 
-def load_library(force_reindex=False):
-    db_cache = Path('.db.cache')
+def load_library(force_reindex=False, cache_folder=config.db_cache,
+                 exclude_filter=None):
+    db_cache = Path(cache_folder)
     src_path = Path('sources')
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
     if not force_reindex and db_cache.exists():
@@ -22,11 +23,17 @@ def load_library(force_reindex=False):
         data = []
         # PDF files are unstructured. They can be named through config.sources
         for src in src_path.glob('pdf/**/*.pdf'):
+            if exclude_filter and exclude_filter in str(src):
+                logger.info(f'skipping pdf: {src}')
+                continue
             logger.info(f'indexing pdf: {src}')
             data += PyPDFLoader(str(src)).load_and_split()
         # jsonl is mainly for documentation
         for src in src_path.glob('jsonl/*.jsonl'):
             logger.info(f'indexing json: {src}')
+            if exclude_filter and exclude_filter in str(src):
+                logger.info(f'skipping json: {src}')
+                continue            
             loader = JSONLoader(src, jq_schema='', content_key='content',
                                 json_lines=True,
                                 metadata_func=_extract_metadata)

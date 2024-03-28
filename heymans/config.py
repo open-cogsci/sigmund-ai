@@ -176,7 +176,13 @@ topic_sources = {
 # The number of documents that is added to the documentation for each search
 # query
 search_docs_per_query = 2
-
+# The distance metric used for search. The cosine metric is useful because it
+# is somewhat invariant to changes in document length
+search_metric = 'cosine'
+# The cache folder for the library that is used to chat
+db_cache = '.db.cache'
+# The cache folder for the library that is used for public search
+public_search_cache = '.ps.cache'
 
 def process_ai_message(msg):
     # This pattern looks for a colon possibly followed by any number of 

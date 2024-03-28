@@ -104,7 +104,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         logger.info('reading FAISS documentation cache')
         self._db = FAISS.load_local(Path('.db.cache'), self._embeddings_model)
         self._retriever = self._db.as_retriever(
-            search_kwargs={'k': config.search_docs_per_query})
+            search_kwargs={'k': config.search_docs_per_query,
+                           'metric': config.search_metric})
     
     def search(self, queries):
         if config.openai_api_key is None:
