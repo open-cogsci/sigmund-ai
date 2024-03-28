@@ -12,7 +12,9 @@
 - Upload and download attachments
 - Read more about [what Sigmund can do](/about) and [our terms of service](/terms)
 
-Sigmund requires a subscription (€9 /month). You can subscribe after signing in. A variety of international payment methods are available. Subscribing is easy and secure. 
+Sigmund requires a subscription (€9 /month). You can subscribe after signing in. A variety of international payment methods are available. Subscribing is easy and secure.
+
+If you need a custom subscription, such as an invoiced subscription for multiple individuals or a longer period, contact [professional@cogsci.nl](mailto:professional@cogsci.nl).
 
 <a id="sign-in-button" class="link-button" onclick="signin()">
     <i class="fas fa-sign-in-alt"></i> Sign in with your forum account
