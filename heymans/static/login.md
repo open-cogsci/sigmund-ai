@@ -3,9 +3,10 @@
 &#128150; Your subscription<br>supports open source
 {: .pretty-text }
 
+- A state-of-the-art general-purpose chatbot
 - Better at answering questions about [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu) than other chatbots
-- Built on state-of-the-art language models and therefore also an excellent general-purpose chatbot.
 - Select OpenAI GPT4, Anthropic Claude 3, or Mistral Large. Your choice!
+- Cheaper than ChatGPT+
 - Messages and attachments are encrypted so that no-one can listen in on your conversation
 - Basic Python and R execution abilities
 - Search for scientific articles through Google Scholar
