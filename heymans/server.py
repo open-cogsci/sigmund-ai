@@ -36,7 +36,9 @@ def create_app(config_class=HeymansConfig):
 
     @app.after_request
     def log_request(response):
-        logger.info(f'request from {request.remote_addr}: {request.full_path}')
+        user_agent = request.headers.get('User-Agent')
+        if 'bot' not in user_agent.lower():
+            logger.info(f'request: {request.full_path}')
         return response
 
     return app
