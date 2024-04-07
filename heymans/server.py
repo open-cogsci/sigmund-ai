@@ -37,7 +37,7 @@ def create_app(config_class=HeymansConfig):
     @app.after_request
     def log_request(response):
         user_agent = request.headers.get('User-Agent')
-        if 'bot' not in user_agent.lower():
+        if user_agent is not None and 'bot' not in user_agent.lower():
             logger.info(f'request: {request.full_path}')
         return response
 
