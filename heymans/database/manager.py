@@ -188,6 +188,7 @@ class DatabaseManager:
             db.session.commit()
             return attachment.attachment_id
         except Exception as e:
+            breakpoint()
             logger.error(f"Error adding attachment: {e}")
             return -1
 

@@ -14,6 +14,7 @@ class TestToolsAttachments(BaseExpensiveTest):
         assert len(self.heymans.database.list_attachments()) == 1
         query = 'Which artist name does the attachment contain?'
         for reply, metadata in self.heymans.send_user_message(query):
+            print(reply)
             if 'Rick Ross' in reply:
                 break
         else:

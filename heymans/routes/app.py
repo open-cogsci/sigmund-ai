@@ -38,7 +38,7 @@ def chat_page():
     for role, message, metadata in heymans.messages:
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
-        if role == 'assistant':
+        if role in ('assistant', 'tool'):
             html_body = utils.md(
                 f'{config.ai_name}: {config.process_ai_message(message)}')
             html_class = 'message-ai'

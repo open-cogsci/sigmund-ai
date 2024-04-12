@@ -1,30 +1,7 @@
 import jinja2
 
 # The system prompt during documentation search consists of the prompt below
-SYSTEM_PROMPT_SEARCH = '''You are Sigmund, an assistant for users of OpenSesame, a program for building psychology and neuroscience experiments.
-
-Do not answer the user's question. Instead, request documentation by replying with JSON in the format shown below. Use the "topics" field to indicate which topics are related to the question. Only use topics shown in the example. Do not make up your own topics. Use the "search" field to specify additional search queries that you feel are relevant.
-
-{
-    "topics": [
-        "opensesame",
-        "osweb",
-        "python",
-        "javascript",
-        "inline_script",
-        "inline_javascript",
-        "datamatrix",
-        "data_analysis",
-        "questions_howto"
-    ],
-    "search", [
-        "search query 1",
-        "search query 2"
-    ]
-}
-
-Respond only with JSON. Do not include additional text in your reply.
-'''
+SYSTEM_PROMPT_SEARCH = '''Do not answer the user's question. Instead, use the search_documentation function tool to search for relevant documentation.'''
 
 # The system prompt used during question answering is composed of the fragments
 # below

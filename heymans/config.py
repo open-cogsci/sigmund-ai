@@ -71,10 +71,9 @@ Let\'s get started! What would like you to disuss?
 '''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
-# The number of previous messages for which transient content should be 
-# retained. Transient content are large chunks of information that are included
-# in AI messages, usually as the result of tool use.
-keep_transient = 4
+# The number of previous messages for which tool results should be 
+# retained.
+keep_tool_results = 4
 
 # RATE LIMITS
 #
@@ -125,7 +124,7 @@ model_config = {
         'answer_model': 'claude-3-opus'
     },
     'mistral': {
-        'search_model': 'mistral-medium',
+        'search_model': 'mistral-large',
         'condense_model': 'mistral-medium',
         'answer_model': 'mistral-large'
     },
@@ -140,11 +139,11 @@ model_config = {
 # 
 # Tools should match the names of classes from heymans.tools
 # Search tools are executed in the first documentation-search phase
-search_tools = ['TopicsTool', 'SearchTool']
+search_tools = ['search_documentation']
 # Answer tools are executed during the answer phase
 answer_tools_with_search = []
-answer_tools_without_search = ['CodeExecutionTool', 'GoogleScholarTool',
-                               'AttachmentsTool', 'DownloadTool']
+answer_tools_without_search = ['read_attachment', 'search_google_scholar',
+                               'execute_code', 'download']
 
 # SETTINGS
 #

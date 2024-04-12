@@ -8,14 +8,12 @@ from pathlib import Path
 from cryptography.fernet import InvalidToken
 from .model import model
 from . import prompt, config, utils, attachments
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain.schema import HumanMessage, AIMessage, SystemMessage, \
+    FunctionMessage
 logger = logging.getLogger('heymans')
 
 
 class Messages:
-    
-    regex_transient = re.compile(r"<div class=['\"]+.*?transient.*?>.*?</div>",
-                                 re.DOTALL)    
     
     def __init__(self, heymans, persistent=False):
         self._heymans = heymans
@@ -85,15 +83,9 @@ class Messages:
         if self._persistent:
             self.save()
             
-    def _message_is_transient(self, content):
-        return self.regex_transient.search(content)
-    
     def prompt(self, system_prompt=None):
         """The prompt consists of the system prompt followed by a sequence of
-        AI and user messages. Transient messages are special messages that are
-        hidden except when they are the last message. This allows the AI to 
-        feed some information to itself to respond to without confounding the
-        rest of the conversation.
+        AI, user, and tool/ function messages.
         
         If no system prompt is provided, one is automatically constructed.
         Typically, an explicit system_prompt is provided during the search
@@ -105,16 +97,15 @@ class Messages:
         msg_len = len(self._condensed_message_history)
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
-            # Messages may contain transient content, such as attachment text,
-            # which are removed if they are a few messages away in the history.
-            # This avoid the prompt from becoming too large.
-            if msg_nr + config.keep_transient < msg_len:
-                if self._message_is_transient(content):
-                    content = '<!--THIS MESSAGE IS NO LONGER AVAILABLE-->'
             if role == 'assistant':
                 model_prompt.append(AIMessage(content=content))
             elif role == 'user':
                 model_prompt.append(HumanMessage(content=content))
+            elif role == 'tool':
+                if msg_nr + config.keep_tool_results < msg_len:
+                    continue
+                model_prompt.append(FunctionMessage(content=content,
+                                                    name='tool_function'))
             else:
                 raise ValueError(f'Invalid role: {role}')
         return model_prompt
@@ -129,7 +120,7 @@ class Messages:
         messages = [{"role": "system", "content": system_prompt}]
         prompt_length = sum(len(content) for role, content
                             in self._condensed_message_history
-                            if not self._message_is_transient(content))
+                            if role != 'tool')
         logger.info(f'system prompt length: {len(system_prompt)}')
         logger.info(f'prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
@@ -169,16 +160,13 @@ class Messages:
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.
-        if self._heymans.answer_model.supports_not_done_yet and \
-                self._heymans.tools:
+        if self._heymans.answer_model.supports_not_done_yet:
             system_prompt.append(prompt.SYSTEM_PROMPT_NOT_DONE_YET)
-        # Each tool has an explanation
-        for tool in self._heymans.tools:
-            if tool.prompt:
-                system_prompt.append(tool.prompt)
         # If available, documentation is also included in the prompt
         if len(self._heymans.documentation):
             system_prompt.append(self._heymans.documentation.prompt())
+        system_prompt.append(
+            attachments.attachments_prompt(self._heymans.database))
         # And finally, if the message history has been condensed, this is also
         # included.
         if self._condensed_text:
@@ -186,7 +174,8 @@ class Messages:
             system_prompt.append(prompt.render(
                 prompt.SYSTEM_PROMPT_CONDENSED,
                 summary=self._condensed_text))
-        return '\n\n'.join(system_prompt)
+        # Combine all non-empty prompt chunks
+        return '\n\n'.join(chunk for chunk in system_prompt if chunk.strip())
         
     def _update_title(self):
         """The conversation title is updated when there are at least two 

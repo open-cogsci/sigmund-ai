@@ -4,26 +4,23 @@ import requests
 logger = logging.getLogger('heymans')
 
 
-class CodeExecutionTool(BaseTool):
+class execute_code(BaseTool):
+    """Execute Python and R code"""
     
-    json_pattern = r"""
-\s*"execute_code"\s*:\s*\{
-\s*"language"\s*:\s*"(?P<language>.+?)"
-\s*,\s*"code"\s*:\s*"(?P<code>.+?)"
-\s*\}
-"""
-    prompt = '''# Code execution
-
-You are also a brilliant programmer. To execute Python and R code, use JSON in the format below. You will receive the output in the next message. Example code included elsewhere in your reply will not be executed. Never execute OpenSesame inline scripts.
-
-{
-    "execute_code": {
-        "language": "python",
-        "code": "print('your code here')"
+    arguments = {
+        'language': {
+            'type': 'string',
+            'description': 'The programming language to use',
+            'enum': ['r', 'python']
+        },
+        'code': {
+            'type': 'string',
+            'description': 'The code to execute. Use print() to print to the standard output.'
+        }
     }
-}'''
+    required_arguments = ['language', 'code']
     
-    def use(self, message, language, code):
+    def __call__(self, language, code):
         logger.info(f'executing {language} code: {code}')
         url = "https://emkc.org/api/v2/piston/execute"
         language_aliases = {'python': 'python',
@@ -45,19 +42,20 @@ You are also a brilliant programmer. To execute Python and R code, use JSON in t
         response = requests.post(url, json=data)
         if response.status_code == 200:
             response_data = response.json()
-            result = response_data.get("run", {}).get("output", "")
+            result = response_data.get("run", {}).get("output", "").strip()
             logger.info(f'result: {result}')
-            result_msg = f'''I executed the following code:
+            result = f'''I executed the following code:
 
 ```{language}
 {code}
 ```
 
-And got the following output:
+And received the following output:
 
 ```
 {result}
-```'''
-            return result_msg, True
+```
+'''
+            return 'Executing code ...', result, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
-        return 'Failed to execute code', True
+        return 'Failed to execute code', None, True

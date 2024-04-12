@@ -49,9 +49,6 @@ class Heymans:
         ]
         self.documentation = Documentation(
             self, sources=[FAISSDocumentationSource(self)])
-        self.search_model = model(self, self.model_config['search_model'])
-        self.answer_model = model(self, self.model_config['answer_model'])
-        self.condense_model = model(self, self.model_config['condense_model'])
         self.messages = Messages(self, persistent)
         if search_tools is None:
             search_tools = config.search_tools
@@ -64,7 +61,23 @@ class Heymans:
         # instantiated with heymans (self) as first argument
         self.search_tools = [getattr(tools, t)(self) for t in search_tools]
         self.answer_tools = [getattr(tools, t)(self) for t in answer_tools]
-        self.tools = self.answer_tools
+        # If there are search tools, the first one should always be used
+        if search_tools:
+            search_tool_choice = search_tools[0]
+        else:
+            search_tool_choice = None
+        # If there are answer tools, the mode can choose freely
+        if answer_tools:
+            answer_tool_choice = 'auto'
+        else:
+            answer_tool_choice = None
+        self.search_model = model(self, self.model_config['search_model'],
+                                  tools=self.search_tools, 
+                                  tool_choice=search_tool_choice)
+        self.answer_model = model(self, self.model_config['answer_model'],
+                                  tools=self.answer_tools,
+                                  tool_choice=answer_tool_choice)
+        self.condense_model = model(self, self.model_config['condense_model'])
     
     def send_user_message(self, message: str,
                           message_id: str=None) -> GeneratorType:
@@ -105,12 +118,14 @@ class Heymans:
         self.documentation.search([message])
         # Then search based on the search-model queries derived from the user
         # question
-        self.tools = self.search_tools
         reply = self.search_model.predict(self.messages.prompt(
             system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
         if config.log_replies:
             logger.info(f'[search state] reply: {reply}')
-        self._run_tools(reply)
+        if callable(reply):
+            reply()
+        else:
+            logger.warning(f'[search state] did not call search tool')
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
@@ -120,7 +135,6 @@ class Heymans:
         yield {'action': 'set_loading_indicator',
                'message': f'{config.ai_name} is thinking and typing '}, {}        
         logger.info(f'[{state} state] entering')
-        self.tools = self.answer_tools
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
         tokens_consumed_before = self.answer_model.total_tokens_consumed
@@ -131,53 +145,37 @@ class Heymans:
         self.database.add_activity(tokens_consumed)        
         if config.log_replies:
             logger.info(f'[{state} state] reply: {reply}')
-        # We then run tools based on the AI reply. This may modify the reply,
-        # mainly by stripping out any JSON commands in the reply
-        reply, result, needs_feedback = self._run_tools(reply)
-        if needs_feedback:
-            logger.info(f'[{state} state] tools need feedback')
-        # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
-        # to indicate that it wants to perform additional actions. This makes 
-        # it easier to perform tasks consisting of multiple responses and 
-        # actions. The marker is stripped from the reply so that it's hidden
-        # from the user. We also check for a number of common linguistic 
-        # indicators that the AI isn't done yet, such "I will now". This is
-        # necessary because the explicit marker isn't reliably sent.
-        if self.answer_model.supports_not_done_yet and \
-                prompt.NOT_DONE_YET_MARKER in reply:
-            reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
-            logger.info(f'[{state} state] not-done-yet marker received')
-            needs_feedback = True
-        # If there is still a non-empty reply after running the tools (i.e.
-        # stripping the JSON hasn't cleared the reply entirely, then yield and
-        # remember it.
-        if reply:
+        # If the reply is a callable, then it's a tool that we need to run
+        if callable(reply):
+            tool_message, result, needs_feedback = reply()
+            if needs_feedback:
+                logger.info(f'[{state} state] tools need feedback')
+            metadata = self.messages.append('assistant', tool_message)
+            yield tool_message, metadata
+            # If the tool has a result, yield and remember it
+            if result:
+                metadata = self.messages.append('tool', result)
+                yield result, metadata
+        # Otherwise the reply is a regular AI message
+        else:
             metadata = self.messages.append('assistant', reply)
             yield reply, metadata
-        else:
-            metadata = self.messages.metadata()
-        # If the tools have a result, yield and remember it
-        if result:
-            self.messages.append('assistant', result)
-            yield result, metadata
+            # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
+            # to indicate that it wants to perform additional actions. This makes 
+            # it easier to perform tasks consisting of multiple responses and 
+            # actions. The marker is stripped from the reply so that it's hidden
+            # from the user. We also check for a number of common linguistic 
+            # indicators that the AI isn't done yet, such "I will now". This is
+            # necessary because the explicit marker isn't reliably sent.
+            if self.answer_model.supports_not_done_yet and \
+                    prompt.NOT_DONE_YET_MARKER in reply:
+                reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
+                logger.info(f'[{state} state] not-done-yet marker received')
+                needs_feedback = True
+            else:
+                needs_feedback = False
         # If feedback is required, either because the tools require it or 
         # because the AI sent a NOT_DONE_YET marker, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
             for reply, metadata in self._answer(state='feedback'):
                 yield reply, metadata
-
-    def _run_tools(self, reply: str) -> Tuple[str, str, bool]:
-        """Runs all tools on a reply. Returns the modified reply, a string
-        that concatenates all output (an empty string if no output was 
-        produced) and a bool indicating whether the AI should in turn repond
-        to the produced output.
-        """
-        logger.info(f'running tools')
-        results = []
-        needs_reply = []
-        for tool in self.tools:
-            reply, tool_results, tool_needs_reply = tool.run(reply)
-            if tool_results:
-                results += tool_results
-            needs_reply.append(tool_needs_reply)
-        return reply, '\n\n'.join(results), any(needs_reply)

@@ -9,17 +9,16 @@ from .. import attachments
 logger = logging.getLogger('heymans')
 
 
-class DownloadTool(BaseTool):
+class download(BaseTool):
+    """Download files or webpage from the internet and save them as attachments"""
     
-    # The JSON pattern should match the regular expression shown in the prompt
-    # and catch the URL as a group with the name 'url'.
-    json_pattern = r"\"download_url\":\s*\"(?P<url>https?://[^']+)\""
-    prompt = '''# Download files
-    
-You have access to the internet. To download a file, use JSON in the format below. The file will be added to your attachments.
-
-{"download_url": "https://url_to_file"}
-'''
+    arguments = {
+        "url": {
+            "type": "string",
+            "description": "The url of a file of webpage",
+        }
+    }
+    required_arguments = ["url"]    
 
     def _download(self, url):
         """Download URL and return a filename, content tuple."""
@@ -56,7 +55,7 @@ You have access to the internet. To download a file, use JSON in the format belo
             logger.error(f"Failed to download the file from {url}: {e}")
             raise
             
-    def use(self, message, url):
+    def __call__(self, url):
         try:
             filename, content = self._download(url)
         except Exception as e:
@@ -70,4 +69,5 @@ You have access to the internet. To download a file, use JSON in the format belo
             'description': description
         }
         self._heymans.database.add_attachment(attachment_data)
-        return f'''I have downloaded {filename} and added it to my attachments.''', True
+        return f'''I have downloaded {filename} and added it to my attachments.''', \
+            None, False

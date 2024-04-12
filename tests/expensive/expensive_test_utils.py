@@ -14,6 +14,7 @@ class BaseExpensiveTest(unittest.TestCase):
         init_db()
         self.heymans = Heymans(user_id='pytest', search_first=False)
         config.max_tokens_per_hour = float('inf')
+        config.log_replies = True
         
     def _test_tool(self):
         pass
