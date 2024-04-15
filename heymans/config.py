@@ -119,8 +119,8 @@ model_config = {
         'answer_model': 'gpt-4'
     },
     'anthropic': {
-        'search_model': 'mistral-medium',
-        'condense_model': 'mistral-medium',
+        'search_model': 'claude-3-sonnet',
+        'condense_model': 'claude-3-sonnet',
         'answer_model': 'claude-3-opus'
     },
     'mistral': {
@@ -134,6 +134,8 @@ model_config = {
         'answer_model': 'dummy'
     }
 }
+# Model-specific arguments
+anthropic_max_tokens = 1024
 
 # TOOLS
 # 

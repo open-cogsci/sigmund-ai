@@ -1,6 +1,8 @@
 import logging
 import asyncio
 import time
+from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
+    FunctionMessage
 logger = logging.getLogger('heymans')
 
 
@@ -17,7 +19,7 @@ class BaseModel:
         self.prompt_tokens_consumed = 0
         self.completion_tokens_consumed = 0
         
-    def invalid_tool(self):
+    def invalid_tool(self) -> str:
         return 'Invalid tool'
         
     def get_response(self, response) -> [str, callable]:
@@ -28,16 +30,31 @@ class BaseModel:
                 for t in self._tools if t.tool_spec]
         
     def invoke(self, messages):
-        return self._model.invoke(messages)
+        raise NotImplementedError()
         
     def async_invoke(self, messages):
-        return self._model.ainvoke(messages)
+        raise NotImplementedError()
         
-    def messages_length(self, messages):
+    def messages_length(self, messages) -> int:
         if isinstance(messages, str):
-            return len(messages)
+            return lebase_format_toolsn(messages)
         return sum([len(m.content if hasattr(m, 'content') else m['content'])
                    for m in messages])
+        
+    def convert_message(self, message):
+        if isinstance(message, str):
+            return dict(role='user', content=message)
+        if isinstance(message, SystemMessage):
+            role = 'system'
+        elif isinstance(message, AIMessage):
+            role = 'assistant'
+        elif isinstance(message, HumanMessage):
+            role = 'user'
+        elif isinstance(message, FunctionMessage):
+            role = 'tool'
+        else:
+            raise ValueError(f'Unknown message type: {message}')
+        return dict(role=role, content=message.content)        
 
     def predict(self, messages, track_tokens=True):
         t0 = time.time()
@@ -63,6 +80,7 @@ class BaseModel:
         """Predicts multiple simple (non-message history) prompts using asyncio
         if possible.
         """
+        prompts = [[self.convert_message(prompt)] for prompt in prompts]
         try:
             loop = asyncio.get_event_loop()
             if not loop.is_running():

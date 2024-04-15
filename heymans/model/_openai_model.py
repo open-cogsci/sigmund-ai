@@ -1,7 +1,5 @@
 from .. import config
 from . import BaseModel
-from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
-    FunctionMessage
 
 
 class OpenAIModel(BaseModel):
@@ -17,22 +15,6 @@ class OpenAIModel(BaseModel):
                                  "function": {"name": self._tool_choice}}
         self._client = Client(api_key=config.openai_api_key)
         self._async_client = AsyncClient(api_key=config.openai_api_key)
-        
-    def convert_message(self, message):
-        # OpenAI expects messages as dict objects
-        if isinstance(message, str):
-            return dict(role='user', content=message)
-        if isinstance(message, SystemMessage):
-            role = 'system'
-        elif isinstance(message, AIMessage):
-            role = 'assistant'
-        elif isinstance(message, HumanMessage):
-            role = 'user'
-        elif isinstance(message, FunctionMessage):
-            role = 'tool'
-        else:
-            raise ValueError(f'Unknown message type: {message}')
-        return dict(role=role, content=message.content)
         
     def predict(self, messages):
         # Strings need to be converted a list of length one with a single
@@ -60,10 +42,6 @@ class OpenAIModel(BaseModel):
                     }]
                 message['tool_call_id'] = tool_call_id        
         return super().predict(messages)
-        
-    def predict_multiple(self, prompts):
-        prompts = [[self.convert_message(prompt)] for prompt in prompts]
-        return super().predict_multiple(prompts)
         
     def get_response(self, response):
         tool_calls = response.choices[0].message.tool_calls

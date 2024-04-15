@@ -31,6 +31,7 @@ class BaseTool:
         return self.__class__.__name__
     
     def bind(self, args):
+        print(f'binding tool to: {args}')
         if isinstance(args, str):
             args = json.loads(args)
         return functools.partial(self, **args)
