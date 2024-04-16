@@ -7,8 +7,13 @@ logger = logging.getLogger('heymans')
 
 
 class BaseModel:
+    """Base implementation for LLM chat models."""
     
-    supports_not_done_yet = False
+    # Indicates whether the model is able to provide feedback on its own output
+    supports_not_done_yet = True
+    # Indicates whether the model is able to provide feedback on tool results 
+    supports_tool_feedback = True
+    # Approximation to keep track of token costs
     characters_per_token = 4
     
     def __init__(self, heymans, tools=None, tool_choice='auto'):
@@ -20,7 +25,7 @@ class BaseModel:
         self.completion_tokens_consumed = 0
         
     def invalid_tool(self) -> str:
-        return 'Invalid tool'
+        return 'Invalid tool', None, False
         
     def get_response(self, response) -> [str, callable]:
         return response.content
@@ -37,7 +42,7 @@ class BaseModel:
         
     def messages_length(self, messages) -> int:
         if isinstance(messages, str):
-            return lebase_format_toolsn(messages)
+            return len(messages)
         return sum([len(m.content if hasattr(m, 'content') else m['content'])
                    for m in messages])
         

@@ -1,5 +1,6 @@
 import logging
 import jinja2
+import json
 from types import GeneratorType
 from typing import Tuple, Optional
 from . import config, library
@@ -147,15 +148,20 @@ class Heymans:
             logger.info(f'[{state} state] reply: {reply}')
         # If the reply is a callable, then it's a tool that we need to run
         if callable(reply):
-            tool_message, result, needs_feedback = reply()
+            tool_message, tool_result, needs_feedback = reply()
             if needs_feedback:
                 logger.info(f'[{state} state] tools need feedback')
+                if not self.answer_model.supports_tool_feedback:
+                    logger.info(
+                        f'[{state} state] model does not support feedback')
+                    needs_feedback = False
             metadata = self.messages.append('assistant', tool_message)
             yield tool_message, metadata
             # If the tool has a result, yield and remember it
-            if result:
-                metadata = self.messages.append('tool', result)
-                yield result, metadata
+            if tool_result:
+                metadata = self.messages.append('tool',
+                                                json.dumps(tool_result))
+                yield tool_result['content'], metadata
         # Otherwise the reply is a regular AI message
         else:
             metadata = self.messages.append('assistant', reply)

@@ -146,15 +146,11 @@ class Messages:
         """The system prompt that is used for question answering consists of
         several fragments.
         """
-        # There is always and identity, information about the current time,
-        # and a list of attached files
+        # There is always and identity and a list of attached files
         if self._heymans.search_first:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITH_SEARCH]
         else:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
-        system_prompt.append(
-            prompt.render(prompt.SYSTEM_PROMPT_DATETIME,
-                          current_datetime=utils.current_datetime()))
         system_prompt.append(
             attachments.attachments_prompt(self._heymans.database))
         # For models that support this, there is also an instruction indicating

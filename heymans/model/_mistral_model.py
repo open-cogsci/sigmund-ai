@@ -1,5 +1,6 @@
 from .. import config, utils
-from . import OpenAIModel, BaseModel
+from . import BaseModel
+from ._openai_model import OpenAIModel
 from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
     FunctionMessage
 
@@ -7,6 +8,7 @@ from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
 class MistralModel(OpenAIModel):
     
     supports_not_done_yet = False
+    supports_tool_feedback = False
 
     def __init__(self, heymans, model, **kwargs):
         from mistralai.async_client import MistralAsyncClient
@@ -18,11 +20,6 @@ class MistralModel(OpenAIModel):
         self._client = MistralClient(api_key=config.mistral_api_key)
         self._async_client = MistralAsyncClient(api_key=config.mistral_api_key)
         
-    def convert_message(self, message):
-        from mistralai.models.chat_completion import ChatMessage
-        message = super().convert_message(message)
-        return ChatMessage(**message)
-        
     def predict(self, messages):
         if isinstance(messages, str):
             messages = [self.convert_message(messages)]
@@ -30,7 +27,8 @@ class MistralModel(OpenAIModel):
             messages = utils.prepare_messages(messages, allow_ai_first=False,
                                               allow_ai_last=False,
                                               merge_consecutive=True)
-            messages = [self.convert_message(message) for message in messages]        
+            messages = [self.convert_message(message) for message in messages]
+            messages = self._prepare_tool_messages(messages)
         return BaseModel.predict(self, messages)
     
     def invoke(self, messages):

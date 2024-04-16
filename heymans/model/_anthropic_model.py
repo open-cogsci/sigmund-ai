@@ -1,10 +1,13 @@
 from . import BaseModel
 from .. import config, utils
 import logging
+import json
 logger = logging.getLogger('heymans')
 
 
 class AnthropicModel(BaseModel):
+    
+    supports_not_done_yet = False
     
     def __init__(self, heymans, model, **kwargs):
         from anthropic import Anthropic, AsyncAnthropic
@@ -30,38 +33,41 @@ class AnthropicModel(BaseModel):
             logger.info('entering message postprocessing loop')
             for i, message in enumerate(messages):
                 if message['role'] == 'tool':
+                    if i == 0:
+                        raise ValueError(
+                            'The first message cannot be a tool message')
                     logger.info('converting tool message to user message')
+                    tool_info = json.loads(message['content'])
                     message['role'] = 'user'
                     message['content'] = [{
                         'type': 'tool_result',
                         'tool_use_id': str(self._tool_use_id),
                         'content': [{
                             'type': 'text',
-                            'text': message['content']
+                            'text': tool_info['content']
                         }]
                     }]
-                    if i > 0:
-                        # The previous message needs to have a tool-use block
-                        prev_message = messages[i - 1]
-                        prev_message['content'] = [
-                            {'type': 'text',
-                             'text': prev_message['content']},
-                            {'type': 'tool_use',
-                             'id': str(self._tool_use_id),
-                             'input': {'args': 'input args'},
-                             'name': 'tool_function'
-                            }
-                        ]
+                    # The previous message needs to have a tool-use block
+                    prev_message = messages[i - 1]
+                    prev_message['content'] = [
+                        {'type': 'text',
+                         'text': prev_message['content']},
+                        {'type': 'tool_use',
+                         'id': str(self._tool_use_id),
+                         'input': {'args': tool_info['args']},
+                         'name': tool_info['name']
+                        }
+                    ]
                     self._tool_use_id += 1
                     if len(messages) > i + 1:
-                        logger.info('merging tool and user message')
                         next_message = messages[i + 1]
                         if next_message['role'] == 'user':
+                            logger.info('merging tool and user message')
                             message['content'].append([{
                                 "type": "text",
                                 "text": next_message['content']
                             }])
-                        break
+                            break
             else:
                 break
             logger.info('dropping duplicate user message')
@@ -74,7 +80,7 @@ class AnthropicModel(BaseModel):
             if block.type == 'tool_use':
                 for tool in self._tools:
                     if tool.name == block.name:
-                        return tool.bind(block.input)
+                        return tool.bind(json.dumps(block.input))
                 return self.invalid_tool
             if block.type == 'text':
                 text.append(block.text)
