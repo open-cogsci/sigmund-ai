@@ -58,4 +58,4 @@ And received the following output:
 '''
             return 'Executing code ...', result, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
-        return 'Failed to execute code', None, True
+        return 'Failed to execute code', '', True

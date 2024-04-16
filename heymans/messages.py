@@ -109,6 +109,20 @@ class Messages:
             else:
                 raise ValueError(f'Invalid role: {role}')
         return model_prompt
+    
+    def visible_messages(self):
+        """Yields role, message, metadata while ignoring messages and 
+        converting tool messages into user messages with tool result as 
+        content. This is mainly for display in the web interface.
+        """
+        for role, message, metadata in self:
+            if role == 'tool':
+                role = 'assistant'
+                tool_results = json.loads(message)
+                message = tool_results['content']
+            if not message.strip():
+                continue
+            yield role, message, metadata
 
     def welcome_message(self):
         if self._heymans.search_first:
@@ -161,8 +175,6 @@ class Messages:
         # If available, documentation is also included in the prompt
         if len(self._heymans.documentation):
             system_prompt.append(self._heymans.documentation.prompt())
-        system_prompt.append(
-            attachments.attachments_prompt(self._heymans.database))
         # And finally, if the message history has been condensed, this is also
         # included.
         if self._condensed_text:

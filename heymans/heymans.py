@@ -161,7 +161,8 @@ class Heymans:
             if tool_result:
                 metadata = self.messages.append('tool',
                                                 json.dumps(tool_result))
-                yield tool_result['content'], metadata
+                if tool_result['content']:
+                    yield tool_result['content'], metadata
         # Otherwise the reply is a regular AI message
         else:
             metadata = self.messages.append('assistant', reply)

@@ -19,3 +19,9 @@ class TestToolsAttachments(BaseExpensiveTest):
                 break
         else:
             assert False
+        query = 'Can you download the following readme: https://raw.githubusercontent.com/open-cogsci/OpenSesame/milgram/readme.md'
+        for reply, metadata in self.heymans.send_user_message(query):
+            print(reply)
+        query = 'Can you read and summarize the readme for me?'
+        for reply, metadata in self.heymans.send_user_message(query):
+            print(reply)

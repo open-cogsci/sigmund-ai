@@ -42,7 +42,12 @@ class BaseTool:
         called again to provide feedback based on the tool result.
         """
         def bound_tool_function():
-            message, result, needs_feedback = self(**json.loads(args))
+            try:
+                message, result, needs_feedback = self(**json.loads(args))
+            except Exception as e:
+                message = 'Failed to run tool'
+                result = f'The following error occurred while trying to run tool:\n\n{e}'
+                needs_feedback = True
             result = {'name': self.name,
                       'args': args,
                       'content': result}

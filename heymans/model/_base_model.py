@@ -31,6 +31,8 @@ class BaseModel:
         return response.content
     
     def tools(self):
+        if self._tools is None:
+            return []
         return [{"type": "function", "function": t.tool_spec}
                 for t in self._tools if t.tool_spec]
         

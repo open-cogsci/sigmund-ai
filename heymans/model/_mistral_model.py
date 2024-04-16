@@ -1,14 +1,15 @@
 from .. import config, utils
 from . import BaseModel
 from ._openai_model import OpenAIModel
+import logging
 from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
     FunctionMessage
+logger = logging.getLogger('heymans')
 
 
 class MistralModel(OpenAIModel):
     
     supports_not_done_yet = False
-    supports_tool_feedback = False
 
     def __init__(self, heymans, model, **kwargs):
         from mistralai.async_client import MistralAsyncClient
@@ -29,12 +30,32 @@ class MistralModel(OpenAIModel):
                                               merge_consecutive=True)
             messages = [self.convert_message(message) for message in messages]
             messages = self._prepare_tool_messages(messages)
+        # Mistral requires an assistant message after a tool message
+        while True:
+            for i, message in enumerate(messages[:-1]):
+                next_message = messages[i + 1]
+                if message['role'] == 'tool' and \
+                        next_message['role'] == 'user':
+                    break
+            else:
+                break
+            logger.info('adding assistant message between tool and user')
+            messages.insert(i + 1, {'role': 'assistant',
+                                'content': 'Tool was executed.'})
         return BaseModel.predict(self, messages)
+        
+    def _mistral_tool_args(self, messages):
+        # Mistral tends to get stuck in a loop where the same tool is called
+        # over and over again. To fix this, we temporarily disallow tools when
+        # the last message was a tool.
+        if messages[-1]['role'] == 'tool':
+            return {}
+        return self._tool_args()
     
     def invoke(self, messages):
         return self._client.chat(model=self._model, messages=messages,
-                                 **self._tool_args())
+                                 **self._mistral_tool_args(messages))
         
     def async_invoke(self, messages):
         return self._async_client.chat(model=self._model, messages=messages,
-                                       **self._tool_args())
+                                       **self._mistral_tool_args(messages))

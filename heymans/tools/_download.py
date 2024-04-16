@@ -56,11 +56,7 @@ class download(BaseTool):
             raise
             
     def __call__(self, url):
-        try:
-            filename, content = self._download(url)
-        except Exception as e:
-            return f'I failed to download the file for the following reason: {e}', \
-                True
+        filename, content = self._download(url)
         description = attachments.describe_file(filename, content,
                                                 self._heymans.condense_model)
         attachment_data = {
@@ -70,4 +66,4 @@ class download(BaseTool):
         }
         self._heymans.database.add_attachment(attachment_data)
         return f'''I have downloaded {filename} and added it to my attachments.''', \
-            None, False
+            '', False

@@ -228,7 +228,7 @@ login_failed_message = '__User name or password incorrect. Please try again.__'
 # SUBSCRIPTIONS
 #
 # Enable this to activate the Stripe-based subscription functionality.
-subscription_required = True
+subscription_required = False
 # This is the duration of the subscription in days. This should be set to a bit
 # longer than a month to provide a grace period in case of payment issues.
 subscription_length = 40

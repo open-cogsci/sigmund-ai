@@ -64,11 +64,13 @@ You have retrieved the following documentation to answer the user's question:
         replies = self._heymans.condense_model.predict_multiple(prompts)
         for reply, doc in zip(replies, optional):
             doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
-            if not reply.lower().startswith('no'):
+            if reply.lower().startswith('no'):
                 important.append(doc)
-                logger.info(f'keeping {doc_desc}')
+                logger.info(f'keeping {doc_desc} (reply: {reply})')
+            elif reply.lower().startswith('yes'):
+                logger.info(f'stripping {doc_desc} (reply: {reply})')
             else:
-                logger.info(f'stripping {doc_desc}')
+                logger.warning(f'invalid reply: {reply}')
         self._documents = important
     
     def clear(self):

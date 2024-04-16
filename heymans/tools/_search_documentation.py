@@ -61,4 +61,4 @@ class search_documentation(BaseTool):
                 page_content=Path(config.topic_sources[topic]).read_text())
             doc.metadata['important'] = True
             self._heymans.documentation.append(doc)
-        return 'Searching documentation ...', None, False
+        return 'Searching documentation ...', '', False

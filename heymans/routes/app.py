@@ -35,7 +35,7 @@ def chat_page():
     html_content = ''
     previous_timestamp = None
     previous_answer_model = None
-    for role, message, metadata in heymans.messages:
+    for role, message, metadata in heymans.messages.visible_messages():
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role in ('assistant', 'tool'):

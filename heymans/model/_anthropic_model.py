@@ -63,10 +63,10 @@ class AnthropicModel(BaseModel):
                         next_message = messages[i + 1]
                         if next_message['role'] == 'user':
                             logger.info('merging tool and user message')
-                            message['content'].append([{
+                            message['content'].append({
                                 "type": "text",
                                 "text": next_message['content']
-                            }])
+                            })
                             break
             else:
                 break
