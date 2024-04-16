@@ -4,7 +4,7 @@ import os
 import statistics
 from heymans import config
 from heymans.heymans import Heymans
-from heymans.model import OpenAIModel, DummyModel
+from heymans.model import model
 from heymans.database import models
 from heymans import prompt
 
@@ -56,7 +56,7 @@ def read_testcases():
 
 def score_testcase(description, question, requirements, n=3):
     heymans = Heymans(user_id='pytest')
-    validation_model = OpenAIModel(heymans, 'gpt-4-1106-preview')
+    validation_model = model(heymans, 'gpt-4')
     scores = []
     for i in range(n):
         for answer, documentation in heymans.send_user_message(question):

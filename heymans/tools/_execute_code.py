@@ -5,7 +5,7 @@ logger = logging.getLogger('heymans')
 
 
 class execute_code(BaseTool):
-    """Execute Python and R code"""
+    """Execute Python and R code. Only use for code that should be executed. Don't use for example code."""
     
     arguments = {
         'language': {

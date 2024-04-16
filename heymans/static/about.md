@@ -56,7 +56,7 @@ Sigmund can download files and web pages and save them as attachments (see below
 
 > Can you download this page for me? https://journalofcognition.org/articles/10.5334/joc.18
 
-Limitation: Sometimes Sigmund gets confused when trying to download something. Some friendly guidance can help.
+Limitation: Some websites forbid downloads by automated agents such as Sigmund.
 
 ### Read attachments
 
@@ -64,7 +64,7 @@ Sigmund can read attachments, which can be uploaded by the user (Menu → Attach
 
 > Can you summarize the attached joc.18 file?
 
-Limitation: Sometimes Sigmund gets confused when trying to read attachments. Some friendly guidance can help.
+Limitation: When attachments are very large, only the start will be read.
 
 
 ## Sigmund is open source

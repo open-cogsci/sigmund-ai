@@ -8,7 +8,7 @@ logger = logging.getLogger('heymans')
 
 
 class read_attachment(BaseTool):
-    """Read an attached file"""
+    """Read an attached file. The full contents of the attachment is returned as plain text."""
     arguments = {
         "filename": {
             "type": "string",

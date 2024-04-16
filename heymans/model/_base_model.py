@@ -10,7 +10,7 @@ class BaseModel:
     """Base implementation for LLM chat models."""
     
     # Indicates whether the model is able to provide feedback on its own output
-    supports_not_done_yet = True
+    supports_not_done_yet = False
     # Indicates whether the model is able to provide feedback on tool results 
     supports_tool_feedback = True
     # Approximation to keep track of token costs

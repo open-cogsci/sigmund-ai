@@ -6,7 +6,7 @@ logger = logging.getLogger('heymans')
 
 
 class search_google_scholar(BaseTool):
-    """Search Google Scholar for scientific articles"""
+    """Search Google Scholar for scientific articles. An overview of metadata (abstracts, authors, titles, etc.) of matching articles will be returned."""
     
     arguments = {
         "queries": {

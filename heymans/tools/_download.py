@@ -10,7 +10,7 @@ logger = logging.getLogger('heymans')
 
 
 class download(BaseTool):
-    """Download files or webpage from the internet and save them as attachments"""
+    """Download a file or webpage from the internet. The downloaded file or webpage will be saved as attachment, and can be read later.·"""
     
     arguments = {
         "url": {

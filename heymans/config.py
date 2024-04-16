@@ -59,11 +59,11 @@ welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly O
 
 If you want to discuss things that are unrelated to OpenSesame, disable "OpenSesame expert" mode in the menu (it is currently enabled). That will make me a better general-purpose chatbot.
 
-What is your name? And would you like to learn more about how to work with me?
+Let\'s get started! What would like you to disuss?
 '''
 welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant!
 
-I have basic code execution abilities, I can read attachments, and I can look up scientific articles on Google Scholar.
+I have basic code execution abilities, I can read attachments, I can download files from the internat, and I can look up scientific articles on Google Scholar.
 
 If you want help with OpenSesame, enable "OpenSesame expert" mode in the menu (it is currently disabled). That will give me access to the OpenSesame documentation.
 
@@ -228,7 +228,8 @@ login_failed_message = '__User name or password incorrect. Please try again.__'
 # SUBSCRIPTIONS
 #
 # Enable this to activate the Stripe-based subscription functionality.
-subscription_required = False
+subscription_required = bool(
+    os.environ.get('SIGMUND_SUBSCRIPTION_REQUIRED', False))
 # This is the duration of the subscription in days. This should be set to a bit
 # longer than a month to provide a grace period in case of payment issues.
 subscription_length = 40
