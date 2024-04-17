@@ -44,18 +44,19 @@ class MistralModel(OpenAIModel):
                                 'content': 'Tool was executed.'})
         return BaseModel.predict(self, messages)
         
-    def _mistral_tool_args(self, messages):
+    def _mistral_invoke(self, fnc, messages):
         # Mistral tends to get stuck in a loop where the same tool is called
         # over and over again. To fix this, we temporarily disallow tools when
         # the last message was a tool.
         if messages[-1]['role'] == 'tool':
-            return {}
-        return self._tool_args()
+            kwargs = {}
+        else:
+            kwargs = self._tool_args()        
+        kwargs.update(config.mistral_kwargs)
+        return fnc(model=self._model, messages=messages, **kwargs)
     
     def invoke(self, messages):
-        return self._client.chat(model=self._model, messages=messages,
-                                 **self._mistral_tool_args(messages))
+        return self._mistral_invoke(self._client.chat, messages)
         
     def async_invoke(self, messages):
-        return self._async_client.chat(model=self._model, messages=messages,
-                                       **self._mistral_tool_args(messages))
+        return self._mistral_invoke(self._async_client.chat, messages)

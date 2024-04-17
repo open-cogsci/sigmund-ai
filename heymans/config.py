@@ -134,8 +134,13 @@ model_config = {
         'answer_model': 'dummy'
     }
 }
-# Model-specific arguments
-anthropic_max_tokens = 1024
+# Model-specific keyword arguments that are passed to the message generation
+# functions
+anthropic_kwargs = {
+    'max_tokens': 1024
+}
+openai_kwargs = {}
+mistral_kwargs = {}
 
 # TOOLS
 # 

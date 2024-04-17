@@ -104,14 +104,14 @@ class AnthropicModel(BaseModel):
         
     def _anthropic_invoke(self, fnc, messages):
         kwargs = self._tool_args()
+        kwargs.update(config.anthropic_kwargs)
         # If the first message is the system prompt, we need to separate this
         # from the user and assistant messages, because the Anthropic messages
         # API takes this as a separate keyword argument
         if messages[0]['role'] == 'system':
             kwargs['system'] = messages[0]['content']
             messages = messages[1:]
-        return fnc(model=self._model, max_tokens=config.anthropic_max_tokens,
-                   messages=messages, **kwargs)
+        return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):
         return self._anthropic_invoke(

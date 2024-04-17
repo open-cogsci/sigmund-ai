@@ -67,10 +67,15 @@ class OpenAIModel(BaseModel):
             return {}
         return {'tools': self.tools(), 'tool_choice': self._tool_choice}
         
+    def _openai_invoke(self, fnc, messages):
+        kwargs = self._tool_args()
+        kwargs.update(config.openai_kwargs)
+        return fnc(model=self._model, messages=messages, **kwargs)
+        
     def invoke(self, messages):
-        return self._client.chat.completions.create(
-            model=self._model, messages=messages, **self._tool_args())
+        return self._openai_invoke(
+            self._client.chat.completions.create, messages=messages)
         
     def async_invoke(self, messages):
-        return self._async_client.chat.completions.create(
-            model=self._model, messages=messages, **self._tool_args())
+        return self._openai_invoke(
+            self._async_client.chat.completions.create, messages=messages)
