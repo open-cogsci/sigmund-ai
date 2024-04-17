@@ -65,6 +65,24 @@ def new_conversation():
     heymans = get_heymans()
     heymans.database.new_conversation()
     return redirect('/chat')
+    
+
+@api_blueprint.route('/conversation/new/with_search')
+@login_required
+def new_conversation_with_search():
+    heymans = get_heymans()
+    heymans.database.set_setting('search_first', 'true')
+    heymans.database.new_conversation()
+    return redirect('/chat')
+    
+
+@api_blueprint.route('/conversation/new/without_search')
+@login_required
+def new_conversation_without_search():
+    heymans = get_heymans()
+    heymans.database.set_setting('search_first', 'false')
+    heymans.database.new_conversation()
+    return redirect('/chat')
 
 
 @api_blueprint.route('/conversation/clear')

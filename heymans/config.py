@@ -55,20 +55,12 @@ chunk_throttle = .1
 # The maximum length of a user message
 max_message_length = 5000
 # A fixed welcome message
-welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! I am best at answering questions that are specific and that I can look up in the documentation.
+welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! How can I help you?
 
-If you want to discuss things that are unrelated to OpenSesame, disable "OpenSesame expert" mode in the menu (it is currently enabled). That will make me a better general-purpose chatbot.
+<div class="message-notification">I am currently functioning as an OpenSesame expert. If you want to discuss things that are not related to OpenSesame, <a href="/api/conversation/new/without_search">click here</a> to turn me into a regular chatbot.</div>'''
+welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant! What would you like to discuss?
 
-Let\'s get started! What would like you to disuss?
-'''
-welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant!
-
-I have basic code execution abilities, I can read attachments, I can download files from the internat, and I can look up scientific articles on Google Scholar.
-
-If you want help with OpenSesame, enable "OpenSesame expert" mode in the menu (it is currently disabled). That will give me access to the OpenSesame documentation.
-
-Let\'s get started! What would like you to disuss?
-'''
+<div class="message-notification">I am currently functioning as a regular chatbot, who can do <a href="/about">lots of things</a>. However, I cannot read the OpenSesame documentation while in this mode. If you want help with OpenSesame, <a href="/api/conversation/new/with_search">click here</a> to turn me into an OpenSesame expert.</div>'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 # The number of previous messages for which tool results should be 
