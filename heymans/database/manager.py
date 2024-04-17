@@ -91,11 +91,16 @@ class DatabaseManager:
     def list_conversations(self) -> dict:
         
         conversations = {}
+        user = User.query.filter_by(user_id=self.user_id).one()
         for conversation in \
                 Conversation.query.filter_by(user_id=self.user_id).all():
             try:
                 data = json.loads(self.encryption_manager.decrypt_data(
                     conversation.data))
+                # Don't list empty conversations except for the active one
+                if len(data.get('message_history', [])) < 2 and \
+                        user.active_conversation_id != conversation.conversation_id:
+                    continue
                 conversations[conversation.conversation_id] = (
                      data.get('title', 'Untitled conversation'),
                      data.get('last_updated', time.time()))
