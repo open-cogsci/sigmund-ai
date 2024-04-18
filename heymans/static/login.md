@@ -20,6 +20,17 @@ If you need a custom subscription, such as an invoiced subscription for multiple
     <i class="fas fa-sign-in-alt"></i> Sign in with your forum account
 </a>
 
-<a href="https://forum.cogsci.nl/entry/register" class="link-button">
+<a href="https://forum.cogsci.nl/entry/register" class="link-button" id="forumLink">
     <i class="fas fa-plus-circle"></i> Create a forum account
 </a>
+
+<script>
+document.getElementById("forumLink").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent the default link behavior
+
+    if (confirm("You will now be redirected to forum.cogsci.nl to create an account. Once you have created an account, simply come back to this tab and log in!")) {
+        window.open(this.href, "_blank"); // Open the link in a new tab
+        window.focus(); // Focus on the new tab for a smooth transition
+    }
+});
+</script>
