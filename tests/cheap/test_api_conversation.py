@@ -11,6 +11,13 @@ class TestApiConversation(BaseRoutesTestCase):
         self.login()
                 
     def test_new_conversation(self):
+        # Add some content to the conversation to make it count
+        self.client.post('/api/setting/set', json={'search_first': 'false'})
+        response = self.client.post('/api/chat/start', json={
+            'message': 'dummy'
+        })
+        for response in self.client.get('/api/chat/stream').iter_encoded():
+            pass
         response = self.client.get('/api/conversation/list')
         original_count = len(response.json)
         response = self.client.get('/api/conversation/new',
@@ -26,6 +33,13 @@ class TestApiConversation(BaseRoutesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete_conversation(self):
+        # Add some content to the conversation to make it count
+        self.client.post('/api/setting/set', json={'search_first': 'false'})
+        response = self.client.post('/api/chat/start', json={
+            'message': 'dummy'
+        })
+        for response in self.client.get('/api/chat/stream').iter_encoded():
+            pass        
         self.client.get('/api/conversation/new', follow_redirects=True)
         list_resp = self.client.get('/api/conversation/list')
         conversation_id = list(list_resp.json)[0]
