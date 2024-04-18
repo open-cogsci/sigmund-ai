@@ -226,7 +226,7 @@ login_failed_message = '__User name or password incorrect. Please try again.__'
 #
 # Enable this to activate the Stripe-based subscription functionality.
 subscription_required = bool(
-    os.environ.get('SIGMUND_SUBSCRIPTION_REQUIRED', False))
+    int(os.environ.get('SIGMUND_SUBSCRIPTION_REQUIRED', 0)))
 # This is the duration of the subscription in days. This should be set to a bit
 # longer than a month to provide a grace period in case of payment issues.
 subscription_length = 40

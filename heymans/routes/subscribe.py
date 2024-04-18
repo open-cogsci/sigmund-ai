@@ -21,6 +21,8 @@ def subscribe():
     happen if the endpoint is accessed directly) then the user is redirected
     to the Stripe customer portal.
     """
+    if not config.subscription_required:
+        return redirect(url_for('app.chat'), code=303)    
     heymans = get_heymans()
     if heymans.database.check_subscription():
         logger.info(f'redirecting {heymans.user_id} to customer portal')
