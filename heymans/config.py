@@ -60,7 +60,7 @@ welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly O
 <div class="message-notification">I am currently functioning as an OpenSesame expert. If you want to discuss things that are not related to OpenSesame, <a href="/api/conversation/new/without_search">click here</a> to turn me into a regular chatbot that has access to a wider range of tools.</div>'''
 welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant! What would you like to discuss?
 
-<div class="message-notification">I am currently functioning as a regular chatbot. While in this mode I can do <a href="/about">lots of things</a>, but I cannot read the OpenSesame documentation. Therefore, if you want help with OpenSesame, <a href="/api/conversation/new/with_search">click here</a> to turn me into an OpenSesame expert.</div>'''
+<div class="message-notification">I am currently functioning as a regular chatbot. In this mode I can do <a href="/about">lots of things</a>, but I cannot read the OpenSesame documentation. Therefore, if you want help with OpenSesame, <a href="/api/conversation/new/with_search">click here</a> to turn me into an OpenSesame expert.</div>'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 # The number of previous messages for which tool results should be 
