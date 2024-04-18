@@ -15,7 +15,8 @@ def load_library(force_reindex=False, cache_folder=config.db_cache,
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
     if not force_reindex and db_cache.exists():
         logger.info('loading library from cache')
-        db = FAISS.load_local(db_cache, embeddings_model)
+        db = FAISS.load_local(db_cache, embeddings_model,
+                              allow_dangerous_deserialization=True)
     else:
         from langchain_community.document_loaders import TextLoader, \
             PyPDFLoader, JSONLoader
