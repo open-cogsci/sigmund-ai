@@ -80,7 +80,7 @@ def callback():
                      backend=default_backend())
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
-    user = User(username)
+    user = User(f'{username} (google)')
     login_user(user)
     logger.info(f'initializing encryption key')    
     return redirect('/')
