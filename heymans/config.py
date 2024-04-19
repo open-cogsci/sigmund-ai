@@ -248,3 +248,13 @@ stripe_webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET', None)
 stripe_checkout_keywords = dict(
     allow_promotion_codes=True,
     payment_method_types=['card', 'ideal', 'bancontact', 'paypal'])
+
+
+# GOOGLE LOGIN
+#
+google_login_enabled = True
+google_client_id = os.environ.get("GOOGLE_CLIENT_ID", None)
+google_client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+google_discovery_url = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)

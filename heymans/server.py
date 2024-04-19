@@ -3,7 +3,8 @@ os.environ['USE_FLASK_SQLALCHEMY'] = '1'
 from flask import Flask, Config, request
 from flask_login import LoginManager
 from . import config
-from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint
+from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
+    google_login_blueprint
 from .database.models import db
 import logging
 logger = logging.getLogger('heymans')
@@ -21,6 +22,7 @@ def create_app(config_class=HeymansConfig):
     app.register_blueprint(app_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(subscribe_blueprint, url_prefix='/subscribe')
+    app.register_blueprint(google_login_blueprint, url_prefix='/google_login')
     # Initialize the databasea
     db.init_app(app)
     with app.app_context():
