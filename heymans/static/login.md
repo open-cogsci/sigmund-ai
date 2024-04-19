@@ -17,20 +17,11 @@ Sigmund requires a subscription (€9 /month). You can subscribe after signing i
 If you need a custom subscription, such as an invoiced subscription for multiple individuals or a longer period, contact [professional@cogsci.nl](mailto:professional@cogsci.nl).
 
 <a id="sign-in-button" class="link-button" onclick="signin()">
-    <i class="fas fa-sign-in-alt"></i> Sign in with your forum account
+    <i class="fas fa-sign-in-alt"></i> Sign in with CogSci forum<br>
+    <small>Use your account from forum.cogsci.nl</small>
 </a>
 
-<a href="https://forum.cogsci.nl/entry/register" class="link-button" id="forumLink">
-    <i class="fas fa-plus-circle"></i> Create a forum account
+<a id="sign-in-button" class="link-button" href="/google_login">
+    <i class="fab fa-google"></i> Sign in with Google<br>
+    <small>Use your Google account</small>
 </a>
-
-<script>
-document.getElementById("forumLink").addEventListener("click", function(event) {
-    event.preventDefault(); // Prevent the default link behavior
-
-    if (confirm("You will now be redirected to forum.cogsci.nl to create an account. Once you have created an account, simply come back to this tab and log in!")) {
-        window.open(this.href, "_blank"); // Open the link in a new tab
-        window.focus(); // Focus on the new tab for a smooth transition
-    }
-});
-</script>
