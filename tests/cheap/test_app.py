@@ -1,9 +1,9 @@
 import unittest
-from heymans.server import create_app, HeymansConfig
-from heymans import config
+from sigmund.server import create_app, SigmundConfig
+from sigmund import config
 
 
-class UnitTestConfig(HeymansConfig):
+class UnitTestConfig(SigmundConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     WTF_CSRF_ENABLED = False

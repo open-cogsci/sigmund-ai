@@ -1,5 +1,5 @@
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from heymans.utils import prepare_messages
+from sigmund.utils import prepare_messages
 
 
 def test_prepare_messages():

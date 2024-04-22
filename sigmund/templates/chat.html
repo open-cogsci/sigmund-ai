@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    <script>
+    window.sigmundSettings = {{ settings | safe }}
+    </script>
+    <script>{% include 'main.js' %}</script>
+    {% include 'header.html' %}
+    {% include 'sign-out.html' %}
+    {% include 'menu.html' %}
+    <div id="container">
+        <div id="chat-area">
+            <div id="response">{{ message_history | safe }}</div>
+            <div id="loading-message"></div>
+            <div id="message-box">
+                <div id="message-container">
+                    <textarea id="message" placeholder="Enter your message"></textarea>
+                    <div id="button-container">
+                        <button title="Send" id="send" disabled><i class="fas fa-paper-plane"></i></button>
+                        <button title="Cancel" id="cancel"><i class="fas fa-stop-circle"></i></button>
+                        <button title="Show menu" id="expand" onclick="app.__vue__.toggleMenu()"><i class="fas fa-bars"></i></button>
+                        <button title="Expand message box" id="expand" onclick="expandMessageBox()"><i class="fas fa-expand"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="message-counter" style="text-align: right;"></div>
+        </div>
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

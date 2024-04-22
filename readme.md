@@ -27,7 +27,7 @@ For a description of how Sigmund works, see: <https://sigmundai.eu/about>. This 
 
 ## Configuration
 
-See `heymans/config.py` for configuration instructions.
+See `sigmund/config.py` for configuration instructions.
 
 
 ## Dependencies

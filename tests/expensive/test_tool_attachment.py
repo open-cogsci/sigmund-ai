@@ -10,18 +10,18 @@ class TestToolsAttachments(BaseExpensiveTest):
             'content': base64.b64encode(b'Rick Ross').decode('utf-8'),
             'description': 'Contains the name of an artist'
         }
-        self.heymans.database.add_attachment(attachment_data)
-        assert len(self.heymans.database.list_attachments()) == 1
+        self.sigmund.database.add_attachment(attachment_data)
+        assert len(self.sigmund.database.list_attachments()) == 1
         query = 'Which artist name does the attachment contain?'
-        for reply, metadata in self.heymans.send_user_message(query):
+        for reply, metadata in self.sigmund.send_user_message(query):
             print(reply)
             if 'Rick Ross' in reply:
                 break
         else:
             assert False
         query = 'Can you download the following readme: https://raw.githubusercontent.com/open-cogsci/OpenSesame/milgram/readme.md'
-        for reply, metadata in self.heymans.send_user_message(query):
+        for reply, metadata in self.sigmund.send_user_message(query):
             print(reply)
         query = 'Can you read and summarize the readme for me?'
-        for reply, metadata in self.heymans.send_user_message(query):
+        for reply, metadata in self.sigmund.send_user_message(query):
             print(reply)

@@ -1,0 +1,417 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+<style>
+.menu-icon {
+  cursor: pointer;
+  position: fixed; /* Changed from absolute to fixed */
+  background-color: white;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease; /* Smooth transition for the background color */
+}
+
+.menu-icon:hover {
+  color: #00796b; /* Change to your preferred hover color */
+}
+
+.menu {
+  border-radius: 4px;
+  display: none;
+  position: fixed; /* Changed from absolute to fixed */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000; /* Ensure the menu is above other content */
+}
+
+.menu.active {
+    display: block;
+}
+
+.menu div {
+  padding: 5px 10px; /* Add padding for better hit area and visual appeal */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition for the background color */
+}
+
+.menu div:hover {
+  background-color: #e8e8e8; /* Change to your preferred hover color */
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal.active {
+  display: block; /* This will display the modal when the 'active' class is applied */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.delete-convo,
+.delete-attachment,
+.close {
+  color: #aaa;
+  float: right;
+}
+
+.delete-convo:hover,
+.delete-convo:focus,
+.delete-attachment:hover,
+.delete-attachment:focus,
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#attachment-heading,
+#conversation-heading {
+  min-height: 40px;
+}
+
+.attachment-filename,
+.conversation-title {
+  color: #0077cc; /* or any color you prefer */
+  cursor: pointer;
+  text-decoration: underline; /* Optional: to make it look more like a link */
+}
+
+.attachment-upload {
+  position: relative;
+  margin-top: 20px;
+}
+.file-upload-wrapper {
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+}
+.file-upload-input {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-upload-button {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.file-upload-button .fa-cloud-upload-alt {
+  margin-right: 8px;
+}
+#uploadMessage {
+  margin-bottom: 20px;
+}
+
+.menu-divider {
+  border: none;
+  height: 1px;
+  background-color: #e8e8e8;
+  margin: 8px 0;
+}
+</style>
+
+{% raw %}
+<div id="app">
+  <div ref="menu" class="menu" v-bind:class="{ 'active': menuVisible }">
+    <div @click="navigateTo(getNewConversationUrl())">New conversation</div>
+    <div @click="showConversations">Browse conversations</div>
+    <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
+    <div @click="showAttachments">Browse attachments</div>
+    <hr class="menu-divider">
+    <div @click="toggleSearchFirst"><i :class="searchFirstIcon"></i>&nbsp; {{ searchFirstLabel }}</div>
+    <hr class="menu-divider">
+    <!-- Model selection -->
+    <div>
+      <label for="model-selection">Model: </label>
+      <select id="model-selection" v-model="modelConfig">
+        <option value="openai">OpenAI (GPT4)</option>
+        <option value="anthropic">Anthropic (Claude 3)</option>
+        <option value="mistral">Mistral (Large)</option>
+      </select>
+    </div>
+    <hr class="menu-divider">
+    <div @click="navigateTo('/about')">About</div>
+    <div @click="navigateTo('/terms')">Terms and conditions</div>
+    <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
+    <div @click="navigateTo('/logout')">Log out</div>
+  </div>
+  <!-- Modal for browsing conversations -->
+  <div class="modal" v-if="showModal" v-bind:class="{ 'active': showModal }">
+    <div class="modal-content">
+      <div id='conversation-heading'>Conversations
+        <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
+      </div>
+      <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
+        <span v-if="index !== 0" class="delete-convo" @click="deleteConversation(conversation.id)">
+          <i class="fas fa-trash-alt"></i>
+        </span>
+        <span @click="activateConversation(conversation.id)" class="conversation-title">
+          {{ conversation.title }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <!-- Modal for browsing attachments -->
+  <div class="modal" v-if="showAttachmentsModal" v-bind:class="{ 'active': showAttachmentsModal }">
+    <div class="modal-content">
+      <div id='attachment-heading'>Attachments
+        <div class="close" @click="closeAttachmentsModal"><i class="fas fa-window-close"></i></div>
+      </div>
+      <div v-if="Object.keys(attachments).length === 0" class="no-attachments">
+        No attachments
+      </div>
+      <div v-else v-for="(attachment, id) in attachments" :key="id">
+        <span class="delete-attachment" @click="deleteAttachment(id)">
+          <i class="fas fa-trash-alt"></i>
+        </span>
+        <span class="attachment-filename" @click="downloadAttachment(id)">
+          {{ attachment.filename }}
+        </span>
+        <span class="attachment-description" @click="downloadAttachment(id)">
+          {{ attachment.description }}
+        </span>
+      </div>
+      <!-- Upload section -->
+      <div class="attachment-upload">
+        <div id="uploadMessage" v-show="isUploading">Uploading, please wait …</div>
+        <div class="file-upload-wrapper">
+          <button class="file-upload-button">
+            <i class="fas fa-cloud-upload-alt"></i> Upload File
+          </button>
+          <input type="file" class="file-upload-input" id="fileInput" @change="uploadAttachment" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endraw %}
+
+<script>
+function setSetting(key, value) {
+  const data = {};
+  data[key] = String(value);
+  console.log('setting:', key, ' = ', data);
+  fetch('/api/setting/set', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data),
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to set ${key} setting: ${response.statusText}`);
+    }
+    return response.json();
+  })
+  .then((json) => {
+    if (!json.success) {
+      throw new Error(`Failed to set ${key} setting: ${json.message}`);
+    }
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+}
+
+new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+    showModal: false,
+    conversations: {},
+    showAttachmentsModal: false,
+    showManageSubscriptions: {{ subscription_required|lower }},
+    attachments: {},
+    isUploading: false,
+    searchFirstLabel: "{{ search_first_menu_label }}",
+    searchFirstIcon: (sigmundSettings.search_first === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off',
+    forceModelConfigUpdate: 0
+  },
+  computed: {
+    sortedConversations() {
+      return Object.entries(this.conversations)
+        .map(([id, [title, timestamp]]) => ({ id, title, timestamp }))
+        .sort((a, b) => b.timestamp - a.timestamp);
+    },
+    searchFirst: {
+      get() {
+        this.menuVisible;  // depend on this to force update
+        return sigmundSettings.search_first;
+      },
+      set(value) {
+        sigmundSettings.search_first = value;
+        this.searchFirstIcon = (value === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
+        setSetting('search_first', value);
+        this.forceModelConfigUpdate += 1;
+      }
+    },
+    modelConfig: {
+      get() {
+        this.menuVisible;  // depend on this to force update
+        this.forceModelConfigUpdate;  // depend on this to force update
+        return sigmundSettings.model_config;
+      },
+      set(value) {
+        sigmundSettings.model_config = value;
+        setSetting('model_config', value);
+      }
+    }
+  },
+  methods: {
+    closeMenu(event) {
+      // Only close the menu if the click was not inside the menu
+      if (!this.$refs.menu.contains(event.target)) {
+        this.menuVisible = false;
+        window.removeEventListener('click', this.closeMenu);
+      }
+    },
+    getNewConversationUrl() {
+      return '/api/conversation/new';
+    },
+    toggleSearchFirst: function() {
+      this.searchFirst = (sigmundSettings.search_first === 'true' ? 'false' : 'true')
+    },
+    toggleMenu: function() {
+      this.menuVisible = !this.menuVisible;
+      // Attach an event handler to close the menu when the window is clicked.
+      // This is done in a timeout to avoid it from being invoked directly as
+      // a result of the current click
+      setTimeout(() => {
+        if (this.menuVisible) {
+          window.addEventListener('click', this.closeMenu);
+        }
+      }, 100);
+    },
+    navigateTo: function(path) {
+      window.location.href = path;
+    },
+    showConversations: function() {
+      this.fetchConversations();
+      this.showModal = true;
+      this.menuVisible = false;
+      console.log('showing conversations')
+    },
+    closeModal: function() {
+      this.showModal = false;
+    },
+    fetchConversations: function() {
+      fetch('/api/conversation/list')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          this.conversations = data;
+        })
+        .catch(error => {
+          console.error('Error fetching conversations:', error);
+        });
+    },
+    activateConversation: function(conversationId) {
+      this.navigateTo(`/api/conversation/activate/${conversationId}`);
+    },
+    deleteConversation: function(conversationId) {
+      // Optimistically remove the conversation from the list
+      Vue.delete(this.conversations, conversationId);
+      // Make delete request to server
+      fetch(`/api/conversation/delete/${conversationId}`, { method: 'DELETE' })
+        .then(response => {
+          if (!response.ok) {
+            // If the delete failed, add it back to the list
+            this.fetchConversations();
+          }
+        });
+    },
+    showAttachments: function() {
+      this.fetchAttachments();
+      this.showAttachmentsModal = true;
+      this.menuVisible = false;
+      console.log('showing attachments');
+    },
+    closeAttachmentsModal: function() {
+      this.showAttachmentsModal = false;
+    },
+    fetchAttachments: function() {
+      fetch('/api/attachments/list')
+        .then(response => response.json())
+        .then(data => {
+          this.attachments = data;
+        })
+        .catch(error => {
+          console.error('Error fetching attachments:', error);
+        });
+    },
+    downloadAttachment: function(attachmentId) {
+      window.location.href = `/api/attachments/get/${attachmentId}`;
+    },
+    deleteAttachment: function(attachmentId) {
+      // Optimistically remove the attachment from the list
+      Vue.delete(this.attachments, attachmentId);
+      // Make delete request to server
+      fetch(`/api/attachments/delete/${attachmentId}`, { method: 'DELETE' })
+        .then(response => {
+          if (!response.ok) {
+            // If the delete failed, add it back to the list
+            this.fetchAttachments();
+          }
+        });
+    },
+    uploadAttachment: function(event) {
+      this.isUploading = true;
+      const fileInput = event.target;
+      if (fileInput.files.length === 0) {
+        return;
+      }
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/attachments/add', true);
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            this.fetchAttachments(); // Refresh the list after upload
+          } else {
+            // Handle error
+            console.error('Upload failed:', response.message);
+          }
+        } else {
+          // Handle error
+          console.error('Error during upload:', xhr.statusText);
+        }
+        this.isUploading = false;
+      };
+
+      xhr.send(formData);
+    }
+  }
+});
+</script>

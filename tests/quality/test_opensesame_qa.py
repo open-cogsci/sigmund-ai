@@ -2,17 +2,17 @@ from pathlib import Path
 import unittest
 import os
 import statistics
-from heymans import config
-from heymans.heymans import Heymans
-from heymans.model import model
-from heymans.database import models
-from heymans import prompt
+from sigmund import config
+from sigmund.sigmund import Sigmund
+from sigmund.model import model
+from sigmund.database import models
+from sigmund import prompt
 
 import argparse
 from datetime import datetime
 import re
 import logging
-logger = logging.getLogger('heymans')
+logger = logging.getLogger('sigmund')
 logging.basicConfig(level=logging.INFO, force=True)
 models.init_db()
 
@@ -55,11 +55,11 @@ def read_testcases():
 
 
 def score_testcase(description, question, requirements, n=3):
-    heymans = Heymans(user_id='pytest')
-    validation_model = model(heymans, 'gpt-4')
+    sigmund = Sigmund(user_id='pytest')
+    validation_model = model(sigmund, 'gpt-4')
     scores = []
     for i in range(n):
-        for answer, documentation in heymans.send_user_message(question):
+        for answer, documentation in sigmund.send_user_message(question):
             pass
         while True:
             validation_response = validation_model.predict(

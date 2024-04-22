@@ -1,6 +1,6 @@
 import json
 from .test_app import BaseRoutesTestCase
-from heymans import config
+from sigmund import config
 
 
 class TestApiConversation(BaseRoutesTestCase):

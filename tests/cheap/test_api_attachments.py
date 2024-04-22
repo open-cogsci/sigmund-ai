@@ -1,7 +1,7 @@
 import json
 import os
 from .test_app import BaseRoutesTestCase
-from heymans import config
+from sigmund import config
 
 
 class TestApiAttachments(BaseRoutesTestCase):

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    {% include 'header.html' %}
+    <style>
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            padding-top: 50px;
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%; /* Could be more or less, depending on screen size */
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: -15px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Style the input fields to match modal width */
+        #login-form input[type="text"],
+        #login-form input[type="password"],
+        #login-form input[type="submit"] {
+            width: 100%; /* 100% width minus padding */
+            box-sizing: border-box; /* Include padding and border in the element's width */
+            padding: 10px; /* Add some padding for aesthetic spacing */
+        }
+    
+        /* Style the labels for a cleaner look */
+        #login-form label {
+            display: block; /* Makes the label take the width of the container */
+            margin-bottom: 5px; /* Space between the label and the input field */
+            text-align: left; /* Aligns the text to the left */
+        }
+        
+        #login-form input[type="submit"] {
+            margin-top: 10px;
+        }
+    
+    </style>    
+    <div id="container">
+        <div id="login">
+            <div id="start-text">{{ login_text|safe }}</div>
+            <div id="login-modal" class="modal">
+            <div class="modal-content">
+            <span class="close">&times;</span>
+            <form method="POST" id="login-form">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                {{ form.username.label }} {{ form.username() }}
+                </div>
+                <div class="form-group">
+                {{ form.password.label }} {{ form.password() }}
+                </div>
+                <div class="form-group">
+                {{ form.submit() }}
+                </div>
+            </form>
+            </div>
+            </div>
+        </div>
+        {% include 'footer.html' %}
+    </div>
+    <script>
+    var modal = document.getElementById("login-modal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("sign-in-button");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }    
+    </script>    
+</body>
+</html>

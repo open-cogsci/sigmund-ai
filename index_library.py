@@ -1,4 +1,4 @@
-from heymans import library, config
+from sigmund import library, config
 import logging; logging.basicConfig(level=logging.INFO, force=True)
 
 if __name__ == '__main__':

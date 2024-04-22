@@ -2,7 +2,7 @@
 requires = ["flit_core >=3.4"]
 build-backend = "flit_core.buildapi"
 [project]
-name = "heymans"
+name = "sigmund"
 authors = [
     {name = "Sebastiaan Mathôt", email = "s.mathot@cogsci.nl"}
 ]

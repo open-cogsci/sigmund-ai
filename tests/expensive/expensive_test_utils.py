@@ -1,18 +1,18 @@
 import unittest
-from heymans.heymans import Heymans
-from heymans import config
+from sigmund.sigmund import Sigmund
+from sigmund import config
 import logging
-logger = logging.getLogger('heymans')
+logger = logging.getLogger('sigmund')
 logging.basicConfig(level=logging.INFO, force=True)
 
 
 class BaseExpensiveTest(unittest.TestCase):
     
     def setUp(self):
-        from heymans.database.models import drop_db, init_db
+        from sigmund.database.models import drop_db, init_db
         drop_db()
         init_db()
-        self.heymans = Heymans(user_id='pytest', search_first=False)
+        self.sigmund = Sigmund(user_id='pytest', search_first=False)
         config.max_tokens_per_hour = float('inf')
         config.log_replies = True
         
