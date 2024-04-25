@@ -1,6 +1,5 @@
 # Important
 
-- Your knowledge of OpenSesame is outdated. Therefore, strictly follow this documentation.
 - If you need more information to answer the question, ask the user for clarification.
 - Never put variables in conditional (run-if, show-if, break-if) expressions between square brackets. Use Python syntax instead. Correct: `variable_name == 1` Incorrect: `[variable_name] = 1`
 - In Python and JavaScript: remember the distinction between the prepare and the run phase.
@@ -31,8 +30,24 @@
 - Conditional expressions should be syntactically valid Python
 - Do not put square brackets around variables
 
-# Example conditional expressions
+Example conditional expressions:
 
 correct == 1
 response_time < 2000 and correct == 1
 count_trial_sequence % 10 == 1
+
+# Built-in variables
+
+The following variables have a special meaning in OpenSesame. Do not make up your own variable names, but use these variable names whenever they are applicable.
+
+Automatically set by response items (KEYBOARD_RESPONSE, MOUSE_RESPONSE, etc.):
+
+- `response`: the participant's last response (key name, mouse button, etc.)
+- `response_time`: the response time for the participant's last response in milliseconds
+- `correct`: whether the participant's last respones was correct (1) or not (0)
+- `acc` or `accuracy`: the percentage of correct responses since the last reset of feedback variables
+- `avg_rt` or `average_response_time`: the average response time since the last reset of feedback variables
+
+Used by response items (KEYBOARD_RESPONSE, MOUSE_RESPONSE, etc.):
+
+- `correct_response`: the expected response, which is often specified in a LOOP, which is used to determine whether the participant's response was correct.
