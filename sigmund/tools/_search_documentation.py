@@ -45,10 +45,6 @@ class search_documentation(BaseTool):
         }    
     
     def __call__(self, primary_topic, queries, secondary_topic=None):
-        if len(self._sigmund.documentation) == 0:
-            logger.info('no topics were added, so skipping search')
-        else:
-            self._sigmund.documentation.search(queries)
         topics = [primary_topic]
         if secondary_topic:
             topics.append(secondary_topic)
@@ -61,4 +57,5 @@ class search_documentation(BaseTool):
                 page_content=Path(config.topic_sources[topic]).read_text())
             doc.metadata['important'] = True
             self._sigmund.documentation.append(doc)
+        self._sigmund.documentation.search(queries)
         return 'Searching documentation ...', '', False

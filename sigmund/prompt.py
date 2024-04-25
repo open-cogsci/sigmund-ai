@@ -28,16 +28,22 @@ CONDENSE_HISTORY = '''Summarize the following conversation:
 {{ history }}
 '''
 
-JUDGE_RELEVANCE = '''Is the following documentation useful to answer the question? Reply with only yes or no.
+JUDGE_RELEVANCE = '''Is the document relevant for answering the question?
 
-Question:
+# Question
 
 {{ question }}
+"""
 
-Documentation:
+# Document
 
+<document>
 {{ documentation }}
-'''
+</document>
+
+# Reply format
+
+Reply with a JSON string to indicate whether the document is relevant ({"relevant": true}) or not ({"relevant": false}). Do not include any additional text.'''
 
 TITLE_PROMPT = '''Provide a brief title that desribes the topic of the conversation below. Reply only with the title, do not add any additional text.'''
 DESCRIBE_PROMPT = '''Provide a brief description of the following text:

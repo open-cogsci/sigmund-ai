@@ -57,20 +57,33 @@ You have retrieved the following documentation to answer the user's question:
                      if doc.metadata.get('important', False)]
         optional = [doc for doc in self
                     if not doc.metadata.get('important', False)]
-        prompts = [prompt.render(prompt.JUDGE_RELEVANCE,
-                                 documentation=doc.page_content,
-                                 question=question)
-                   for doc in optional]
-        replies = self._sigmund.condense_model.predict_multiple(prompts)
-        for reply, doc in zip(replies, optional):
-            doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
-            if reply.lower().startswith('yes'):
-                important.append(doc)
+        while optional and len(important) < config.search_docs_max:
+            batch = optional[:config.search_docs_max]
+            logger.info(f'evaluating document batch (n={len(batch)})')
+            optional = optional[config.search_docs_max:]
+            prompts = [prompt.render(prompt.JUDGE_RELEVANCE,
+                                     documentation=doc.page_content,
+                                     question=question)
+                       for doc in batch]
+            self._sigmund.condense_model.json_mode = True
+            replies = self._sigmund.condense_model.predict_multiple(prompts)
+            self._sigmund.condense_model.json_mode = False
+            config.mistral_kwargs = dict()
+            for reply, doc in zip(replies, optional):
+                doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
+                try:
+                    reply = json.loads(reply)
+                except json.JSONDecodeError:
+                    logger.warning(f'invalid JSON for {doc_desc} (reply: {reply})')
+                    continue
+                if not isinstance(reply, dict):
+                    logger.warning(f'invalid JSON for {doc_desc} (reply: {reply})')
+                    continue
+                if not reply.get('relevant', False):
+                    logger.info(f'stripping {doc_desc} (reply: {reply})')
+                    continue
                 logger.info(f'keeping {doc_desc} (reply: {reply})')
-            elif reply.lower().startswith('no'):
-                logger.info(f'stripping {doc_desc} (reply: {reply})')
-            else:
-                logger.warning(f'invalid reply: {reply}')
+                important.append(doc)
         self._documents = important
     
     def clear(self):
@@ -112,6 +125,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
             return []
         docs = []
         for query in queries:
+            if config.log_replies:
+                logger.info(f'documentation search query: {query}')
             for doc, score in self._db.similarity_search_with_score(
                     query, k=config.search_docs_per_query):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
@@ -136,7 +151,6 @@ class FAISSDocumentationSource(BaseDocumentationSource):
                 reordered_docs.append(with_url.pop(0))
             if without_url:
                 reordered_docs.append(without_url.pop(0))
-        reordered_docs = reordered_docs[:config.search_docs_max]
         for doc, score in reordered_docs:
             doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
             logger.info(f'considering {doc_desc}, score: {score}')

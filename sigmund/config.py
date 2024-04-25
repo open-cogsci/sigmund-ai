@@ -174,7 +174,7 @@ topic_sources = {
 # The number of documents that is considered for each search query
 search_docs_per_query = 20
 # The number of documents that is kept for all search queries combined
-search_docs_max = 4
+search_docs_max = 6
 # The distance metric used for search. The cosine metric is useful because it
 # is somewhat invariant to changes in document length
 search_metric = 'cosine'
