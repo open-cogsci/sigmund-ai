@@ -106,25 +106,38 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         logger.info('reading FAISS documentation cache')
         self._db = FAISS.load_local(Path('.db.cache'), self._embeddings_model,
                                     allow_dangerous_deserialization=True)
-        self._retriever = self._db.as_retriever(
-            search_kwargs={'k': config.search_docs_per_query,
-                           'metric': config.search_metric})
     
     def search(self, queries):
         if config.openai_api_key is None:
             return []
         docs = []
         for query in queries:
-            logger.info(f'searching FAISS')
-            for doc in self._retriever.invoke(query):
+            for doc, score in self._db.similarity_search_with_score(
+                    query, k=config.search_docs_per_query):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
-                if any(doc.page_content == ref.page_content for ref in docs):
-                    logger.info(f'duplicate {doc_desc}')
+                if any(doc.page_content == ref.page_content for ref, _ in docs):
                     continue
                 if doc.page_content not in self._sigmund.documentation and \
                         doc.page_content not in docs:
-                    logger.info(f'adding {doc_desc}')
-                    docs.append(doc)
-                else:
-                    logger.info(f'skipping {doc_desc}')
-        return docs
+                    docs.append((doc, score))
+        # The documents that are retrieved need a little re-ordering to be
+        # optimal. First we rank them by score across all search queries. Then
+        # we reorder them so that documents without URL, which tend to be short
+        # how-to's alternate with documents with URL, which tend to be longer
+        # pieces of documentation. This is to make sure that documentation
+        # stands a chance against the how-to's, which tend to be preferred by
+        # the algorithm. Finally we keep only the top few documents.
+        docs = sorted(docs, key=lambda doc: -doc[1])
+        with_url = [d for d in docs if d[0].metadata['url'] is not None]
+        without_url = [d for d in docs if d[0].metadata['url'] is None]
+        reordered_docs = []
+        while with_url or without_url:
+            if with_url:
+                reordered_docs.append(with_url.pop(0))
+            if without_url:
+                reordered_docs.append(without_url.pop(0))
+        reordered_docs = reordered_docs[:config.search_docs_max]
+        for doc, score in reordered_docs:
+            doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
+            logger.info(f'considering {doc_desc}, score: {score}')
+        return [doc for doc, _ in reordered_docs]

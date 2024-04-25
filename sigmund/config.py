@@ -171,9 +171,10 @@ topic_sources = {
     'data_analysis': 'sources/topics/datamatrix.py',
     'questions_howto': 'sources/topics/questions-how-to.md',
 }
-# The number of documents that is added to the documentation for each search
-# query
-search_docs_per_query = 2
+# The number of documents that is considered for each search query
+search_docs_per_query = 20
+# The number of documents that is kept for all search queries combined
+search_docs_max = 4
 # The distance metric used for search. The cosine metric is useful because it
 # is somewhat invariant to changes in document length
 search_metric = 'cosine'
