@@ -5,7 +5,7 @@ logger = logging.getLogger('sigmund')
 
 
 class execute_code(BaseTool):
-    """Execute Python and R code. Only use for code that should be executed. Don't use for example code."""
+    """Execute Python and R code. Do not use this tool unless code should actually be executed. When executing Python, you can only use modules from the Python standard library."""
     
     arguments = {
         'language': {
