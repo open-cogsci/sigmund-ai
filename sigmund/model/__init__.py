@@ -5,10 +5,10 @@ def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
     if model == 'gpt-4':
         from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-4-1106-preview', **kwargs)
+        return OpenAIModel(sigmund, 'gpt-4-turbo', **kwargs)
     if model == 'gpt-3.5':
         from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-3.5-turbo-1106', **kwargs)
+        return OpenAIModel(sigmund, 'gpt-3.5-turbo', **kwargs)
     if model == 'claude-2.1':
         from ._anthropic_model import AnthropicModel
         return AnthropicModel(sigmund, 'claude-2.1', **kwargs)

@@ -23,6 +23,7 @@ class BaseModel:
         self.total_tokens_consumed = 0
         self.prompt_tokens_consumed = 0
         self.completion_tokens_consumed = 0
+        self.json_mode = False
         
     def invalid_tool(self) -> str:
         return 'Invalid tool', None, False

@@ -70,6 +70,8 @@ class OpenAIModel(BaseModel):
     def _openai_invoke(self, fnc, messages):
         kwargs = self._tool_args()
         kwargs.update(config.openai_kwargs)
+        if self.json_mode:
+            kwargs['response_format'] = {"type": "json_object"}        
         return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):
