@@ -1,6 +1,10 @@
 import json
+import logging
 from .. import config
 from . import BaseModel
+
+
+logger = logging.getLogger('sigmund')
 
 
 class OpenAIModel(BaseModel):
