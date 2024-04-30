@@ -44,12 +44,17 @@ def callback():
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint = google_provider_cfg["token_endpoint"]
     # Prepare and send a request to get tokens! Yay tokens!
-    token_url, headers, body = client.prepare_token_request(
-        token_endpoint,
-        authorization_response=request.url.replace('http:', 'https:'),
-        redirect_url=request.base_url.replace('http:', 'https:'),
-        code=code
-    )
+    try:
+        token_url, headers, body = client.prepare_token_request(
+            token_endpoint,
+            authorization_response=request.url.replace('http:', 'https:'),
+            redirect_url=request.base_url.replace('http:', 'https:'),
+            code=code
+        )
+    except Exception as e:
+        logger.warning(f'failed to prepare token request: {e}')
+        return redirect('/')
+        
     token_response = requests.post(
         token_url,
         headers=headers,
