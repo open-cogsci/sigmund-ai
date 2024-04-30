@@ -1,4 +1,4 @@
-Sigmund is a powerful, privacy-focused AI assistant (or chatbot). It is a web app that built on state-of-the-art large language models (LLMs).
+Sigmund is a powerful, privacy-focused AI assistant (or chatbot). It is a web app that is built on state-of-the-art large language models (LLMs).
 
 
 [TOC]
@@ -10,7 +10,7 @@ If OpenSesame-expert mode is enabled (in the menu), Sigmund searches for relevan
 
 Sigmund is especially good at generating code for (Python) inline_script or inline_javascript items. Try it!
 
-<blockquote>
+<blockquote style="white-space:pre-wrap;">
 I want to create a stimulus display in OpenSesame, using a canvas in a Python inline script. It's a bit complex, so please read carefully! There should be:
 
 - A central fixation dot.
@@ -39,6 +39,8 @@ Sigmund can search Google Scholar for scientific literature. Try it!
 > Do your pupils constrict when you think of something bright, such as a sunny beach? Please base your answer on scientific literature.
 
 Limitation: Sigmund reads abstracts, titles, author lists, etc. but does not spontaneously reads complete articles. To have Sigmund read complete articles, you can either encourage Sigmund to download the article (see below) or upload the article as an attachment yourself.
+
+Limitation: Google Scholar occasionally blocks searches from autonomous agents such as Sigmund, which results in an error message. When this happens, try again later.
 
 
 ### Execute Python and R code
