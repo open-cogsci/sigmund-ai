@@ -110,7 +110,11 @@ class BaseModel:
             
         async def wrap_gather():
             tasks = [self.async_invoke(prompt) for prompt in prompts]
-            predictions = await asyncio.gather(*tasks)
+            try:
+                predictions = await asyncio.gather(*tasks)
+            except Exception as e:
+                logger.warning(f'failed to gather predictions: {e}')
+                return []
             return [self.get_response(p) for p in predictions]
             
         logger.info('predicting multiple using async')
