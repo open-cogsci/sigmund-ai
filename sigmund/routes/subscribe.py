@@ -26,7 +26,7 @@ def subscribe():
     sigmund = get_sigmund()
     if sigmund.database.check_subscription():
         logger.info(f'redirecting {sigmund.user_id} to customer portal')
-        redirect(url_for('subscribe.customer-portal'), code=303)
+        redirect(url_for('subscribe.customer_portal'), code=303)
     return utils.render('subscribe-now.html', username=sigmund.user_id)
     
     
