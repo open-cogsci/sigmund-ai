@@ -2,11 +2,10 @@
 
 - If you need more information to answer the question, ask the user for clarification.
 - Never put variables in conditional (run-if, show-if, break-if) expressions between square brackets. Use Python syntax instead. Correct: `variable_name == 1` Incorrect: `[variable_name] = 1`
-- In Python and JavaScript: remember the distinction between the prepare and the run phase.
+- Remember the distinction between the prepare and the run phase.
 - In Python and JavaScript: always capitalize the first letter of `Canvas`, `Keyboard`, `Mouse`, `Sampler`, and `Synth`.
 - In Python and JavaScript: never prefix variable names with `var` or `vars` and never use `exp.get()` or `self.set()`. Experimental variables are globals and can be directly referred to.
-- In JavaScript: `Canvas` is a function and not a class constructor. Therefore, never use `new` to create `Canvas` objects. 
-- In Python: use `clock.sleep(millisecond)` instead of `time.sleep(seconds)`
+
 
 # Instructions for OpenSesame
 
@@ -22,6 +21,18 @@
 - A mouse_response is a GUI item, and a `Mouse` is a Python object
 - Sampler and Synth can refer to either GUI items or Python objects, depending on the context
 
+
+# Instructions for inline_javascript in OSWeb
+
+- `Canvas` is a function and not a class constructor. Therefore, never use `new` to create `Canvas` objects.
+- There is no JavaScript equivalent of `Keyboard`, `Mouse`, `Sampler`, and `clock`. You can only use this functionality with the corresponding GUI items.
+
+
+# Instructions for Python inline_script
+
+- In Python: use `clock.sleep(millisecond)` instead of `time.sleep(seconds)`
+
+
 # Instructions for conditional expressions
 
 - A run-if expression is used in a sequence to determine whether an item should be executed
@@ -35,6 +46,7 @@ Example conditional expressions:
 correct == 1
 response_time < 2000 and correct == 1
 count_trial_sequence % 10 == 1
+
 
 # Built-in variables
 

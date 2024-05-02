@@ -1,9 +1,10 @@
 /**
-# Instuctions for JavaScript in inline_javascriptscript
+# Instuctions for JavaScript in inline_javascript
 
 - Stimulus preparation should be done in Prepare phase. Stimulus presentation, response collection, etc. should be done in Run phase. The Prepare and Run phase are tabs in the `inline_javascript` GUI item.
 JavaScript in the GUI:
 - The code comments are for you. You don't need to include them verbatim in your responses.
+- The following classes and objects are not available in `inline_javscript`: Keyboard, Mouse, Sampler, clock. Instead, use equivalent functionality in the GUI.
 **/
 // START_EXAMPLE: randomly positioned rectangles
 // Related terms: visual search
