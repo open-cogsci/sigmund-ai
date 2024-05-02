@@ -28,7 +28,7 @@ def clean(text, escape_html=True, render=True):
     if render:
         text = render_template_string(text)
     if escape_html:
-        text = html.escape(text).replace('\n', '<br>\n')
+        text = html.escape(text)
     return text
     
 
