@@ -6,6 +6,7 @@ from flask import request, jsonify, Response, redirect, session, \
     stream_with_context, make_response, Blueprint
 from flask_login import login_required
 from .. import config, utils, attachments
+from ..sigmund import Sigmund
 from .app import get_sigmund
 from redis import Redis
 logger = logging.getLogger('sigmund')
@@ -212,3 +213,4 @@ def get_setting(key):
             return jsonify(success=False, value=value)
     logger.info(f'get setting: {key} = {value}')
     return jsonify(success=True, value=value)
+    

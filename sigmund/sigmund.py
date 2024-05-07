@@ -79,6 +79,7 @@ class Sigmund:
                                   tools=self.answer_tools,
                                   tool_choice=answer_tool_choice)
         self.condense_model = model(self, self.model_config['condense_model'])
+        self.public_model = model(self, self.model_config['public_model'])
     
     def send_user_message(self, message: str,
                           message_id: str=None) -> GeneratorType:

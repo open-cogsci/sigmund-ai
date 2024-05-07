@@ -108,21 +108,25 @@ model_config = {
     'openai': {
         'search_model': 'gpt-3.5',
         'condense_model': 'gpt-3.5',
+        'public_model': 'claude-3-haiku',
         'answer_model': 'gpt-4'
     },
     'anthropic': {
         'search_model': 'claude-3-sonnet',
         'condense_model': 'claude-3-sonnet',
+        'public_model': 'claude-3-haiku',
         'answer_model': 'claude-3-opus'
     },
     'mistral': {
         'search_model': 'mistral-large',
         'condense_model': 'mistral-medium',
+        'public_model': 'claude-3-haiku',
         'answer_model': 'mistral-large'
     },
     'dummy': {
         'search_model': 'dummy',
         'condense_model': 'dummy',
+        'public_model': 'dummy',
         'answer_model': 'dummy'
     }
 }
@@ -175,13 +179,20 @@ topic_sources = {
 search_docs_per_query = 20
 # The number of documents that is kept for all search queries combined
 search_docs_max = 6
+# The number of documents and maximum number of words that is kept for public 
+# search
+public_search_docs_max = 4
+public_search_max_doc_length = 1000
 # The distance metric used for search. The cosine metric is useful because it
 # is somewhat invariant to changes in document length
 search_metric = 'cosine'
-# The cache folder for the library that is used to chat
-db_cache = '.db.cache'
-# The cache folder for the library that is used for public search
-public_search_cache = '.ps.cache'
+# The cache folder for the library that contains documentation
+db_cache = 'default'
+db_cache_sources = {
+    'default': '.db.cache',
+    'public-with-forum': '.public-with-forum.db.cache',
+    'public-without-forum': '.public-without-forum.db.cache'
+}
 
 def process_ai_message(msg):
     # This pattern looks for a colon possibly followed by any number of 

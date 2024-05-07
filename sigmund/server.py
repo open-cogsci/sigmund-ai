@@ -4,7 +4,7 @@ from flask import Flask, Config, request
 from flask_login import LoginManager
 from . import config
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
-    google_login_blueprint
+    google_login_blueprint, public_blueprint
 from .database.models import db
 import logging
 logger = logging.getLogger('sigmund')
@@ -23,6 +23,7 @@ def create_app(config_class=SigmundConfig):
     app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(subscribe_blueprint, url_prefix='/subscribe')
     app.register_blueprint(google_login_blueprint, url_prefix='/google_login')
+    app.register_blueprint(public_blueprint, url_prefix='/public')
     # Initialize the databasea
     db.init_app(app)
     with app.app_context():

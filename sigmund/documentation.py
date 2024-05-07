@@ -16,11 +16,18 @@ class Documentation:
         self._documents = []
         self._sources = sources
         
+    def _doc_to_str(self, doc):
+        s = '<document>\n'
+        if doc.metadata.get('title', None):
+            s += f'# {doc.metadata["title"]}\n\n'
+        if doc.metadata.get('url', None):
+            s += f'Source: {doc.metadata["url"]}\n\n'
+        return s + doc.page_content + '\n</document>'
+        
     def __str__(self):
         if not self._documents:
             return ''
-        return '\n\n'.join(
-            f"<document>{doc.page_content}</document>" for doc in self._documents)
+        return '\n\n'.join(self._doc_to_str(doc) for doc in self._documents)
         
     def to_json(self):
         return json.dumps([{'page_content': doc.page_content,
@@ -117,7 +124,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         self._embeddings_model = OpenAIEmbeddings(
             openai_api_key=config.openai_api_key)
         logger.info('reading FAISS documentation cache')
-        self._db = FAISS.load_local(Path('.db.cache'), self._embeddings_model,
+        db_cache = config.db_cache_sources[config.db_cache]
+        self._db = FAISS.load_local(Path(db_cache), self._embeddings_model,
                                     allow_dangerous_deserialization=True)
     
     def search(self, queries):

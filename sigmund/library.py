@@ -9,7 +9,7 @@ logger = logging.getLogger('sigmund')
 
 
 def load_library(force_reindex=False, cache_folder=config.db_cache,
-                 exclude_filter=None):
+                 exclude_filter=[]):
     db_cache = Path(cache_folder)
     src_path = Path('sources')
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
@@ -24,7 +24,7 @@ def load_library(force_reindex=False, cache_folder=config.db_cache,
         data = []
         # PDF files are unstructured. They can be named through config.sources
         for src in src_path.glob('pdf/**/*.pdf'):
-            if exclude_filter and exclude_filter in str(src):
+            if any(f in str(src) for f in exclude_filter):
                 logger.info(f'skipping pdf: {src}')
                 continue
             logger.info(f'indexing pdf: {src}')
@@ -32,7 +32,7 @@ def load_library(force_reindex=False, cache_folder=config.db_cache,
         # jsonl is mainly for documentation
         for src in src_path.glob('jsonl/*.jsonl'):
             logger.info(f'indexing json: {src}')
-            if exclude_filter and exclude_filter in str(src):
+            if any(f in str(src) for f in exclude_filter):
                 logger.info(f'skipping json: {src}')
                 continue            
             loader = JSONLoader(src, jq_schema='', content_key='content',

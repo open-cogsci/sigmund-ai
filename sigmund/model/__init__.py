@@ -18,6 +18,9 @@ def model(sigmund, model, **kwargs):
     if model == 'claude-3-sonnet':
         from ._anthropic_model import AnthropicModel
         return AnthropicModel(sigmund, 'claude-3-sonnet-20240229', **kwargs)
+    if model == 'claude-3-haiku':
+        from ._anthropic_model import AnthropicModel
+        return AnthropicModel(sigmund, 'claude-3-haiku-20240307', **kwargs)
     if model.startswith('mistral-'):
         from ._mistral_model import MistralModel
         if not model.endswith('-latest'):

@@ -1,0 +1,112 @@
+<script>
+class SearchWidget extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({mode: 'open'});
+        this.offset = 0; // Initialize offset
+
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host {
+                    display: block;
+                }
+
+                .spinner {
+                    display: none;
+                }
+
+                :host(.searching) .spinner {
+                    display: inline-block;
+                }
+
+                select {
+                    margin: 10px 0;
+                }
+            </style>
+
+            <div>
+                <input type="text" id="search-input" placeholder="Enter search query">
+                <select id="source-select">
+                    <option value="public-with-forum" selected>Public with Forum</option>
+                    <option value="public-without-forum">Public without Forum</option>
+                </select>
+                <span class="spinner">🔄</span>
+                <div id="search-results"></div>
+                <button id="more-button" style="display:none;">More …</button>
+            </div>
+        `;
+
+        this.searchInput = this.shadowRoot.getElementById('search-input');
+        this.sourceSelect = this.shadowRoot.getElementById('source-select');
+        this.searchResults = this.shadowRoot.getElementById('search-results');
+        this.moreButton = this.shadowRoot.getElementById('more-button');
+
+        this.searchInput.addEventListener('keypress', this.handleSearch.bind(this));
+        this.moreButton.addEventListener('click', this.handleMore.bind(this));
+    }
+
+    handleSearch(e) {
+        if (e.key === 'Enter') {
+            this.performNewSearch();
+        }
+    }
+
+    handleMore() {
+        this.offset += 1; // Increment offset by number of results previously returned
+        this.performSearch();
+    }
+
+    performNewSearch() {
+        this.offset = 0; // Reset offset if new search
+        this.performSearch();
+    }
+
+    performSearch() {
+        const query = this.searchInput.value;
+        const source = this.sourceSelect.value;
+        this.classList.add('searching');
+        this.searchInput.disabled = true;
+        this.moreButton.style.display = 'none'; // Hide more button during search
+
+        const queryObject = {
+            query: query,
+            source: source,
+            offset: this.offset
+        };
+
+        fetch(this.endpoint, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(queryObject)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length) {
+                this.searchResults.innerHTML += data.results;
+                this.moreButton.style.display = 'block'; // Show more button only if results are returned
+            } else {
+                this.searchResults.innerHTML = 'No more results.';
+                this.moreButton.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            this.searchResults.innerHTML = 'Error performing search. Please try again.';
+            console.error(error);
+        })
+        .finally(() => {
+            this.classList.remove('searching');
+            this.searchInput.disabled = false;
+        });
+    }
+
+    get endpoint() {
+        return this.getAttribute('endpoint') || '/public/search';
+    }
+}
+
+customElements.define('search-widget', SearchWidget);
+</script>
+
+<search-widget endpoint="/public/search"></search-widget>
