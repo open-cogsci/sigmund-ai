@@ -1,5 +1,5 @@
 import logging
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint, request, Response
 from .. import config, utils, prompt
 from ..sigmund import Sigmund
 from .app import get_sigmund
@@ -41,3 +41,9 @@ def search():
 @public_blueprint.route('/search_widget')
 def search_widget():
     return utils.render('search-widget.html')
+
+
+@public_blueprint.route('/search-widget.js')
+def search_widget_js():
+    return Response(utils.render('search-widget.js'),
+                    mimetype='text/javascript')
