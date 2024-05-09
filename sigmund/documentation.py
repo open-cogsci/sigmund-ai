@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.documents import Document
 import logging
 from . import config
@@ -127,7 +128,14 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         db_cache = config.db_cache_sources[config.db_cache]
         self._db = FAISS.load_local(Path(db_cache), self._embeddings_model,
                                     allow_dangerous_deserialization=True)
-    
+        if config.search_docs_distance_metric == 'cosine':
+            self._db.distance_strategy = DistanceStrategy.COSINE
+        elif config.search_docs_distance_metric == 'euclidean_distance':
+            self._db.distance_strategy = DistanceStrategy.EUCLIDEAN_DISTANCE
+        else:
+            raise ValueError(
+                f'invalid search_docs_distance_metric: {config.search_docs_distance_metric}')
+
     def search(self, queries):
         if config.openai_api_key is None:
             return []
@@ -135,7 +143,7 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         for query in queries:
             if config.log_replies:
                 logger.info(f'documentation search query: {query}')
-            for doc, score in self._db.similarity_search_with_score(
+            for doc, score in self._db.similarity_search_with_relevance_scores(
                     query, k=config.search_docs_per_query):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
                 if any(doc.page_content == ref.page_content for ref, _ in docs):

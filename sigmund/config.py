@@ -179,9 +179,12 @@ topic_sources = {
 search_docs_per_query = 20
 # The number of documents that is kept for all search queries combined
 search_docs_max = 6
+# The distance metric to search through documentation. Should be 'cosine' or
+# 'euclidean_distance'
+search_docs_distance_metric = 'cosine'
 # The number of documents and maximum number of words that is kept for public 
 # search
-public_search_docs_max = 4
+public_search_docs_max = 6
 public_search_max_doc_length = 1000
 # The distance metric used for search. The cosine metric is useful because it
 # is somewhat invariant to changes in document length
