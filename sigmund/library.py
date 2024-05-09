@@ -10,7 +10,7 @@ logger = logging.getLogger('sigmund')
 
 def load_library(force_reindex=False, cache_folder=config.db_cache,
                  exclude_filter=[]):
-    db_cache = Path(cache_folder)
+    db_cache = Path(config.db_cache_sources[cache_folder])
     src_path = Path('sources')
     embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key,
                                         model=config.search_embedding_model)
