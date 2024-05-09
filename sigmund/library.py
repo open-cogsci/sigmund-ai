@@ -35,7 +35,7 @@ def load_library(force_reindex=False, cache_folder=config.db_cache,
             if any(f in str(src) for f in exclude_filter):
                 logger.info(f'skipping json: {src}')
                 continue            
-            loader = JSONLoader(src, jq_schema='', content_key='content',
+            loader = JSONLoader(src, jq_schema='.', content_key='content',
                                 json_lines=True,
                                 metadata_func=_extract_metadata)
             data += loader.load()
