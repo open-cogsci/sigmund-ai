@@ -6,69 +6,141 @@ class SearchWidget extends HTMLElement {
         this.numResults = 0; // To store number of results returned
 
         this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            <style>
-                :host {
-                    display: block;
-                    position: relative;
-                    width: 300px; /* Set a specific width for the input */
-                }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    :host {
+        display: block;
+        position: relative;
+        margin-bottom: 32px;
+    }
 
-                input[type="text"] {
-                    width: 100%;
-                    padding-right: 30px; /* Make space for the button */
-                    box-sizing: border-box;
-                }
+    input[type="text"] {
+        width: 100%;
+        padding: 12px 16px 12px 16px; /* Increased padding for better touch targets */
+        border: none;
+        border-bottom: 1px solid #ccc; /* Minimal and clean underline style */
+        border-radius: 4px 4px 0 0; /* Rounded corners on the top */
+        box-sizing: border-box;
+        transition: all 0.3s; /* Smooth transition for focus and hover */
+        outline: none; /* Remove the default focus outline */
+        font-family: "Roboto Condensed";
+        font-size: 1em;
+    }
+    
+    ul {
+        margin: 0px;
+        padding-inline-start: 24px;
+    }
+    
+    a,
+    a:visited {
+        color: #0277bd;
+    }
+    
+    a:hover {
+        color: #FF5722;
+    }
 
-                #search-button, .spinner {
-                    position: absolute;
-                    right: 5px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    border: none;
-                    background: none;
-                    cursor: pointer;
-                }
+    input[type="text"]:focus {
+        border-bottom-color: #0277bd; /* Material Design Primary Color when focused */
+    }
 
-                .spinner {
-                    display: none;
-                }
+    #search-button, .spinner {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: #0277bd; /* Making it consistent with Material Design primary color */
+    }
 
-                #controls {
-                    display: none;
-                    position: absolute;
-                    background: white;
-                    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-                    width: 100%;
-                    box-sizing: border-box;
-                    z-index: 100;
-                }
+    .spinner {
+        display: none;
+        right: 18px;
+        animation: spin 1s linear infinite;
+    }
 
-                :host(.show-controls) #controls {
-                    display: block;
-                }
+    @keyframes spin {
+        100% { transform: translateY(-50%) rotate(360deg); }
+    }
 
-                #more-button {
-                    display: none;
-                    margin-top: 10px;
-                }
-            </style>
+    #controls {
+        display: none;
+        position: absolute;
+        background: white;
+        border-radius: 0 0 4px 4px; /* Rounded corners on the bottom */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+        width: 100%;
+        box-sizing: border-box;
+        padding: 16px; /* Inner spacing */
+        z-index: 100;
+        transition: all 0.3s;
+    }
+    
+    #powered-by-sigmund {
+        float: right;
+        font-family: "Roboto Condensed";
+    }
 
-            <div id="sigmund-search-widget-container">
-                <input type="text" id="search-input" placeholder="Enter search query">
-                <button id="search-button" aria-label="Search">
-                    <i class="fas fa-search"></i>
-                </button>
-                <span class="spinner" id="spinner">
-                    <i class="far fa-hourglass"></i>
-                </span>
-                <div id="controls">
-                    <label><input type="checkbox" id="source-checkbox"> Include forum posts</label>
-                    <div id="search-results"></div>
-                    <button id="more-button">More …</button>
-                </div>
-            </div>
-        `;
+    :host(.show-controls) #controls {
+        display: block;
+        animation: slideDown 0.3s ease-out; /* Animating appearance */
+    }
+
+    @keyframes slideDown {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    #more-button {
+        display: none;
+        margin-top: 16px;
+        background-color: #0277bd; /* Primary color for the button */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        outline: none;
+        font-size: 1em;
+    }
+
+    #more-button:hover {
+        background-color: #FF5722; /* Darker shade on hover */
+    }
+    
+    #search-results ul:first-child {
+        margin-top: 10px;
+    }
+
+    label {
+        display: inline-block;
+        font-family: "Roboto Condensed";
+    }
+
+    input[type="checkbox"] {
+        accent-color: #0277bd; /* MD primary color for the checkbox */
+    }
+</style>
+
+<div id="sigmund-search-widget-container">
+    <input type="text" id="search-input" placeholder="Enter search query">
+    <button id="search-button" aria-label="Search">
+        <i class="fas fa-search"></i>
+    </button>
+    <span class="spinner" id="spinner">
+        <i class="far fa-hourglass"></i>
+    </span>
+    <div id="controls">
+        <div id="powered-by-sigmund">Powered by <a href="https://sigmundai.eu">SigmundAI</a></div>
+        <label><input type="checkbox" id="source-checkbox"> Include forum posts</label>
+        <div id="search-results"></div>
+        <button id="more-button">More …</button>
+    </div>
+</div>`;
 
         this.searchInput = this.shadowRoot.getElementById('search-input');
         this.searchButton = this.shadowRoot.getElementById('search-button');

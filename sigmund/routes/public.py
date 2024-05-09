@@ -1,5 +1,6 @@
 import logging
 from flask import jsonify, Blueprint, request, Response
+from flask_cors import cross_origin
 from .. import config, utils, prompt
 from ..sigmund import Sigmund
 from .app import get_sigmund
@@ -8,6 +9,7 @@ public_blueprint = Blueprint('public', __name__)
 
 
 @public_blueprint.route('/search', methods=['POST'])
+@cross_origin()
 def search():
     data = request.json
     config.db_cache = data.get('source', 'default')
@@ -44,6 +46,7 @@ def search_widget():
 
 
 @public_blueprint.route('/search-widget.js')
+@cross_origin()
 def search_widget_js():
     return Response(utils.render('search-widget.js'),
                     mimetype='text/javascript')
