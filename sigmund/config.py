@@ -182,6 +182,9 @@ search_docs_max = 6
 # The distance metric to search through documentation. Should be 'cosine' or
 # 'euclidean_distance'
 search_docs_distance_metric = 'cosine'
+# The embedding model used for search. This has the name of an OpenAI embedding
+# model
+search_embedding_model = 'text-embedding-3-large'
 # The number of documents and maximum number of words that is kept for public 
 # search
 public_search_docs_max = 6

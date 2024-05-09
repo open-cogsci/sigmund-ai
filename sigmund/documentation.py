@@ -123,7 +123,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
                 'No OpenAI API key provided, no documentation available')
             return
         self._embeddings_model = OpenAIEmbeddings(
-            openai_api_key=config.openai_api_key)
+            openai_api_key=config.openai_api_key,
+            model=config.search_embedding_model)
         logger.info('reading FAISS documentation cache')
         db_cache = config.db_cache_sources[config.db_cache]
         self._db = FAISS.load_local(Path(db_cache), self._embeddings_model,
@@ -143,7 +144,7 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         for query in queries:
             if config.log_replies:
                 logger.info(f'documentation search query: {query}')
-            for doc, score in self._db.similarity_search_with_relevance_scores(
+            for doc, score in self._db.similarity_search_with_score(
                     query, k=config.search_docs_per_query):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
                 if any(doc.page_content == ref.page_content for ref, _ in docs):
@@ -158,7 +159,7 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         # pieces of documentation. This is to make sure that documentation
         # stands a chance against the how-to's, which tend to be preferred by
         # the algorithm. Finally we keep only the top few documents.
-        docs = sorted(docs, key=lambda doc: -doc[1])
+        docs = sorted(docs, key=lambda doc: doc[1])
         with_url = [d for d in docs if d[0].metadata['url'] is not None]
         without_url = [d for d in docs if d[0].metadata['url'] is None]
         reordered_docs = []

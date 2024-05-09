@@ -12,7 +12,8 @@ def load_library(force_reindex=False, cache_folder=config.db_cache,
                  exclude_filter=[]):
     db_cache = Path(cache_folder)
     src_path = Path('sources')
-    embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key)
+    embeddings_model = OpenAIEmbeddings(openai_api_key=config.openai_api_key,
+                                        model=config.search_embedding_model)
     if not force_reindex and db_cache.exists():
         logger.info('loading library from cache')
         db = FAISS.load_local(db_cache, embeddings_model,
