@@ -5,7 +5,7 @@ def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
     if model == 'gpt-4':
         from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-4-turbo', **kwargs)
+        return OpenAIModel(sigmund, 'gpt-4o', **kwargs)
     if model == 'gpt-3.5':
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, 'gpt-3.5-turbo', **kwargs)
