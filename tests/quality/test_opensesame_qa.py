@@ -70,6 +70,7 @@ def score_testcase(description, question, requirements, n=3):
             logger.info(answer)
             logger.info('Validation response:')
             logger.info(validation_response)
+            validation_response = validation_response.replace('**Score:**', 'Score:')
             try:
                 score = float(validation_response.lower().split('score:')[-1].strip(' .')[0])
             except Exception as e:
