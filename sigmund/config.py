@@ -174,6 +174,16 @@ topic_sources = {
     'datamatrix': 'sources/topics/datamatrix.py',
     'data_analysis': 'sources/topics/datamatrix.py',
     'questions_howto': 'sources/topics/questions-how-to.md',
+    'mouse_response_item': 'sources/topics/mouse_response_item.md',
+    'feedback_item': 'sources/topics/feedback_item.md',
+    'keyboard_response_item': 'sources/topics/keyboard_response_item.md',
+    'logger_item': 'sources/topics/logger_item.md',
+    'loop_item': 'sources/topics/loop_item.md',
+    'mouse_response_item': 'sources/topics/mouse_response_item.md',
+    'sampler_item': 'sources/topics/sampler_item.md',
+    'sketchpad_item': 'sources/topics/sketchpad_item.md',
+    'synth_item': 'sources/topics/synth_item.md',
+    'sequence_item': 'sources/topics/sequence_item.md',
 }
 # The number of documents that is considered for each search query
 search_docs_per_query = 20
