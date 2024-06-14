@@ -1,4 +1,4 @@
-how can i draw a square in a sketchpad item?
+How can i draw a square in a sketchpad item?
 
 the answer should: 
 
