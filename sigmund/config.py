@@ -179,7 +179,6 @@ topic_sources = {
     'keyboard_response_item': 'sources/topics/keyboard_response_item.md',
     'logger_item': 'sources/topics/logger_item.md',
     'loop_item': 'sources/topics/loop_item.md',
-    'mouse_response_item': 'sources/topics/mouse_response_item.md',
     'sampler_item': 'sources/topics/sampler_item.md',
     'sketchpad_item': 'sources/topics/sketchpad_item.md',
     'synth_item': 'sources/topics/synth_item.md',

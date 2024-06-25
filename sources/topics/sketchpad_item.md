@@ -1,5 +1,24 @@
-# Sketchpad Features
+# sketchpad item
 
--   Duration Setting: a numeric value (duration in milliseconds), `keypress` or `mouseclick`.
--	View Options: Top right; choose from "view control", "view script", or "split view".
--	Show-if Expression: Determines whether or not a particular element should be shown. Show-if expressions in sketchpad items are evaluated during the prepare phase, which occurs before the trial starts. Therefor, you cannot use show-if expressions in sketchpads to conditionally show elements based on something that happens during the trial.
+The sketchpad item is used to present visual stimuli. The main difference between a feedback and a sketchpad item is that a sketchpad item is prepared in advance, whereas a feedback item is prepared only at the moment that it is shown. This means that the content of a sketchpad item (unlike a feedback item) cannot depend on what happened just before the sketchpad was presented.
+
+It has built-in drawing tools that allow you to easily draw the following elements:
+
+- Text (textline)
+- Image
+- Fixation dot (fixdot)
+- Line
+- Arrow
+- Rectangle (rect)
+- Circle
+- Ellipse
+- Gabor patch (gabor)
+- Noies patch (noise)
+
+Each element has a Show-if expression, which is a Python expression that determines whether or not it should be shown.
+
+The duration of a sketchap item is a numeric duration in milliseconds, 'keypress' (to show the display until a key is pressed) or 'mouseclick' (to show the display until a mouse button is clicked).
+
+More information:
+
+- <https://osdoc.cogsci.nl/4.0/manual/stimuli/visual/>
