@@ -13,6 +13,7 @@ dynamic = ["version", "description"]
 dependencies = [
     "anthropic",
     "cryptography",
+    "datamatrix",
     "faiss-cpu",
     "flask",
     "flask-login",
