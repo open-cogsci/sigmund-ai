@@ -67,7 +67,7 @@ You have retrieved the following documentation to answer the user's question:
                     if not doc.metadata.get('important', False)]
         while optional and len(important) < config.search_docs_max:
             batch = optional[:config.search_docs_max]
-            logger.info(f'evaluating document batch (n={len(batch)})')
+            logger.info(f'evaluating document batch (n={len(batch)}): {[doc.metadata["seq_num"] for doc in batch]}')
             optional = optional[config.search_docs_max:]
             prompts = [prompt.render(prompt.JUDGE_RELEVANCE,
                                      documentation=doc.page_content,
@@ -77,7 +77,7 @@ You have retrieved the following documentation to answer the user's question:
             replies = self._sigmund.condense_model.predict_multiple(prompts)
             self._sigmund.condense_model.json_mode = False
             config.mistral_kwargs = dict()
-            for reply, doc in zip(replies, optional):
+            for reply, doc in zip(replies, batch):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
                 try:
                     reply = json.loads(reply)
