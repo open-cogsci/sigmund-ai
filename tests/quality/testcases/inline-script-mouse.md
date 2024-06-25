@@ -1,4 +1,4 @@
-I would like to use a Python script to collect a mouse click press. I would like the mouse cursor to be visible. There should be response timeout of five seconds. Can you show me how?
+I would like to use a Python script to collect a mouse click press. I would like the mouse cursor to be visible. There should be a response timeout of two seconds. Can you show me how?
 
 The answer should:
 
