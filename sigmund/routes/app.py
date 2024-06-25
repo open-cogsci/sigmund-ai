@@ -114,6 +114,13 @@ def about():
         'info-page.html',
         content=utils.md(Path('sigmund/static/about.md').read_text()))
     
+    
+@app_blueprint.route('/user_question_guide')
+def user_questin_guide():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('sigmund/static/user_question_guide.md').read_text()))
+    
 
 @app_blueprint.route('/terms')
 def terms():

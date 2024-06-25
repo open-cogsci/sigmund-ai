@@ -1,16 +1,20 @@
-# Question Formulation Guide for Sigmund AI
+# How to ask effective questions
 
-This guide provides essential tips to help you ask Sigmund effective questions about OpenSesame. Learn how to clearly define your query, choose the right level of detail, and communicate effectively to get the most accurate and useful responses from Sigmund. The tips are organized into two main topics: (1) Optimizing Question Clarity and Detail and (2) Scripts and Error Messages.
+This guide provides essential tips to help you ask Sigmund effective questions about OpenSesame. Learn how to clearly define your query, choose the right level of detail, and communicate effectively to get the most accurate and useful responses from Sigmund.
+
+[TOC]
 
 ## 1. Optimizing Question Clarity and Detail
 
 To optimize question clarity and detail, follow these tips when asking questions about OpenSesame:
-- Be specific and concrete. Include key terms like “sketchpad”, “inline_script”, “OSWeb”, “Python”, “Canvas”, etc. This helps Sigmund find relevant parts of the documentation.
-- In OpenSesame, many tasks can be executed using multiple methods. For example, you can display an image either by using the clickable element in a sketchpad item, modifying the script of a sketchpad item or by adding an inline_script. Other examples of tasks for which multiple methods are viable include displaying text, playing sounds, creating and playing synths, and collecting keyboard or mouse responses. When you want to execute a task using a specific method, it’s best to specify it when it cannot otherwise be derived from your question.
-- Find a balance between brevity and detail in your questions. Concise questions are efficient but may miss necessary details, while overly elaborate questions can bury the main issue under too much information.
-- Check that your question can likely be answered based on OpenSesame's features and functionality. Sigmund specializes in OpenSesame, but his knowledge of other tools is limited.
 
-### Examples of Effectively Formulated Questions:
+- Be specific and concrete. Include key terms like “sketchpad”, “inline_script”, “OSWeb”, “Python”, “Canvas”, etc. This helps Sigmund find relevant parts of the documentation.
+- In OpenSesame, many tasks can be executed using multiple methods. For example, you can display an image either by using the clickable element in a `sketchpad` item, modifying the script of a `sketchpad` item or by adding an `inline_script`. Other examples of tasks for which multiple methods are viable include displaying text, playing sounds, generating and playing sounds, and collecting keyboard or mouse responses. When you want to execute a task using a specific method, it’s best to specify it when it cannot otherwise be derived from your question.
+- Find a balance between brevity and detail in your questions. Concise questions are efficient but may miss necessary details, while overly elaborate questions can bury the main issue under too much information.
+- Check that your question can likely be answered based on OpenSesame's features and functionality. Sigmund specializes in OpenSesame, but its knowledge of other tools is limited.
+
+### Examples of Effective Questions:
+
 - “How do I present an image using a sketchpad item in OpenSesame?”
 - “I want to display a green square in the middle of the screen using Python inline_script. How can I do this?”
 - “What's the best way to collect response time data for a task in OSWeb?”
@@ -19,7 +23,8 @@ To optimize question clarity and detail, follow these tips when asking questions
   `draw textline color=white text="Accuracy: {accuracy} %" x=0 y=0`
   Any clues what’s wrong?”
 
-### Examples of Less Effectively Formulated Questions:
+### Examples of Less Effective Questions:
+
 - **Unspecific:** “How can I present a distractor stimulus?”
 - **No preferred method indicated:** “I want to display a green square in the middle of the screen. How can I do this?" 
 - **Lacking necessary detail:** “The feedback item does not display the accuracy correctly. Can you help?”
@@ -27,18 +32,20 @@ To optimize question clarity and detail, follow these tips when asking questions
   `draw textline color=white text="Accuracy: {accuracy} %" x=0 y=0`
   Responses are logged using the `correct_response` variable. I also have a Python inline script to log additional details like reaction times and trial numbers in a separate file. I’ve reviewed the documentation but couldn’t find a solution. I’m using OpenSesame 4.0 with the PsychoPy backend. Could you help me figure out what’s wrong?”
 
+
 ## 2. Scripts and Error Messages
 
 ### Scripts
 
-A script is a piece of code that defines and controls various aspects of the experiment, such as stimuli presentation, logic, and data handling. In OpenSesame, scripts are used either within GUI items like a sketchpad item or within an inline_script item. Providing Sigmund with your relevant scripts will help Sigmund to best assist you with building your OpenSesame project. Here are some examples of when sharing your script with Sigmund would be helpful:
-- When your inline_script or GUI item is not working as expected, and you need help identifying why.
-- When you want to modify your GUI item script or inline_script but are unsure how to do so.
+A script is a piece of code that defines and controls various aspects of the experiment, such as stimuli presentation, logic, and data handling. In OpenSesame, scripts are mainly used within the script view of GUI items like a `sketchpad` item, within an `inline_script` item, or within an `inline_javascript` item. Providing Sigmund with your relevant scripts will help Sigmund to best assist you with building your OpenSesame project. Here are some examples of when sharing your script with Sigmund would be helpful:
+- When your `inline_script` or GUI item is not working as expected, and you need help identifying why.
+- When you want to modify your GUI item script or `inline_script` but are unsure how to do so.
 
-An example of how to provide a sketchpad’s script is given below:
+An example of how to provide a `sketchpad`’s script is given below:
 
-```plaintext
+<blockquote style="white-space:pre-wrap;">
 You: Dear Sigmund, my sketchpad item disappears really quickly and I do not understand why. I provided my sketchpad script below, can you tell me why this is happening?:
+
 set start_response_interval no
 set duration 10
 set description "Displays stimuli"
@@ -47,7 +54,7 @@ draw textline center=1 color=white font_bold=no font_family=mono font_italic=no 
 
 Sigmund: Dear user,
 Based on the script you provided, the duration of your sketchpad is set to 10, which means the sketchpad will be displayed for only 10 milliseconds. This very short duration is likely why [...]
-```
+</blockquote>
 
 ### Error Messages
 
@@ -56,6 +63,7 @@ If you receive error messages and want Sigmund's assistance, it is good practice
 ## 3. Takeaways
 
 In general, when asking a question:
+
 - Include key terms
 - Provide the specific issue.
 - Include relevant code or settings.
