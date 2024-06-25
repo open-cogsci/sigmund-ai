@@ -18,6 +18,9 @@ def model(sigmund, model, **kwargs):
     if model == 'claude-3-sonnet':
         from ._anthropic_model import AnthropicModel
         return AnthropicModel(sigmund, 'claude-3-sonnet-20240229', **kwargs)
+    if model == 'claude-3.5-sonnet':
+        from ._anthropic_model import AnthropicModel
+        return AnthropicModel(sigmund, 'claude-3-5-sonnet-20240620', **kwargs)
     if model == 'claude-3-haiku':
         from ._anthropic_model import AnthropicModel
         return AnthropicModel(sigmund, 'claude-3-haiku-20240307', **kwargs)
