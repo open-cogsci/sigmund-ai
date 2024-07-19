@@ -3,13 +3,13 @@
 &#128150; Your subscription<br>supports open source
 {: .pretty-text }
 
+- State-of-the-art chatbot
 - Better at answering questions about [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu) than any other chatbot
-- Also a state-of-the-art general-purpose chatbot
-- Use your favorite language model! Select OpenAI GPT4o, Anthropic Claude 3.5, or Mistral Large
-- Messages and attachments are encrypted so that no-one can listen in on your conversation
+- Search and summarize scientific literature (access to Google Scholar)
 - Basic Python and R execution abilities
-- Search for scientific articles through Google Scholar
 - Upload and download attachments
+- Messages and attachments are encrypted so that no-one can listen in on your conversation
+- Use your favorite language model! Select OpenAI GPT4o, Anthropic Claude 3.5, or Mistral Large
 - Read more about [what Sigmund can do](/about) and [our terms of service](/terms)
 
 Sigmund requires a subscription (€9 /month). You can subscribe after signing in. A variety of international payment methods are available. Subscribing is easy and secure.
