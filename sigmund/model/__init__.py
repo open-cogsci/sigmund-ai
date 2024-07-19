@@ -3,9 +3,12 @@ from ._base_model import BaseModel
 
 def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
-    if model == 'gpt-4':
+    if model in ('gpt-4', 'gpt-4o'):
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, 'gpt-4o', **kwargs)
+    if model == 'gpt-4o-mini':
+        from ._openai_model import OpenAIModel
+        return OpenAIModel(sigmund, 'gpt-4o-mini', **kwargs)
     if model == 'gpt-3.5':
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, 'gpt-3.5-turbo', **kwargs)

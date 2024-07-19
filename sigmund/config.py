@@ -89,10 +89,12 @@ anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 # Supported models are currently:
 # - gpt-3.5
-# - gpt-4
+# - gpt-4o
+# - gpt-4o-mini
 # - claude-2.1
 # - claude-3-sonnet
 # - claude-3-opus
+# - claude-3.5-sonnet
 # - mistral-tiny
 # - mistral-small
 # - mistral-medium
@@ -106,9 +108,9 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 #   model
 model_config = {
     'openai': {
-        'search_model': 'gpt-3.5',
-        'condense_model': 'gpt-3.5',
-        'public_model': 'claude-3-haiku',
+        'search_model': 'gpt-4o-mini',
+        'condense_model': 'gpt-4o-mini',
+        'public_model': 'gpt-4o-mini',
         'answer_model': 'gpt-4'
     },
     'anthropic': {
@@ -120,7 +122,7 @@ model_config = {
     'mistral': {
         'search_model': 'mistral-large',
         'condense_model': 'mistral-medium',
-        'public_model': 'claude-3-haiku',
+        'public_model': 'gpt-4o-mini',
         'answer_model': 'mistral-large'
     },
     'dummy': {
