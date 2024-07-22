@@ -4,3 +4,4 @@ from ._search_google_scholar import search_google_scholar
 from ._read_attachment import read_attachment
 from ._execute_code import execute_code
 from ._download import download
+from ._generate_image import generate_image

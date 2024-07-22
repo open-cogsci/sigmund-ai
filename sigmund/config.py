@@ -148,7 +148,7 @@ search_tools = ['search_documentation']
 # Answer tools are executed during the answer phase
 answer_tools_with_search = []
 answer_tools_without_search = ['read_attachment', 'search_google_scholar',
-                               'execute_code', 'download']
+                               'execute_code', 'download', 'generate_image']
 
 # SETTINGS
 #

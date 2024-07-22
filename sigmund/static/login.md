@@ -6,6 +6,7 @@
 - State-of-the-art chatbot
 - Better at answering questions about [OpenSesame](https://osdoc.cogsci.nl/) and [DataMatrix](https://pydatamatrix.eu) than any other chatbot
 - Search and summarize scientific literature (access to Google Scholar)
+- Generate images (using Dall-E 3)
 - Basic Python and R execution abilities
 - Upload and download attachments
 - Messages and attachments are encrypted so that no-one can listen in on your conversation

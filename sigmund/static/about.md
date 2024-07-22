@@ -52,6 +52,13 @@ Sigmund can not only write Python and R code, but also execute it. Try it!
 Limitation: Sigmund cannot use or generate attachments during code execution and cannot display figures. This will be improved in future versions.
 
 
+### Generate images
+
+Sigmund can also generate images using OpenAI's Dall-E 3 model. Try it!
+
+> Can you generate an image that represents yourself?
+
+
 ### Download files and web pages
 
 Sigmund can download files and web pages and save them as attachments (see below). Try it!
