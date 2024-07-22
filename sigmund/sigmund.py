@@ -121,7 +121,8 @@ class Sigmund:
         # Then search based on the search-model queries derived from the user
         # question
         reply = self.search_model.predict(self.messages.prompt(
-            system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
+            system_prompt=prompt.SYSTEM_PROMPT_SEARCH,
+            skip_large_tool_results=True))
         if config.log_replies:
             logger.info(f'[search state] reply: {reply}')
         if callable(reply):
@@ -140,7 +141,8 @@ class Sigmund:
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
         tokens_consumed_before = self.answer_model.total_tokens_consumed
-        reply = self.answer_model.predict(self.messages.prompt())
+        reply = self.answer_model.predict(self.messages.prompt(
+            skip_large_tool_results=True))
         tokens_consumed = self.answer_model.total_tokens_consumed \
             - tokens_consumed_before
         logger.info(f'tokens consumed: {tokens_consumed}')

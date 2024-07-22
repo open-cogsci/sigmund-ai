@@ -83,7 +83,7 @@ class Messages:
         if self._persistent:
             self.save()
             
-    def prompt(self, system_prompt=None):
+    def prompt(self, system_prompt=None, skip_large_tool_results=False):
         """The prompt consists of the system prompt followed by a sequence of
         AI, user, and tool/ function messages.
         
@@ -103,6 +103,8 @@ class Messages:
                 model_prompt.append(HumanMessage(content=content))
             elif role == 'tool':
                 if msg_nr + config.keep_tool_results < msg_len:
+                    continue
+                if len(content) > config.large_tool_result_length:
                     continue
                 model_prompt.append(FunctionMessage(content=content,
                                                     name='tool_function'))

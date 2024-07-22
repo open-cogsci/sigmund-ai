@@ -15,7 +15,7 @@ class generate_image(BaseTool):
         },
         'quality': {
             'type': 'string',
-            'description': 'The quality of the image',
+            'description': 'The quality of the image. Use standard unless there is a good reason to use HD.',
             'enum': ['standard', 'hd']
         },
         'size': {
