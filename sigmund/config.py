@@ -68,7 +68,7 @@ default_conversation_title = 'New conversation'
 keep_tool_results = 4
 # Tool results larger than this are not included in the prompt used for
 # generating
-large_tool_result_length = 1024
+large_tool_result_length = 50000
 
 # RATE LIMITS
 #
