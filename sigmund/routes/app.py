@@ -22,7 +22,8 @@ class User(UserMixin):
         logger.info(f'initializing user id: {self.id}')
 
 
-def get_sigmund():
+def get_sigmund(db_cache='default'):
+    config.db_cache = db_cache
     return Sigmund(user_id=current_user.get_id(), persistent=True,
                    encryption_key=session['encryption_key'])
     
