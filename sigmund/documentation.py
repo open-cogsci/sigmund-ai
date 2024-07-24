@@ -125,8 +125,8 @@ class FAISSDocumentationSource(BaseDocumentationSource):
         self._embeddings_model = OpenAIEmbeddings(
             openai_api_key=config.openai_api_key,
             model=config.search_embedding_model)
-        logger.info('reading FAISS documentation cache')
         db_cache = config.db_cache_sources[config.db_cache]
+        logger.info(f'reading FAISS documentation cache from {db_cache}')
         self._db = FAISS.load_local(Path(db_cache), self._embeddings_model,
                                     allow_dangerous_deserialization=True)
         if config.search_docs_distance_metric == 'cosine':
