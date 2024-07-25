@@ -27,10 +27,8 @@ def model(sigmund, model, **kwargs):
     if model == 'claude-3-haiku':
         from ._anthropic_model import AnthropicModel
         return AnthropicModel(sigmund, 'claude-3-haiku-20240307', **kwargs)
-    if model.startswith('mistral-'):
+    if 'mistral' in model:
         from ._mistral_model import MistralModel
-        if not model.endswith('-latest'):
-            model += '-latest'
         return MistralModel(sigmund, model, **kwargs)
     if model == 'dummy':
         from ._dummy_model import DummyModel

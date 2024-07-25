@@ -76,7 +76,7 @@ You have retrieved the following documentation to answer the user's question:
             self._sigmund.condense_model.json_mode = True
             replies = self._sigmund.condense_model.predict_multiple(prompts)
             self._sigmund.condense_model.json_mode = False
-            config.mistral_kwargs = dict()
+            # config.mistral_kwargs = dict()
             for reply, doc in zip(replies, batch):
                 doc_desc = f'{doc.metadata["url"]} ({doc.metadata["seq_num"]})'
                 try:

@@ -16,8 +16,6 @@ class MistralModel(OpenAIModel):
         from mistralai.client import MistralClient
         BaseModel.__init__(self, sigmund, **kwargs)
         self._model = model
-        if self._tool_choice is not None:
-            self._tool_choice = 'any'
         self._client = MistralClient(api_key=config.mistral_api_key)
         self._async_client = MistralAsyncClient(api_key=config.mistral_api_key)
         
@@ -44,10 +42,14 @@ class MistralModel(OpenAIModel):
                                 'content': 'Tool was executed.'})
         return BaseModel.predict(self, messages)
         
+    def _tool_call_id(self, nr):
+        # Must be a-z, A-Z, 0-9, with a length of 9
+        return f'{nr:09d}'
+        
     def _mistral_invoke(self, fnc, messages):
         # Mistral tends to get stuck in a loop where the same tool is called
         # over and over again. To fix this, we temporarily disallow tools when
-        # the last message was a tool.
+        # the last message was a tool.	
         if messages[-1]['role'] == 'tool':
             kwargs = {}
         else:

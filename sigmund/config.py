@@ -126,10 +126,10 @@ model_config = {
         'answer_model': 'claude-3.5-sonnet'
     },
     'mistral': {
-        'search_model': 'mistral-large',
-        'condense_model': 'mistral-medium',
+        'search_model': 'mistral-large-latest',
+        'condense_model': 'open-mistral-nemo',
         'public_model': 'gpt-4o-mini',
-        'answer_model': 'mistral-large'
+        'answer_model': 'mistral-large-latest'
     },
     'dummy': {
         'search_model': 'dummy',

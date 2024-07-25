@@ -29,6 +29,9 @@ class OpenAIModel(BaseModel):
             messages = self._prepare_tool_messages(messages)
         return super().predict(messages)
         
+    def _tool_call_id(self, nr):
+        return f'call_{nr}'
+        
     def _prepare_tool_messages(self, messages):
         # OpenAI requires the tool message to be linked to the previous AI
         # message with a tool_call_id. The actual content doesn't appear to
@@ -37,7 +40,7 @@ class OpenAIModel(BaseModel):
             if i == 0 or message['role'] != 'tool':
                 continue
             tool_info = json.loads(message['content'])
-            tool_call_id = f'call_{i}'
+            tool_call_id = self._tool_call_id(i)
             prev_message = messages[i - 1]
             # an assistant message should not have both content and tool calls
             prev_message['content'] = ''
