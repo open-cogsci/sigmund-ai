@@ -41,9 +41,7 @@ class read_attachment(BaseTool):
             if filename != attachment['filename']:
                 continue
             attachment = self._sigmund.database.get_attachment(attachment_id)
-            content = file_to_text(
-                attachment['filename'],
-                base64.b64decode(attachment['content']))
+            content = attachment['content']
             text = f'File name: {attachment["filename"]}\n\nFile content:\n{content}'
             result = f'''One moment please ...
         

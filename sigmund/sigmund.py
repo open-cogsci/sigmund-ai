@@ -39,7 +39,7 @@ class Sigmund:
                  search_tools: Optional[list] = None,
                  answer_tools: Optional[list] = None):
         self.user_id = user_id
-        self.database = DatabaseManager(user_id, encryption_key)
+        self.database = DatabaseManager(self, user_id, encryption_key)
         # Search first is stored as a str but should be a bool here
         self.search_first = (
             self.database.get_setting('search_first') == 'true'

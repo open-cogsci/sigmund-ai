@@ -8,7 +8,7 @@ from . import config, prompt
 logger = logging.getLogger('sigmund')
 
 
-def file_to_text(name: str, content: bytes) -> str:
+def file_to_text(name: str, content: bytes, model) -> str:
     """Generates a text representation of a file, based on its name and 
     content. If the file cannot be converted to a text representation, 
     'No description' is returned. The representation is limited to the maximum
@@ -43,17 +43,22 @@ def file_to_text(name: str, content: bytes) -> str:
         text_representation = content.decode('utf-8', errors='ignore')
     text_representation = text_representation.strip()[
         :config.max_text_representation_length]
+    if len(text_representation) > config.text_respresentation_summary_threshold:
+        original_length = len(text_representation)
+        text_representation = model.predict(
+            prompt.render(prompt.SUMMARIZE_PROMPT,
+                          text_representation=text_representation))
+        logger.info(f'summarized from {original_length} to {len(text_representation)}')
     if not text_representation:
         return 'No description'
     return text_representation
 
 
-def describe_file(name: str, content: bytes, model: str) -> str:
+def describe_file(name: str, content: bytes, model) -> str:
     """Generates an LLM description of a file based on its name and content."""
     return model.predict(
-        prompt.render(prompt.DESCRIBE_PROMPT,
-                      name=name,
-                      text_representation=file_to_text(name, content)))
+        prompt.render(prompt.DESCRIBE_PROMPT, name=name,
+                      text_representation=content))
 
 
 def attachments_prompt(db) -> str:

@@ -42,7 +42,10 @@ condense_chunk_length = 10000
 #
 # The maximum length of the text representation of an attachment that is used
 # to generate a description
-max_text_representation_length = 30000
+max_text_representation_length = 100000
+# The maximum length of the text representation that is not summarized. Beyond
+# this, the text is summarized rather than stored in its entirety.
+text_respresentation_summary_threshold = 30000
 
 # LIBRARY INDEXING
 #
@@ -53,7 +56,7 @@ chunk_throttle = .1
 
 # MESSAGES
 # The maximum length of a user message
-max_message_length = 5000
+max_message_length = 10000
 # A fixed welcome message
 welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! How can I help you?
 

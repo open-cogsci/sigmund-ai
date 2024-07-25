@@ -1,8 +1,9 @@
 import json
 import logging
 import time
+import base64
 from datetime import datetime, timedelta
-from .. import config
+from .. import config, attachments
 from .models import db, User, Conversation, Attachment, Activity, \
     Subscription, Setting
 from .encryption import EncryptionManager
@@ -10,11 +11,14 @@ from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 logger = logging.getLogger('sigmund')
+ATTACHMENT_PREFIX = '::plain-text-attachment::'
 
 
 class DatabaseManager:
     
-    def __init__(self, username: str, encryption_key: [str, bytes]=None):
+    def __init__(self, sigmund, username: str,
+                 encryption_key: [str, bytes]=None):
+        self._sigmund = sigmund
         self.username = username
         self.encryption_manager = EncryptionManager(encryption_key)
         self.ensure_user_exists()
@@ -185,6 +189,7 @@ class DatabaseManager:
         and description keys, where content is a base64-encoded str.
         """
         try:
+            attachment_data['plaintext'] = True
             json_data = json.dumps(attachment_data)
             encrypted_data = self.encryption_manager.encrypt_data(
                 json_data.encode('utf-8'))
@@ -199,11 +204,20 @@ class DatabaseManager:
 
     def get_attachment(self, attachment_id: int) -> dict:
         try:
-            attachment = Attachment.query.filter_by(
+            attachment_record = Attachment.query.filter_by(
                 attachment_id=attachment_id, user_id=self.user_id).one()
-            decrypted_data = self.encryption_manager.decrypt_data(
-                attachment.data)
-            return json.loads(decrypted_data)
+            attachment = json.loads(
+                self.encryption_manager.decrypt_data(attachment_record.data))
+            # Old attachments are stored as binary blobs and need to be
+            # explicitly converted to text. These can be recognized by the
+            # fact that they do not start with the attachment prefix
+            if not attachment.get('plaintext', False):
+                logger.info('attachment stored as binary, decoding')
+                attachment['content'] = attachments.file_to_text(
+                    attachment['filename'],
+                    base64.b64decode(attachment['content']),
+                    self._sigmund.condense_model)
+            return attachment
         except NoResultFound:
             logger.warning(f"Attachment {attachment_id} not found or does not "
                            f"belong to user {self.user_id}")

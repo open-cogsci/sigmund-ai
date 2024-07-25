@@ -53,6 +53,11 @@ Filename: {{ name }}
 <TEXT>
 {{ text_representation }}
 </TEXT>'''
+SUMMARIZE_PROMPT = '''Provide a long comprehensive summary of the following text:
+
+<TEXT>
+{{ text_representation }}
+</TEXT>'''
 PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide a summary in a single bullet point using this format: "- [title](url): description (max 2 sentences)". Only reply with bullet points.
     
 {{ documentation }}

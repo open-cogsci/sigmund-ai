@@ -1,5 +1,4 @@
 import json
-import base64
 import logging
 from werkzeug.utils import secure_filename
 from flask import request, jsonify, Response, redirect, session, \
@@ -148,12 +147,13 @@ def add_attachment():
     if file.filename == '':
         return jsonify(success=False, message="No selected file"), 400
     filename = secure_filename(file.filename)
-    content = file.read()
+    content = attachments.file_to_text(filename, file.read(),
+                                       sigmund.condense_model)
     file.seek(0)
     description = attachments.describe_file(filename, content,
                                             sigmund.condense_model)
     attachment_data = {'filename': filename,
-                       'content': base64.b64encode(content).decode('utf-8'),
+                       'content': content,
                        'description': description}
     attachment_id = sigmund.database.add_attachment(attachment_data)
     if attachment_id == -1:
@@ -168,8 +168,7 @@ def get_attachment(attachment_id):
     sigmund = get_sigmund()
     attachment_data = sigmund.database.get_attachment(attachment_id)
     if attachment_data:
-        decoded_content = base64.b64decode(attachment_data['content'])
-        response = make_response(decoded_content)
+        response = make_response(attachment_data['content'])
         response.headers['Content-Type'] = 'application/octet-stream'
         response.headers['Content-Disposition'] = \
             f'attachment; filename={attachment_data["filename"]}'
