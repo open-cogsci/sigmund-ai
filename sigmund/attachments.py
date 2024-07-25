@@ -15,7 +15,10 @@ def file_to_text(name: str, content: bytes, model) -> str:
     length as specified in the config.
     """
     suffix = os.path.splitext(name)[1].lower()
-    if suffix == '.pdf':
+    if suffix in ['.txt', '.md']:
+        # File formats that don't need any processing
+        text_representation = content.decode('utf-8', errors='ignore')
+    elif suffix == '.pdf':
         try:
             text_representation = extract_text(io.BytesIO(content))
         except Exception as e:
