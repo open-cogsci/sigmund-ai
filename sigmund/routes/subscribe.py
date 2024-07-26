@@ -157,8 +157,7 @@ def webhook():
     elif event_type == 'invoice.payment_succeeded':
         # Attempt to get the user-specific database instance based on the
         # stripe customer id
-        database = DatabaseManager.from_stripe_customer_id(
-            None, stripe_customer_id)
+        database = DatabaseManager.from_stripe_customer_id(stripe_customer_id)
         # For new subscriptions, this fails because the link between the 
         # stripe customer id and the sigmund user id still needs to be 
         # established in checkout.session.completed, which is fired later.

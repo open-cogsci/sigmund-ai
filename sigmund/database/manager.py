@@ -311,7 +311,7 @@ class DatabaseManager:
         ).first()
         if not user_record:
             return None
-        return DatabaseManager(username=user_record.username)
+        return DatabaseManager(None, username=user_record.username)
 
     def get_setting(self, key: str) -> str:
         """Retrieve a setting value for the current user, which is available
