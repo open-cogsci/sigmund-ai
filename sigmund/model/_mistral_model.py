@@ -16,6 +16,12 @@ class MistralModel(OpenAIModel):
         from mistralai.client import MistralClient
         BaseModel.__init__(self, sigmund, **kwargs)
         self._model = model
+        # Mistral doesn't allow a tool to be specified by name. So if this
+        # happens, we instead use the 'any' option, which forces use of the
+        # best fitting tool, which in the case of a single tool boils down to
+        # the same thing as forcing the tool by name.
+        if self._tool_choice not in [None, 'none', 'auto', 'any']:
+            self._tool_choice = 'any'
         self._client = MistralClient(api_key=config.mistral_api_key)
         self._async_client = MistralAsyncClient(api_key=config.mistral_api_key)
         
