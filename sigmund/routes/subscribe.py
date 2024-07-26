@@ -144,7 +144,7 @@ def webhook():
     # for subscription renewals, which are handled below.
     if event_type == 'checkout.session.completed':
         sigmund_user_id = event_object['client_reference_id']
-        database = DatabaseManager(sigmund_user_id)
+        database = DatabaseManager(None, sigmund_user_id)
         database.update_subscription(
             stripe_customer_id=stripe_customer_id,
             stripe_subscription_id=stripe_subscription_id)
