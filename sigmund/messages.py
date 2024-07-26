@@ -146,6 +146,9 @@ class Messages:
         condense_messages = []
         while condense_length < config.condense_chunk_length:
             role, content = self._condensed_message_history.pop(0)
+            if role == 'tool' and \
+                    len(content) > config.large_tool_result_length:
+                continue
             condense_length += len(content)
             condense_messages.insert(0, (role, content))
         logger.info(f'condensing {len(condense_messages)} messages')
