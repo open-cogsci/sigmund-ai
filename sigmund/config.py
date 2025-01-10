@@ -58,12 +58,7 @@ chunk_throttle = .1
 # The maximum length of a user message
 max_message_length = 10000
 # A fixed welcome message
-welcome_message_with_search = '''Nice to meet you! I am Sigmund, your friendly OpenSesame assistant! How can I help you?
-
-<div class="message-notification">I am currently functioning as an OpenSesame expert. <a href="/user_question_guide">Learn how to ask effective questions.</a> If you want to discuss things that are not related to OpenSesame, <a href="/api/conversation/new/without_search">click here</a> to turn me into a regular chatbot that has access to a wider range of tools.</div>'''
-welcome_message_without_search = '''Nice to meet you! I am Sigmund, your friendly AI assistant! What would you like to discuss?
-
-<div class="message-notification">I am currently functioning as a regular chatbot. In this mode I can do <a href="/about">lots of things</a>, but I cannot read the OpenSesame documentation. Therefore, if you want help with OpenSesame, <a href="/api/conversation/new/with_search">click here</a> to turn me into an OpenSesame expert.</div>'''
+welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant! How can I help you?'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 # The number of previous messages for which tool results should be 
@@ -160,16 +155,20 @@ answer_tools_without_search = ['read_attachment', 'search_google_scholar',
 #
 # These are default values for settings, which are stored in the database.
 settings_default = {
-    # Indicates whether documentation should be searched before answering the 
-    'search_first': 'true',
     # Indicates the model configuration as specified above
-    'model_config': 'openai'
+    'model_config': 'openai',
+    # Indicates which tools are available in generic assistant mode
+    'mode': 'opensesame',
+    'tool_read_attachment': 'true',
+    'tool_download': 'true',
+    'tool_execute_code': 'true',
+    'tool_read_attachment': 'true',
+    'tool_search_google_scholar': 'true',
+    'tool_generate_image': 'true'
 }
 
 # DOCUMENTATION
 #
-# Jow the search-first option appears in the menu
-search_first_menu_label = 'OpenSesame expert'
 # Topic sources are used to feed in specific chunks of documentation that are
 # relevant to a topic.
 topic_sources = {

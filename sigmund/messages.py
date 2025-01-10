@@ -127,9 +127,7 @@ class Messages:
             yield role, message, metadata
 
     def welcome_message(self):
-        if self._sigmund.search_first:
-            return config.welcome_message_with_search
-        return config.welcome_message_without_search
+        return config.welcome_message
         
     def _condense_message_history(self):
         system_prompt = self._system_prompt()

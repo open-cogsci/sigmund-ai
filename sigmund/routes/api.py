@@ -65,24 +65,6 @@ def new_conversation():
     sigmund = get_sigmund()
     sigmund.database.new_conversation()
     return redirect('/chat')
-    
-
-@api_blueprint.route('/conversation/new/with_search')
-@login_required
-def new_conversation_with_search():
-    sigmund = get_sigmund()
-    sigmund.database.set_setting('search_first', 'true')
-    sigmund.database.new_conversation()
-    return redirect('/chat')
-    
-
-@api_blueprint.route('/conversation/new/without_search')
-@login_required
-def new_conversation_without_search():
-    sigmund = get_sigmund()
-    sigmund.database.set_setting('search_first', 'false')
-    sigmund.database.new_conversation()
-    return redirect('/chat')
 
 
 @api_blueprint.route('/conversation/clear')

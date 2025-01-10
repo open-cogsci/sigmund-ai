@@ -76,7 +76,6 @@ def chat_page():
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=sigmund.user_id,
-                        search_first_menu_label=config.search_first_menu_label,
                         settings=json.dumps(settings))
 
 

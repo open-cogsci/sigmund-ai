@@ -30,6 +30,12 @@
             </div>
             <div id="message-counter" style="text-align: right;"></div>
         </div>
+        <script>
+        // Show menu on new discussoin
+        if (document.getElementById('response').children.length < 2) {
+            app.__vue__.toggleMenu()
+        }
+        </script>
         {% include 'footer.html' %}
     </div>
 </body>

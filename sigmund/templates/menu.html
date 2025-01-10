@@ -1,164 +1,91 @@
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-
-<style>
-.menu-icon {
-  cursor: pointer;
-  position: fixed; /* Changed from absolute to fixed */
-  background-color: white;
-  top: 10px;
-  right: 10px;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  transition: background-color 0.3s ease; /* Smooth transition for the background color */
-}
-
-.menu-icon:hover {
-  color: #00796b; /* Change to your preferred hover color */
-}
-
-.menu {
-  border-radius: 4px;
-  display: none;
-  position: fixed; /* Changed from absolute to fixed */
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid #ccc;
-  background: #fff;
-  padding: 10px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1000; /* Ensure the menu is above other content */
-}
-
-.menu.active {
-    display: block;
-}
-
-.menu div {
-  padding: 5px 10px; /* Add padding for better hit area and visual appeal */
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Smooth transition for the background color */
-}
-
-.menu div:hover {
-  background-color: #e8e8e8; /* Change to your preferred hover color */
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1001;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.modal.active {
-  display: block; /* This will display the modal when the 'active' class is applied */
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  border-radius: 4px;
-  width: 80%;
-}
-
-.delete-convo,
-.delete-attachment,
-.close {
-  color: #aaa;
-  float: right;
-}
-
-.delete-convo:hover,
-.delete-convo:focus,
-.delete-attachment:hover,
-.delete-attachment:focus,
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-#attachment-heading,
-#conversation-heading {
-  min-height: 40px;
-}
-
-.attachment-filename,
-.conversation-title {
-  color: #0077cc; /* or any color you prefer */
-  cursor: pointer;
-  text-decoration: underline; /* Optional: to make it look more like a link */
-}
-
-.attachment-upload {
-  position: relative;
-  margin-top: 20px;
-}
-.file-upload-wrapper {
-  overflow: hidden;
-  position: relative;
-  display: inline-block;
-}
-.file-upload-input {
-  font-size: 100px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-.file-upload-button {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  display: inline-block;
-  padding: 6px 12px;
-  cursor: pointer;
-}
-.file-upload-button .fa-cloud-upload-alt {
-  margin-right: 8px;
-}
-#uploadMessage {
-  margin-bottom: 20px;
-}
-
-.menu-divider {
-  border: none;
-  height: 1px;
-  background-color: #e8e8e8;
-  margin: 8px 0;
-}
-</style>
-
 {% raw %}
 <div id="app">
-  <div ref="menu" class="menu" v-bind:class="{ 'active': menuVisible }">
-    <div @click="navigateTo(getNewConversationUrl())">New conversation</div>
+  <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
+    <div ref="menuCloseButton" class="close"><i class="fas fa-window-close"></i></div>
+    <div class="mode-selector">
+        <label>Mode:</label>
+        <div class="mode-buttons">
+            <button 
+                @click="mode = 'opensesame'" 
+                :class="{ active: mode === 'opensesame' }">
+                <img src="/static/opensesame.png" alt="OpenSesame Icon">
+                <span>OpenSesame expert</span>
+            </button>
+            <button 
+                @click="mode = 'academic'" 
+                :class="{ active: mode === 'academic' }">
+                <img src="/static/research-assistant.png" alt="Academic Icon">
+                <span>Research assistant</span>
+            </button>
+        </div>
+    </div>    
+    <div class="tools-section" v-show="mode === 'academic'">
+        <label>Tools:</label>
+        <div class="tool-item">
+            <input type="checkbox" 
+                   id="tool-search-google-scholar" 
+                   v-model="tool_search_google_scholar">
+            <label for="tool-search-google-scholar">Google Scholar</label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox" 
+                   id="tool-execute-code" 
+                   v-model="tool_execute_code">
+            <label for="tool-execute-code">Code execution</label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox" 
+                   id="tool-generate-image" 
+                   v-model="tool_generate_image">
+            <label for="tool-generate-image">Image generation</label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox" 
+                   id="tool-download" 
+                   v-model="tool_download">
+            <label for="tool-download">Download</label>
+        </div>            
+        <div class="tool-item">
+            <input type="checkbox" 
+                   id="tool-read-attachment" 
+                   v-model="tool_read_attachment">
+            <label for="tool-read-attachment">Attachments</label>
+        </div>            
+    </div>
+    <hr class="menu-divider">
+    <!-- Model selection -->
+    <div class="model-selector">
+        <label>AI model:</label>
+        <div class="model-buttons">
+            <button 
+                @click="modelConfig = 'openai'" 
+                :class="{ active: modelConfig === 'openai' }">
+                <!-- Icon for OpenAI model -->
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span>OpenAI<br><small>GPT4o</small></span>
+            </button>
+            <button 
+                @click="modelConfig = 'anthropic'" 
+                :class="{ active: modelConfig === 'anthropic' }">
+                <!-- Icon for Anthropic model -->
+                <img src="/static/anthropic.png" alt="Anthropic Icon">
+                <span>Anthropic<br><small>Claude 3.5</small></span>
+            </button>
+            <button 
+                @click="modelConfig = 'mistral'" 
+                :class="{ active: modelConfig === 'mistral' }">
+                <!-- Icon for Mistral model -->
+                <img src="/static/mistral.png" alt="Mistral Icon">
+                <span>Mistral<br><small>Large</small></span>
+            </button>
+        </div>
+    </div>    
+    <hr class="menu-divider">
+    <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <div @click="showAttachments">Browse attachments</div>
-    <hr class="menu-divider">
-    <div @click="toggleSearchFirst"><i :class="searchFirstIcon"></i>&nbsp; {{ searchFirstLabel }}</div>
-    <hr class="menu-divider">
-    <!-- Model selection -->
-    <div>
-      <label for="model-selection">Model: </label>
-      <select id="model-selection" v-model="modelConfig">
-        <option value="openai">OpenAI (GPT4o)</option>
-        <option value="anthropic">Anthropic (Claude 3.5)</option>
-        <option value="mistral">Mistral (Large)</option>
-      </select>
-    </div>
-    <hr class="menu-divider">
+    <hr class="menu-divider">    
     <div @click="navigateTo('/about')">About</div>
     <div @click="navigateTo('/terms')">Terms and conditions</div>
     <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
@@ -251,44 +178,36 @@ new Vue({
     showManageSubscriptions: {{ subscription_required|lower }},
     attachments: {},
     isUploading: false,
-    searchFirstLabel: "{{ search_first_menu_label }}",
-    searchFirstIcon: (sigmundSettings.search_first === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off',
-    forceModelConfigUpdate: 0
+    modelConfig: sigmundSettings.model_config,
+    forceModelConfigUpdate: 0,
+    mode: sigmundSettings.mode,
+    tool_download: sigmundSettings.tool_download === 'true',
+    tool_execute_code: sigmundSettings.tool_execute_code === 'true',
+    tool_generate_image: sigmundSettings.tool_generate_image === 'true',
+    tool_read_attachment: sigmundSettings.tool_read_attachment === 'true',
+    tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
+    shouldShowNewConversationButton: true
   },
   computed: {
     sortedConversations() {
       return Object.entries(this.conversations)
         .map(([id, [title, timestamp]]) => ({ id, title, timestamp }))
         .sort((a, b) => b.timestamp - a.timestamp);
-    },
-    searchFirst: {
-      get() {
-        this.menuVisible;  // depend on this to force update
-        return sigmundSettings.search_first;
-      },
-      set(value) {
-        sigmundSettings.search_first = value;
-        this.searchFirstIcon = (value === 'true') ? 'fas fa-toggle-on' : 'fas fa-toggle-off';
-        setSetting('search_first', value);
-        this.forceModelConfigUpdate += 1;
-      }
-    },
-    modelConfig: {
-      get() {
-        this.menuVisible;  // depend on this to force update
-        this.forceModelConfigUpdate;  // depend on this to force update
-        return sigmundSettings.model_config;
-      },
-      set(value) {
-        sigmundSettings.model_config = value;
-        setSetting('model_config', value);
-      }
     }
+  },
+  watch: {
+    modelConfig(value) { setSetting('model_config', value); },
+    mode(value) { setSetting('mode', value); },
+    tool_download(value) { setSetting('tool_download', value); },
+    tool_execute_code(value) { setSetting('tool_execute_code', value); },
+    tool_generate_image(value) { setSetting('tool_generate_image', value); },
+    tool_read_attachment(value) { setSetting('tool_read_attachment', value); },
+    tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); }
   },
   methods: {
     closeMenu(event) {
       // Only close the menu if the click was not inside the menu
-      if (!this.$refs.menu.contains(event.target)) {
+      if (this.$refs.menuCloseButton.contains(event.target) || !this.$refs.menu.contains(event.target)) {
         this.menuVisible = false;
         window.removeEventListener('click', this.closeMenu);
       }
@@ -296,10 +215,9 @@ new Vue({
     getNewConversationUrl() {
       return '/api/conversation/new';
     },
-    toggleSearchFirst: function() {
-      this.searchFirst = (sigmundSettings.search_first === 'true' ? 'false' : 'true')
-    },
     toggleMenu: function() {
+      const responseElement = document.getElementById('response');
+      this.shouldShowNewConversationButton = responseElement.children.length > 1;
       this.menuVisible = !this.menuVisible;
       // Attach an event handler to close the menu when the window is clicked.
       // This is done in a timeout to avoid it from being invoked directly as

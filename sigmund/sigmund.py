@@ -42,7 +42,7 @@ class Sigmund:
         self.database = DatabaseManager(self, user_id, encryption_key)
         # Search first is stored as a str but should be a bool here
         self.search_first = (
-            self.database.get_setting('search_first') == 'true'
+            self.database.get_setting('mode') == 'opensesame'
             if search_first is None else search_first)
         self.model_config = config.model_config[
             self.database.get_setting('model_config')
@@ -57,7 +57,10 @@ class Sigmund:
             if self.search_first:
                 answer_tools = config.answer_tools_with_search
             else:
-                answer_tools = config.answer_tools_without_search
+                answer_tools = [
+                    t for t in config.answer_tools_without_search
+                    if self.database.get_setting(f'tool_{t}') == 'true'
+                ]
         # Tools are class names from the tools module, which need to be
         # instantiated with sigmund (self) as first argument
         self.search_tools = [getattr(tools, t)(self) for t in search_tools]
