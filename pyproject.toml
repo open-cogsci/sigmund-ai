@@ -49,4 +49,4 @@ test = [
 ]
 [project.urls]
 Documentation = "https://sigmundai.eu"
-Source = "https://github.com/smathot/sigmundai"
+Source = "https://github.com/open-cogsci/sigmund-ai"
