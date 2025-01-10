@@ -1,0 +1,204 @@
+.menu-icon {
+  cursor: pointer;
+  position: fixed; /* Changed from absolute to fixed */
+  background-color: white;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease; /* Smooth transition for the background color */
+}
+
+.menu-icon:hover {
+  color: #00796b; /* Change to your preferred hover color */
+}
+
+.menu {
+  border-radius: 4px;
+  display: none;
+  position: fixed; /* Changed from absolute to fixed */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000; /* Ensure the menu is above other content */
+}
+
+.menu.active {
+    display: block;
+}
+
+.menu div {
+  padding: 5px 10px; /* Add padding for better hit area and visual appeal */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition for the background color */
+}
+
+.menu div:hover {
+  background-color: #e8e8e8; /* Change to your preferred hover color */
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal.active {
+  display: block; /* This will display the modal when the 'active' class is applied */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.delete-convo,
+.delete-attachment,
+.close {
+  color: #aaa;
+  float: right;
+}
+
+.delete-convo:hover,
+.delete-convo:focus,
+.delete-attachment:hover,
+.delete-attachment:focus,
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#attachment-heading,
+#conversation-heading {
+  min-height: 40px;
+}
+
+.attachment-filename,
+.conversation-title {
+  color: #0077cc; /* or any color you prefer */
+  cursor: pointer;
+  text-decoration: underline; /* Optional: to make it look more like a link */
+}
+
+.attachment-upload {
+  position: relative;
+  margin-top: 20px;
+}
+.file-upload-wrapper {
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+}
+.file-upload-input {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-upload-button {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.file-upload-button .fa-cloud-upload-alt {
+  margin-right: 8px;
+}
+#uploadMessage {
+  margin-bottom: 20px;
+}
+
+.menu-divider {
+  border: none;
+  height: 1px;
+  background-color: #e8e8e8;
+  margin: 8px 0;
+}
+
+
+.mode-buttons,
+.model-buttons {
+    padding: 0px!important;
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.mode-buttons button,
+.model-buttons button {
+    flex-grow: 1;
+    border: none;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.mode-buttons button.active,
+.model-buttons button.active {
+    background-color: #007BFF; /* Highlight active button */
+    color: white;
+}
+
+.mode-buttons button img,
+.model-buttons button img {
+    width: 40px; /* Size of the icon */
+    height: 40px;
+    margin-bottom: 5px; /* Space between icon and text */
+}
+
+.mode-buttons button span,
+.model-buttons button span {
+    font-size: 14px; /* Text size */
+}
+
+.mode-buttons button:hover,
+.model-buttons button:hover {
+    background-color: #e0e0e0; /* Hover effect */
+}
+
+
+.scrollable-menu {
+    max-height: 100%; /* Set a maximum height */
+    overflow-y: auto; /* Enables vertical scrolling when necessary */
+}
+
+/* Optional: style the scrollbar for webkit browsers */
+.scrollable-menu::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.scrollable-menu::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Color of the scrollbar handle */
+    border-radius: 10px; /* Roundness of the scrollbar handle */
+}
+
+.scrollable-menu::-webkit-scrollbar-thumb:hover {
+    background-color: #999; /* Color when hovered */
+}
