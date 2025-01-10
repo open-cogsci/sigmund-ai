@@ -4,7 +4,7 @@
     
     <p>Designed to answer questions about OpenSesame</p>
     <p>Helps with data analysis and literature search</p>
-    <p>Conversations are encrypted and will not used to train AI</p>
+    <p>Conversations are encrypted and will not be used to train AI</p>
 
 </div>
 
