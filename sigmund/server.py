@@ -2,6 +2,7 @@ import os
 os.environ['USE_FLASK_SQLALCHEMY'] = '1'
 from flask import Flask, Config, request
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from . import config
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
     google_login_blueprint, public_blueprint
@@ -30,7 +31,8 @@ def create_app(config_class=SigmundConfig):
         db.create_all()
     # Initialize login manager
     login_manager = LoginManager()
-    
+    # Set up database migration
+    migrate = Migrate(app, db)
     @login_manager.user_loader
     def load_user(user_id):
         return User(user_id)
