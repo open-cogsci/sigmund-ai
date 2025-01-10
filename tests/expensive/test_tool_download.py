@@ -4,7 +4,7 @@ from .expensive_test_utils import BaseExpensiveTest
 class TestToolsDownload(BaseExpensiveTest):
     
     def _test_tool(self):
-        query = 'Can you download https://www.biorxiv.org/content/10.1101/2023.12.05.570327v1.full.pdf for me?'
+        query = 'Can you download https://raw.githubusercontent.com/open-cogsci/sigmund-ai/refs/heads/master/readme.md for me?'
         n = len(self.sigmund.database.list_attachments())
         for reply, metadata in self.sigmund.send_user_message(query):
             print(reply)

@@ -16,7 +16,7 @@ class TestApiChat(BaseRoutesTestCase):
         self.login()
         
     def test_chat_without_search(self):
-        self.client.post('/api/setting/set', json={'search_first': 'false'})
+        self.client.post('/api/setting/set', json={'mode': 'academic'})
         response = self.client.post('/api/chat/start', json={
             'message': 'hello'
         })
@@ -33,7 +33,7 @@ class TestApiChat(BaseRoutesTestCase):
                 assert data['action'] == 'close'
                 
     def test_chat_with_search(self):
-        self.client.post('/api/setting/set', json={'search_first': 'true'})
+        self.client.post('/api/setting/set', json={'mode': 'opensesame'})
         response = self.client.post('/api/chat/start', json={
             'message': 'hello'
         })

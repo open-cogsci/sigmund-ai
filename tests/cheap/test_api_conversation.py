@@ -12,7 +12,7 @@ class TestApiConversation(BaseRoutesTestCase):
                 
     def test_new_conversation(self):
         # Add some content to the conversation to make it count
-        self.client.post('/api/setting/set', json={'search_first': 'false'})
+        self.client.post('/api/setting/set', json={'mode': 'academic'})
         response = self.client.post('/api/chat/start', json={
             'message': 'dummy'
         })
@@ -34,7 +34,7 @@ class TestApiConversation(BaseRoutesTestCase):
 
     def test_delete_conversation(self):
         # Add some content to the conversation to make it count
-        self.client.post('/api/setting/set', json={'search_first': 'false'})
+        self.client.post('/api/setting/set', json={'mode': 'opensesame'})
         response = self.client.post('/api/chat/start', json={
             'message': 'dummy'
         })
