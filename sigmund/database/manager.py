@@ -55,6 +55,10 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error retrieving message {message_id}: {e}")
             return {}
+            
+    def get_message_history(self, conversation_data):
+        message_ids = conversation_data.get('message_history', [])
+        return [self.get_message(msg_id) for msg_id in message_ids]
     
     def add_message(self, conversation_id: int, message_data: dict) -> int:
         json_data = json.dumps(message_data)
@@ -133,8 +137,7 @@ class DatabaseManager:
             logger.warning(f"No active conversation to update for user {self.user_id}")
             return False    
 
-    def list_conversations(self) -> dict:
-        
+    def list_conversations(self, query=None) -> dict:
         conversations = {}
         user = User.query.filter_by(user_id=self.user_id).one()
         for conversation in \
@@ -146,9 +149,22 @@ class DatabaseManager:
                 if len(data.get('message_history', [])) < 2 and \
                         user.active_conversation_id != conversation.conversation_id:
                     continue
+                title = data.get('title', 'Untitled conversation')
+                if query is not None:
+                    # First check title match
+                    if query.lower() not in title.lower():
+                        # If the title doesn't match, then we do a full-text
+                        # search on the message history
+                        match = False
+                        for message in self.get_message_history(data):
+                            message_text = message[1]
+                            if query.lower() in message_text.lower():
+                                match = True
+                                break
+                        if not match:
+                            continue
                 conversations[conversation.conversation_id] = (
-                     data.get('title', 'Untitled conversation'),
-                     data.get('last_updated', time.time()))
+                     title, data.get('last_updated', time.time()))
             except Exception as e:
                 logger.error(f"Error decrypting conversation data: {e}")
         return conversations

@@ -202,3 +202,16 @@
 .scrollable-menu::-webkit-scrollbar-thumb:hover {
     background-color: #999; /* Color when hovered */
 }
+
+.search-conversations {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.search-conversations input {
+  flex-grow: 1;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

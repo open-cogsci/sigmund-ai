@@ -87,11 +87,12 @@ def activate_conversation(conversation_id):
     return redirect('/chat')
 
 
-@api_blueprint.route('/conversation/list', methods=['GET', 'POST'])
+@api_blueprint.route('/conversation/list', methods=['GET'])
 @login_required
 def list_conversations():
     sigmund = get_sigmund()
-    return jsonify(sigmund.database.list_conversations())
+    query = request.args.get('query', None)
+    return jsonify(sigmund.database.list_conversations(query))
     
 
 @api_blueprint.route('/conversation/delete/<int:conversation_id>',

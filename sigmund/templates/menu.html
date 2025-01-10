@@ -97,6 +97,10 @@
       <div id='conversation-heading'>Conversations
         <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
       </div>
+      <!-- Search input and button -->
+      <div class="search-conversations">
+          <input v-model="searchQuery" @keydown.enter="fetchConversations" type="text" placeholder="Search …">
+      </div>      
       <div id="loadingConversationsMessage" v-show="isLoadingConversations">Loading conversations …</div>
       <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
         <span v-if="index !== 0" class="delete-convo" @click="deleteConversation(conversation.id)">
@@ -190,7 +194,8 @@ new Vue({
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
     shouldShowNewConversationButton: true,
     isLoadingConversations: true,
-    isLoadingAttachments: true
+    isLoadingAttachments: true,
+    searchQuery: ''
   },
   computed: {
     sortedConversations() {
@@ -244,17 +249,19 @@ new Vue({
     closeModal: function() {
       this.showModal = false;
     },
-    fetchConversations: function() {
-      fetch('/api/conversation/list')
-        .then(response => response.json())
-        .then(data => {
-          console.log(data);
-          this.conversations = data;
-          this.isLoadingConversations = false;
-        })
-        .catch(error => {
-          console.error('Error fetching conversations:', error);
-        });
+    fetchConversations(query = '') {
+        this.conversations = {};
+        this.isLoadingConversations = true;
+        fetch(`/api/conversation/list?query=${encodeURIComponent(this.searchQuery)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                this.conversations = data;
+                this.isLoadingConversations = false;
+            })
+            .catch(error => {
+                console.error('Error fetching conversations:', error);
+            });
     },
     activateConversation: function(conversationId) {
       this.navigateTo(`/api/conversation/activate/${conversationId}`);
