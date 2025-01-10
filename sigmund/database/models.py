@@ -55,6 +55,34 @@ class Conversation(Model):
 
     conversation_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.user_id'))
+    # Data corresponds to an encrypted blob. After encryption, it becomes a
+    # JSON string with the following format:
+    # {
+    #     "condensed_text": "A summary",
+    #     "message_history": [
+    #         message_id1,
+    #         message_id2
+    #     ],
+    #     "condensed_message_history": [
+    #         { message object1 },
+    #         { message object2 }
+    #     ]
+    #     'title': self._conversation_title,
+    # }
+    # The message_ids refer to entries in the message table below. For older
+    # conversations, the message_ids may instead by dicts. The 
+    # DatabaseManager.get_message() function takes care of this.
+    data = Column(LargeBinary)
+
+
+class Message(Model):
+    __tablename__ = 'message'
+
+    message_id = Column(Integer, primary_key=True)
+    conversation_id = Column(Integer,
+                             ForeignKey('conversation.conversation_id'))
+    # Data corresponds to an encrypted blob. After encryption, it becomes a
+    # JSON string.
     data = Column(LargeBinary)
 
 

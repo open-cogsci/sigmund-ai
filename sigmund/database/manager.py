@@ -5,7 +5,7 @@ import base64
 from datetime import datetime, timedelta
 from .. import config, attachments
 from .models import db, User, Conversation, Attachment, Activity, \
-    Subscription, Setting
+    Subscription, Setting, Message
 from .encryption import EncryptionManager
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
@@ -36,19 +36,52 @@ class DatabaseManager:
             db.session.commit()
             self.user_id = user.user_id
             self.new_conversation()
-
+    
+    def get_message(self, message_id: int) -> dict:
+        # If it's not an int, then it's an old-style mesage
+        if not isinstance(message_id, int):
+            return message_id
+        try:
+            # First, check if the message exists in the new Message table
+            message = Message.query.filter_by(message_id=message_id).first()
+            if message:
+                # If it exists, decrypt and return the message
+                decrypted_data = self.encryption_manager.decrypt_data(message.data)
+                return json.loads(decrypted_data)
+            else:
+                # If it doesn't exist, assume it's an old-style message
+                # embedded in conversation data, and return as is
+                return message_id
+        except Exception as e:
+            logger.error(f"Error retrieving message {message_id}: {e}")
+            return {}
+    
+    def add_message(self, conversation_id: int, message_data: dict) -> int:
+        json_data = json.dumps(message_data)
+        encrypted_data = self.encryption_manager.encrypt_data(
+            json_data.encode('utf-8'))
+        message = Message(conversation_id=conversation_id, data=encrypted_data)
+        db.session.add(message)
+        db.session.commit()
+        return message.message_id
+    
     def get_active_conversation(self) -> dict:
         try:
             user = User.query.filter_by(user_id=self.user_id).one()
             conversation = Conversation.query.filter_by(
                 conversation_id=user.active_conversation_id).one()
-            decrypted_data = self.encryption_manager.decrypt_data(
-                conversation.data)
-            return json.loads(decrypted_data)
+            decrypted_data = self.encryption_manager.decrypt_data(conversation.data)
+            conversation_data = json.loads(decrypted_data)
+    
+            # Fetch and decrypt messages
+            message_ids = conversation_data.get('message_history', [])
+            message_history = [self.get_message(msg_id) for msg_id in message_ids]
+            conversation_data['message_history'] = message_history
+    
+            return conversation_data
         except NoResultFound:
-            logger.warning(
-                f"No active conversation found for user {self.user_id}")
-            return {}
+            logger.warning(f"No active conversation found for user {self.user_id}")
+            return {}    
 
     def set_active_conversation(self, conversation_id: int) -> bool:
         try:
@@ -74,23 +107,31 @@ class DatabaseManager:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
             return False
-
+    
     def update_active_conversation(self, conversation_data: dict) -> bool:
         try:
             user = User.query.filter_by(user_id=self.user_id).one()
             conversation = Conversation.query.filter_by(
                 conversation_id=user.active_conversation_id).one()
+    
+            # Extract messages and store them separately
+            message_history = conversation_data.pop('message_history', [])
+            message_ids = []
+            for message in message_history:
+                message_id = self.add_message(conversation.conversation_id, message)
+                message_ids.append(message_id)
+    
+            conversation_data['message_history'] = message_ids
             conversation_data['last_updated'] = time.time()
+    
             json_data = json.dumps(conversation_data)
-            encrypted_data = self.encryption_manager.encrypt_data(
-                json_data.encode('utf-8'))
+            encrypted_data = self.encryption_manager.encrypt_data(json_data.encode('utf-8'))
             conversation.data = encrypted_data
             db.session.commit()
             return True
         except NoResultFound:
-            logger.warning(
-                f"No active conversation to update for user {self.user_id}")
-            return False
+            logger.warning(f"No active conversation to update for user {self.user_id}")
+            return False    
 
     def list_conversations(self) -> dict:
         
@@ -133,7 +174,7 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error creating new conversation: {e}")
             return False
-
+    
     def delete_conversation(self, conversation_id: int) -> bool:
         try:
             user = User.query.filter_by(user_id=self.user_id).one()
@@ -144,13 +185,18 @@ class DatabaseManager:
                     f"Cannot delete active conversation {conversation_id} for "
                     f"user {self.user_id}")
                 return False
+
+            # Delete associated messages
+            Message.query.filter_by(conversation_id=conversation_id).delete()
+
+            # Delete the conversation
             db.session.delete(conversation)
             db.session.commit()
             return True
         except NoResultFound:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
-            return False
+            return False    
 
     def list_attachments(self) -> dict:
         attachments = Attachment.query.filter_by(user_id=self.user_id).all()
@@ -277,6 +323,9 @@ class DatabaseManager:
         now = datetime.utcnow()
         subscription = Subscription.query.filter_by(
             user_id=self.user_id).first()
+        print(now)
+        print(subscription.from_date)
+        print(subscription.to_date)
         return subscription and \
             subscription.from_date <= now < subscription.to_date
 
