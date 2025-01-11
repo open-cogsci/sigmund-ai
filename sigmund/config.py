@@ -80,7 +80,7 @@ max_tokens_per_hour_exceeded_message = 'You have reached the hourly usage limit.
 #
 # When set to True, replies will be logged. This should disabled during 
 # production for privacy.
-log_replies = False
+log_replies = os.environ.get('SIGMUND_LOG_REPLIES', False)
 
 # MODELS
 #
@@ -227,9 +227,16 @@ def process_ai_message(msg):
     # This pattern looks for a colon possibly followed by any number of 
     # whitespaces # and/or HTML tags, followed by a newline and a dash, and 
     # replaces it with a colon, newline, newline, and dash
-    pattern = r':\s*(<[^>]+>\s*)?\n-'
-    replacement = ':\n\n-'
-    return re.sub(pattern, replacement, msg)
+    # pattern = r':\s*(<[^>]+>\s*)?\n-'
+    pattern = r':\s*(<[^>]+>\s*)?\n(?=-|\d+\.)'
+    replacement = ':\n\n'
+    msg = re.sub(pattern, replacement, msg)
+    # If the message doesn't start with a letter, then it may start with some
+    # markdown character that we should properly interpret, and thus needs to
+    # be on a newline preceded by an empty line.
+    if msg and not msg[0].isalpha():
+        msg = '\n\n' + msg
+    return msg
     
 
 def validate_user(username, password):
