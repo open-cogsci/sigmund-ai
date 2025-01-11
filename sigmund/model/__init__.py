@@ -3,6 +3,9 @@ from ._base_model import BaseModel
 
 def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
+    if model == 'o1':
+        from ._openai_model import OpenAIModel
+        return OpenAIModel(sigmund, 'o1', **kwargs)
     if model in ('gpt-4', 'gpt-4o'):
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, 'gpt-4o', **kwargs)

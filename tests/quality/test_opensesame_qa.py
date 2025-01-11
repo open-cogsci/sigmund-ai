@@ -112,6 +112,12 @@ def test_openai():
     config.settings_default['model_config'] = 'openai'
     init_testlog()
     score_testcases()
+
+
+def test_openai_o1():
+    config.settings_default['model_config'] = 'openai_o1'
+    init_testlog()
+    score_testcases()
     
 
 def test_mistral():

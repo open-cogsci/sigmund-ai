@@ -112,7 +112,13 @@ model_config = {
         'search_model': 'gpt-4o-mini',
         'condense_model': 'gpt-4o-mini',
         'public_model': 'gpt-4o-mini',
-        'answer_model': 'gpt-4'
+        'answer_model': 'o1'
+    },
+    'openai_o1': {
+        'search_model': 'gpt-4o-mini',
+        'condense_model': 'gpt-4o-mini',
+        'public_model': 'gpt-4o-mini',
+        'answer_model': 'o1'
     },
     'anthropic': {
         'search_model': 'claude-3.5-sonnet',
