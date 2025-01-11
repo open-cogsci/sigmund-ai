@@ -339,9 +339,6 @@ class DatabaseManager:
         now = datetime.utcnow()
         subscription = Subscription.query.filter_by(
             user_id=self.user_id).first()
-        print(now)
-        print(subscription.from_date)
-        print(subscription.to_date)
         return subscription and \
             subscription.from_date <= now < subscription.to_date
 
