@@ -69,21 +69,21 @@
         <div id="login">
             <div id="start-text">{{ login_text|safe }}</div>
             <div id="login-modal" class="modal">
-            <div class="modal-content">
-            <span class="close">&times;</span>
-            <form method="POST" id="login-form">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                {{ form.username.label }} {{ form.username() }}
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <form method="POST" id="login-form">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            {{ form.username.label }} {{ form.username(autocomplete='username') }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password.label }} {{ form.password(autocomplete='current-password') }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.submit() }}
+                        </div>
+                    </form>
                 </div>
-                <div class="form-group">
-                {{ form.password.label }} {{ form.password() }}
-                </div>
-                <div class="form-group">
-                {{ form.submit() }}
-                </div>
-            </form>
-            </div>
             </div>
         </div>
         {% include 'footer.html' %}
