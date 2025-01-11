@@ -6,7 +6,7 @@ Sigmund is a powerful, privacy-focused AI assistant (or chatbot). It is a web ap
 
 ## Sigmund is an OpenSesame expert
 
-If OpenSesame-expert mode is enabled (in the menu), Sigmund searches for relevant sections in the documentation of [OpenSesame](https://osdoc.cogsci.nl/), a program for developing psychology and cognitive-neuroscience experiments. Sigmund also receives a set of fixed instructions designed to enhance its general knowledge of OpenSesame. Sigmund subsequently uses this information to answer questions, and to provide links to relevant pages from the documentation. This technique, which is a variation of so-called Retrieval-Augmented Generation, allows Sigmund to answer questions about OpenSesame much better than other chatbots.
+If OpenSesame-expert mode is enabled (in the menu), Sigmund searches for relevant sections in the documentation of [OpenSesame](https://osdoc.cogsci.nl/), a program for developing psychology and cognitive-neuroscience experiments. Sigmund also receives a set of fixed instructions designed to enhance its general knowledge of OpenSesame. Sigmund subsequently uses this information to answer questions, and to provide links to relevant pages from the documentation. This technique, which is a variation of so-called [Retrieval-Augmented Generation](https://en.wikipedia.org/wiki/Retrieval-augmented_generation), allows Sigmund to answer questions about OpenSesame much better than other chatbots.
 
 Sigmund is especially good at generating code for (Python) inline_script or inline_javascript items. Try it!
 
@@ -23,14 +23,14 @@ I want to create a stimulus display in OpenSesame, using a canvas in a Python in
 
 ## Sigmund respects your privacy
 
-Your messages and attachments are encrypted based on a key that is linked to your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
+Your messages and attachments are encrypted based on a key that is derived from your password. This means that no-one, not even the administrators of Sigmund, are able to access your data. 
 
 Sigmund uses large-language-model APIs provided by third parties. You can choose which model you want to use in the menu. Importantly, none of these third parties uses data that is sent through the API for any purposes other than replying to the request. Specifically, your data will *not* be used to train their models. For more information, see the terms of service of [OpenAI](https://openai.com/enterprise-privacy), [Anthropic](https://www.anthropic.com/legal/commercial-terms), and [Mistral](https://mistral.ai/terms/).
 
 
-## Things Sigmund can do
+## Tools that Sigmund can use
 
-The following capabilities are only available when OpenSesame-expert mode is disabled. (This is to avoid overwhelming the model with instructions.)
+The following tools are only available when Research-assistant mode is disabled. (This is to avoid overwhelming the model with instructions in OpenSesame-expert mode.)
 
 ### Search Google Scholar
 
@@ -85,4 +85,7 @@ The source code of Sigmund is available on GitHub:
 
 ## How can I get an account?
 
-First, create an account on <https://forum.cogsci.nl/>. Next, use this account to login to Sigmund.
+There are two ways to log-in to Sigmund:
+
+- With your Google Account. This also includes organizational accounts that use Google Log-in.
+- With your CogSci forum account. If you do not already have a forum account, create one <https://forum.cogsci.nl/>. Next, use this account to login to Sigmund.
