@@ -112,7 +112,7 @@ model_config = {
         'search_model': 'gpt-4o-mini',
         'condense_model': 'gpt-4o-mini',
         'public_model': 'gpt-4o-mini',
-        'answer_model': 'o1'
+        'answer_model': 'gpt-4o'
     },
     'openai_o1': {
         'search_model': 'gpt-4o-mini',
