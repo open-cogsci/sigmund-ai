@@ -2,6 +2,7 @@ import html
 import logging
 import textwrap
 import time
+import re
 from flask import render_template, render_template_string
 import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
@@ -15,8 +16,6 @@ logger = logging.getLogger('sigmund')
 
 
 def md(text):
-    if '<REPORTED>' in text or '<FINISHED>' in text:
-        return text
     return markdown.markdown(text,
                              extensions=[FencedCodeExtension(),
                                          CodeHiliteExtension(),
@@ -118,6 +117,23 @@ def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
         logger.info('adding continue message')
         messages.append(HumanMessage(content='Please continue!'))
     return messages
+
+
+def extract_workspace(txt: str) -> tuple:
+    """Takes a string of text. If the text contains a workspace indicated like
+    this: `<workspace>your workspace content</workspace>` then the content
+    should be extracted and returned as the second value of the tuple. The
+    workspace tags and the content should be stripped from the txt. If there
+    is no workspace, then the txt should be left as is, and the workspace
+    return value should be None."""
+    workspace_pattern = re.compile(r'<workspace>(.*?)</workspace>',
+                                   re.IGNORECASE | re.DOTALL)
+    match = workspace_pattern.search(txt)
+    if match:
+        workspace_content = match.group(1)
+        txt = workspace_pattern.sub('', txt)
+        return txt, workspace_content.strip()
+    return txt, None
 
 
 def current_datetime():

@@ -18,6 +18,7 @@ class Messages:
     def __init__(self, sigmund, persistent=False):
         self._sigmund = sigmund
         self._persistent = persistent
+        self.workspace = None
         if self._persistent:
             self.load()
         else:
@@ -168,8 +169,10 @@ class Messages:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITH_SEARCH]
         else:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
-        system_prompt.append(
-            attachments.attachments_prompt(self._sigmund.database))
+        system_prompt.append(prompt.render(
+            prompt.WORKSPACE_PROMPT, workspace=self.workspace))
+        # system_prompt.append(
+        #     attachments.attachments_prompt(self._sigmund.database))
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.

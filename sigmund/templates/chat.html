@@ -13,7 +13,17 @@
         </button>
     </div>
     {% include 'menu.html' %}
+    
+<!-- CodeMirror CSS (replace with the version/theme you prefer) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
+  <!-- Optional theme, e.g., darcula -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/darcula.min.css">
+
+    <button id="toggleBtn">Toggle Workspace</button>
     <div id="container">
+        <div id="workspace-area">
+            <textarea id="workspace"></textarea>
+        </div>
         <div id="chat-area">
             <div id="response">{{ message_history | safe }}</div>
             <div id="loading-message"></div>

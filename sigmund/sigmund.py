@@ -8,8 +8,7 @@ from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
 from .model import model
 from .database.manager import DatabaseManager
-from . import prompt
-from . import tools
+from . import prompt, tools, utils
 logger = logging.getLogger('sigmund')
 
 
@@ -84,27 +83,30 @@ class Sigmund:
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
     
-    def send_user_message(self, message: str,
-                          message_id: str=None) -> GeneratorType:
+    def send_user_message(self, message: str, workspace: str = None,
+                          message_id: str = None) -> GeneratorType:
         """The main function that takes a user message and returns one or 
         replies. This is a generator function where each yield gives a tuple.
         
-        This tuple can be (dict, dict) in which case the first dict contains an 
-        action and a message key. This communicates to the client that an 
-        action should be taking, such that the loading indicator should change.
-        This tuple can also be (str, dict) in which case the str contains an
-        AI message and the dict contains metadata for the message.
+        This tuple can be (dict, dict, str) in which case the first dict 
+        contains an action and a message key. This communicates to the client 
+        that an action should be taking, such that the loading indicator should
+        change. This tuple can also be (str, dict, str) in which case the first
+        str contains an AI message and the dict contains metadata for the 
+        message. The third element corresponds to the content of the workspace,
+        and can be None if empty.
         """
         if self._rate_limit_exceeded():
             yield config.max_tokens_per_hour_exceeded_message, \
-                    self.messages.metadata()
+                    self.messages.metadata(), None
             return
+        self.messages.workspace = workspace
         self.messages.append('user', message, message_id)
         if self.search_first:
-            for reply, metadata in self._search(message):
-                yield reply, metadata
-        for reply, metadata in self._answer():
-            yield reply, metadata
+            for reply, metadata, workspace in self._search(message):
+                yield reply, metadata, workspace
+        for reply, metadata, workspace in self._answer():
+            yield reply, metadata, workspace
             
     def _rate_limit_exceeded(self):
         tokens_consumed_past_hour = self.database.get_activity()
@@ -115,7 +117,7 @@ class Sigmund:
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
         yield {'action': 'set_loading_indicator',
-               'message': f'{config.ai_name} is searching '}, {}
+               'message': f'{config.ai_name} is searching '}, {}, None
         logger.info('[search state] entering')
         self.documentation.clear()
         # First seach based on the user question
@@ -139,7 +141,8 @@ class Sigmund:
     def _answer(self, state: str = 'answer') -> GeneratorType:
         """Implements the answer phase."""
         yield {'action': 'set_loading_indicator',
-               'message': f'{config.ai_name} is thinking and typing '}, {}        
+               'message': f'{config.ai_name} is thinking and typing '}, {}, \
+              None
         logger.info(f'[{state} state] entering')
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
@@ -162,17 +165,18 @@ class Sigmund:
                         f'[{state} state] model does not support feedback')
                     needs_feedback = False
             metadata = self.messages.append('assistant', tool_message)
-            yield tool_message, metadata
+            yield tool_message, metadata, None
             # If the tool has a result, yield and remember it
             if tool_result:
                 metadata = self.messages.append('tool',
                                                 json.dumps(tool_result))
                 if tool_result['content']:
-                    yield tool_result['content'], metadata
+                    yield None, metadata, tool_result['content']
         # Otherwise the reply is a regular AI message
         else:
+            reply, workspace = utils.extract_workspace(reply)
             metadata = self.messages.append('assistant', reply)
-            yield reply, metadata
+            yield reply, metadata, workspace
             # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
             # to indicate that it wants to perform additional actions. This makes 
             # it easier to perform tasks consisting of multiple responses and 
@@ -191,4 +195,5 @@ class Sigmund:
         # because the AI sent a NOT_DONE_YET marker, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
             for reply, metadata in self._answer(state='feedback'):
-                yield reply, metadata
+                reply, workspace = utils.extract_workspace(reply)
+                yield reply, metadata, workspace

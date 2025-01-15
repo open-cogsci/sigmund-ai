@@ -18,6 +18,7 @@ redis_client = Redis()
 def api_chat_start():
     data = request.json
     session['user_message'] = data.get('message', '')
+    session['workspace'] = data.get('workspace', None)
     session['message_id'] = data.get('message_id', None)
     sigmund = get_sigmund()
     redis_client.delete(f'stream_cancel_{sigmund.user_id}')
@@ -37,19 +38,24 @@ def api_chat_cancel_stream():
 @login_required
 def api_chat_stream():
     message = session['user_message']
+    workspace = session['workspace']
+    print(f'workspace: {workspace}')
     message_id = session['message_id']
     sigmund = get_sigmund()
     logger.info(f'starting stream for {sigmund.user_id}')
     def generate():
-        for reply, metadata in sigmund.send_user_message(message, message_id):
+        for reply, metadata, output_workspace in sigmund.send_user_message(
+                message, workspace, message_id):
             if isinstance(reply, dict):
                 reply = json.dumps(reply)
             else:
                 reply = json.dumps(
                     {'response': utils.md(
                         f'{config.ai_name}: {config.process_ai_message(reply)}'),
-                     'metadata': metadata})
+                     'metadata': metadata,
+                     'workspace': output_workspace})
             logger.debug(f'ai message: {reply}')
+            logger.debug(f'ai workspace: {output_workspace}')
             yield f'data: {reply}\n\n'
             if redis_client.get(f'stream_cancel_{sigmund.user_id}'):
                 logger.info(f'stream cancelled for {sigmund.user_id}')

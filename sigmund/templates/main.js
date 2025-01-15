@@ -1,21 +1,11 @@
 function globalElements(event) {
     window.responseDiv = document.getElementById('response');
     window.loadingMessageDiv = document.getElementById('loading-message');
-    window.documentationDiv = document.getElementById('documentation');
-    window.courseInput = document.getElementById('course');
-    window.chapterInput = document.getElementById('chapter');
-    window.chatmodeInput = document.getElementById('chatmode');
     window.sendButton = document.getElementById('send');
     window.cancelButton = document.getElementById('cancel');
     window.messageInput = document.getElementById('message');
     window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
-    window.chatArea = document.getElementById('chat-area');
-    window.startInfo = document.getElementById('start-info');
-    window.startButton = document.getElementById('start');
-    window.courseGroup = document.getElementById("courseGroup");
-    window.chapterGroup = document.getElementById("chapterGroup");
-    window.exampleQueries = document.getElementById("example-queries");
     window.scrollTo(0, document.body.scrollHeight);
 }
 
@@ -54,6 +44,30 @@ function initMain(event) {
         messageInput.value = '';
         sendMessage(message);
     });
+    
+
+    // Initialize CodeMirror
+    window.workspace = CodeMirror.fromTextArea(document.getElementById("workspace"), {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "darcula", // optional
+    });
+    // We’ll toggle visibility of the workspace-area
+    var toggleBtn = document.getElementById('toggleBtn');
+    var workspaceArea = document.getElementById('workspace-area');
+    toggleBtn.addEventListener('click', function() {
+      if (workspaceArea.classList.contains('hidden')) {
+        // Show workspace
+        workspaceArea.classList.remove('hidden');
+        // When CodeMirror is initially hidden, you may need a short delay or refresh to fix layout
+        setTimeout(function() {
+          editor.refresh();
+        }, 100);
+      } else {
+        // Hide workspace
+        workspaceArea.classList.add('hidden');
+      }
+    });    
 }
 
 function generateUUID() {
@@ -119,7 +133,7 @@ async function sendMessage(message) {
     await fetchWithRetry('{{ server_url }}/api/chat/start', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: requestBody(message, user_message_id)
+        body: requestBody(message, workspace.getValue(), user_message_id)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
     });
@@ -147,6 +161,8 @@ async function sendMessage(message) {
             return
         }
         const metadata = data.metadata
+        // Update the workspace if any new information was given
+        if (typeof data.workspace !== null) workspace.setValue(data.workspace)
         // If the message is an actual message, we add it to the chat window
         // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');
@@ -248,9 +264,10 @@ function deleteMessage(messageId) {
 
 
 
-function requestBody(message, user_message_id) {
+function requestBody(message, workspace, user_message_id) {
     return JSON.stringify({
         message: message,
+        workspace: workspace,
         message_id: user_message_id
     })
 }
