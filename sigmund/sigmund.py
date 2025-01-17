@@ -165,13 +165,15 @@ class Sigmund:
                         f'[{state} state] model does not support feedback')
                     needs_feedback = False
             metadata = self.messages.append('assistant', tool_message)
-            yield tool_message, metadata, None
-            # If the tool has a result, yield and remember it
+            # If the tool has a result, yield it as the workspace content,
+            # and remember it in the mssage history
             if tool_result:
                 metadata = self.messages.append('tool',
                                                 json.dumps(tool_result))
-                if tool_result['content']:
-                    yield None, metadata, tool_result['content']
+                workspace = tool_result['content']
+            else:
+                workspace = None
+            yield tool_message, metadata, workspace
         # Otherwise the reply is a regular AI message
         else:
             reply, workspace = utils.extract_workspace(reply)
@@ -194,6 +196,5 @@ class Sigmund:
         # If feedback is required, either because the tools require it or 
         # because the AI sent a NOT_DONE_YET marker, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
-            for reply, metadata in self._answer(state='feedback'):
-                reply, workspace = utils.extract_workspace(reply)
+            for reply, metadata, workspace in self._answer(state='feedback'):
                 yield reply, metadata, workspace

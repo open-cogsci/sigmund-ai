@@ -3,6 +3,7 @@
 body {
     background-color: #ECEFF1;
     font-family: "Roboto Light", sans-serif;
+    margin: 0px;
 }
 
 h1 {
@@ -82,16 +83,15 @@ a:visited {
     text-align: right;
     font-family: 'Roboto Condensed';
     margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 #footer-bar a {
     color: gray;
 }
 
-#sign-out,
-#container {
+#sign-out {
     margin: auto;
-    max-width: 600px;
 }
 
 #sign-out {
@@ -103,7 +103,6 @@ a:visited {
 #header-bar {
     display: flex;
     justify-content: center;
-    max-width: 599px;
     margin: 0 auto
 }
 
@@ -427,4 +426,54 @@ button#start {
 .menu small {
     font-family: "Roboto Condensed";
     color: #aaa;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#code-editor {
+    background-color: #f0f0f0;
+    overflow: auto;
+}
+
+#chat-area {
+    background-color: #e0e0e0;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 10px 10px 0px 10px;
+}
+
+/* Large screens */
+@media (min-width: 768px) {
+    #container {
+        flex-direction: row;
+    }
+    
+    .CodeMirror {
+        height: 100vh!important;
+    }
+
+    #code-editor {
+        flex: 1;
+        height: 100vh;
+    }
+
+    #chat-area {
+        width: 600px;
+        height: calc(100vh - 10px);
+    }
+}
+
+/* Small screens */
+@media (max-width: 767px) {
+    #code-editor {
+        height: 190px; /* Adjust as needed */
+    }
+
+    #chat-area {
+        height: calc(100vh - 200px); /* Adjust as needed */
+    }
 }

@@ -44,18 +44,12 @@ class execute_code(BaseTool):
             response_data = response.json()
             result = response_data.get("run", {}).get("output", "").strip()
             logger.info(f'result: {result}')
-            result = f'''I executed the following code:
-
-```{language}
-{code}
-```
-
-And received the following output:
+            message = f'''I added code to the workspace, executed it, and received the following output:
 
 ```
 {result}
 ```
 '''
-            return 'Executing code ...', result, True
+            return message, code, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
-        return 'Failed to execute code', '', True
+        return 'Failed to execute code', code, True

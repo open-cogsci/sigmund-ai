@@ -46,28 +46,12 @@ function initMain(event) {
     });
     
 
-    // Initialize CodeMirror
+    // Initialize CodeMirror workspace editor
     window.workspace = CodeMirror.fromTextArea(document.getElementById("workspace"), {
       lineNumbers: true,
       mode: "javascript",
-      theme: "darcula", // optional
-    });
-    // We’ll toggle visibility of the workspace-area
-    var toggleBtn = document.getElementById('toggleBtn');
-    var workspaceArea = document.getElementById('workspace-area');
-    toggleBtn.addEventListener('click', function() {
-      if (workspaceArea.classList.contains('hidden')) {
-        // Show workspace
-        workspaceArea.classList.remove('hidden');
-        // When CodeMirror is initially hidden, you may need a short delay or refresh to fix layout
-        setTimeout(function() {
-          editor.refresh();
-        }, 100);
-      } else {
-        // Hide workspace
-        workspaceArea.classList.add('hidden');
-      }
-    });    
+      theme: "darcula",
+    })
 }
 
 function generateUUID() {
@@ -162,7 +146,8 @@ async function sendMessage(message) {
         }
         const metadata = data.metadata
         // Update the workspace if any new information was given
-        if (typeof data.workspace !== null) workspace.setValue(data.workspace)
+        debugger
+        if (data.workspace !== null) workspace.setValue(data.workspace)
         // If the message is an actual message, we add it to the chat window
         // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');

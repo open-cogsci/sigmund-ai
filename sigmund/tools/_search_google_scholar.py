@@ -30,10 +30,6 @@ class search_google_scholar(BaseTool):
                 results.append(info)
                 if i >= 3:
                     break
-        results = f'''I found {len(results)} articles ...
-        
-<div class="google-scholar-search-results">
-{json.dumps(results)}
-</div>'''
-        return 'Searching for articles on Google Scholar ...', \
-            results, True
+        message = f'I found {len(results)} articles and added them to the workspace.'
+        results = json.dumps(results, indent='  ')
+        return message, results, True

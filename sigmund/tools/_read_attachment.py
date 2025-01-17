@@ -41,13 +41,7 @@ class read_attachment(BaseTool):
             if filename != attachment['filename']:
                 continue
             attachment = self._sigmund.database.get_attachment(attachment_id)
-            content = attachment['content']
-            text = f'File name: {attachment["filename"]}\n\nFile content:\n{content}'
-            result = f'''One moment please ...
-        
-<div class="attachment-content">
-{text}
-</div>'''            
-            return 'I am going to read the attached file now.', result, True
+            message = f'I have added {attachment["filename"]} to the workspace.'
+            return message, attachment['content'], True
         return 'Something went wrong while trying to read the attachment', \
             '', False
