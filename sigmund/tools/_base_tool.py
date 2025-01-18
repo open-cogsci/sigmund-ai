@@ -43,15 +43,22 @@ class BaseTool:
         """
         def bound_tool_function():
             try:
-                message, result, needs_feedback = self(**json.loads(args))
+                tool_response = self(**json.loads(args))
             except Exception as e:
                 message = 'Failed to run tool'
                 result = f'The following error occurred while trying to run tool:\n\n{e}'
                 needs_feedback = True
+            if len(tool_response) == 3:
+                message, result, needs_feedback = tool_response
+                language = 'text'
+            elif len(tool_response) == 4:
+                message, result, language, needs_feedback = tool_response
+            else:
+                raise ValueError(f'Invalid tool response: {tool_response}')
             result = {'name': self.name,
                       'args': args,
                       'content': result}
-            return message, result, needs_feedback
+            return message, result, language, needs_feedback
         return bound_tool_function
         
     def __call__(self) -> Tuple[str, Optional[str], bool]:

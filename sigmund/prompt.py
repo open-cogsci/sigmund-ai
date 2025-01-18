@@ -64,12 +64,12 @@ PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide 
 '''
 WORKSPACE_PROMPT = '''# Workspace
 
-The workspace is shared between you and the user. You can add code, images, and text to the workspace by including `<workspace>your workspace content</workspace>` in your reply. The user can also add content to the workspace.
+The workspace is the main place to share content with the user. You can add code, images, and text to the workspace by adding `<workspace language="workspace language">your workspace content</workspace>` to the end of your reply. The user can also share content with you through the workspace.
 
 Currently the workspace contains the following content:
 
-<workspace>
-{{ workspace }}
+<workspace language="{{ workspace_language}} ">
+{{ workspace_content }}
 </workspace>
 '''
 

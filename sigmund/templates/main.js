@@ -7,6 +7,8 @@ function globalElements(event) {
     window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
     window.scrollTo(0, document.body.scrollHeight);
+    window.workspaceLanguageSelect = document.getElementById('workspace-language');
+    window.clearWorkspaceButton = document.getElementById('clear-workspace');
 }
 
 function initMain(event) {
@@ -45,13 +47,21 @@ function initMain(event) {
         sendMessage(message);
     });
     
-
     // Initialize CodeMirror workspace editor
     window.workspace = CodeMirror.fromTextArea(document.getElementById("workspace"), {
-      lineNumbers: true,
-      mode: "javascript",
+      lineNumbers: false,
+      mode: "markdown",
       theme: "darcula",
+      tabSize: 4
     })
+    workspaceLanguageSelect.addEventListener("change", function() {
+        console.log('Changing workspace language to', this.value);
+        window.workspace.setOption("mode", this.value);
+    });
+    clearWorkspaceButton.addEventListener("click", function() {
+        console.log('clearing workspace');
+        window.workspace.setValue("");
+    });    
 }
 
 function generateUUID() {
@@ -117,7 +127,7 @@ async function sendMessage(message) {
     await fetchWithRetry('{{ server_url }}/api/chat/start', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: requestBody(message, workspace.getValue(), user_message_id)
+        body: requestBody(message, workspace.getValue(), workspace.getOption('mode'), user_message_id)
     }).catch(e => {
         console.error('Failed to start chat session:', e);
     });
@@ -132,9 +142,9 @@ async function sendMessage(message) {
     // Now start streaming
     const eventSource = new EventSource('{{ server_url }}/api/chat/stream');
     eventSource.onmessage = function(event) {
+        console.log(event)
         // Parse the JSON message data
         const data = JSON.parse(event.data);
-        console.log(data)
         // If the message reflects an action, we process it separately.
         if (typeof data.action !== 'undefined') {
             if (data.action == 'close') {
@@ -146,8 +156,17 @@ async function sendMessage(message) {
         }
         const metadata = data.metadata
         // Update the workspace if any new information was given
-        debugger
-        if (data.workspace !== null) workspace.setValue(data.workspace)
+        if (data.workspace_content !== null) {
+            workspace.setValue(data.workspace_content);
+            workspace.setOption("mode", data.workspace_language);
+            // Check if the language exists in the options, if not, fall back to 'markdown'
+            const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === data.workspace_language);
+            if (languageExists) {
+                workspaceLanguageSelect.value = data.workspace_language;
+            } else {
+                workspaceLanguageSelect.value = 'markdown';
+            }
+        }
         // If the message is an actual message, we add it to the chat window
         // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');
@@ -249,10 +268,11 @@ function deleteMessage(messageId) {
 
 
 
-function requestBody(message, workspace, user_message_id) {
+function requestBody(message, workspace_content, workspace_language, user_message_id) {
     return JSON.stringify({
         message: message,
-        workspace: workspace,
+        workspace_content: workspace_content,
+        workspace_language: workspace_language,
         message_id: user_message_id
     })
 }

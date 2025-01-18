@@ -32,6 +32,17 @@
             {% include 'footer.html' %}
         </div>
         <div id="code-editor">
+            <div id="code-editor-options">
+                <select id="workspace-language">
+                  <option value="css">CSS</option>
+                  <option value="htmlmixed">HTML</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="markdown" selected>Text (Markdown)</option>
+                  <option value="python">Python</option>
+                  <option value="r">R</option>
+                </select>
+                <button id="clear-workspace">Clear</button>
+            </div>
             <textarea id="workspace"></textarea>
         </div>        
     </div>

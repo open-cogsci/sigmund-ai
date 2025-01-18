@@ -18,7 +18,8 @@ class Messages:
     def __init__(self, sigmund, persistent=False):
         self._sigmund = sigmund
         self._persistent = persistent
-        self.workspace = None
+        self.workspace_content = None
+        self.workspace_language = None
         if self._persistent:
             self.load()
         else:
@@ -120,9 +121,7 @@ class Messages:
         """
         for role, message, metadata in self:
             if role == 'tool':
-                role = 'assistant'
-                tool_results = json.loads(message)
-                message = tool_results['content']
+                continue
             if not message.strip():
                 continue
             yield role, message, metadata
@@ -170,7 +169,8 @@ class Messages:
         else:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
         system_prompt.append(prompt.render(
-            prompt.WORKSPACE_PROMPT, workspace=self.workspace))
+            prompt.WORKSPACE_PROMPT, workspace_content=self.workspace_content,
+            workspace_language=self.workspace_language))
         # system_prompt.append(
         #     attachments.attachments_prompt(self._sigmund.database))
         # For models that support this, there is also an instruction indicating

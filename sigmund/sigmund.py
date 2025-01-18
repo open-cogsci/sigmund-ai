@@ -4,9 +4,10 @@ import json
 from types import GeneratorType
 from typing import Tuple, Optional
 from . import config, library
+from .reply import Reply, ActionReply
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
-from .model import model
+from .model import model    
 from .database.manager import DatabaseManager
 from . import prompt, tools, utils
 logger = logging.getLogger('sigmund')
@@ -83,7 +84,8 @@ class Sigmund:
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
     
-    def send_user_message(self, message: str, workspace: str = None,
+    def send_user_message(self, message: str, workspace_content: str = None,
+                          workspace_language: str = 'text',
                           message_id: str = None) -> GeneratorType:
         """The main function that takes a user message and returns one or 
         replies. This is a generator function where each yield gives a tuple.
@@ -97,16 +99,17 @@ class Sigmund:
         and can be None if empty.
         """
         if self._rate_limit_exceeded():
-            yield config.max_tokens_per_hour_exceeded_message, \
-                    self.messages.metadata(), None
+            yield Reply(config.max_tokens_per_hour_exceeded_message,
+                        self.messages.metadata())
             return
-        self.messages.workspace = workspace
+        self.messages.workspace_content = workspace_content
+        self.messages.workspace_language = workspace_language
         self.messages.append('user', message, message_id)
         if self.search_first:
-            for reply, metadata, workspace in self._search(message):
-                yield reply, metadata, workspace
-        for reply, metadata, workspace in self._answer():
-            yield reply, metadata, workspace
+            for reply in self._search(message):
+                yield reply
+        for reply in self._answer():
+            yield reply
             
     def _rate_limit_exceeded(self):
         tokens_consumed_past_hour = self.database.get_activity()
@@ -116,8 +119,7 @@ class Sigmund:
     
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
-        yield {'action': 'set_loading_indicator',
-               'message': f'{config.ai_name} is searching '}, {}, None
+        yield ActionReply(f'{config.ai_name} is searching ')
         logger.info('[search state] entering')
         self.documentation.clear()
         # First seach based on the user question
@@ -140,9 +142,7 @@ class Sigmund:
     
     def _answer(self, state: str = 'answer') -> GeneratorType:
         """Implements the answer phase."""
-        yield {'action': 'set_loading_indicator',
-               'message': f'{config.ai_name} is thinking and typing '}, {}, \
-              None
+        yield ActionReply(f'{config.ai_name} is thinking and typing ')
         logger.info(f'[{state} state] entering')
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
@@ -157,7 +157,7 @@ class Sigmund:
             logger.info(f'[{state} state] reply: {reply}')
         # If the reply is a callable, then it's a tool that we need to run
         if callable(reply):
-            tool_message, tool_result, needs_feedback = reply()
+            tool_message, tool_result, tool_language, needs_feedback = reply()
             if needs_feedback:
                 logger.info(f'[{state} state] tools need feedback')
                 if not self.answer_model.supports_tool_feedback:
@@ -170,15 +170,19 @@ class Sigmund:
             if tool_result:
                 metadata = self.messages.append('tool',
                                                 json.dumps(tool_result))
-                workspace = tool_result['content']
+                workspace_content = tool_result['content']
+                workspace_language = tool_language
             else:
-                workspace = None
-            yield tool_message, metadata, workspace
+                workspace_content = None
+                workspace_language = None
+            yield Reply(tool_message, metadata, workspace_content,
+                        workspace_language)
         # Otherwise the reply is a regular AI message
         else:
-            reply, workspace = utils.extract_workspace(reply)
+            reply, workspace_content, workspace_language = \
+                utils.extract_workspace(reply)
             metadata = self.messages.append('assistant', reply)
-            yield reply, metadata, workspace
+            yield Reply(reply, metadata, workspace_content, workspace_language)
             # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
             # to indicate that it wants to perform additional actions. This makes 
             # it easier to perform tasks consisting of multiple responses and 
@@ -196,5 +200,5 @@ class Sigmund:
         # If feedback is required, either because the tools require it or 
         # because the AI sent a NOT_DONE_YET marker, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
-            for reply, metadata, workspace in self._answer(state='feedback'):
-                yield reply, metadata, workspace
+            for reply in self._answer(state='feedback'):
+                yield reply

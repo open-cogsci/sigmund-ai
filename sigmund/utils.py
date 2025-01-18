@@ -121,19 +121,24 @@ def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
 
 def extract_workspace(txt: str) -> tuple:
     """Takes a string of text. If the text contains a workspace indicated like
-    this: `<workspace>your workspace content</workspace>` then the content
-    should be extracted and returned as the second value of the tuple. The
-    workspace tags and the content should be stripped from the txt. If there
-    is no workspace, then the txt should be left as is, and the workspace
-    return value should be None."""
-    workspace_pattern = re.compile(r'<workspace>(.*?)</workspace>',
-                                   re.IGNORECASE | re.DOTALL)
-    match = workspace_pattern.search(txt)
+    this: `<workspace language="language">your workspace content</workspace>` 
+    then the language and the content should be extracted and returned as the 
+    second value of the tuple. The workspace tags and the content should be 
+    stripped from the txt. If there is no workspace, then the txt should be 
+    left as is, and the language and workspace return value should both be 
+    None. If no language is specified, it defaults to 'text'."""
+
+    pattern = r'<workspace(?: language="(.+?)")?>(.*?)</workspace>'
+    match = re.search(pattern, txt, re.DOTALL)
+
     if match:
-        workspace_content = match.group(1)
-        txt = workspace_pattern.sub('', txt)
-        return txt, workspace_content.strip()
-    return txt, None
+        language = match.group(1) if match.group(1) else 'text'
+        content = match.group(2).strip()
+        text_without_workspace = re.sub(pattern, "", txt,
+                                        flags=re.DOTALL).strip()
+        return text_without_workspace, content, language
+
+    return txt, None, None
 
 
 def current_datetime():

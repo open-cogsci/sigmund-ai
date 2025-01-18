@@ -50,6 +50,6 @@ class execute_code(BaseTool):
 {result}
 ```
 '''
-            return message, code, True
+            return message, code, language, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
-        return 'Failed to execute code', code, True
+        return 'Failed to execute code', code, language, True
