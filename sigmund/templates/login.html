@@ -2,7 +2,6 @@
 <html>
 {% include 'head.html' %}
 <body>
-    {% include 'header.html' %}
     <style>
         /* The Modal (background) */
         .modal {
@@ -65,9 +64,10 @@
         }
     
     </style>    
-    <div id="container">
+    <div id="centered-container">
+        {% include 'header.html' %}        
+        <div id="start-text">{{ login_text|safe }}</div>
         <div id="login">
-            <div id="start-text">{{ login_text|safe }}</div>
             <div id="login-modal" class="modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>

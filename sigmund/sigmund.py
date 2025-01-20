@@ -104,7 +104,11 @@ class Sigmund:
             return
         self.messages.workspace_content = workspace_content
         self.messages.workspace_language = workspace_language
-        self.messages.append('user', message, message_id)
+        self.messages.append('user', 
+                             message=message,
+                             workspace_content=workspace_content,
+                             workspace_language=workspace_language,
+                             message_id=message_id)
         if self.search_first:
             for reply in self._search(message):
                 yield reply
@@ -164,15 +168,20 @@ class Sigmund:
                     logger.info(
                         f'[{state} state] model does not support feedback')
                     needs_feedback = False
-            metadata = self.messages.append('assistant', tool_message)
             # If the tool has a result, yield it as the workspace content,
             # and remember it in the mssage history
             if tool_result:
-                metadata = self.messages.append('tool',
-                                                json.dumps(tool_result))
                 workspace_content = tool_result['content']
                 workspace_language = tool_language
+                # The workspace is included with the assistant message, because
+                # the tool message won't be exposed to the user.
+                metadata = self.messages.append(
+                    'assistant', message=tool_message,
+                    workspace_content=workspace_content,
+                    workspace_language=workspace_language)
+                self.messages.append('tool', message=json.dumps(tool_result))
             else:
+                metadata = self.messages.append('assistant', tool_message)
                 workspace_content = None
                 workspace_language = None
             yield Reply(tool_message, metadata, workspace_content,
@@ -181,7 +190,11 @@ class Sigmund:
         else:
             reply, workspace_content, workspace_language = \
                 utils.extract_workspace(reply)
-            metadata = self.messages.append('assistant', reply)
+            metadata = self.messages.append(
+                'assistant',
+                message=reply,
+                workspace_content=workspace_content,
+                workspace_language=workspace_language)
             yield Reply(reply, metadata, workspace_content, workspace_language)
             # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
             # to indicate that it wants to perform additional actions. This makes 

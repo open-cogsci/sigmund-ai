@@ -64,7 +64,25 @@ PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide 
 '''
 WORKSPACE_PROMPT = '''# Workspace
 
-The workspace is the main place to share content with the user. You can add code, images, and text to the workspace by adding `<workspace language="workspace language">your workspace content</workspace>` to the end of your reply. The user can also share content with you through the workspace.
+- The workspace is the main channel for sharing content with the user.
+- If you generate code or text, always add it into the workspace.
+- The user adds content to the workspace by editing the workspace editor in the chat interface.
+- You can add content to the workspace by including `<workspace language="workspace language">your workspace content</workspace>` in your reply, as shown in the example below.
+
+## Example reply with workspace content
+
+Here's an example of how you can include workspace content in your reply:
+
+```
+Sure, I can write a hello world function for you! See the code in the workspace.
+
+<workspace language="python">
+def hello_world():
+    print('Hello world!')
+</div>
+```
+
+## Current workspace content
 
 Currently the workspace contains the following content:
 

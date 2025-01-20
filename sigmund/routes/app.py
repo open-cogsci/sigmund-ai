@@ -36,6 +36,8 @@ def chat_page():
     html_content = ''
     previous_timestamp = None
     previous_answer_model = None
+    workspace_content = ''
+    workspace_language = 'markdown'
     for role, message, metadata in sigmund.messages.visible_messages():
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
@@ -48,6 +50,16 @@ def chat_page():
                                             escape_html=True,
                                             render=False) + '</p>'
             html_class = 'message-user'
+        if metadata.get('workspace_content', None):
+            workspace_content = metadata['workspace_content']
+            workspace_language = metadata['workspace_language']
+            workspace_div = f'''<div class="message-workspace" id="message-workspace-{message_id}">
+                <a href="#" onclick="loadMessageWorkspace('{message_id}')">Load workspace</a>
+                <pre class="workspace-content">{workspace_content}</pre>
+                <div class="workspace-language">{workspace_language}</div>
+                </div>'''
+        else:
+            workspace_div = ''
         if 'sources' in metadata:
             sources_div = '<div class="message-sources">'
             sources = json.loads(metadata['sources'])
@@ -68,7 +80,7 @@ def chat_page():
         else:
             answer_model_div = ''
             
-        html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{timestamp_div}{answer_model_div}{sources_div}</div>'
+        html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{workspace_div}{timestamp_div}{answer_model_div}{sources_div}</div>'
     # The user's settings are the defaults updated with the user-specific 
     # settings from the database
     settings = config.settings_default.copy()
@@ -76,7 +88,9 @@ def chat_page():
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=sigmund.user_id,
-                        settings=json.dumps(settings))
+                        settings=json.dumps(settings),
+                        workspace_content=workspace_content,
+                        workspace_language=workspace_language)
 
 
 def login_handler(form, failed=False):

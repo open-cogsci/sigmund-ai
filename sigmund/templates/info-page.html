@@ -2,8 +2,8 @@
 <html>
 {% include 'head.html' %}
 <body>
-    {% include 'header.html' %}
-    <div id="container">
+    <div id="centered-container">
+        {% include 'header.html' %}
         <div id="start-text">
             <p><a href="/"><i class="fas fa-home"></i> Back to main page</a></p>
         {{ content|safe }}

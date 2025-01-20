@@ -43,17 +43,23 @@ class Messages:
             [role, content] for role, content, metadata
             in self._message_history[:]]        
             
-    def metadata(self, message_id=None):
+    def metadata(self, workspace_content: str = None,
+                 workspace_language: str = None, message_id: str = None):
         return {'message_id': str(uuid.uuid4()) 
                     if message_id is None else message_id,
+                'workspace_content': workspace_content,
+                'workspace_language': workspace_language,
                 'timestamp': utils.current_datetime(),
                 'sources': self._sigmund.documentation.to_json(),
                 'search_model': self._sigmund.model_config['search_model'],
                 'condense_model': self._sigmund.model_config['condense_model'],
                 'answer_model': self._sigmund.model_config['answer_model']}
         
-    def append(self, role, message, message_id=None):
-        metadata = self.metadata(message_id=message_id)
+    def append(self, role: str, message: str, workspace_content: str = None,
+               workspace_language: str = None, message_id: str = None):
+        metadata = self.metadata(workspace_content=workspace_content,
+                                 workspace_language=workspace_language,
+                                 message_id=message_id)
         self._message_history.append([role, message, metadata])
         self._condensed_message_history.append([role, message])
         self._condense_message_history()

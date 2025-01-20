@@ -9,6 +9,7 @@ function globalElements(event) {
     window.scrollTo(0, document.body.scrollHeight);
     window.workspaceLanguageSelect = document.getElementById('workspace-language');
     window.clearWorkspaceButton = document.getElementById('clear-workspace');
+    window.workspacePlaceholder = document.getElementById('workspace-placeholder');
 }
 
 function initMain(event) {
@@ -48,12 +49,22 @@ function initMain(event) {
     });
     
     // Initialize CodeMirror workspace editor
-    window.workspace = CodeMirror.fromTextArea(document.getElementById("workspace"), {
+    const workspaceTextArea = document.getElementById("workspace");
+    const language = workspaceTextArea.getAttribute('data-mode') || 'markdown';
+    window.workspace = CodeMirror.fromTextArea(workspaceTextArea, {
       lineNumbers: false,
-      mode: "markdown",
-      theme: "darcula",
-      tabSize: 4
+      mode: language,
+      theme: "monokai",
+      tabSize: 4,
+      lineWrapping: true
     })
+    // Check if the language exists in the options, if not, fall back to 'markdown'
+    const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === language);
+    if (languageExists) {
+        workspaceLanguageSelect.value = language;
+    } else {
+        workspaceLanguageSelect.value = 'markdown';
+    }    
     workspaceLanguageSelect.addEventListener("change", function() {
         console.log('Changing workspace language to', this.value);
         window.workspace.setOption("mode", this.value);
@@ -61,7 +72,9 @@ function initMain(event) {
     clearWorkspaceButton.addEventListener("click", function() {
         console.log('clearing workspace');
         window.workspace.setValue("");
-    });    
+    });
+    workspace.on('change', updateWorkspacePlaceholder);
+    updateWorkspacePlaceholder();    
 }
 
 function generateUUID() {
@@ -155,18 +168,6 @@ async function sendMessage(message) {
             return
         }
         const metadata = data.metadata
-        // Update the workspace if any new information was given
-        if (data.workspace_content !== null) {
-            workspace.setValue(data.workspace_content);
-            workspace.setOption("mode", data.workspace_language);
-            // Check if the language exists in the options, if not, fall back to 'markdown'
-            const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === data.workspace_language);
-            if (languageExists) {
-                workspaceLanguageSelect.value = data.workspace_language;
-            } else {
-                workspaceLanguageSelect.value = 'markdown';
-            }
-        }
         // If the message is an actual message, we add it to the chat window
         // Create and append the message elements as in your existing code
         const aiMessage = document.createElement('div');
@@ -180,6 +181,27 @@ async function sendMessage(message) {
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
         deleteButton.onclick = () => deleteMessage(metadata['message_id']);
         aiMessage.prepend(deleteButton);
+        // Update the workspace if any new information was given
+        if (data.workspace_content !== null) {
+            setWorkspace(data.workspace_content, data.workspace_language)
+            const workspaceDiv = document.createElement('div');
+            workspaceDiv.className = 'message-workspace';
+            workspaceDiv.id = 'message-workspace-' + metadata['message_id'];
+            const workspaceLoadLink = document.createElement('a');
+            workspaceLoadLink.href = '#'
+            workspaceLoadLink.innerHTML = 'Load workspace';
+            workspaceLoadLink.onclick = () => loadMessageWorkspace(metadata['message_id'])
+            workspaceContentPre = document.createElement('pre');
+            workspaceContentPre.className = 'workspace-content';
+            workspaceContentPre.innerHTML = data.workspace_content;
+            workspaceLanguageDiv = document.createElement('div');
+            workspaceLanguageDiv.className = 'workspace-language';
+            workspaceLanguageDiv.innerText = data.workspace_language;
+            workspaceDiv.appendChild(workspaceLoadLink);
+            workspaceDiv.appendChild(workspaceContentPre);
+            workspaceDiv.appendChild(workspaceLanguageDiv);
+            aiMessage.appendChild(workspaceDiv);            
+        }
         // Create a div for timestamp
         const timestampDiv = document.createElement('div');
         timestampDiv.className = 'message-timestamp';
@@ -280,6 +302,34 @@ function requestBody(message, workspace_content, workspace_language, user_messag
 
 function expandMessageBox() {
     document.getElementById('message-box').classList.toggle('expanded-message-box');
+};
+
+function setWorkspace(content, language) {
+    workspace.setValue(content);
+    workspace.setOption("mode", language);
+    const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === language);
+    if (languageExists) {
+        workspaceLanguageSelect.value = language;
+    } else {
+        workspaceLanguageSelect.value = 'markdown';
+    }
+};
+
+
+function loadMessageWorkspace(id) {
+    const div = document.getElementById('message-workspace-' + id);
+    const workspaceContent = div.querySelector('.workspace-content').innerText;
+    const workspaceLanguage = div.querySelector('.workspace-language').innerText;
+    setWorkspace(workspaceContent, workspaceLanguage);
+};
+
+
+function updateWorkspacePlaceholder() {
+    if (workspace.getValue() === '') {
+        workspacePlaceholder.style.display = 'block';
+    } else {
+        workspacePlaceholder.style.display = 'none';
+    }
 };
 
 
