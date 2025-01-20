@@ -128,8 +128,8 @@ def extract_workspace(txt: str) -> tuple:
     left as is, and the language and workspace return value should both be 
     None. If no language is specified, it defaults to 'text'."""
 
-    pattern = r'<workspace(?: language="(.+?)")?>(.*?)</workspace>'
-    match = re.search(pattern, txt, re.DOTALL)
+    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)</workspace>'
+    match = re.search(pattern, txt, re.DOTALL | re.MULTILINE)
 
     if match:
         language = match.group(1) if match.group(1) else 'text'
