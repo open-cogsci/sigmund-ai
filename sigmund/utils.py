@@ -120,24 +120,45 @@ def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
 
 
 def extract_workspace(txt: str) -> tuple:
-    """Takes a string of text. If the text contains a workspace indicated like
-    this: `<workspace language="language">your workspace content</workspace>` 
-    then the language and the content should be extracted and returned as the 
-    second value of the tuple. The workspace tags and the content should be 
-    stripped from the txt. If there is no workspace, then the txt should be 
-    left as is, and the language and workspace return value should both be 
-    None. If no language is specified, it defaults to 'text'."""
-
-    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)</workspace>'
+    """Takes a string of text and extracts workspace content from it. There are
+    a few ways in which this can occur:
+    
+    - If the text contains a workspace indicated like this:
+      <workspace language="language">
+      your workspace content
+      </workspace>`
+      Then language and the content should be extracted and returned as the 
+      second value of the tuple. If no language is specified, it defaults to
+      'markdown'. The workspace tags and content should be stripped from txt.
+    - If the text doesn't contain an explicit workspace, but does contain 
+      markdown code blocks like this:
+      ```language 
+      code here
+      ```
+      Then this code should be extracted as the workspace content and language,
+      again falling back markdown if no language is provided. The markdown
+      code blocks do not have to be stripped from txt.
+      
+    Return txt, workspace_content, language
+    """
+    # Checks for <workspace> tags
+    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)^</workspace>'
     match = re.search(pattern, txt, re.DOTALL | re.MULTILINE)
-
     if match:
-        language = match.group(1) if match.group(1) else 'text'
+        language = match.group(1) if match.group(1) else 'markdown'
         content = match.group(2).strip()
         text_without_workspace = re.sub(pattern, "", txt,
-                                        flags=re.DOTALL).strip()
+                                        flags=re.DOTALL | re.MULTILINE).strip()
         return text_without_workspace, content, language
-
+    # Checks for ``` code blocks
+    pattern_codeblock = r'^```(?:([a-z]+))?\n(.*?)^```'
+    match_codeblock = re.search(pattern_codeblock, txt, re.DOTALL | re.MULTILINE)
+    if match_codeblock:
+        language = match_codeblock.group(1) if match_codeblock.group(1) else 'markdown'
+        content = match_codeblock.group(2).strip()
+        if len(content.splitlines()) > 2:
+            return txt, content, language
+    # Simply returns txt if no workspace is detected
     return txt, None, None
 
 

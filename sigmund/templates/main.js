@@ -1,5 +1,6 @@
 function globalElements(event) {
     window.responseDiv = document.getElementById('response');
+    window.chatAreaDiv = document.getElementById('chat-area');
     window.loadingMessageDiv = document.getElementById('loading-message');
     window.sendButton = document.getElementById('send');
     window.cancelButton = document.getElementById('cancel');
@@ -132,7 +133,7 @@ async function sendMessage(message) {
     sendButton.disabled = true;
     sendButton.style.display = 'none';
     cancelButton.style.display = 'block';
-    window.scrollTo(0, document.body.scrollHeight);
+    chatAreaDiv.scrollTo(0, chatAreaDiv.scrollHeight);
     
     // Start the chat streaming. We need to do this through a separate endpoint
     // because the user message may be too long to fit into the URL that we use
@@ -241,7 +242,7 @@ async function sendMessage(message) {
         // Append the AI message div to the response div, just before the 
         // loading message.
         responseDiv.insertBefore(aiMessage, responseDiv.lastElementChild);
-        window.scrollTo(0, document.body.scrollHeight);
+        aiMessage.scrollIntoViewIfNeeded()
     };
 
     eventSource.onerror = function(error) {

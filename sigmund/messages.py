@@ -108,6 +108,12 @@ class Messages:
             if role == 'assistant':
                 model_prompt.append(AIMessage(content=content))
             elif role == 'user':
+                # Prefix the last message with the current workspace
+                if msg_nr == len(self._condensed_message_history) - 1:
+                    content = prompt.render(
+                        prompt.CURRENT_WORKPACE,
+                        workspace_content=self.workspace_content,
+                        workspace_language=self.workspace_language) + content
                 model_prompt.append(HumanMessage(content=content))
             elif role == 'tool':
                 if msg_nr + config.keep_tool_results < msg_len:
@@ -174,11 +180,9 @@ class Messages:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITH_SEARCH]
         else:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
-        system_prompt.append(prompt.render(
-            prompt.WORKSPACE_PROMPT, workspace_content=self.workspace_content,
-            workspace_language=self.workspace_language))
-        # system_prompt.append(
-        #     attachments.attachments_prompt(self._sigmund.database))
+        system_prompt.append(prompt.WORKSPACE_PROMPT)
+        system_prompt.append(
+            attachments.attachments_prompt(self._sigmund.database))
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.

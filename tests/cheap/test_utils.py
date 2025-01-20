@@ -1,5 +1,5 @@
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from sigmund.utils import prepare_messages
+from sigmund.utils import prepare_messages, extract_workspace
 
 
 def test_prepare_messages():
@@ -51,3 +51,71 @@ def test_prepare_messages():
         AIMessage(content="AI message 1\nAI message 2")
     ]
     assert prepare_messages(messages, merge_consecutive=True) == expected_output
+    
+    
+def test_extract_workspace():
+    
+    s = '''Here's a simple workspace example:
+    
+<workspace language="python">
+print('hello world')
+</workspace>'''
+    txt, content, language = extract_workspace(s)
+    assert txt.strip() == "Here's a simple workspace example:"
+    assert content.strip() == "print('hello world')"
+    assert language == 'python'
+    s = '''Here's a simple workspace example:
+    
+```python
+print(1)
+print(2)
+print(3)
+```
+'''
+    txt, content, language = extract_workspace(s)
+    assert s == txt
+    assert content.strip() == "print(1)\nprint(2)\nprint(3)"
+    assert language == 'python'
+    s = '''Here's a simple workspace example:
+    
+```python
+print(1)
+```
+'''
+    txt, content, language = extract_workspace(s)
+    assert s == txt
+    assert content is None
+    assert language is None
+    s = '''Here's a simple workspace example:
+    
+<workspace>
+print('hello world')
+</workspace>'''
+    txt, content, language = extract_workspace(s)
+    assert txt.strip() == "Here's a simple workspace example:"
+    assert content.strip() == "print('hello world')"
+    assert language == 'markdown'
+    s = '''Here's a simple workspace example:
+    
+```
+print(1)
+print(2)
+print(3)
+```
+'''
+    txt, content, language = extract_workspace(s)
+    assert s == txt
+    assert content.strip() == "print(1)\nprint(2)\nprint(3)"
+    assert language == 'markdown'
+    s = '''Here's a simple workspace example:
+    
+```
+print(1)
+```
+'''
+    txt, content, language = extract_workspace(s)
+    assert s == txt
+    assert content is None
+    assert language is None
+    
+    

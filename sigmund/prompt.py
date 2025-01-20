@@ -62,19 +62,12 @@ PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide 
     
 {{ documentation }}
 '''
-WORKSPACE_PROMPT = '''# Workspace
+WORKSPACE_PROMPT = '''When providing examples or updated text or code to the user always do this through the workspace by including `<workspace language="workspace language">text or code</workspace>` in your reply.
 
-- The workspace is the main channel for sharing content with the user.
-- If you generate code or text, always add it into the workspace.
-- The user adds content to the workspace by editing the workspace editor in the chat interface.
-- You can add content to the workspace by including `<workspace language="workspace language">your workspace content</workspace>` in your reply, as shown in the example below.
-
-## Example reply with workspace content
-
-Here's an example of how you can include workspace content in your reply:
+Here is an example:
 
 ```
-Sure, I can write a hello world function for you! See the code in the workspace.
+Sure, I can write a hello world function for you! I added the code to the workspace.
 
 <workspace language="python">
 def hello_world():
@@ -82,9 +75,12 @@ def hello_world():
 </div>
 ```
 
-## Current workspace content
+Important: always use the workspace as shown above, and do *not* simply include long examples of text or code in your reply.
+'''
 
-Currently the workspace contains the following content:
+CURRENT_WORKPACE = '''## Current workspace content
+
+The workspace contains the following content:
 
 <workspace language="{{ workspace_language}} ">
 {{ workspace_content }}
