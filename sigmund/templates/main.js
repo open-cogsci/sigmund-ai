@@ -112,6 +112,37 @@ async function sendMessage(message) {
         deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
         deleteButton.onclick = () => deleteMessage(user_message_id);
         userMessageBox.prepend(deleteButton);
+        // Retrieve user workspace content
+        const userWorkspaceContent = workspace.getValue();
+        const userWorkspaceLanguage = workspace.getOption('mode');
+        // Create a workspace container if content is present
+        if (userWorkspaceContent) {
+            const userWorkspaceDiv = document.createElement('div');
+            userWorkspaceDiv.className = 'message-workspace';
+            userWorkspaceDiv.id = 'message-workspace-' + user_message_id;
+
+            const workspaceLoadLink = document.createElement('a');
+            workspaceLoadLink.href = '#';
+            workspaceLoadLink.innerHTML = 'Load workspace';
+            workspaceLoadLink.onclick = () => {
+                // Load the user workspace content back into the editor
+                setWorkspace(userWorkspaceContent, userWorkspaceLanguage);
+            };
+
+            const workspaceContentPre = document.createElement('pre');
+            workspaceContentPre.className = 'workspace-content';
+            workspaceContentPre.innerText = userWorkspaceContent;
+
+            const workspaceLanguageDiv = document.createElement('div');
+            workspaceLanguageDiv.className = 'workspace-language';
+            workspaceLanguageDiv.innerText = userWorkspaceLanguage;
+
+            userWorkspaceDiv.appendChild(workspaceLoadLink);
+            userWorkspaceDiv.appendChild(workspaceContentPre);
+            userWorkspaceDiv.appendChild(workspaceLanguageDiv);
+
+            userMessageBox.appendChild(userWorkspaceDiv);
+        }        
     }
     // Show the loading indicator and animate it
     const loadingMessageBox = document.createElement('div');
