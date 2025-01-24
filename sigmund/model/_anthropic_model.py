@@ -18,6 +18,10 @@ class AnthropicModel(BaseModel):
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)
         
     def predict(self, messages):
+        # import pprint
+        # print('=== preparing tool messages')
+        # pprint.pprint(messages)
+        # print('---')        
         if isinstance(messages, str):
             return super().predict([self.convert_message(messages)])
         messages = utils.prepare_messages(messages, allow_ai_first=False,
@@ -39,6 +43,8 @@ class AnthropicModel(BaseModel):
                     logger.info('converting tool message to user message')
                     tool_info = json.loads(message['content'])
                     message['role'] = 'user'
+                    if tool_info['content'] is None:
+                        tool_info['content'] = ''
                     message['content'] = [{
                         'type': 'tool_result',
                         'tool_use_id': str(self._tool_use_id),
@@ -72,6 +78,8 @@ class AnthropicModel(BaseModel):
                 break
             logger.info('dropping duplicate user message')
             messages.remove(next_message)
+        # pprint.pprint(messages)
+        # print('=== end preparing tool messages')                
         return super().predict(messages)
         
     def get_response(self, response):

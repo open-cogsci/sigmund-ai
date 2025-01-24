@@ -91,7 +91,7 @@ class Messages:
         if self._persistent:
             self.save()
             
-    def prompt(self, system_prompt=None, skip_large_tool_results=False):
+    def prompt(self, system_prompt=None):
         """The prompt consists of the system prompt followed by a sequence of
         AI, user, and tool/ function messages.
         
@@ -105,21 +105,19 @@ class Messages:
         msg_len = len(self._condensed_message_history)
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
+            content = utils.remove_masked_elements(content)
             if role == 'assistant':
                 model_prompt.append(AIMessage(content=content))
             elif role == 'user':
                 # Prefix the last message with the current workspace
-                if msg_nr == len(self._condensed_message_history) - 1:
+                if self.workspace_content and \
+                        msg_nr == len(self._condensed_message_history) - 1:
                     content = prompt.render(
                         prompt.CURRENT_WORKPACE,
                         workspace_content=self.workspace_content,
                         workspace_language=self.workspace_language) + content
                 model_prompt.append(HumanMessage(content=content))
             elif role == 'tool':
-                if msg_nr + config.keep_tool_results < msg_len:
-                    continue
-                if len(content) > config.large_tool_result_length:
-                    continue
                 model_prompt.append(FunctionMessage(content=content,
                                                     name='tool_function'))
             else:
@@ -144,9 +142,12 @@ class Messages:
     def _condense_message_history(self):
         system_prompt = self._system_prompt()
         messages = [{"role": "system", "content": system_prompt}]
-        prompt_length = sum(len(content) for role, content
-                            in self._condensed_message_history
-                            if role != 'tool')
+        # Determine the effective length of the uncondensed prompt while
+        # excluding masked content
+        prompt_length = sum([
+            len(utils.remove_masked_elements(content))
+            for role, content in self._condensed_message_history
+        ])
         logger.info(f'system prompt length: {len(system_prompt)}')
         logger.info(f'prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
@@ -154,11 +155,10 @@ class Messages:
             return
         condense_length = 0
         condense_messages = []
-        while condense_length < config.condense_chunk_length:
-            role, content = self._condensed_message_history.pop(0)
-            if role == 'tool' and \
-                    len(content) > config.large_tool_result_length:
-                continue
+        while self._condensed_message_history and \
+                condense_length < config.condense_chunk_length:
+            role, content = self._condensed_message_history.pop()
+            content = utils.remove_masked_elements(content)
             condense_length += len(content)
             condense_messages.insert(0, (role, content))
         logger.info(f'condensing {len(condense_messages)} messages')

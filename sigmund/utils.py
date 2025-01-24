@@ -1,6 +1,7 @@
 import html
 import logging
 import textwrap
+from bs4 import BeautifulSoup
 import time
 import re
 from flask import render_template, render_template_string
@@ -149,6 +150,10 @@ def extract_workspace(txt: str) -> tuple:
         content = match.group(2).strip()
         text_without_workspace = re.sub(pattern, "", txt,
                                         flags=re.DOTALL | re.MULTILINE).strip()
+        # Empty messages can cause issues, so if stripping the workspace 
+        # results in an empty message, we add a placeholder.
+        if not text_without_workspace:
+            text_without_workspace = 'I added content to the workspace!'
         return text_without_workspace, content, language
     # Checks for ``` code blocks
     pattern_codeblock = r'^```(?:([a-z]+))?\n(.*?)^```'
@@ -160,6 +165,14 @@ def extract_workspace(txt: str) -> tuple:
             return txt, content, language
     # Simply returns txt if no workspace is detected
     return txt, None, None
+
+
+def remove_masked_elements(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    # Find all elements with class 'mask' and decompose them
+    for element in soup.find_all(class_='mask'):
+        element.decompose()
+    return str(soup)
 
 
 def current_datetime():

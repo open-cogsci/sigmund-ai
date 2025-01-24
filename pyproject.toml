@@ -12,6 +12,7 @@ requires-python = ">=3.8"
 dynamic = ["version", "description"]
 dependencies = [
     "anthropic",
+    "beautifulsoup4",
     "cryptography",
     "datamatrix",
     "faiss-cpu",

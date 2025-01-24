@@ -6,11 +6,10 @@ from flask import request, jsonify, Response, redirect, session, \
 from flask_login import login_required
 from .. import config, utils, attachments
 from ..sigmund import Sigmund
+from ..redis_client import redis_client
 from .app import get_sigmund
-from redis import Redis
 logger = logging.getLogger('sigmund')
 api_blueprint = Blueprint('api', __name__)
-redis_client = Redis()
 
 
 @api_blueprint.route('/chat/start', methods=['POST'])

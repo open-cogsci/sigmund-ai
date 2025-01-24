@@ -1,5 +1,6 @@
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from sigmund.utils import prepare_messages, extract_workspace
+from sigmund.utils import prepare_messages, extract_workspace, \
+    remove_masked_elements
 
 
 def test_prepare_messages():
@@ -119,3 +120,40 @@ print(1)
     assert language is None
     
     
+def test_remove_masked_elements():
+    html_content = """
+    Here's some content
+    
+    <div class="test mask">
+    This should be masked
+    </div>
+    
+    And more content
+    
+    <div class="test">
+    This should not be masked
+    </div>
+    
+    And more
+    
+    <span class="mask">
+    This should not be masked
+    </span>
+    """
+    
+    expected_output = """
+    Here's some content
+    
+    
+    
+    And more content
+    
+    <div class="test">
+    This should not be masked
+    </div>
+    
+    And more
+    """
+    
+    result = remove_masked_elements(html_content)
+    assert result.strip() == expected_output.strip()

@@ -36,6 +36,15 @@ class OpenAIModel(BaseModel):
         # OpenAI requires the tool message to be linked to the previous AI
         # message with a tool_call_id. The actual content doesn't appear to
         # matter, so here we dummy-link the messages
+        # The system message cannot have tool_calls information, so in that 
+        # case we add a dummy message. 
+        # import pprint
+        # print('=== preparing tool messages')
+        # pprint.pprint(messages)
+        # print('---')
+        if len(messages) > 1 and messages[1]['role'] == 'tool':
+            logger.info('insert dummy assistant message before tool')
+            messages.insert(1, {'role': 'assistant'})
         for i, message in enumerate(messages):
             if i == 0 or message['role'] != 'tool':
                 continue
@@ -56,6 +65,10 @@ class OpenAIModel(BaseModel):
             message['tool_call_id'] = tool_call_id       
             message['name'] = tool_info['name']
             message['content'] = tool_info['content']
+            if message['content'] is None:
+                message['content'] = ''
+        # pprint.pprint(messages)
+        # print('=== end preparing tool messages')                
         return messages
         
     def get_response(self, response):

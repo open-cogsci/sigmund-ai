@@ -42,5 +42,5 @@ class generate_image(BaseTool):
                                           style=style,
                                           response_format='b64_json', n=1)
         data = response.data[0].b64_json
-        html = f'Here\'s an image for "{prompt}"!\n<div class="image-generation"><img src="data:image/png;base64,{data}"></div>'
-        return f'Generating image ...', html, False
+        html = f'Here\'s an image for "{prompt}"!\n<div class="image-generation mask"><img src="data:image/png;base64,{data}"></div>'
+        return html, None, False

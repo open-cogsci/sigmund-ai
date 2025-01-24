@@ -3,7 +3,9 @@ os.environ['USE_FLASK_SQLALCHEMY'] = '1'
 from flask import Flask, Config, request
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_session import Session
 from . import config
+from .redis_client import redis_client
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
     google_login_blueprint, public_blueprint
 from .database.models import db
@@ -15,11 +17,17 @@ logging.basicConfig(level=logging.INFO, force=True)
 class SigmundConfig(Config):
     SECRET_KEY = config.flask_secret_key
     SQLALCHEMY_DATABASE_URI = 'sqlite:///sigmund.db'
+    SESSION_TYPE = 'redis'
+    SESSION_PERMANENT = False
+    SESSION_USE_SIGNER = True
+    SESSION_REDIS = redis_client
 
 
 def create_app(config_class=SigmundConfig):
     app = Flask(__name__, static_url_path='/static')
     app.config.from_object(config_class)
+    # Initialize Flask-Session to activate Redis for session management
+    Session(app)
     app.register_blueprint(app_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(subscribe_blueprint, url_prefix='/subscribe')

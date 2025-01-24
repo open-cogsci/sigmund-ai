@@ -43,18 +43,25 @@ class BaseTool:
         """
         def bound_tool_function():
             try:
-                tool_response = self(**json.loads(args))
+                kwargs = json.loads(args)
+                import pprint
+                print('*** arguments')
+                pprint.pprint(kwargs)
+                print('***')
+                tool_response = self(**kwargs)
             except Exception as e:
                 message = 'Failed to run tool'
                 result = f'The following error occurred while trying to run tool:\n\n{e}'
                 needs_feedback = True
-            if len(tool_response) == 3:
-                message, result, needs_feedback = tool_response
-                language = 'text'
-            elif len(tool_response) == 4:
-                message, result, language, needs_feedback = tool_response
+                language = 'markdown'
             else:
-                raise ValueError(f'Invalid tool response: {tool_response}')
+                if len(tool_response) == 3:
+                    message, result, needs_feedback = tool_response
+                    language = 'markdown'
+                elif len(tool_response) == 4:
+                    message, result, language, needs_feedback = tool_response
+                else:
+                    raise ValueError(f'Invalid tool response: {tool_response}')
             result = {'name': self.name,
                       'args': args,
                       'content': result}

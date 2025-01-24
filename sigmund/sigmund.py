@@ -98,6 +98,8 @@ class Sigmund:
         message. The third element corresponds to the content of the workspace,
         and can be None if empty.
         """
+        if config.log_replies:
+            logger.info(f'[user message] {message}')
         if self._rate_limit_exceeded():
             yield Reply(config.max_tokens_per_hour_exceeded_message,
                         self.messages.metadata())
@@ -132,8 +134,7 @@ class Sigmund:
         # Then search based on the search-model queries derived from the user
         # question
         reply = self.search_model.predict(self.messages.prompt(
-            system_prompt=prompt.SYSTEM_PROMPT_SEARCH,
-            skip_large_tool_results=True))
+            system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
         if config.log_replies:
             logger.info(f'[search state] reply: {reply}')
         if callable(reply):
@@ -151,8 +152,7 @@ class Sigmund:
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
         tokens_consumed_before = self.answer_model.total_tokens_consumed
-        reply = self.answer_model.predict(self.messages.prompt(
-            skip_large_tool_results=True))
+        reply = self.answer_model.predict(self.messages.prompt())
         tokens_consumed = self.answer_model.total_tokens_consumed \
             - tokens_consumed_before
         logger.info(f'tokens consumed: {tokens_consumed}')
