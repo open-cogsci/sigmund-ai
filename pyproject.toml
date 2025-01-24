@@ -22,6 +22,7 @@ dependencies = [
     "flask-wtf",
     "flask-cors",
     "flask-migrate",
+    "flask-session",
     "jinja2",
     "jq",
     "langchain",
