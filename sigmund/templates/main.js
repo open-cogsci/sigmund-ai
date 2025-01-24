@@ -11,6 +11,7 @@ function globalElements(event) {
     window.workspaceLanguageSelect = document.getElementById('workspace-language');
     window.clearWorkspaceButton = document.getElementById('clear-workspace');
     window.workspacePlaceholder = document.getElementById('workspace-placeholder');
+    window.originalFavicon = document.querySelector('link[rel="icon"]').href;
 }
 
 function initMain(event) {
@@ -97,6 +98,7 @@ async function fetchWithRetry(url, options, retries = 3) {
 
 async function sendMessage(message) {
     console.log('user message: ' + message)
+    setFavicon('static/loading.svg');
     const user_message_id = generateUUID()
     messageCounter.innerText = ''
     // Show the user's message
@@ -273,7 +275,8 @@ async function sendMessage(message) {
         // Append the AI message div to the response div, just before the 
         // loading message.
         responseDiv.insertBefore(aiMessage, responseDiv.lastElementChild);
-        aiMessage.scrollIntoViewIfNeeded()
+        aiMessage.scrollIntoViewIfNeeded();
+        setFavicon(originalFavicon);
     };
 
     eventSource.onerror = function(error) {
@@ -364,6 +367,10 @@ function updateWorkspacePlaceholder() {
     }
 };
 
+function setFavicon(url) {
+    let faviconLink = document.querySelector('link[rel="icon"]');
+    faviconLink.href = url;
+}
 
 document.addEventListener('DOMContentLoaded', globalElements)
 document.addEventListener('DOMContentLoaded', initMain)
