@@ -42,7 +42,8 @@
                   <option value="r">R</option>
                   <option value="markdown" selected>Text (Markdown)</option>
                 </select>
-                <button id="clear-workspace">Clear</button>
+                <button id="clear-workspace" title="Clear"><i class="fas fa-eraser"></i></button>
+                <!-- button id="hide-workspace" title="Hide"><i class="fas fa-eye-slash"></i></button -->
             </div>
             <textarea id="workspace" data-mode="{{ workspace_language }}">{{ workspace_content }}</textarea>
             <div id="workspace-placeholder">Use this workspace to share text and code</div>

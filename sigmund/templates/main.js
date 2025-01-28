@@ -379,7 +379,7 @@ function updateWorkspacePlaceholder() {
 function setFavicon(url) {
     let faviconLink = document.querySelector('link[rel="icon"]');
     faviconLink.href = url;
-}
+};
 
 document.addEventListener('DOMContentLoaded', globalElements)
 document.addEventListener('DOMContentLoaded', initMain)
