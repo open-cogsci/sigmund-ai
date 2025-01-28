@@ -11,6 +11,6 @@ class TestToolSearchDocumentation(BaseExpensiveTest):
     
     def _test_tool(self):
         query = 'What is the first header line of the OpenSesame topic documentation?'
-        for reply, metadata in self.sigmund.send_user_message(query):
-            print(reply)
-        assert 'important' in reply.lower()
+        for reply in self.sigmund.send_user_message(query):
+            print(reply.msg)
+        assert 'important' in reply

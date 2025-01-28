@@ -2,7 +2,16 @@ import json
 from . import config, utils
 
 
-class Reply:
+class BaseReply:
+    
+    def __contains__(self, needle):
+        return needle.lower() in self.to_json().lower()
+        
+    def __str__(self):
+        return self.to_json()
+        
+        
+class Reply(BaseReply):
     """Corresponds to a regular AI reply that is sent to the client."""
     def __init__(self, msg: str, metadata: dict,
                  workspace_content: str=None, workspace_language: str='text'):
@@ -22,7 +31,7 @@ class Reply:
         )
         
         
-class ActionReply:
+class ActionReply(BaseReply):
     """Corresponds to an action reply that is sent to the client, typically to
     set the loading indicator.
     """
