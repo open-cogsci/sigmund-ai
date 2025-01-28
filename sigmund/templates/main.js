@@ -52,28 +52,25 @@ function initMain(event) {
     
     // Initialize CodeMirror workspace editor
     const workspaceTextArea = document.getElementById("workspace");
-    const language = workspaceTextArea.getAttribute('data-mode') || 'markdown';
-    window.workspace = CodeMirror.fromTextArea(workspaceTextArea, {
+    let language = workspaceTextArea.getAttribute('data-mode') || 'markdown';
+    workspace = CodeMirror.fromTextArea(workspaceTextArea, {
       lineNumbers: false,
       mode: language,
       theme: "monokai",
       tabSize: 4,
       lineWrapping: true
     })
-    // Check if the language exists in the options, if not, fall back to 'markdown'
-    const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === language);
-    if (languageExists) {
-        workspaceLanguageSelect.value = language;
-    } else {
-        workspaceLanguageSelect.value = 'markdown';
-    }    
+    let mode = null;
+    [language, mode] = workspaceLanguage(language);
+    workspaceLanguageSelect.value = language;
     workspaceLanguageSelect.addEventListener("change", function() {
-        console.log('Changing workspace language to', this.value);
-        window.workspace.setOption("mode", this.value);
+        const [language, mode] = workspaceLanguage(this.value);
+        console.log('mode = ' + mode)
+        workspace.setOption("mode", mode);
     });
     clearWorkspaceButton.addEventListener("click", function() {
         console.log('clearing workspace');
-        window.workspace.setValue("");
+        workspace.setValue("");
     });
     workspace.on('change', updateWorkspacePlaceholder);
     updateWorkspacePlaceholder();    
@@ -339,15 +336,27 @@ function expandMessageBox() {
     document.getElementById('message-box').classList.toggle('expanded-message-box');
 };
 
-function setWorkspace(content, language) {
-    workspace.setValue(content);
-    workspace.setOption("mode", language);
-    const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === language);
-    if (languageExists) {
-        workspaceLanguageSelect.value = language;
-    } else {
-        workspaceLanguageSelect.value = 'markdown';
+function workspaceLanguage(language) {
+    console.log(language);
+    if (language === 'html') {
+        return ['html', 'htmlmixed'];
     }
+    if (language === 'opensesame') {
+        return ['python', 'python'];
+    }
+    const languageExists = Array.from(workspaceLanguageSelect.options).some(option => option.value === language);
+    if (!languageExists) {
+        return ['markdown', 'markdown'];
+    }
+    return [language, language];
+}
+
+function setWorkspace(content, language) {
+    let mode = null;
+    [language, mode] = workspaceLanguage(language);
+    workspace.setValue(content);
+    workspace.setOption("mode", mode);
+    workspaceLanguageSelect.value = language;
 };
 
 

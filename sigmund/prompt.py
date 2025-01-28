@@ -62,7 +62,7 @@ PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide 
     
 {{ documentation }}
 '''
-WORKSPACE_PROMPT = '''When providing examples or updated text or code to the user always do this through the workspace. You set workspace content by including `<workspace language="workspace language">text or code</workspace>` in your reply or by using tools.
+WORKSPACE_PROMPT = '''When providing examples or updated text or code to the user always do this through the workspace. You set workspace content by including `<workspace language="language">text or code</workspace>` in your reply or by using tools.
 
 Here is an example:
 
@@ -72,8 +72,10 @@ Sure, I can write a hello world function for you! I added the code to the worksp
 <workspace language="python">
 def hello_world():
     print('Hello world!')
-</div>
+</workspace>
 ```
+
+Available languages: css, html, javascript, opensesame, python, r, markdown
 
 Important: always use the workspace as shown above, and do *not* simply include long examples of text or code in your reply.
 '''
