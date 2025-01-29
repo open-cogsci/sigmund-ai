@@ -24,7 +24,28 @@ class DatabaseManager:
         self.ensure_user_exists()
         logger.info(
             f'initializing database for user {self.username} ({self.user_id})')
-
+        
+    def prune_detached_messages(self):
+        """Delete all messages that are not attached to a conversation anymore
+        due to an old bug in which messages where re-added but never deleted.
+        """
+        for conversation in Conversation.query.filter_by(
+                user_id=self.user_id).all():
+            decrypted_data = self.encryption_manager.decrypt_data(
+                conversation.data)
+            conversation_data = json.loads(decrypted_data)
+            attached_message_ids = conversation_data.get('message_history', [])
+            attached_message_ids = [
+                msg_id for msg_id in attached_message_ids
+                if isinstance(msg_id, int)
+            ]
+            all_messages = Message.query.filter_by(
+                conversation_id=conversation.conversation_id).all()
+            for message in all_messages:
+                if message.message_id not in attached_message_ids:
+                    db.session.delete(message)
+            db.session.commit()
+            
     def ensure_user_exists(self):
         try:
             user = User.query.filter_by(username=self.username).one()
@@ -74,68 +95,81 @@ class DatabaseManager:
             user = User.query.filter_by(user_id=self.user_id).one()
             conversation = Conversation.query.filter_by(
                 conversation_id=user.active_conversation_id).one()
-            decrypted_data = self.encryption_manager.decrypt_data(conversation.data)
-            conversation_data = json.loads(decrypted_data)
-    
-            # Fetch and decrypt messages
-            message_ids = conversation_data.get('message_history', [])
-            message_history = [self.get_message(msg_id) for msg_id in message_ids]
-            conversation_data['message_history'] = message_history
-    
-            return conversation_data
         except NoResultFound:
             logger.warning(f"No active conversation found for user {self.user_id}")
             return {}    
+        decrypted_data = self.encryption_manager.decrypt_data(conversation.data)
+        conversation_data = json.loads(decrypted_data)
+        message_ids = conversation_data.get('message_history', [])
+        message_history = [self.get_message(msg_id) for msg_id in message_ids]
+        conversation_data['message_history'] = message_history
+        return conversation_data
 
     def set_active_conversation(self, conversation_id: int) -> bool:
         try:
             # We first get the active conversation
             conversation = Conversation.query.filter_by(
                 conversation_id=conversation_id, user_id=self.user_id).one()
-            # And then update the current time for that conversation so that
-            # it ends on top
-            decrypted_data = self.encryption_manager.decrypt_data(
-                conversation.data)
-            conversation_data = json.loads(decrypted_data)
-            conversation_data['last_updated'] = time.time()
-            json_data = json.dumps(conversation_data)
-            encrypted_data = self.encryption_manager.encrypt_data(
-                json_data.encode('utf-8'))
-            conversation.data = encrypted_data
-            # Finally we change the active conversation for the user
-            user = User.query.filter_by(user_id=self.user_id).one()
-            user.active_conversation_id = conversation.conversation_id
-            db.session.commit()
-            return True
         except NoResultFound:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
             return False
+        # And then update the current time for that conversation so that
+        # it ends on top
+        decrypted_data = self.encryption_manager.decrypt_data(
+            conversation.data)
+        conversation_data = json.loads(decrypted_data)
+        conversation_data['last_updated'] = time.time()
+        json_data = json.dumps(conversation_data)
+        encrypted_data = self.encryption_manager.encrypt_data(
+            json_data.encode('utf-8'))
+        conversation.data = encrypted_data
+        # Finally we change the active conversation for the user
+        user = User.query.filter_by(user_id=self.user_id).one()
+        user.active_conversation_id = conversation.conversation_id
+        db.session.commit()
+        return True
     
     def update_active_conversation(self, conversation_data: dict) -> bool:
+        """Updates the active conversation. The messages are saved in a 
+        separate table as separate entries. However, all messages are replaced
+        when the conversation is updated. That the conversation doesn't grow
+        when a new message is added, but rather is reconstructed.
+        """
         try:
             user = User.query.filter_by(user_id=self.user_id).one()
             conversation = Conversation.query.filter_by(
-                conversation_id=user.active_conversation_id).one()
-    
-            # Extract messages and store them separately
-            message_history = conversation_data.pop('message_history', [])
-            message_ids = []
-            for message in message_history:
-                message_id = self.add_message(conversation.conversation_id, message)
-                message_ids.append(message_id)
-    
-            conversation_data['message_history'] = message_ids
-            conversation_data['last_updated'] = time.time()
-    
-            json_data = json.dumps(conversation_data)
-            encrypted_data = self.encryption_manager.encrypt_data(json_data.encode('utf-8'))
-            conversation.data = encrypted_data
-            db.session.commit()
-            return True
+                conversation_id=user.active_conversation_id
+            ).one()
         except NoResultFound:
-            logger.warning(f"No active conversation to update for user {self.user_id}")
-            return False    
+            logger.warning(
+                f"No active conversation to update for user {self.user_id}")
+            return False            
+        # Get all message ids that are linked to this conversation through 
+        # message.conversation_id. Store these in a list.
+        old_messages = Message.query.filter_by(
+            conversation_id=conversation.conversation_id).all()
+        old_message_ids = [msg.message_id for msg in old_messages]
+        # Extract new messages and store them separately
+        message_history = conversation_data.pop('message_history', [])
+        message_ids = []
+        for message in message_history:
+            message_id = self.add_message(conversation.conversation_id,
+                                          message)
+            message_ids.append(message_id)
+        conversation_data['message_history'] = message_ids
+        conversation_data['last_updated'] = time.time()
+        json_data = json.dumps(conversation_data)
+        encrypted_data = self.encryption_manager.encrypt_data(
+            json_data.encode('utf-8'))
+        conversation.data = encrypted_data
+        # After the conversation was succesfully updated, remove all
+        # message ids that we stored above, because these are now no longer
+        # necessary. This avoids unlinked message rows.
+        for old_message in old_messages:
+            db.session.delete(old_message)
+        db.session.commit()
+        return True
 
     def list_conversations(self, query=None) -> dict:
         conversations = {}

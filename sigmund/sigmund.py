@@ -98,6 +98,11 @@ class Sigmund:
         message. The third element corresponds to the content of the workspace,
         and can be None if empty.
         """
+        # A temporary hack to prune messages for accounts
+        if message == 'prune_detached_message()':
+            yield ActionReply(f'{config.ai_name} is pruning detached messages')
+            self.database.prune_detached_messages()
+            return Reply('Done', None, None, None)
         if config.log_replies:
             logger.info(f'[user message] {message}')
         if self._rate_limit_exceeded():
