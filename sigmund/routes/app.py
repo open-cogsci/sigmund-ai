@@ -50,8 +50,8 @@ def chat_page():
                                             escape_html=True,
                                             render=False) + '</p>'
             html_class = 'message-user'
-        workspace_content = metadata['workspace_content']
-        workspace_language = metadata['workspace_language']
+        workspace_content = metadata.get('workspace_content', None)
+        workspace_language = metadata.get('workspace_language', None)
         if workspace_content:
             workspace_div = f'''<div class="message-workspace" id="message-workspace-{message_id}">
                 <a href="#" onclick="loadMessageWorkspace('{message_id}')">Load workspace</a>
