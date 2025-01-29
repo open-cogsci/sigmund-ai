@@ -157,7 +157,9 @@ class Messages:
         condense_messages = []
         while self._condensed_message_history and \
                 condense_length < config.condense_chunk_length:
-            role, content = self._condensed_message_history.pop()
+            if len(self._condensed_message_history) <= 2:
+                break
+            role, content = self._condensed_message_history.pop(0)
             content = utils.remove_masked_elements(content)
             condense_length += len(content)
             condense_messages.insert(0, (role, content))
