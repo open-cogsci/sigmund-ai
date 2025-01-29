@@ -167,12 +167,20 @@ def extract_workspace(txt: str) -> tuple:
     return txt, None, None
 
 
-def remove_masked_elements(html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    # Find all elements with class 'mask' and decompose them
-    for element in soup.find_all(class_='mask'):
-        element.decompose()
-    return str(soup)
+def remove_masked_elements(content):
+    # This pattern matches:
+    #   1) an opening tag <tag ...>
+    #   2) that includes class="...mask..."
+    #   3) everything inside (including nested tags)
+    #   4) up to the matching </tag>
+    #
+    # It does this by capturing the tag name in group 1, so we can search for
+    # the matching </tag> later, and also checking for "mask" in the class attribute.
+    pattern = re.compile(
+        r'<([a-zA-Z0-9]+)([^>]*)\bclass\s*=\s*[\'"]([^"\']*\bmask\b[^"\']*)[\'"]([^>]*)>(.*?)</\1>',
+        re.DOTALL
+    )
+    return re.sub(pattern, '', content)
 
 
 def current_datetime():
