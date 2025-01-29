@@ -5,7 +5,10 @@
     <script>
     window.sigmundSettings = {{ settings | safe }}
     </script>
-    <script>{% include 'main.js' %}</script>
+    <script>
+        {% include 'main.js' %}
+        {% include 'listener.js' %}
+    </script>
     <div id="container">
         <div id="chat-area">
             {% include 'header.html' %}

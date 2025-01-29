@@ -243,6 +243,8 @@ async function sendMessage(message) {
             workspaceDiv.appendChild(workspaceLanguageDiv);
             aiMessage.appendChild(workspaceDiv);            
         }
+        //
+        socketSendMessage(data.response, data.workspace_content, data.workspace_language);
         // Create a div for timestamp
         const timestampDiv = document.createElement('div');
         timestampDiv.className = 'message-timestamp';
