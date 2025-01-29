@@ -44,10 +44,10 @@ class BaseTool:
         def bound_tool_function():
             try:
                 kwargs = json.loads(args)
-                import pprint
-                print('*** arguments')
-                pprint.pprint(kwargs)
-                print('***')
+                # import pprint
+                # print('*** arguments')
+                # pprint.pprint(kwargs)
+                # print('***')
                 tool_response = self(**kwargs)
             except Exception as e:
                 message = 'Failed to run tool'

@@ -45,7 +45,7 @@ condense_chunk_length = 10000
 max_text_representation_length = 100000
 # The maximum length of the text representation that is not summarized. Beyond
 # this, the text is summarized rather than stored in its entirety.
-text_respresentation_summary_threshold = 30000
+text_respresentation_summary_threshold = 100000
 
 # LIBRARY INDEXING
 #

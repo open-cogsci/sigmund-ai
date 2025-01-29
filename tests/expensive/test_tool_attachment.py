@@ -19,6 +19,12 @@ class TestToolsAttachments(BaseExpensiveTest):
                 break
         else:
             assert False
+        query = 'Can you download the following article: https://journalofcognition.org/articles/18/files/submission/proof/18-1-153-1-10-20180221.pdf'
+        for reply in self.sigmund.send_user_message(query):
+            print(reply.msg)
+        query = 'Can you read and summarize the article for me?'
+        for reply in self.sigmund.send_user_message(query):
+            print(reply.msg)
         query = 'Can you download the following readme: https://raw.githubusercontent.com/open-cogsci/OpenSesame/milgram/readme.md'
         for reply in self.sigmund.send_user_message(query):
             print(reply.msg)

@@ -57,11 +57,13 @@ class download(BaseTool):
             
     def __call__(self, url):
         filename, content = self._download(url)
-        description = attachments.describe_file(filename, content,
+        text_content = attachments.file_to_text(filename, content,
+                                                self._sigmund.condense_model)
+        description = attachments.describe_file(filename, text_content,
                                                 self._sigmund.condense_model)
         attachment_data = {
             'filename': filename,
-            'content': base64.b64encode(content).decode('utf-8'),
+            'content': text_content,
             'description': description
         }
         self._sigmund.database.add_attachment(attachment_data)
