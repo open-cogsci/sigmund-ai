@@ -1,5 +1,7 @@
 # Sigmund AI
 
+![](artwork/sigmund-avatar.png)
+
 Copyright 2023-2025 Sebastiaan Mathôt
 
 A Python library and web app for an LLM-based chatbot with two main modes:
@@ -21,6 +23,8 @@ Features:
     
 Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), and [Mistral](https://mistral.ai/) are supported. API keys from these respective providers are required.
 
+
+![](artwork/screenshot.png)
 
 ## What can Sigmund do? And how does Sigmund work?
 
