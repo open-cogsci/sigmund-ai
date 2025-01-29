@@ -50,9 +50,9 @@ def chat_page():
                                             escape_html=True,
                                             render=False) + '</p>'
             html_class = 'message-user'
-        if metadata.get('workspace_content', None):
-            workspace_content = metadata['workspace_content']
-            workspace_language = metadata['workspace_language']
+        workspace_content = metadata['workspace_content']
+        workspace_language = metadata['workspace_language']
+        if workspace_content:
             workspace_div = f'''<div class="message-workspace" id="message-workspace-{message_id}">
                 <a href="#" onclick="loadMessageWorkspace('{message_id}')">Load workspace</a>
                 <pre class="workspace-content">{workspace_content}</pre>
@@ -85,6 +85,9 @@ def chat_page():
     # settings from the database
     settings = config.settings_default.copy()
     settings.update(sigmund.database.list_settings())
+    if workspace_content is None:
+        workspace_content = ''
+        workspace_language = 'markdown'
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=sigmund.user_id,
