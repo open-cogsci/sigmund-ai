@@ -177,3 +177,99 @@ def remove_masked_elements(html_content):
 
 def current_datetime():
     return time.strftime('%a %d %b %Y %H:%M')
+
+
+def process_ai_message(msg):
+    # This pattern looks for a colon possibly followed by any number of
+    # whitespaces
+    # and/or HTML tags, followed by a newline and a dash, and
+    # replaces it with a colon, newline, newline, and dash
+    pattern = r':\s*(&lt;[^&gt;]+&gt;\s*)?\n(?=-|\d+\.)'
+    replacement = ':\n\n'
+    msg = re.sub(pattern, replacement, msg)
+    # If the message doesn't start with a letter, then it may start with some 
+    # markdown character that we should properly interpret, and thus needs to 
+    # be on a newline preceded by an empty line.
+    if msg and not msg[0].isalpha():
+        msg = '\n\n' + msg
+    msg = dedent_code_blocks(msg)
+    return msg
+
+
+def dedent_code_blocks(message: str) -> str:
+    """
+    Dedent code blocks (triple backticks or triple tildes) if *all* lines
+    in the block share the same leading indentation, including the fence lines.
+    Handles optional language specifiers like ```python or ~~~javascript.
+    """
+
+    lines = message.splitlines(keepends=True)  # preserve line endings
+    n = len(lines)
+    i = 0
+    result = []
+
+    while i < n:
+        line = lines[i]
+        # Attempt to match an opening fence: indentation + "```" or "~~~",
+        # plus optional language specifier, and then end-of-line.
+        mo_open = re.match(r'^([ \t]*)(```|~~~)([^\n]*)\r?\n?$', line)
+        if not mo_open:
+            # Not an opening fence line => just append and move on
+            result.append(line)
+            i += 1
+            continue
+        # Extract fence info
+        indent = mo_open.group(1)
+        fence = mo_open.group(2)
+        # The optional language spec is mo_open.group(3), but we don’t need to store it
+
+        block_lines = [line]  # include opening fence line
+        found_closing = False
+        i_block = i + 1
+
+        # Look for matching closing fence
+        while i_block < n:
+            candidate = lines[i_block]
+            mo_close = re.match(
+                rf'^([ \t]*)({re.escape(fence)})([^\n]*)\r?\n?$', 
+                candidate
+            )
+            if mo_close and mo_close.group(1) == indent:
+                # Same indentation, same fence => it's the closing fence
+                block_lines.append(candidate)
+                found_closing = True
+                i_block += 1
+                break
+            else:
+                # Not a closing fence => collect as part of the block
+                block_lines.append(candidate)
+                i_block += 1
+
+        # If we found a closing fence, we can attempt to dedent
+        if found_closing:
+            # Check uniform indentation for ALL lines in block (opening + content + closing)
+            all_share_indent = True
+            for bline in block_lines:
+                mo_line = re.match(r'^([ \t]*)(.*)$', bline)
+                if mo_line:
+                    line_indent = mo_line.group(1)
+                    print(bline, len(indent), len(line_indent))
+                    if line_indent < indent:
+                        all_share_indent = False
+                        break
+
+            if all_share_indent:
+                # Dedent each line by removing the common indent
+                dedented = [bline[len(indent):] for bline in block_lines]
+                result.extend(dedented)
+            else:
+                # Keep block as-is
+                result.extend(block_lines)
+
+            i = i_block
+        else:
+            # No closing fence found => keep everything as-is
+            result.extend(block_lines)
+            i = i_block
+
+    return "".join(result)

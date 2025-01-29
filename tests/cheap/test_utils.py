@@ -1,6 +1,6 @@
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from sigmund.utils import prepare_messages, extract_workspace, \
-    remove_masked_elements
+    remove_masked_elements, process_ai_message, dedent_code_blocks
 
 
 def test_prepare_messages():
@@ -157,3 +157,182 @@ def test_remove_masked_elements():
     
     result = remove_masked_elements(html_content)
     assert result.strip() == expected_output.strip()
+
+
+def test_process_ai_message():
+    test_case = '''# Header should go to next line
+
+Enumerations should be fixed:
+- one line
+- another line
+
+The following should be dedented:
+
+    ```
+    def test():
+        pass
+    ```
+
+This as well:
+
+	```python
+	def test():
+	    pass
+	```
+
+  ~~~
+  def test():
+      pass
+  ~~~
+
+And this as well:
+
+		~~~python
+		def test():
+		    pass
+		~~~
+
+But not this (because it's not uniformly indented): 
+
+    ```
+def test():
+    pass
+```
+
+'''
+
+    expected_output = '''
+
+# Header should go to next line
+
+Enumerations should be fixed:
+
+- one line
+- another line
+
+The following should be dedented:
+
+```
+def test():
+    pass
+```
+
+This as well:
+
+```python
+def test():
+    pass
+```
+
+~~~
+def test():
+    pass
+~~~
+
+And this as well:
+
+~~~python
+def test():
+    pass
+~~~
+
+But not this (because it's not uniformly indented): 
+
+    ```
+def test():
+    pass
+```
+
+'''
+    actual_output = process_ai_message(test_case)    
+    assert expected_output == actual_output
+
+
+def test_dedent_code_blocks():
+    
+        test_cases = [
+            (
+                "No code blocks",
+                "Just a line of text\nAnd another line\n",
+                "Just a line of text\nAnd another line\n"
+            ),
+            (
+                "Already unindented code block with triple backticks",
+                """```
+some code
+```""",
+                """```
+some code
+```"""
+            ),
+            (
+                "Simple uniformly-indented code block with triple backticks",
+                """    ```\n    print("Hello World")\n    ```""",
+                """```
+print("Hello World")
+```"""
+            ),
+            (
+                "Triple-tilde code block with uniform indentation",
+                """        ~~~
+        a = 1
+        b = 2
+        ~~~""",
+                """~~~
+a = 1
+b = 2
+~~~"""
+            ),
+            (
+                "Non-uniform indentation, should remain unchanged",
+                """    ```
+        print("Hello")
+    ```""",
+                """    ```
+        print("Hello")
+    ```"""
+            ),
+            (
+                "Block missing ending fence, should remain unchanged",
+                """    ```
+    print("No closing fence")
+                """,
+                """    ```
+    print("No closing fence")
+                """
+            ),
+            (
+                "Content that almost looks like a code block but isn't (leading spaces then backticks mid-line)",
+                """    This is a line with ```backticks``` in the middle
+    But not a real code fence
+    """,
+                """    This is a line with ```backticks``` in the middle
+    But not a real code fence
+    """
+            ),
+            (
+                "Multiple code blocks in the same text",
+                """Some text here
+    ```
+    block1
+    ```
+Some more text
+        ~~~
+        block2
+        ~~~
+Done""",
+                """Some text here
+```
+block1
+```
+Some more text
+~~~
+block2
+~~~
+Done"""
+            ),
+        ]
+
+        for desc, input_text, expected in test_cases:
+            print(desc)
+            dedent_code_blocks(input_text) == expected
