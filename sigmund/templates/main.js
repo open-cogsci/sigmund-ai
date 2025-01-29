@@ -10,6 +10,7 @@ function globalElements(event) {
     window.scrollTo(0, document.body.scrollHeight);
     window.workspaceLanguageSelect = document.getElementById('workspace-language');
     window.clearWorkspaceButton = document.getElementById('clear-workspace');
+    window.copyWorkspaceButton = document.getElementById('copy-workspace');
     window.workspacePlaceholder = document.getElementById('workspace-placeholder');
     window.originalFavicon = document.querySelector('link[rel="icon"]').href;
 }
@@ -71,6 +72,15 @@ function initMain(event) {
     clearWorkspaceButton.addEventListener("click", function() {
         console.log('clearing workspace');
         workspace.setValue("");
+    });
+    copyWorkspaceButton.addEventListener("click", async function() {
+        const content = workspace.getValue();
+        try {
+            await navigator.clipboard.writeText(content);
+            console.log('Content successfully copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+        }
     });
     workspace.on('change', updateWorkspacePlaceholder);
     updateWorkspacePlaceholder();    
