@@ -1,8 +1,8 @@
 # Sigmund AI
 
-![](artwork/sigmund-avatar.png)
-
 Copyright 2023-2025 Sebastiaan Mathôt
+
+![](artwork/sigmund-avatar-small.png)
 
 A Python library and web app for an LLM-based chatbot with two main modes:
 
