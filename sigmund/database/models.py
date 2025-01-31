@@ -47,14 +47,14 @@ class User(Model):
     user_id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
     active_conversation_id = Column(
-        Integer, ForeignKey('conversation.conversation_id'))
+        Integer, ForeignKey('conversation.conversation_id'), index=True)
 
 
 class Conversation(Model):
     __tablename__ = 'conversation'
 
     conversation_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
     # Data corresponds to an encrypted blob. After encryption, it becomes a
     # JSON string with the following format:
     # {
@@ -71,7 +71,7 @@ class Conversation(Model):
     # }
     # The message_ids refer to entries in the message table below. For older
     # conversations, the message_ids may instead by dicts. The 
-    # DatabaseManager.get_message() function takes care of this.
+    # DatabaseManager.get_message() function takes care of this.    
     data = Column(LargeBinary)
 
 
@@ -80,7 +80,8 @@ class Message(Model):
 
     message_id = Column(Integer, primary_key=True)
     conversation_id = Column(Integer,
-                             ForeignKey('conversation.conversation_id'))
+                             ForeignKey('conversation.conversation_id'),
+                             index=True)
     # Data corresponds to an encrypted blob. After encryption, it becomes a
     # JSON string.
     data = Column(LargeBinary)
@@ -90,7 +91,7 @@ class Attachment(Model):
     __tablename__ = 'attachment'
 
     attachment_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
     data = Column(LargeBinary)
 
 
@@ -98,7 +99,7 @@ class Activity(Model):
     __tablename__ = 'activity'
 
     activity_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
     time = Column(DateTime)
     tokens_consumed = Column(Integer)
 
@@ -107,7 +108,7 @@ class Subscription(Model):
     __tablename__ = 'subscription'
 
     subscription_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
     from_date = Column(DateTime)
     to_date = Column(DateTime)
     stripe_subscription_id = Column(String(80))
@@ -118,6 +119,6 @@ class Setting(Model):
     __tablename__ = 'setting'
 
     setting_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
     key = Column(String(80))
     value = Column(String(80))
