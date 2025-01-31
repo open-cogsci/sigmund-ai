@@ -261,7 +261,6 @@ def dedent_code_blocks(message: str) -> str:
                 mo_line = re.match(r'^([ \t]*)(.*)$', bline)
                 if mo_line:
                     line_indent = mo_line.group(1)
-                    print(bline, len(indent), len(line_indent))
                     if line_indent < indent:
                         all_share_indent = False
                         break
