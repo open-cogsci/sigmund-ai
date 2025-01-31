@@ -7,7 +7,7 @@ from .. import config, attachments
 from .models import db, User, Conversation, Attachment, Activity, \
     Subscription, Setting, Message
 from .encryption import EncryptionManager
-from sqlalchemy import func
+from sqlalchemy import func, delete
 from sqlalchemy.orm.exc import NoResultFound
 
 logger = logging.getLogger('sigmund')
@@ -31,20 +31,29 @@ class DatabaseManager:
         """
         for conversation in Conversation.query.filter_by(
                 user_id=self.user_id).all():
+            logger.info(f'decrypting {conversation.conversation_id}, {len(conversation.data)} bytes')
+            if len(conversation.data) > 20000:
+                logger.info('skipping')
+                continue
             decrypted_data = self.encryption_manager.decrypt_data(
                 conversation.data)
             conversation_data = json.loads(decrypted_data)
+            logger.info('getting attached messages')
             attached_message_ids = conversation_data.get('message_history', [])
             attached_message_ids = [
                 msg_id for msg_id in attached_message_ids
                 if isinstance(msg_id, int)
             ]
+            logger.info('getting all messages')
             all_messages = Message.query.filter_by(
                 conversation_id=conversation.conversation_id).all()
             for message in all_messages:
                 if message.message_id not in attached_message_ids:
+                    logger.info(f'deleting {message.message_id}')
                     db.session.delete(message)
-            db.session.commit()
+        logger.info('committing')
+        db.session.commit()
+        logger.info('done')
             
     def ensure_user_exists(self):
         try:
@@ -145,11 +154,15 @@ class DatabaseManager:
             logger.warning(
                 f"No active conversation to update for user {self.user_id}")
             return False            
-        # Get all message ids that are linked to this conversation through 
-        # message.conversation_id. Store these in a list.
-        old_messages = Message.query.filter_by(
-            conversation_id=conversation.conversation_id).all()
-        old_message_ids = [msg.message_id for msg in old_messages]
+        logger.info(f'updating conversation {user.active_conversation_id}')
+        logger.info('deleting old messages')
+        # Batch delete all messages linked to this conversation, because we
+        # will recreate new messages
+        db.session.execute(
+            delete(Message).where(
+                Message.conversation_id == conversation.conversation_id)
+        )
+        logger.info('adding new messages')
         # Extract new messages and store them separately
         message_history = conversation_data.pop('message_history', [])
         message_ids = []
@@ -163,12 +176,9 @@ class DatabaseManager:
         encrypted_data = self.encryption_manager.encrypt_data(
             json_data.encode('utf-8'))
         conversation.data = encrypted_data
-        # After the conversation was succesfully updated, remove all
-        # message ids that we stored above, because these are now no longer
-        # necessary. This avoids unlinked message rows.
-        for old_message in old_messages:
-            db.session.delete(old_message)
+        logger.info('committing conversation')
         db.session.commit()
+        logger.info('done')
         return True
 
     def list_conversations(self, query=None) -> dict:

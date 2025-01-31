@@ -99,8 +99,9 @@ class Sigmund:
         and can be None if empty.
         """
         # A temporary hack to prune messages for accounts
-        if message == 'prune_detached_message()':
-            yield ActionReply(f'{config.ai_name} is pruning detached messages')
+        if message == 'prune_detached_messages()':
+            yield ActionReply(
+                f'{config.ai_name} is pruning detached messages ')
             self.database.prune_detached_messages()
             return Reply('Done', None, None, None)
         if config.log_replies:
