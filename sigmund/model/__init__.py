@@ -1,38 +1,32 @@
 from ._base_model import BaseModel
 
 
+OPENAI_MODELS = {
+    'o1': 'o1',
+    'o3-mini': 'o3-mini',
+    'gpt-4': 'gpt-4o',
+    'gpt-4o': 'gpt-4o',
+    'gpt-4o-mini': 'gpt-4o-mini',
+    'gpt-3.5': 'gpt-3.5-turbo'
+}
+ANTHROPIC_MODELS = {
+    'claude-2.1': 'claude-2.1',
+    'claude-3-opus': 'claude-3-opus-20240229',
+    'claude-3-sonnet': 'claude-3-sonnet-20240229',
+    'claude-3-haiku': 'claude-3-haiku-20240307',
+    'claude-3.5-sonnet': 'claude-3-5-sonnet-latest',
+    'claude-3.5-haiku': 'claude-3-5-haiku-latest'
+}
+
+
 def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
-    if model == 'o1':
+    if model in OPENAI_MODELS:
         from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'o1', **kwargs)
-    if model in ('gpt-4', 'gpt-4o'):
-        from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-4o', **kwargs)
-    if model == 'gpt-4o-mini':
-        from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-4o-mini', **kwargs)
-    if model == 'gpt-3.5':
-        from ._openai_model import OpenAIModel
-        return OpenAIModel(sigmund, 'gpt-3.5-turbo', **kwargs)
-    if model == 'claude-2.1':
+        return OpenAIModel(sigmund, OPENAI_MODELS[model], **kwargs)
+    if model in ANTHROPIC_MODELS:
         from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-2.1', **kwargs)
-    if model == 'claude-3-opus':
-        from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-3-opus-20240229', **kwargs)
-    if model == 'claude-3-sonnet':
-        from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-3-sonnet-20240229', **kwargs)
-    if model == 'claude-3.5-sonnet':
-        from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-3-5-sonnet-latest', **kwargs)
-    if model == 'claude-3-haiku':
-        from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-3-haiku-20240307', **kwargs)
-    if model == 'claude-3.5-haiku':
-        from ._anthropic_model import AnthropicModel
-        return AnthropicModel(sigmund, 'claude-3-5-haiku-latest', **kwargs)
+        return AnthropicModel(sigmund, ANTHROPIC_MODELS[model], **kwargs)
     if 'mistral' in model:
         from ._mistral_model import MistralModel
         return MistralModel(sigmund, model, **kwargs)
