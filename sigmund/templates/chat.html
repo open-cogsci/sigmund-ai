@@ -6,8 +6,10 @@
     window.sigmundSettings = {{ settings | safe }}
     </script>
     <script>
+        {% include 'global_elements.js' %}
+        {% include 'workspace.js' %}
+        {% include 'websocket_client.js' %}
         {% include 'main.js' %}
-        {% include 'listener.js' %}
     </script>
     <div id="container">
         <div id="chat-area">

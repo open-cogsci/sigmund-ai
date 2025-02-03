@@ -12,19 +12,32 @@ function connectWebSocket() {
                 clearInterval(retryInterval); // Clear retry interval once connected
                 retryInterval = null;
             }
+            // Rebuild the conversation history
+            let action;
+            let message;
+            socketSendMessage("clear_messages");
+            for (let messageDiv of responseDiv.children) {
+                messageDiv = copyAndStripDiv(messageDiv);
+                if (messageDiv.classList.contains('message-ai')) {
+                    action = 'ai_message';
+                    message = messageDiv.getHTML();
+                } else {
+                    action = 'user_message';
+                    message = messageDiv.textContent;
+                }
+                socketSendMessage(action, message)
+            }
         };
 
         socket.onmessage = function (event) {
             console.log('Received from server:', event.data);
             try {
                 const data = JSON.parse(event.data);
-                if (data.command === 'send_user_message') {
-                    const { message, workspace_content, workspace_language } = data;
-
+                if (data.action === 'user_message') {
                     // Assuming these functions exist to handle the received data
-                    messageInput.value = message;
-                    setWorkspace(workspace_content, workspace_language);
-                    sendMessage(message);
+                    messageInput.value = data.message;
+                    setWorkspace(data.workspace_content, data.workspace_language);
+                    sendMessage(data.message);
                 }
             } catch (error) {
                 // If the message does not adhere to the expected format, ignore it.
@@ -53,9 +66,9 @@ function startReconnect() {
 }
 
 
-function socketSendMessage(message, workspace_content, workspace_language) {
+function socketSendMessage(action, message, workspace_content, workspace_language) {
     const data = JSON.stringify({
-        command: "send_ai_message",
+        action: action,
         message: message,
         workspace_content: workspace_content,
         workspace_language: workspace_language,
@@ -65,4 +78,28 @@ function socketSendMessage(message, workspace_content, workspace_language) {
 }
 
 
-connectWebSocket(); // Initial attempt to connect
+function copyAndStripDiv(originalDiv) {
+  // Clone the original div (deep clone, so copy all descendants)
+  const clonedDiv = originalDiv.cloneNode(true);
+  
+  // List of classes to remove
+  const classesToRemove = [
+    'message-delete',
+    'message-workspace',
+    'message-sources',
+    'message-timestamp',
+    'message-answer-model'
+  ];
+  
+  // For each class we want to remove
+  for (const className of classesToRemove) {
+    const elements = clonedDiv.querySelectorAll(`.${className}`);
+    // Remove each matching element from the cloned div
+    for (const el of elements) {
+      el.remove();
+    }
+  }
+  
+  // Return the stripped clone
+  return clonedDiv;
+}
