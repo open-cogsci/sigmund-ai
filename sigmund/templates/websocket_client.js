@@ -1,6 +1,6 @@
 let socket;
 let retryInterval;
-const retryDelay = 3000; // Retry every 3 seconds
+const retryDelay = 5000;
 
 function connectWebSocket() {
     try {
@@ -9,10 +9,13 @@ function connectWebSocket() {
         socket.onopen = function () {
             console.log('Connected to server');
             if (retryInterval) {
-                clearInterval(retryInterval); // Clear retry interval once connected
+                clearInterval(retryInterval); 
                 retryInterval = null;
             }
-            // Rebuild the conversation history
+            // CHANGED: Show the "connected-status" div on successful connection
+            document.getElementById('connected-status').style.display = 'block';
+
+            // Rebuild conversation history
             let action;
             let message;
             socketSendMessage("clear_messages");
@@ -30,34 +33,31 @@ function connectWebSocket() {
         };
 
         socket.onmessage = function (event) {
-            console.log('Received from server:', event.data);
             try {
                 const data = JSON.parse(event.data);
                 if (data.action === 'user_message') {
-                    // Assuming these functions exist to handle the received data
                     messageInput.value = data.message;
                     setWorkspace(data.workspace_content, data.workspace_language);
                     sendMessage(data.message);
                 }
             } catch (error) {
                 // If the message does not adhere to the expected format, ignore it.
-                console.error('Error parsing message data or data does not conform to expected format:', error);
             }
         };
 
         socket.onclose = function () {
             console.log('Disconnected from server');
+            document.getElementById('connected-status').style.display = 'none';
             startReconnect();
         };
 
         socket.onerror = function () {
-            console.log('Attempting to reconnect...');
             socket.close(); // Gracefully close socket on error
         };
     } catch (error) {
-        console.log('Failed to connect:');
     }
 }
+
 
 function startReconnect() {
     if (!retryInterval) {
