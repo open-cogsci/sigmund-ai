@@ -59,11 +59,13 @@ def score_testcase(description, question, requirements, n=3):
     validation_model = model(sigmund, 'gpt-4')
     scores = []
     for i in range(n):
-        for answer, documentation in sigmund.send_user_message(question):
+        for reply in sigmund.send_user_message(question):
             pass
+        answer = reply.msg
         while True:
             validation_response = validation_model.predict(
-                VALIDATION_TEMPLATE.format(requirements=requirements, answer=answer))
+                VALIDATION_TEMPLATE.format(requirements=requirements,
+                                           answer=answer))
             logger.info('Question:')
             logger.info(question)
             logger.info('Answer:')
@@ -116,6 +118,12 @@ def test_openai():
 
 def test_openai_o1():
     config.settings_default['model_config'] = 'openai_o1'
+    init_testlog()
+    score_testcases()
+    
+    
+def test_openai_o3():
+    config.settings_default['model_config'] = 'openai_o3'
     init_testlog()
     score_testcases()
     
