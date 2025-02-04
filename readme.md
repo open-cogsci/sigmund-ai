@@ -48,9 +48,9 @@ Download the source code, and in the folder of the source code execute the follo
 ```
 # Specify API keys for model providers. Even when using Anthropic (Claude) or
 # Mistral, an OpenAI key is provided when document search is enabled
-export OPENAI_API_KEY = 'your key here'
-export ANTHROPIC_API_KEY = 'your key here'
-export MISTRAL_API_KEY = 'your key here'
+export OPENAI_API_KEY="your key here"
+export ANTHROPIC_API_KEY="your key here"
+export MISTRAL_API_KEY="your key here"
 pip install .               # install dependencies
 python index_library.py     # build library (documentation) index
 python app.py               # start the app
@@ -59,7 +59,7 @@ python app.py               # start the app
 Next, access the app (by default) through:
 
 ```
-https://127.0.0.1:5000/
+http://127.0.0.1:5000/
 ```
 
 
