@@ -263,6 +263,7 @@ async function sendMessage(message) {
         });
         cancelButton.onclick = null;
         cancelButton.style.display = 'none';
+        socketSendMessage("cancel_message");
     }
     cancelButton.onclick = cancelStreaming;
 }
