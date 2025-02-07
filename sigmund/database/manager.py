@@ -212,6 +212,25 @@ class DatabaseManager:
             except Exception as e:
                 logger.error(f"Error decrypting conversation data: {e}")
         return conversations
+    
+    def export_conversations(self) -> dict:
+        conversations = []
+        user = User.query.filter_by(user_id=self.user_id).one()
+        for conversation in \
+                Conversation.query.filter_by(user_id=self.user_id).all():
+            try:
+                decrypted_data = self.encryption_manager.decrypt_data(
+                    conversation.data)
+                conversation_data = json.loads(decrypted_data)
+                message_ids = conversation_data.get('message_history', [])
+                message_history = [self.get_message(msg_id)
+                                   for msg_id in message_ids]
+            except Exception as e:
+                logger.error(f"Error decrypting conversation data: {e}")
+            else:
+                conversation_data['message_history'] = message_history
+                conversations.append(conversation_data)
+        return conversations    
 
     def new_conversation(self) -> bool:
         try:

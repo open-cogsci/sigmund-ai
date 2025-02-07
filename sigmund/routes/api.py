@@ -102,6 +102,21 @@ def delete_conversation(conversation_id):
     return '', 204
 
 
+@api_blueprint.route('/conversation/export', methods=['GET'])
+@login_required
+def export_conversations():
+    sigmund = get_sigmund()
+    conversations = sigmund.database.export_conversations()
+    if conversations:
+        response = make_response(json.dumps(conversations))
+        response.headers['Content-Type'] = 'application/json'
+        response.headers['Content-Disposition'] = \
+            f'attachment; filename=sigmund-export.json'
+        return response
+    return jsonify(success=False,
+                   message="No conversations found or access denied"), 404
+
+
 @api_blueprint.route('/attachments/list', methods=['GET', 'POST'])
 @login_required
 def list_attachments():
