@@ -1,6 +1,7 @@
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from sigmund.utils import prepare_messages, extract_workspace, \
-    remove_masked_elements, process_ai_message, dedent_code_blocks
+    remove_masked_elements, process_ai_message, dedent_code_blocks, \
+    fix_markdown_headings, fix_bullet_points
 
 
 def test_prepare_messages():
@@ -238,13 +239,12 @@ def test():
     pass
 ~~~
 
-But not this (because it's not uniformly indented): 
+But not this (because it's not uniformly indented):
 
     ```
 def test():
     pass
 ```
-
 '''
     actual_output = process_ai_message(test_case)    
     assert expected_output == actual_output
@@ -338,3 +338,140 @@ Done"""
         for desc, input_text, expected in test_cases:
             print(desc)
             dedent_code_blocks(input_text) == expected
+
+
+def test_fix_markdown_headings():
+    """
+    Runs assertion-based tests on the fix_markdown_headings function.
+    """
+
+    test_cases = [
+        {
+            "name": "Box drawing characters around a normal heading",
+            "input": """────────────────────────────────────
+Heading 1
+────────────────────────────────────
+This is some text after heading 1.
+""",
+            "expected": """## Heading 1
+
+This is some text after heading 1.
+
+"""
+        },
+        {
+            "name": "Dashed lines around heading",
+            "input": """-----------------------
+Second Heading
+-----------------------
+Some more text follows here.
+""",
+            "expected": """## Second Heading
+
+Some more text follows here.
+
+"""
+        },
+        {
+            "name": "A blank heading (should NOT convert)",
+            "input": """────────────────
+
+────────────────
+We had blank lines.
+""",
+            "expected": """────────────────
+
+────────────────
+We had blank lines.
+
+"""
+        },
+        {
+            "name": "No rule lines at all",
+            "input": """Just a piece of text.
+No headings here whatsoever.
+""",
+            "expected": """Just a piece of text.
+No headings here whatsoever.
+
+"""
+        },
+        {
+            "name": "Multiple headings in succession",
+            "input": """────────────────────────
+Heading A
+────────────────────────
+Text under heading A.
+
+-----------------------
+Heading B
+-----------------------
+Text under heading B.
+""",
+            "expected": """## Heading A
+
+Text under heading A.
+
+## Heading B
+
+Text under heading B.
+
+"""
+        },
+        {
+            "name": "Heading followed by more dash lines (should only use pairs)",
+            "input": """-----------------------
+Misinterpreted?
+-----------------------
+-----------------------
+Real Heading
+-----------------------
+More text.
+""",
+            "expected": """## Misinterpreted?
+
+## Real Heading
+
+More text.
+
+"""
+        }
+    ]
+    
+    for case in test_cases:
+        result = fix_markdown_headings(case["input"])
+        assert result.rstrip() == case["expected"].rstrip(), (
+            f"Test '{case['name']}' failed.\n"
+            f"Expected:\n{repr(case['expected'])}\n"
+            f"Got:\n{repr(result)}"
+        )
+    
+    print("All tests passed!")
+
+
+def test_fix_bullet_points():
+    # 1) A line that starts with '• ' becomes '- '
+    input_text = "• This is a bullet.\nSome other line.\n• Another bullet."
+    expected = "- This is a bullet.\nSome other line.\n- Another bullet."
+    output = fix_bullet_points(input_text)
+    assert output == expected, f"1) Expected:\n{expected}\nGot:\n{output}"
+    
+    # 2) A line that has '•' not at the start but in the middle of text remains unchanged
+    input_text = "Some line with a • in the middle."
+    expected = "Some line with a • in the middle."
+    output = fix_bullet_points(input_text)
+    assert output == expected, f"2) Expected:\n{expected}\nGot:\n{output}"
+    
+    # 3) No bullets
+    input_text = "No special bullet points here."
+    expected = "No special bullet points here."
+    output = fix_bullet_points(input_text)
+    assert output == expected, f"3) Expected:\n{expected}\nGot:\n{output}"
+    
+    # 4) Mixed lines
+    input_text = "• bullet\nplain line\n• bullet again\n"
+    expected = "- bullet\nplain line\n- bullet again\n"
+    output = fix_bullet_points(input_text)
+    assert output == expected, f"4) Expected:\n{expected}\nGot:\n{output}"
+    
+    print("All tests for fix_bullet_points passed!")

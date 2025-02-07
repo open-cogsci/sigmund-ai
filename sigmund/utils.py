@@ -180,6 +180,8 @@ def process_ai_message(msg):
     if msg and not msg[0].isalpha():
         msg = '\n\n' + msg
     msg = dedent_code_blocks(msg)
+    msg = fix_markdown_headings(msg)
+    msg = fix_bullet_points(msg)
     return msg
 
 
@@ -263,3 +265,58 @@ def dedent_code_blocks(message: str) -> str:
             i = i_block
 
     return "".join(result)
+
+
+def fix_markdown_headings(text: str) -> str:
+    """
+    Converts text with heading lines of repeated '─' or '-' surrounding a heading
+    into valid Markdown headings, ensuring each heading is non-empty and followed by
+    a blank line.
+    
+    Example:
+      ────────────────────────────────────────────────────────────────────────
+      Why you’re getting “Bad file descriptor”
+      ────────────────────────────────────────────────────────────────────────
+      
+    becomes:
+      ## Why you’re getting “Bad file descriptor”
+      
+      (with a blank line after)
+    """
+    lines = text.splitlines()
+    output = []
+    i = 0
+    while i < len(lines):
+        line = lines[i].rstrip()
+        
+        # Check if the current line is a "rule" line
+        if re.fullmatch(r'[─-]{10,}', line):
+            # Make sure we have at least two more lines to consider
+            if i + 2 < len(lines):
+                heading_candidate = lines[i + 1].rstrip()
+                next_line = lines[i + 2].rstrip()
+                
+                # Check if the line after next is also a "rule" line
+                if re.fullmatch(r'[─-]{10,}', next_line):
+                    # Check if the heading candidate is non-empty
+                    if heading_candidate.strip():
+                        # It's a heading: turn the middle line into a heading
+                        output.append(f"## {heading_candidate.strip()}")
+                        output.append("")  # blank line after heading
+                        i += 3
+                        continue
+        
+        # If it's not a heading section, just add the line as is
+        output.append(line)
+        i += 1
+    
+    return "\n".join(output)
+
+
+def fix_bullet_points(text: str) -> str:
+    """
+    Convert lines that start with '• ' into '- '.
+    """
+    # Use a regex that finds lines that begin either at start of text or
+    # after a newline, followed by '•', then a space, e.g. "• ".
+    return re.sub(r"^(?:•)\s+", "- ", text, flags=re.MULTILINE)
