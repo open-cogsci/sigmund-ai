@@ -43,27 +43,6 @@ def render(path, **kwargs):
         **kwargs)
 
 
-def deindent_code_blocks(text):
-    in_block = False
-    lines = []
-    for line_nr, line in enumerate(text.splitlines()):
-        if in_block:
-            block.append(line)
-            # Ending line
-            if line.lstrip().startswith('```'):
-                in_block = False
-                block = textwrap.dedent('\n'.join(block))
-                lines.append(block)
-            continue
-        # Starting line
-        if line.lstrip().startswith('```'):
-            in_block = True
-            block = [line]
-        else:
-            lines.append(line)
-    return '\n'.join(lines)
-    
-    
 def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
                      merge_consecutive=False, merge_separator='\n'):
     """Takes a list of Message objects formats them to meet the requirements
@@ -258,6 +237,9 @@ def dedent_code_blocks(message: str) -> str:
             # Check uniform indentation for ALL lines in block (opening + content + closing)
             all_share_indent = True
             for bline in block_lines:
+                # Ignore empty lines
+                if not bline.strip():
+                    continue                
                 mo_line = re.match(r'^([ \t]*)(.*)$', bline)
                 if mo_line:
                     line_indent = mo_line.group(1)
@@ -267,7 +249,8 @@ def dedent_code_blocks(message: str) -> str:
 
             if all_share_indent:
                 # Dedent each line by removing the common indent
-                dedented = [bline[len(indent):] for bline in block_lines]
+                dedented = [bline[len(indent):] if bline.strip() else bline
+                            for bline in block_lines]
                 result.extend(dedented)
             else:
                 # Keep block as-is

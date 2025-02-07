@@ -177,6 +177,7 @@ This as well:
 
 	```python
 	def test():
+
 	    pass
 	```
 
@@ -221,6 +222,7 @@ This as well:
 
 ```python
 def test():
+
     pass
 ```
 
