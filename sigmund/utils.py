@@ -167,6 +167,7 @@ def current_datetime():
 
 
 def process_ai_message(msg):
+    msg = fix_bullet_points(msg)
     # This pattern looks for a colon possibly followed by any number of
     # whitespaces
     # and/or HTML tags, followed by a newline and a dash, and
@@ -181,7 +182,6 @@ def process_ai_message(msg):
         msg = '\n\n' + msg
     msg = dedent_code_blocks(msg)
     msg = fix_markdown_headings(msg)
-    msg = fix_bullet_points(msg)
     return msg
 
 
