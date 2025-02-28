@@ -15,7 +15,9 @@ ANTHROPIC_MODELS = {
     'claude-3-sonnet': 'claude-3-sonnet-20240229',
     'claude-3-haiku': 'claude-3-haiku-20240307',
     'claude-3.5-sonnet': 'claude-3-5-sonnet-latest',
-    'claude-3.5-haiku': 'claude-3-5-haiku-latest'
+    'claude-3.7-sonnet': 'claude-3-7-sonnet-latest',
+    'claude-3.7-sonnet-thinking': 'claude-3-7-sonnet-latest',
+    'claude-3.5-haiku': 'claude-3-5-haiku-latest',
 }
 
 
@@ -26,6 +28,8 @@ def model(sigmund, model, **kwargs):
         return OpenAIModel(sigmund, OPENAI_MODELS[model], **kwargs)
     if model in ANTHROPIC_MODELS:
         from ._anthropic_model import AnthropicModel
+        if model.endswith('-thinking'):
+            kwargs['thinking'] = True
         return AnthropicModel(sigmund, ANTHROPIC_MODELS[model], **kwargs)
     if 'mistral' in model:
         from ._mistral_model import MistralModel

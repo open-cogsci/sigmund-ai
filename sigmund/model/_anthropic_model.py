@@ -9,9 +9,10 @@ class AnthropicModel(BaseModel):
     
     supports_not_done_yet = False
     
-    def __init__(self, sigmund, model, **kwargs):
+    def __init__(self, sigmund, model, thinking=False, **kwargs):
         from anthropic import Anthropic, AsyncAnthropic
         super().__init__(sigmund, **kwargs)
+        self._thinking = thinking
         self._model = model
         self._tool_use_id = 0
         self._client = Anthropic(api_key=config.anthropic_api_key)
@@ -119,12 +120,17 @@ class AnthropicModel(BaseModel):
         if messages[0]['role'] == 'system':
             kwargs['system'] = messages[0]['content']
             messages = messages[1:]
+        if self._thinking:
+            kwargs['thinking'] = {
+                "type": "enabled",
+                "budget_tokens": config.anthropic_max_thinking_tokens
+            }
         return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):
         return self._anthropic_invoke(
-            self._client.beta.tools.messages.create, messages)
+            self._client.messages.create, messages)
         
     def async_invoke(self, messages):
         return self._anthropic_invoke(
-            self._async_client.beta.tools.messages.create, messages)
+            self._async_client.messages.create, messages)
