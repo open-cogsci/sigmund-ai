@@ -74,7 +74,7 @@ large_tool_result_length = 50000
 # model.
 max_tokens_per_hour = 500000
 max_tokens_per_hour_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
-
+anthropic_max_thinking_tokens = 2048
 
 # LOGGING
 #
@@ -121,10 +121,16 @@ model_config = {
         'answer_model': 'o1'
     },
     'anthropic': {
-        'search_model': 'claude-3.5-sonnet',
-        'condense_model': 'claude-3.5-sonnet',
-        'public_model': 'claude-3-haiku',
-        'answer_model': 'claude-3.5-sonnet'
+        'search_model': 'claude-3.7-sonnet',
+        'condense_model': 'claude-3.7-sonnet',
+        'public_model': 'claude-3.5-haiku',
+        'answer_model': 'claude-3.7-sonnet'
+    },
+    'anthropic_thinking': {
+        'search_model': 'claude-3.7-sonnet',
+        'condense_model': 'claude-3.7-sonnet',
+        'public_model': 'claude-3.5-haiku',
+        'answer_model': 'claude-3.7-sonnet-thinking'
     },
     'mistral': {
         'search_model': 'mistral-large-latest',
@@ -142,7 +148,7 @@ model_config = {
 # Model-specific keyword arguments that are passed to the message generation
 # functions
 anthropic_kwargs = {
-    'max_tokens': 1024
+    'max_tokens': 4096
 }
 openai_kwargs = {}
 mistral_kwargs = {}

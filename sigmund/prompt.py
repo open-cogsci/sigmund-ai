@@ -32,8 +32,9 @@ JUDGE_RELEVANCE = '''Is the document relevant for answering the question?
 
 # Question
 
+<question>
 {{ question }}
-"""
+</question>
 
 # Document
 

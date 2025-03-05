@@ -146,8 +146,13 @@ def test_mistral():
     score_testcases()
 
 
-def test_anthropic():
+def test_anthropic_regular():
     config.settings_default['model_config'] = 'anthropic'
+    init_testlog()
+    score_testcases()
+    
+def test_anthropic_thinking():
+    config.settings_default['model_config'] = 'anthropic_thinking'
     init_testlog()
     score_testcases()
 
