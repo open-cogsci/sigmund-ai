@@ -18,8 +18,17 @@ function connectWebSocket() {
             // Rebuild conversation history
             let action;
             let message;
+			let workspace;
             socketSendMessage("clear_messages");
             for (let messageDiv of responseDiv.children) {
+				workspace = messageDiv.querySelector('.message-workspace');
+				if (workspace !== null) {
+					workspace_content = messageDiv.querySelector('.workspace-content').textContent;
+					workspace_language = messageDiv.querySelector('.workspace-language').textContent;
+				} else {
+					workspace_content = null;
+					workspace_language = null;
+				}
                 messageDiv = copyAndStripDiv(messageDiv);
                 if (messageDiv.classList.contains('message-ai')) {
                     action = 'ai_message';
@@ -28,7 +37,7 @@ function connectWebSocket() {
                     action = 'user_message';
                     message = messageDiv.textContent;
                 }
-                socketSendMessage(action, message)
+                socketSendMessage(action, message, workspace_content, workspace_language, true);
             }
         };
 
@@ -66,12 +75,16 @@ function startReconnect() {
 }
 
 
-function socketSendMessage(action, message, workspace_content, workspace_language) {
+function socketSendMessage(action, message, workspace_content, workspace_language, on_connect) {
+	if (typeof on_connect === 'undefined') {
+		on_connect = false;
+	}
     const data = JSON.stringify({
         action: action,
         message: message,
         workspace_content: workspace_content,
         workspace_language: workspace_language,
+		on_connect: on_connect
     });
     console.log('Sending to server:', data);
     socket.send(data);
