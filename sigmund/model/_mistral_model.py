@@ -2,8 +2,6 @@ from .. import config, utils
 from . import BaseModel
 from ._openai_model import OpenAIModel
 import logging
-from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
-    FunctionMessage
 logger = logging.getLogger('sigmund')
 
 

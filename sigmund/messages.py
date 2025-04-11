@@ -1,13 +1,7 @@
 import logging
-import json
-import zlib
 import uuid
-import time
-import re
-from pathlib import Path
 from cryptography.fernet import InvalidToken
-from .model import model
-from . import prompt, config, utils, attachments
+from . import prompt, config, utils
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, \
     FunctionMessage
 logger = logging.getLogger('sigmund')
@@ -183,8 +177,6 @@ class Messages:
         else:
             system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
         system_prompt.append(prompt.WORKSPACE_PROMPT)
-        system_prompt.append(
-            attachments.attachments_prompt(self._sigmund.database))
         # For models that support this, there is also an instruction indicating
         # that a special marker can be sent to indicate that the response isn't
         # done yet. Not all models support this to avoid infinite loops.

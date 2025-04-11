@@ -38,19 +38,7 @@
                    id="tool-generate-image" 
                    v-model="tool_generate_image">
             <label for="tool-generate-image">Image generation</label>
-        </div>
-        <div class="tool-item">
-            <input type="checkbox" 
-                   id="tool-download" 
-                   v-model="tool_download">
-            <label for="tool-download">Download</label>
-        </div>            
-        <div class="tool-item">
-            <input type="checkbox" 
-                   id="tool-read-attachment" 
-                   v-model="tool_read_attachment">
-            <label for="tool-read-attachment">Attachments</label>
-        </div>
+        </div>           
         <small>Only enable tools that you need for best performance</small>
     </div>
     <hr class="menu-divider">
@@ -100,7 +88,6 @@
     <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
-    <div @click="showAttachments">Browse attachments</div>
     <hr class="menu-divider">    
     <div @click="navigateTo('/about')">About</div>
     <div @click="navigateTo('/terms')">Terms and conditions</div>
@@ -126,39 +113,6 @@
         <span @click="activateConversation(conversation.id)" class="conversation-title">
           {{ conversation.title }}
         </span>
-      </div>
-    </div>
-  </div>
-  <!-- Modal for browsing attachments -->
-  <div class="modal" v-if="showAttachmentsModal" v-bind:class="{ 'active': showAttachmentsModal }">
-    <div class="modal-content">
-      <div id='attachment-heading'>Attachments
-        <div class="close" @click="closeAttachmentsModal"><i class="fas fa-window-close"></i></div>
-      </div>
-      <div id="loadingAttachmentsMessage" v-show="isLoadingAttachments">Loading attachments …</div>
-      <div v-if="Object.keys(attachments).length === 0" class="no-attachments">
-        No attachments
-      </div>
-      <div v-else v-for="(attachment, id) in attachments" :key="id">
-        <span class="delete-attachment" @click="deleteAttachment(id)">
-          <i class="fas fa-trash-alt"></i>
-        </span>
-        <span class="attachment-filename" @click="downloadAttachment(id)">
-          {{ attachment.filename }}
-        </span>
-        <span class="attachment-description" @click="downloadAttachment(id)">
-          {{ attachment.description }}
-        </span>
-      </div>
-      <!-- Upload section -->
-      <div class="attachment-upload">
-        <div id="uploadMessage" v-show="isUploading">Uploading and reading, please wait …</div>
-        <div class="file-upload-wrapper">
-          <button class="file-upload-button">
-            <i class="fas fa-cloud-upload-alt"></i> Upload File
-          </button>
-          <input type="file" class="file-upload-input" id="fileInput" @change="uploadAttachment" />
-        </div>
       </div>
     </div>
   </div>
@@ -197,9 +151,7 @@ new Vue({
     menuVisible: false,
     showModal: false,
     conversations: {},
-    showAttachmentsModal: false,
     showManageSubscriptions: {{ subscription_required|lower }},
-    attachments: {},
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
     forceModelConfigUpdate: 0,
@@ -207,11 +159,9 @@ new Vue({
     tool_download: sigmundSettings.tool_download === 'true',
     tool_execute_code: sigmundSettings.tool_execute_code === 'true',
     tool_generate_image: sigmundSettings.tool_generate_image === 'true',
-    tool_read_attachment: sigmundSettings.tool_read_attachment === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
     shouldShowNewConversationButton: true,
     isLoadingConversations: true,
-    isLoadingAttachments: true,
     searchQuery: ''
   },
   computed: {
@@ -227,7 +177,6 @@ new Vue({
     tool_download(value) { setSetting('tool_download', value); },
     tool_execute_code(value) { setSetting('tool_execute_code', value); },
     tool_generate_image(value) { setSetting('tool_generate_image', value); },
-    tool_read_attachment(value) { setSetting('tool_read_attachment', value); },
     tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); }
   },
   methods: {
@@ -294,71 +243,6 @@ new Vue({
             this.fetchConversations();
           }
         });
-    },
-    showAttachments: function() {
-      this.fetchAttachments();
-      this.showAttachmentsModal = true;
-      this.menuVisible = false;
-      console.log('showing attachments');
-    },
-    closeAttachmentsModal: function() {
-      this.showAttachmentsModal = false;
-    },
-    fetchAttachments: function() {
-      fetch('/api/attachments/list')
-        .then(response => response.json())
-        .then(data => {
-          this.attachments = data;
-          this.isLoadingAttachments = false;
-        })
-        .catch(error => {
-          console.error('Error fetching attachments:', error);
-        });
-    },
-    downloadAttachment: function(attachmentId) {
-      window.location.href = `/api/attachments/get/${attachmentId}`;
-    },
-    deleteAttachment: function(attachmentId) {
-      // Optimistically remove the attachment from the list
-      Vue.delete(this.attachments, attachmentId);
-      // Make delete request to server
-      fetch(`/api/attachments/delete/${attachmentId}`, { method: 'DELETE' })
-        .then(response => {
-          if (!response.ok) {
-            // If the delete failed, add it back to the list
-            this.fetchAttachments();
-          }
-        });
-    },
-    uploadAttachment: function(event) {
-      this.isUploading = true;
-      const fileInput = event.target;
-      if (fileInput.files.length === 0) {
-        return;
-      }
-      const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/attachments/add', true);
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          if (response.success) {
-            this.fetchAttachments(); // Refresh the list after upload
-          } else {
-            // Handle error
-            console.error('Upload failed:', response.message);
-          }
-        } else {
-          // Handle error
-          console.error('Error during upload:', xhr.statusText);
-        }
-        this.isUploading = false;
-      };
-
-      xhr.send(formData);
     }
   }
 });

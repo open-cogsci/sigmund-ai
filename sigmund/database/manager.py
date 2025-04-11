@@ -1,17 +1,15 @@
 import json
 import logging
 import time
-import base64
 from datetime import datetime, timedelta
-from .. import config, attachments
-from .models import db, User, Conversation, Attachment, Activity, \
-    Subscription, Setting, Message
+from .. import config
+from .models import db, User, Conversation, Activity, Subscription, Setting, \
+    Message
 from .encryption import EncryptionManager
 from sqlalchemy import func, delete
 from sqlalchemy.orm.exc import NoResultFound
 
 logger = logging.getLogger('sigmund')
-ATTACHMENT_PREFIX = '::plain-text-attachment::'
 
 
 class DatabaseManager:
@@ -215,7 +213,6 @@ class DatabaseManager:
     
     def export_conversations(self) -> dict:
         conversations = []
-        user = User.query.filter_by(user_id=self.user_id).one()
         for conversation in \
                 Conversation.query.filter_by(user_id=self.user_id).all():
             try:
@@ -275,82 +272,7 @@ class DatabaseManager:
         except NoResultFound:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
-            return False    
-
-    def list_attachments(self) -> dict:
-        attachments = Attachment.query.filter_by(user_id=self.user_id).all()
-        attachment_dict = {}
-        for attachment in attachments:
-            try:
-                decrypted_data = self.encryption_manager.decrypt_data(
-                    attachment.data)
-                attachment_data = json.loads(decrypted_data)
-                attachment_dict[attachment.attachment_id] = {
-                    'filename' : attachment_data.get(
-                        'filename', 'No filename'),
-                    'description' : attachment_data.get(
-                        'description', 'No description')
-                }
-            except Exception as e:
-                logger.error(f"Error decrypting attachment data for "
-                             f"attachment_id {attachment.attachment_id}: {e}")
-        return attachment_dict
-
-    def delete_attachment(self, attachment_id: int) -> bool:
-        try:
-            attachment = Attachment.query.filter_by(
-                attachment_id=attachment_id, user_id=self.user_id).one()
-            db.session.delete(attachment)
-            db.session.commit()
-            return True
-        except NoResultFound:
-            logger.warning(f"Attachment {attachment_id} not found or does not "
-                           f"belong to user {self.user_id}")
             return False
-
-    def add_attachment(self, attachment_data: dict) -> int:
-        """Adds an attachment and returns the attachment_id or -1 if an error
-        occurred. attachment_data should be a dict with filename, content,
-        and description keys, where content is a base64-encoded str.
-        """
-        try:
-            attachment_data['plaintext'] = True
-            json_data = json.dumps(attachment_data)
-            encrypted_data = self.encryption_manager.encrypt_data(
-                json_data.encode('utf-8'))
-            attachment = Attachment(user_id=self.user_id, data=encrypted_data)
-            db.session.add(attachment)
-            db.session.commit()
-            return attachment.attachment_id
-        except Exception as e:
-            breakpoint()
-            logger.error(f"Error adding attachment: {e}")
-            return -1
-
-    def get_attachment(self, attachment_id: int) -> dict:
-        try:
-            attachment_record = Attachment.query.filter_by(
-                attachment_id=attachment_id, user_id=self.user_id).one()
-            attachment = json.loads(
-                self.encryption_manager.decrypt_data(attachment_record.data))
-            # Old attachments are stored as binary blobs and need to be
-            # explicitly converted to text. These can be recognized by the
-            # fact that they do not start with the attachment prefix
-            if not attachment.get('plaintext', False):
-                logger.info('attachment stored as binary, decoding')
-                attachment['content'] = attachments.file_to_text(
-                    attachment['filename'],
-                    base64.b64decode(attachment['content']),
-                    self._sigmund.condense_model)
-            return attachment
-        except NoResultFound:
-            logger.warning(f"Attachment {attachment_id} not found or does not "
-                           f"belong to user {self.user_id}")
-            return {}
-        except Exception as e:
-            logger.error(f"Error decrypting attachment data for attachment_id "
-                         f"{attachment_id}: {e}")
-            return {}
 
     def add_activity(self, tokens_consumed: int):
         """Adds the number of tokens consumed using the current time."""

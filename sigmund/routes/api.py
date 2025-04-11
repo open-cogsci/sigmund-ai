@@ -1,11 +1,9 @@
 import json
 import logging
-from werkzeug.utils import secure_filename
 from flask import request, jsonify, Response, redirect, session, \
     stream_with_context, make_response, Blueprint
 from flask_login import login_required
-from .. import config, utils, attachments
-from ..sigmund import Sigmund
+from .. import config
 from ..redis_client import redis_client
 from .app import get_sigmund
 logger = logging.getLogger('sigmund')
@@ -111,66 +109,10 @@ def export_conversations():
         response = make_response(json.dumps(conversations))
         response.headers['Content-Type'] = 'application/json'
         response.headers['Content-Disposition'] = \
-            f'attachment; filename=sigmund-export.json'
+            'attachment; filename=sigmund-export.json'
         return response
     return jsonify(success=False,
                    message="No conversations found or access denied"), 404
-
-
-@api_blueprint.route('/attachments/list', methods=['GET', 'POST'])
-@login_required
-def list_attachments():
-    sigmund = get_sigmund()
-    return jsonify(sigmund.database.list_attachments())
-
-
-@api_blueprint.route('/attachments/delete/<int:attachment_id>',
-                     methods=['DELETE'])
-@login_required
-def delete_attachment(attachment_id):
-    sigmund = get_sigmund()
-    success = sigmund.database.delete_attachment(attachment_id)
-    return jsonify(success=success)
-    
-
-@api_blueprint.route('/attachments/add', methods=['POST'])
-@login_required
-def add_attachment():
-    sigmund = get_sigmund()
-    if 'file' not in request.files:
-        return jsonify(success=False, message="No file part"), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify(success=False, message="No selected file"), 400
-    filename = secure_filename(file.filename)
-    content = attachments.file_to_text(filename, file.read(),
-                                       sigmund.condense_model)
-    file.seek(0)
-    description = attachments.describe_file(filename, content,
-                                            sigmund.condense_model)
-    attachment_data = {'filename': filename,
-                       'content': content,
-                       'description': description}
-    attachment_id = sigmund.database.add_attachment(attachment_data)
-    if attachment_id == -1:
-        return jsonify(success=False, message="Failed to add attachment"), 500
-    else:
-        return jsonify(success=True, attachment_id=attachment_id)
-
-
-@api_blueprint.route('/attachments/get/<int:attachment_id>', methods=['GET'])
-@login_required
-def get_attachment(attachment_id):
-    sigmund = get_sigmund()
-    attachment_data = sigmund.database.get_attachment(attachment_id)
-    if attachment_data:
-        response = make_response(attachment_data['content'])
-        response.headers['Content-Type'] = 'application/octet-stream'
-        response.headers['Content-Disposition'] = \
-            f'attachment; filename={attachment_data["filename"]}'
-        return response
-    return jsonify(success=False,
-                   message="Attachment not found or access denied"), 404
 
 
 @api_blueprint.route('/message/delete/<message_id>', methods=['DELETE'])

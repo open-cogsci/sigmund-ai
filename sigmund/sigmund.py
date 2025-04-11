@@ -1,9 +1,7 @@
 import logging
-import jinja2
 import json
 from types import GeneratorType
-from typing import Tuple, Optional
-from . import config, library
+from . import config
 from .reply import Reply, ActionReply
 from .documentation import Documentation, FAISSDocumentationSource
 from .messages import Messages
@@ -33,11 +31,11 @@ class Sigmund:
         config default will be used.
     """
     def __init__(self, user_id: str, persistent: bool = False,
-                 encryption_key: Optional[str] = None,
-                 search_first: Optional[bool] = None,
-                 model_config: Optional[str] = None,
-                 search_tools: Optional[list] = None,
-                 answer_tools: Optional[list] = None):
+                 encryption_key: str = None,
+                 search_first: bool = None,
+                 model_config: str = None,
+                 search_tools: list = None,
+                 answer_tools: list = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
         # Search first is stored as a str but should be a bool here
@@ -146,7 +144,7 @@ class Sigmund:
         if callable(reply):
             reply()
         else:
-            logger.warning(f'[search state] did not call search tool')
+            logger.warning('[search state] did not call search tool')
         self.documentation.strip_irrelevant(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
@@ -220,7 +218,7 @@ class Sigmund:
         # because the AI sent a NOT_DONE_YET marker, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
             if workspace_content is not None:
-                logger.info(f'workspace content has been updated for feedback')
+                logger.info('workspace content has been updated for feedback')
                 self.messages.workspace_content = workspace_content
                 self.messages.workspace_language = workspace_language
             for reply in self._answer(state='feedback'):

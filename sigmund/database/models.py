@@ -87,14 +87,6 @@ class Message(Model):
     data = Column(LargeBinary)
 
 
-class Attachment(Model):
-    __tablename__ = 'attachment'
-
-    attachment_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
-    data = Column(LargeBinary)
-
-
 class Activity(Model):
     __tablename__ = 'activity'
 

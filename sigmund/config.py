@@ -38,15 +38,6 @@ max_prompt_length = 20000
 # The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
-# ATTACHMENTS
-#
-# The maximum length of the text representation of an attachment that is used
-# to generate a description
-max_text_representation_length = 100000
-# The maximum length of the text representation that is not summarized. Beyond
-# this, the text is summarized rather than stored in its entirety.
-text_respresentation_summary_threshold = 100000
-
 # LIBRARY INDEXING
 #
 # The number of documents that are indexed at once and the delay after each
@@ -160,8 +151,8 @@ mistral_kwargs = {}
 search_tools = ['search_documentation']
 # Answer tools are executed during the answer phase
 answer_tools_with_search = []
-answer_tools_without_search = ['read_attachment', 'search_google_scholar',
-                               'execute_code', 'download', 'generate_image']
+answer_tools_without_search = ['search_google_scholar', 'execute_code',
+                               'generate_image']
 
 # SETTINGS
 #
@@ -171,8 +162,6 @@ settings_default = {
     'model_config': 'openai',
     # Indicates which tools are available in generic assistant mode
     'mode': 'opensesame',
-    'tool_read_attachment': 'true',
-    'tool_download': 'true',
     'tool_execute_code': 'true',
     'tool_read_attachment': 'true',
     'tool_search_google_scholar': 'true',

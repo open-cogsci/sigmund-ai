@@ -10,12 +10,6 @@ SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH = '''You are Sigmund, a brilliant AI assis
 # Sent by AI to indicate that message requires for replies or actions
 NOT_DONE_YET_MARKER = '<NOT_DONE_YET>'
 SYSTEM_PROMPT_NOT_DONE_YET = f'''When you intend to perform an action ("please wait", "I will now"), such as searching or code execution, end your reply with {NOT_DONE_YET_MARKER}.'''
-SYSTEM_PROMPT_ATTACHMENTS = '''# Attachments
-
-You have access to the following attached files:
-
-{{ description }}
-'''
 SYSTEM_PROMPT_CONDENSED = '''Below is a summary of the start of the conversation:
 
 <summary>

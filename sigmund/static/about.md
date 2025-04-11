@@ -59,23 +59,6 @@ Sigmund can also generate images using OpenAI's Dall-E 3 model. Try it!
 > Can you generate an image that represents yourself?
 
 
-### Download files and web pages
-
-Sigmund can download files and web pages and save them as attachments (see below). Try it!
-
-> Can you download this page for me? https://journalofcognition.org/articles/10.5334/joc.18
-
-Limitation: Some websites forbid downloads by automated agents such as Sigmund.
-
-### Read attachments
-
-Sigmund can read attachments, which can be uploaded by the user (Menu → Attachments) or downloaded by Sigmund itself (see above). Let's assume you've downloaded the file above and try it!
-
-> Can you summarize the attached joc.18 file?
-
-Limitation: When attachments are very large, only the start will be read.
-
-
 ## Sigmund is open source
 
 The source code of Sigmund is available on GitHub:
