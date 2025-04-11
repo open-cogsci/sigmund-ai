@@ -129,14 +129,30 @@ async function sendMessage(message) {
     // Start the chat streaming. We need to do this through a separate endpoint
     // because the user message may be too long to fit into the URL that we use
     // for streaming.
-    await fetchWithRetry('{{ server_url }}/api/chat/start', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: requestBody(message, workspace.getValue(), workspace.getOption('mode'), user_message_id)
-    }).catch(e => {
-        console.error('Failed to start chat session:', e);
+    const formData = new FormData();
+
+    // Append text fields
+    formData.append('message', message);
+    formData.append('workspace_content', workspace.getValue());
+    formData.append('workspace_language', workspace.getOption('mode'));
+    formData.append('message_id', user_message_id);
+
+    // Append attached files
+    attachments.forEach(file => {
+        formData.append('attachments', file);
     });
+
+    try {
+        // Switch out JSON headers for a multipart/form-data request
+        await fetchWithRetry('{{ server_url }}/api/chat/start', {
+            method: 'POST',
+            body: formData
+        });
+    } catch (e) {
+        console.error('Failed to start chat session:', e);
+    }
     function endStream() {
+        clearAttachments();
         clearInterval(messageInterval);
         messageInput.disabled = false;
         sendButton.style.display = 'block';
@@ -146,7 +162,7 @@ async function sendMessage(message) {
     }
     // Now start streaming
     const eventSource = new EventSource('{{ server_url }}/api/chat/stream');
-    eventSource.onmessage = function(event) {
+    eventSource.onmessage = function(event) {        
         console.log(event)
         // Parse the JSON message data
         const data = JSON.parse(event.data);

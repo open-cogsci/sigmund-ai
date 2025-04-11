@@ -1,4 +1,3 @@
-import base64
 from sigmund.sigmund import Sigmund
 from .expensive_test_utils import BaseExpensiveTest
 

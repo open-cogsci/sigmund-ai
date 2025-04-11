@@ -84,6 +84,7 @@ class Sigmund:
     
     def send_user_message(self, message: str, workspace_content: str = None,
                           workspace_language: str = 'text',
+                          attachments: list = None,
                           message_id: str = None) -> GeneratorType:
         """The main function that takes a user message and returns one or 
         replies. This is a generator function where each yield gives a tuple.
@@ -118,7 +119,7 @@ class Sigmund:
         if self.search_first:
             for reply in self._search(message):
                 yield reply
-        for reply in self._answer():
+        for reply in self._answer(attachments):
             yield reply
             
     def _rate_limit_exceeded(self):
@@ -149,14 +150,16 @@ class Sigmund:
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
     
-    def _answer(self, state: str = 'answer') -> GeneratorType:
+    def _answer(self, attachments: [] = None,
+                state: str = 'answer') -> GeneratorType:
         """Implements the answer phase."""
         yield ActionReply(f'{config.ai_name} is thinking and typing ')
         logger.info(f'[{state} state] entering')
         # We first collect a regular reply to the user message. While doing so
         # we also keep track of the number of tokens consumed.
         tokens_consumed_before = self.answer_model.total_tokens_consumed
-        reply = self.answer_model.predict(self.messages.prompt())
+        reply = self.answer_model.predict(self.messages.prompt(),
+                                          attachments=attachments)
         tokens_consumed = self.answer_model.total_tokens_consumed \
             - tokens_consumed_before
         logger.info(f'tokens consumed: {tokens_consumed}')
@@ -221,5 +224,5 @@ class Sigmund:
                 logger.info('workspace content has been updated for feedback')
                 self.messages.workspace_content = workspace_content
                 self.messages.workspace_language = workspace_language
-            for reply in self._answer(state='feedback'):
+            for reply in self._answer(attachments, state='feedback'):
                 yield reply

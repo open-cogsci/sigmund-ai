@@ -1,7 +1,10 @@
+import logging
+import tempfile
+import base64
+import os
 from .. import config, utils
 from . import BaseModel
 from ._openai_model import OpenAIModel
-import logging
 logger = logging.getLogger('sigmund')
 
 
@@ -10,20 +13,19 @@ class MistralModel(OpenAIModel):
     supports_not_done_yet = False
 
     def __init__(self, sigmund, model, **kwargs):
-        from mistralai.async_client import MistralAsyncClient
-        from mistralai.client import MistralClient
+        from mistralai import Mistral
         BaseModel.__init__(self, sigmund, **kwargs)
         self._model = model
+        self._actual_model = self._model
         # Mistral doesn't allow a tool to be specified by name. So if this
         # happens, we instead use the 'any' option, which forces use of the
         # best fitting tool, which in the case of a single tool boils down to
         # the same thing as forcing the tool by name.
         if self._tool_choice not in [None, 'none', 'auto', 'any']:
             self._tool_choice = 'any'
-        self._client = MistralClient(api_key=config.mistral_api_key)
-        self._async_client = MistralAsyncClient(api_key=config.mistral_api_key)
+        self._client = Mistral(api_key=config.mistral_api_key)
         
-    def predict(self, messages):
+    def predict(self, messages, attachments=None, track_tokens=True):
         if isinstance(messages, str):
             messages = [self.convert_message(messages)]
         else:
@@ -44,7 +46,44 @@ class MistralModel(OpenAIModel):
             logger.info('adding assistant message between tool and user')
             messages.insert(i + 1, {'role': 'assistant',
                                 'content': 'Tool was executed.'})
-        return BaseModel.predict(self, messages)
+        # Attachments are included with the last message. The content is now
+        # no longer a single str, but a list of dict
+        self._actual_model = self._model
+        if attachments:
+            logger.info('adding attachments to last message')
+            content = [{'type': 'text', 'text': messages[-1]['content']}]
+            for attachment in attachments:
+                # Decompose the HTML-style data into a mimetype and the 
+                # actual data
+                url = attachment['url']
+                data = url[url.find(',') + 1:]                
+                if attachment['type'] == 'image':
+                    # Vision requires a special model (pixtral). This model also
+                    # understands text and documents, so whenever there is a 
+                    # single attachment, we switch to using this model.
+                    self._actual_model = \
+                        config.model_config['mistral']['vision_model']
+                    content.append({'type': 'image_url',
+                                    'image_url': attachment['url']})
+                elif attachment['type'] == 'document':
+                    # Documents have to be uploaded first, and then provided as
+                    # a url
+                    tmp_file = tempfile.NamedTemporaryFile(delete=False)
+                    tmp_file.write(base64.b64decode(data))
+                    tmp_file.close()
+                    uploaded_pdf = self._client.files.upload(
+                        file={
+                            "file_name": attachment['file_name'],
+                            "content": open(tmp_file.name, 'rb'),
+                        },
+                        purpose="ocr"
+                    )
+                    os.remove(tmp_file.name)
+                    signed_url = self._client.files.get_signed_url(file_id=uploaded_pdf.id)
+                    content.append({'type': 'document_url',
+                                    'document_url': signed_url.url})
+            messages[-1]['content'] = content
+        return BaseModel.predict(self, messages, attachments, track_tokens)
         
     def _tool_call_id(self, nr):
         # Must be a-z, A-Z, 0-9, with a length of 9
@@ -61,10 +100,10 @@ class MistralModel(OpenAIModel):
         kwargs.update(config.mistral_kwargs)
         if self.json_mode:
             kwargs['response_format'] = {"type": "json_object"}
-        return fnc(model=self._model, messages=messages, **kwargs)
+        return fnc(model=self._actual_model, messages=messages, **kwargs)
     
     def invoke(self, messages):
-        return self._mistral_invoke(self._client.chat, messages)
+        return self._mistral_invoke(self._client.chat.complete, messages)
         
-    def async_invoke(self, messages):
-        return self._mistral_invoke(self._async_client.chat, messages)
+    def async_invoke(self, messages, attachments=None):
+        return self._mistral_invoke(self._client.chat.complete_async, messages)

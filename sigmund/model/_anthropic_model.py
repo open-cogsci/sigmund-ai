@@ -18,13 +18,14 @@ class AnthropicModel(BaseModel):
         self._client = Anthropic(api_key=config.anthropic_api_key)
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)
         
-    def predict(self, messages):
+    def predict(self, messages, attachments=None, track_tokens=True):
         # import pprint
         # print('=== preparing tool messages')
         # pprint.pprint(messages)
         # print('---')        
         if isinstance(messages, str):
-            return super().predict([self.convert_message(messages)])
+            return super().predict([self.convert_message(messages)],
+                                   attachments, track_tokens)
         messages = utils.prepare_messages(messages, allow_ai_first=False,
                                           allow_ai_last=False,
                                           merge_consecutive=True)
@@ -79,9 +80,33 @@ class AnthropicModel(BaseModel):
                 break
             logger.info('dropping duplicate user message')
             messages.remove(next_message)
-        # pprint.pprint(messages)
-        # print('=== end preparing tool messages')                
-        return super().predict(messages)
+        # Attachments are included with the last message. The content is now
+        # no longer a single str, but a list of dict
+        if attachments:
+            logger.info('adding attachments to last message')
+            content = [{'type': 'text', 'text': messages[-1]['content']}]
+            for attachment in attachments:
+                # Decompose the HTML-style data into a mimetype and the 
+                # actual data
+                url = attachment['url']
+                mimetype = url[5:url.find(';')]
+                data = url[url.find(',') + 1:]
+                if attachment['type'] == 'image':
+                    content.append({
+                        'type': 'image',
+                        'source': {'type': 'base64',
+                                   'media_type': mimetype,
+                                   'data': data}
+                    })
+                elif attachment['type'] == 'document':
+                    content.append({
+                        'type': 'document',
+                        'source': {'type': 'base64',
+                                   'media_type': mimetype,
+                                   'data': data}
+                    })
+            messages[-1]['content'] = content
+        return super().predict(messages, attachments, track_tokens)
         
     def get_response(self, response):
         text = []
@@ -128,9 +153,8 @@ class AnthropicModel(BaseModel):
         return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):
-        return self._anthropic_invoke(
-            self._client.messages.create, messages)
+        return self._anthropic_invoke(self._client.messages.create, messages)
         
     def async_invoke(self, messages):
-        return self._anthropic_invoke(
-            self._async_client.messages.create, messages)
+        return self._anthropic_invoke(self._async_client.messages.create,
+                                      messages)

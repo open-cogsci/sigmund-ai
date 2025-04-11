@@ -5,8 +5,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from flask import redirect, url_for, session, Blueprint
-from flask_login import login_user, login_required, current_user, \
-    logout_user, UserMixin
+from flask_login import login_user, current_user, logout_user, UserMixin
 from .. import config
 from .. import utils
 from ..forms import LoginForm
@@ -114,7 +113,7 @@ def login_handler(form, failed=False):
             kdf.derive(password.encode()))
         user = User(username)
         login_user(user)
-        logger.info(f'initializing encryption key')
+        logger.info('initializing encryption key')
         return redirect('/')
     login_text = Path('sigmund/static/login.md').read_text()
     if failed:
@@ -133,7 +132,7 @@ def about():
     
     
 @app_blueprint.route('/user_question_guide')
-def user_questin_guide():
+def user_question_guide():
     return utils.render(
         'info-page.html',
         content=utils.md(Path('sigmund/static/user_question_guide.md').read_text()))

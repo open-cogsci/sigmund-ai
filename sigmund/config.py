@@ -127,7 +127,8 @@ model_config = {
         'search_model': 'mistral-large-latest',
         'condense_model': 'open-mistral-nemo',
         'public_model': 'gpt-4o-mini',
-        'answer_model': 'mistral-large-latest'
+        'answer_model': 'mistral-large-latest',
+        'vision_model': 'pixtral-large-latest'
     },
     'dummy': {
         'search_model': 'dummy',

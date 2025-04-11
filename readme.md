@@ -17,8 +17,6 @@ Features:
 - __Tool use__ (in research-assistant mode):
     - __Code execution__: ability to execute Python and R code
     - __Google Scholar search__: ability to search for articles on Google Scholar
-    - __Attachments__: ability to read attachments
-    - __Download__: ability to download pages and files as attachments
     - __Image generation__: ability to generate images
     
 Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), and [Mistral](https://mistral.ai/) are supported. API keys from these respective providers are required.

@@ -19,7 +19,7 @@ class OpenAIModel(BaseModel):
         self._client = Client(api_key=config.openai_api_key)
         self._async_client = AsyncClient(api_key=config.openai_api_key)
         
-    def predict(self, messages):
+    def predict(self, messages, attachments=None, track_tokens=True):
         # Strings need to be converted a list of length one with a single
         # message dict
         if isinstance(messages, str):
@@ -27,7 +27,26 @@ class OpenAIModel(BaseModel):
         else:
             messages = [self.convert_message(message) for message in messages]
             messages = self._prepare_tool_messages(messages)
-        return super().predict(messages)
+        # Attachments are included with the last message. The content is now
+        # no longer a single str, but a list of dict            
+        if attachments:
+            logger.info('adding attachments to last message')
+            content = [{'type': 'text', 'text': messages[-1]['content']}]
+            for attachment in attachments:
+                if attachment['type'] == 'image':
+                    content.append({
+                        'type': 'image_url',
+                        'image_url': {'url': attachment['url']}
+                        })
+                elif attachment['type'] == 'document':
+                    content.append({
+                        'type': 'file',
+                        'file': {
+                            'filename': attachment['file_name'],
+                            'file_data': attachment['url']
+                        }})
+            messages[-1]['content'] = content            
+        return super().predict(messages, attachments, track_tokens)
         
     def _tool_call_id(self, nr):
         return f'call_{nr}'

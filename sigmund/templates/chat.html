@@ -22,10 +22,31 @@
             {% include 'menu.html' %}    
             <div id="response">{{ message_history | safe }}</div>
             <div id="loading-message"></div>
+            
+            <!-- Attachments list -->
+            <div id="attachment-list" style="margin-bottom: 10px;"></div>
+            
             <div id="message-box">
                 <div id="message-container">
                     <textarea id="message" placeholder="Enter your message"></textarea>
+                    
+                    <!-- Hidden file input -->
+                    <input 
+                        type="file" 
+                        id="attachment-input" 
+                        style="display: none;" 
+                        multiple 
+                        accept=".pdf,.doc,.docx,.png,.jpg"
+                    >
+                    
                     <div id="button-container">
+                        <button 
+                            title="Attach" 
+                            id="attach" 
+                            onclick="document.getElementById('attachment-input').click();"
+                        >
+                            <i class="fas fa-paperclip"></i>
+                        </button>
                         <button title="Send" id="send" disabled><i class="fas fa-paper-plane"></i></button>
                         <button title="Cancel" id="cancel"><i class="fas fa-stop-circle"></i></button>
                         <button title="Show menu" id="expand" onclick="app.__vue__.toggleMenu()"><i class="fas fa-bars"></i></button>
@@ -33,9 +54,11 @@
                     </div>
                 </div>
             </div>
+            
             <div id="message-counter" style="text-align: right;"></div>
             {% include 'footer.html' %}
         </div>
+        
         <div id="code-editor">
             <div id="connected-status"><i class="fas fa-plug"></i> Connected to OpenSesame</div>
             <div id="code-editor-options">
@@ -50,17 +73,14 @@
                 </select>
                 <button id="clear-workspace" title="Clear"><i class="fas fa-eraser"></i></button>
                 <button id="copy-workspace" title="Clear"><i class="fas fa-copy"></i></button>
-                <!-- button id="hide-workspace" title="Hide"><i class="fas fa-eye-slash"></i></button -->
             </div>
+            
             <textarea id="workspace" data-mode="{{ workspace_language }}">{{ workspace_content }}</textarea>
             <div id="workspace-placeholder">Use this workspace to share text and code</div>
-        </div>        
+        </div>
     </div>
-    <script>    
-    // Show menu on new discussion
-    if (document.getElementById('response').children.length < 2) {
-        app.__vue__.toggleMenu()
-    }
+    <script>
+    {% include 'attachments.js' %}
     </script>
 </body>
 </html>

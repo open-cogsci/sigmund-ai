@@ -1,4 +1,6 @@
 import json
+import base64
+import mimetypes
 import logging
 from flask import request, jsonify, Response, redirect, session, \
     stream_with_context, make_response, Blueprint
@@ -13,37 +15,77 @@ api_blueprint = Blueprint('api', __name__)
 @api_blueprint.route('/chat/start', methods=['POST'])
 @login_required
 def api_chat_start():
-    data = request.json
-    session['user_message'] = data.get('message', '')
-    session['workspace_content'] = data.get('workspace_content', None)
-    session['workspace_language'] = data.get('workspace_language', None)
-    session['message_id'] = data.get('message_id', None)
+
+    # For multipart/form-data, use request.form for text data
+    message = request.form.get('message', '')
+    workspace_content = request.form.get('workspace_content', '')
+    workspace_language = request.form.get('workspace_language', '')
+    message_id = request.form.get('message_id', '')
+
+    # Example: store the user inputs in session
+    session['user_message']       = message
+    session['workspace_content']  = workspace_content
+    session['workspace_language'] = workspace_language
+    session['message_id']         = message_id
+
     sigmund = get_sigmund()
     redis_client.delete(f'stream_cancel_{sigmund.user_id}')
-    return '{}'
-    
 
-@api_blueprint.route('/chat/cancel', methods=['POST'])
-@login_required
-def api_chat_cancel_stream():
-    sigmund = get_sigmund()
-    logger.info(f'cancelling stream for {sigmund.user_id}')
-    redis_client.set(f'stream_cancel_{sigmund.user_id}', '1')
-    return jsonify({'status': 'cancelled'}), 200
+    # Grab attached files from the request
+    attachments = request.files.getlist('attachments')
+    attachment_list = []
+    for file in attachments:
+        if not file:
+            continue
+        # Read file contents
+        file_bytes = file.read()
+        file_b64 = base64.b64encode(file_bytes).decode('utf-8')
+        # Guess a MIME type for building the data URL
+        mime_type, _ = mimetypes.guess_type(file.filename)
+        if not mime_type:
+            # Fallback if unable to guess the MIME type
+            mime_type = 'application/octet-stream'
+        # Build data URL
+        data_url = f"data:{mime_type};base64,{file_b64}"
+        # Define the type field
+        # (Optional) Distinguish between documents and images more precisely:
+        if mime_type.startswith('image/'):
+            attachment_type = 'image'
+        else:
+            attachment_type = 'document'
+        attachment_list.append({
+            'type': attachment_type,
+            'file_name': file.filename,
+            'url': data_url
+        })
+    # Save to Redis
+    # Convert list of attachments to JSON first
+    redis_client.set(f'attachments_{sigmund.user_id}', json.dumps(attachment_list))
+    return '{}'
 
 
 @api_blueprint.route('/chat/stream', methods=['GET'])
 @login_required
 def api_chat_stream():
-    message = session['user_message']
-    workspace_content = session['workspace_content']
-    workspace_language = session['workspace_language']
-    message_id = session['message_id']
+
+    # Retrieve message details from session
+    message = session.get('user_message', '')
+    workspace_content = session.get('workspace_content', '')
+    workspace_language = session.get('workspace_language', '')
+    message_id = session.get('message_id', '')
+
+    # Retrieve attachments from Redis
     sigmund = get_sigmund()
+    attachments_json = redis_client.get(f'attachments_{sigmund.user_id}')
+    attachments = []
+    if attachments_json:
+        attachments = json.loads(attachments_json)
+
     logger.info(f'starting stream for {sigmund.user_id}')
     def generate():
         for reply in sigmund.send_user_message(
-                message, workspace_content, workspace_language, message_id):
+                message, workspace_content, workspace_language,
+                attachments=attachments, message_id=message_id):
             json_reply = reply.to_json()
             logger.debug(f'ai message: {json_reply}')
             yield f'data: {json_reply}\n\n'
@@ -51,8 +93,19 @@ def api_chat_stream():
                 logger.info(f'stream cancelled for {sigmund.user_id}')
                 break
         yield 'data: {"action": "close"}\n\n'
+
+    # Return a server-sent event response
     return Response(stream_with_context(generate()),
                     mimetype='text/event-stream')
+
+
+@api_blueprint.route('/chat/cancel', methods=['POST'])
+@login_required
+def api_chat_cancel_stream():
+    sigmund = get_sigmund()
+    logger.info(f'cancelling stream for {sigmund.user_id}')
+    redis_client.set(f'stream_cancel_{sigmund.user_id}', '1')
+    return jsonify({'status': 'cancelled'}), 200    
     
     
 @api_blueprint.route('/conversation/new')

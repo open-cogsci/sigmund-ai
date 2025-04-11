@@ -37,10 +37,10 @@ class BaseModel:
         return [{"type": "function", "function": t.tool_spec}
                 for t in self._tools if t.tool_spec]
         
-    def invoke(self, messages):
+    def invoke(self, messages, attachments=None):
         raise NotImplementedError()
         
-    def async_invoke(self, messages):
+    def async_invoke(self, messages, attachments=None):
         raise NotImplementedError()
         
     def messages_length(self, messages) -> int:
@@ -64,7 +64,7 @@ class BaseModel:
             raise ValueError(f'Unknown message type: {message}')
         return dict(role=role, content=message.content)        
 
-    def predict(self, messages, track_tokens=True):
+    def predict(self, messages, attachments=None, track_tokens=True):
         t0 = time.time()
         logger.info(f'predicting with {self.__class__} model')
         reply = self.get_response(self.invoke(messages))
