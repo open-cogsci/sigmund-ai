@@ -183,6 +183,14 @@
     background-color: #e0e0e0; /* Hover effect */
 }
 
+/* When the screen is 600px wide or smaller, stack buttons vertically */
+@media (max-width: 600px) {
+    .model-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 
 .scrollable-menu {
     max-height: 100%; /* Set a maximum height */
