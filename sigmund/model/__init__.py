@@ -3,7 +3,11 @@ from ._base_model import BaseModel
 
 OPENAI_MODELS = {
     'o1': 'o1',
+    'o3': 'o3',
     'o3-mini': 'o3-mini',
+    'o4-mini': 'o4-mini',
+    'gpt-4.1': 'gpt-4.1',
+    'gpt-4.1-mini': 'gpt-4.1-mini',
     'gpt-4': 'gpt-4o',
     'gpt-4o': 'gpt-4o',
     'gpt-4o-mini': 'gpt-4o-mini',

@@ -100,16 +100,16 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 #   model
 model_config = {
     'openai': {
-        'search_model': 'gpt-4o-mini',
-        'condense_model': 'gpt-4o-mini',
-        'public_model': 'gpt-4o-mini',
-        'answer_model': 'gpt-4o'
+        'search_model': 'gpt-4.1-mini',
+        'condense_model': 'gpt-4.1-mini',
+        'public_model': 'gpt-4.1-mini',
+        'answer_model': 'gpt-4.1'
     },
     'openai_o1': {
-        'search_model': 'gpt-4o-mini',
-        'condense_model': 'gpt-4o-mini',
-        'public_model': 'gpt-4o-mini',
-        'answer_model': 'o1'
+        'search_model': 'gpt-4.1-mini',
+        'condense_model': 'gpt-4.1-mini',
+        'public_model': 'gpt-4.1-mini',
+        'answer_model': 'o3'
     },
     'anthropic': {
         'search_model': 'claude-3.7-sonnet',
