@@ -65,24 +65,24 @@
                 :class="{ active: modelConfig === 'anthropic' }">
                 <!-- Icon for Anthropic model -->
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 3.7<br/>Conversations</small></span>
+                <span>Anthropic<br><small>Claude 4<br>Sonnet<br>Conversations</small></span>
             </button>
             <button 
                 @click="modelConfig = 'anthropic_thinking'" 
                 :class="{ active: modelConfig === 'anthropic_thinking' }">
                 <!-- Icon for Anthropic model -->
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 3.7<br/>Problem solving</small></span>
+                <span>Anthropic<br><small>Claude 4<br>Opus<br>Problem solving</small></span>
             </button>
             <button 
                 @click="modelConfig = 'mistral'" 
                 :class="{ active: modelConfig === 'mistral' }">
                 <!-- Icon for Mistral model -->
                 <img src="/static/mistral.png" alt="Mistral Icon">
-                <span>Mistral<br><small>Large</small></span>
+                <span>Mistral<br><small>Medium<br>Conversations</small></span>
             </button>
         </div>
-        <small>For OpenSesame, o1 is  most effective. For other tasks, each model has its own strengths.</small>
+        <small>For OpenSesame, o3 is  most effective. For other tasks, each model has its own strengths.</small>
     </div>    
     <hr class="menu-divider">
     <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>

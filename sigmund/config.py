@@ -112,16 +112,16 @@ model_config = {
         'answer_model': 'o3'
     },
     'anthropic': {
-        'search_model': 'claude-3.7-sonnet',
-        'condense_model': 'claude-3.7-sonnet',
+        'search_model': 'claude-4-sonnet',
+        'condense_model': 'claude-4-sonnet',
         'public_model': 'claude-3.5-haiku',
-        'answer_model': 'claude-3.7-sonnet'
+        'answer_model': 'claude-4-sonnet'
     },
     'anthropic_thinking': {
-        'search_model': 'claude-3.7-sonnet',
-        'condense_model': 'claude-3.7-sonnet',
+        'search_model': 'claude-4-sonnet',
+        'condense_model': 'claude-4-sonnet',
         'public_model': 'claude-3.5-haiku',
-        'answer_model': 'claude-3.7-sonnet-thinking'
+        'answer_model': 'claude-4-opus-thinking'
     },
     'mistral': {
         'search_model': 'mistral-large-latest',

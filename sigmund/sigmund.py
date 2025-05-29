@@ -175,13 +175,15 @@ class Sigmund:
                     logger.info(
                         f'[{state} state] model does not support feedback')
                     needs_feedback = False
-            # If the tool has a result, yield it as the workspace content,
-            # and remember it in the mssage history
+            tool_message, workspace_content, workspace_language = \
+                utils.extract_workspace(tool_message)
+            # If the tool has a result and no workspace content was included in
+            # the message itself, use the result as the workspace message. Also
+            # remember the tool result it in the mssage history.
             if tool_result:
-                workspace_content = tool_result['content']
-                workspace_language = tool_language
-                # The workspace is included with the assistant message, because
-                # the tool message won't be exposed to the user.
+                if workspace_content is None:
+                    workspace_content = tool_result['content']
+                    workspace_language = tool_language
                 metadata = self.messages.append(
                     'assistant', message=tool_message,
                     workspace_content=workspace_content,
@@ -189,8 +191,6 @@ class Sigmund:
                 self.messages.append('tool', message=json.dumps(tool_result))
             else:
                 metadata = self.messages.append('assistant', tool_message)
-                workspace_content = None
-                workspace_language = None
             yield Reply(tool_message, metadata, workspace_content,
                         workspace_language)
         # Otherwise the reply is a regular AI message

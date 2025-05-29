@@ -10,6 +10,7 @@ from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.attr_list import AttrListExtension
+from markdown.extensions.md_in_html import MarkdownInHtmlExtension
 from langchain.schema import HumanMessage
 from . import config
 from . import __version__
@@ -21,7 +22,8 @@ def md(text):
                              extensions=[FencedCodeExtension(),
                                          CodeHiliteExtension(),
                                          TocExtension(),
-                                         AttrListExtension()])
+                                         AttrListExtension(),
+                                         MarkdownInHtmlExtension()])
 
 
 def clean(text, escape_html=True, render=True):
@@ -167,6 +169,8 @@ def current_datetime():
 
 
 def process_ai_message(msg):
+    msg = msg.replace('<div class="thinking_block_content">',
+                      '<div class="thinking_block_content" markdown="1">')
     msg = fix_bullet_points(msg)
     # This pattern looks for a colon possibly followed by any number of
     # whitespaces

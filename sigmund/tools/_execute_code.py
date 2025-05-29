@@ -49,7 +49,11 @@ class execute_code(BaseTool):
 ```
 {result}
 ```
+
+<workspace language="{language}">
+{code}
+</workspace>
 '''
-            return message, code, language, True
+            return message, result, language, True
         logger.error(f"Error: {response.status_code} with message: {response.content}")
         return 'Failed to execute code', code, language, True

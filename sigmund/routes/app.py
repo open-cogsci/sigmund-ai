@@ -41,8 +41,10 @@ def chat_page():
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role == 'assistant':
+            print(utils.process_ai_message(message))
             html_body = utils.md(
                 f'{config.ai_name}: {utils.process_ai_message(message)}')
+            print(html_body)
             html_class = 'message-ai'
         else:
             html_body = '<p>' + utils.clean(f'You: {message}', 

@@ -1,5 +1,6 @@
 from . import BaseModel
 from .. import config, utils
+import re
 import logging
 import json
 logger = logging.getLogger('sigmund')
@@ -30,11 +31,37 @@ class AnthropicModel(BaseModel):
                                           allow_ai_last=False,
                                           merge_consecutive=True)
         messages = [self.convert_message(message) for message in messages]
+        # The Anthropic messages API expects thinking blocks if thinking mode is
+        # enabled. These thinking blocks are embedded in plain text in the 
+        # responses and should be extracted. This also changes the message 
+        # content from plain text to a list of blocks.
+        if self._thinking:
+            for message in messages:
+                # only AI messages have thinking blocks
+                if message['role'] != 'assistant':
+                    continue                
+                content = message['content']
+                content, thinking_signature, thinking_content = \
+                    self.extract_thinking_block(content)
+                if thinking_signature is None:
+                    continue
+                message['content'] = [
+                    {'type': 'thinking',
+                     'thinking': thinking_content,
+                     'signature': thinking_signature},
+                    {'type': 'text',
+                     'text': content}
+                ]
+                logger.info('extracted thinking block')
         # The Anthropic messages API doesn't accept tool results in a separate
         # message. Instead, tool results are included as a special content 
         # block in a user message. Since two subsequent user messages aren't
         # allowed, we need to convert a tool message to a user message and if
         # necessary merge it with the next user message.
+        # import pprint
+        # print('*** after extracting thinking block')
+        # pprint.pprint(messages)
+        # print('***')
         while True:
             logger.info('entering message postprocessing loop')
             for i, message in enumerate(messages):
@@ -49,23 +76,29 @@ class AnthropicModel(BaseModel):
                         tool_info['content'] = ''
                     message['content'] = [{
                         'type': 'tool_result',
-                        'tool_use_id': str(self._tool_use_id),
+                        # IDs formatted like this: toolu_01WaeSyitUGJFaaPe68cJuEv
+                        'tool_use_id': f'toolu_{self._tool_use_id:024}',
                         'content': [{
                             'type': 'text',
                             'text': tool_info['content']
                         }]
                     }]
-                    # The previous message needs to have a tool-use block
+                    # The previous message needs to have a tool-use block. If
+                    # necessary, this means that the content is changed to a
+                    # list of blocks from a plain text.
                     prev_message = messages[i - 1]
-                    prev_message['content'] = [
-                        {'type': 'text',
-                         'text': prev_message['content']},
+                    if isinstance(prev_message['content'], str):                        
+                        prev_message['content'] = [
+                            {'type': 'text',
+                             'text': prev_message['content']}
+                        ]
+                    prev_message['content'].append(
                         {'type': 'tool_use',
-                         'id': str(self._tool_use_id),
+                         'id': f'toolu_{self._tool_use_id:024}',
                          'input': {'args': tool_info['args']},
                          'name': tool_info['name']
                         }
-                    ]
+                    )
                     self._tool_use_id += 1
                     if len(messages) > i + 1:
                         next_message = messages[i + 1]
@@ -80,11 +113,17 @@ class AnthropicModel(BaseModel):
                 break
             logger.info('dropping duplicate user message')
             messages.remove(next_message)
+        # print('*** after tool processing')
+        # pprint.pprint(messages)
+        # print('***')            
         # Attachments are included with the last message. The content is now
         # no longer a single str, but a list of dict
         if attachments:
             logger.info('adding attachments to last message')
-            content = [{'type': 'text', 'text': messages[-1]['content']}]
+            content = messages[-1]['content']
+            # If the content is plain text, convert it to a list of blocks
+            if isinstance(content, str):
+                content = [{'type': 'text', 'text': content}]
             for attachment in attachments:
                 # Decompose the HTML-style data into a mimetype and the 
                 # actual data
@@ -106,20 +145,34 @@ class AnthropicModel(BaseModel):
                                    'data': data}
                     })
             messages[-1]['content'] = content
+        # print('*** after attachment processing')
+        # import pprint
+        # pprint.pprint(messages)
+        # print('***')            
         return super().predict(messages, attachments, track_tokens)
         
     def get_response(self, response):
         text = []
+        tool_message_prefix = ''
+        thinking_block = None
         for block in response.content:
             if block.type == 'tool_use':
                 for tool in self._tools:
                     if tool.name == block.name:
-                        return tool.bind(json.dumps(block.input))
+                        return tool.bind(
+                            json.dumps(block.input),
+                            message_prefix=tool_message_prefix + '\n\n')
                 return self.invalid_tool
             if block.type == 'text':
                 text.append(block.text)
+                tool_message_prefix += block.text
+            if block.type == 'thinking':
+                thinking_block = self.embed_thinking_block(block.signature,
+                                                           block.thinking)
+                tool_message_prefix += thinking_block
+        if thinking_block is not None:
+            text.insert(0, thinking_block)
         return '\n'.join(text)
-        
         
     def _tool_args(self):
         if not self._tools:
@@ -158,3 +211,37 @@ class AnthropicModel(BaseModel):
     def async_invoke(self, messages):
         return self._anthropic_invoke(self._async_client.messages.create,
                                       messages)
+
+    @staticmethod
+    def embed_thinking_block(signature: str | None, content: str | None) -> str:
+        """Embeds information about an Anthropic thinking block as an HTML element."""
+        sig = f'<div class="thinking_block_signature">{signature}</div>' if signature else ""
+        cont = f'<div class="thinking_block_content">{content}</div>' if content else ""
+        return sig + cont
+    
+    @staticmethod
+    def extract_thinking_block(content: str) -> [str, str | None, str | None]:
+        """
+        Extracts signature/content spans if present and returns a tuple:
+          (cleaned_content, signature, content)
+        """
+        sig_pattern = r'<div\s+class="thinking_block_signature">(.*?)</div>'
+        cont_pattern = r'<div\s+class="thinking_block_content">(.*?)</div>'
+        signature = None
+        thinking_content = None
+    
+        sig_match = re.search(sig_pattern, content)
+        if sig_match:
+            signature = sig_match.group(1)
+            content = re.sub(sig_pattern, '', content, count=1)
+    
+        cont_match = re.search(cont_pattern, content, re.MULTILINE | re.DOTALL)
+        if cont_match:
+            thinking_content = cont_match.group(1)
+            content = re.sub(cont_pattern, '', content, count=1,
+                             flags=re.MULTILINE | re.DOTALL)
+    
+        cleaned = content.strip()
+        if signature or thinking_content:
+            return cleaned, signature, thinking_content
+        return content, None, None

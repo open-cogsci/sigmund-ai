@@ -31,7 +31,7 @@ class BaseTool:
     def name(self):
         return self.__class__.__name__
     
-    def bind(self, args: str) -> callable:
+    def bind(self, args: str, message_prefix: str | None = None) -> callable:
         """Returns a callable that corresponds to a tool function called with
         a string of arguments, which should be in JSON format. The callable 
         itself returns a (progress_message: str, result_message, result: dict,
@@ -65,6 +65,8 @@ class BaseTool:
             result = {'name': self.name,
                       'args': args,
                       'content': result}
+            if message_prefix is not None:
+                message = message_prefix + message
             return message, result, language, needs_feedback
         return bound_tool_function
         

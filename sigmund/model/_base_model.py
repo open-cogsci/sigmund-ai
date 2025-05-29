@@ -97,7 +97,7 @@ class BaseModel:
             else:
                 logger.info('async event loop is already running')
                 use_async = False
-        except RuntimeError as e:
+        except RuntimeError:
             logger.info('creating async event loop')
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
