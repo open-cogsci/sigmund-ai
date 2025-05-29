@@ -2,10 +2,10 @@ import logging
 import requests
 import json
 import base64
-from flask import redirect, Blueprint, url_for, request, session
+from flask import redirect, Blueprint, request, session, jsonify
 from flask_login import login_user
 from . import User
-from .. import config, utils
+from .. import config
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -69,14 +69,14 @@ def callback():
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
+    unique_id = userinfo_response.json()["sub"]
+    username = userinfo_response.json()["given_name"]
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
     # app, and now you've verified their email through Google!
     if not userinfo_response.json().get("email_verified"):
         logger.info(f'google log-in failed ({username})')
         return redirect('/login_failed')
-    unique_id = userinfo_response.json()["sub"]
-    username = userinfo_response.json()["given_name"]
     logger.info(f'google log-in successful ({username})')
     kdf = PBKDF2HMAC(algorithm=hashes.SHA256(),
                      length=32,
@@ -85,7 +85,10 @@ def callback():
                      backend=default_backend())
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
-    user = User(f'{username} (google)')
+    # We use only part of the unique id, so that the username doesn't allow us
+    # to derive the encryption key
+    username = f'{username} (google)::{unique_id[:10]}'
+    user = User(username)
     login_user(user)
     logger.info(f'initializing encryption key')    
     return redirect('/')

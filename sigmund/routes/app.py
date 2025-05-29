@@ -87,9 +87,12 @@ def chat_page():
     if workspace_content is None:
         workspace_content = ''
         workspace_language = 'markdown'
+    username = sigmund.user_id
+    if '(google)::' in username:
+        username = username.split('(google)::')[0] + '(Google)'
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
-                        username=sigmund.user_id,
+                        username=username,
                         settings=json.dumps(settings),
                         workspace_content=workspace_content,
                         workspace_language=workspace_language)

@@ -57,7 +57,36 @@ class DatabaseManager:
         try:
             user = User.query.filter_by(username=self.username).one()
             self.user_id = user.user_id
+            logger.info(f'user {self.username} exists')
         except NoResultFound:
+            # This is a hack to fix a bug in earlier versions of Sigmund without
+            # breaking log-in for existing users.
+            #
+            # If the user id doesn't exist, this may be because the user 
+            # previously logged in through Google before the unique ID was 
+            # included in the username. Currently, Google usernames look like
+            # Name (google)::unique_id. Previously, Google usernames looked like
+            # Name (google). If an old Google username exists, we automatically
+            # rename the user to the new unique username.
+            if '(google)::' in self.username:
+                # Strip everything after (google)::
+                old_username = self.username.split('(google)::')[0] + '(google)'
+                logger.info(
+                    f'Checking if {self.username} exists as {old_username}')
+                try:                    
+                    user = User.query.filter_by(username=old_username).one()
+                    self.user_id = user.user_id
+                except NoResultFound:
+                    # No the user really doesn't exist
+                    pass
+                else:
+                    # Yes, the user has an old-style name, so we need to update
+                    # the database so that User.username is set to old username
+                    user.username = self.username
+                    db.session.commit()
+                    return
+            # If the user doesn't exist, we create it and start a new 
+            # conversation
             logger.info(f'creating new user: {self.username}')
             user = User(username=self.username)
             db.session.add(user)
