@@ -1,10 +1,11 @@
 <div class="login-text">
 
     <h1>Sigmund is an AI research assistant</h1>
-    
+
     <p>Designed to answer questions about OpenSesame</p>
     <p>Helps with data analysis and literature search</p>
     <p>Conversations are encrypted and will not be used to train AI</p>
+    <p>Powered by the latest models from OpenAI, Anthropic, and Mistral</p>    
 
 </div>
 
@@ -21,6 +22,8 @@
 <hr>
 
 <small>
+
+Install the [Sigmund Copilot extention](https://osdoc.cogsci.nl/4.0/manual/sigmund/) for OpenSesame
 
 Read [what Sigmund can do](/about) and [our terms of service](/terms)
 
