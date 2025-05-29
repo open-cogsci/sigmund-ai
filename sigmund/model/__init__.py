@@ -39,7 +39,7 @@ def model(sigmund, model, **kwargs):
         if model.endswith('-thinking'):
             kwargs['thinking'] = True
         return AnthropicModel(sigmund, ANTHROPIC_MODELS[model], **kwargs)
-    if 'mistral' in model:
+    if 'mistral' in model or 'ministral' in model:
         from ._mistral_model import MistralModel
         return MistralModel(sigmund, model, **kwargs)
     if model == 'dummy':
