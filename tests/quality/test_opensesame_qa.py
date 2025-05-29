@@ -117,13 +117,8 @@ def test_openai():
 
 
 def test_openai_o1():
+    # Not actually o1 anymore
     config.settings_default['model_config'] = 'openai_o1'
-    init_testlog()
-    score_testcases()
-    
-    
-def test_openai_o3():
-    config.settings_default['model_config'] = 'openai_o3'
     init_testlog()
     score_testcases()
     
