@@ -27,7 +27,10 @@ def subscribe():
     if sigmund.database.check_subscription():
         logger.info(f'redirecting {sigmund.user_id} to customer portal')
         redirect(url_for('subscribe.customer_portal'), code=303)
-    return utils.render('subscribe-now.html', username=sigmund.user_id)
+    username = sigmund.user_id
+    if '(google)::' in username:
+        username = username.split('(google)::')[0] + '(Google)'
+    return utils.render('subscribe-now.html', username=username)
     
     
 @subscribe_blueprint.route('/create-checkout-session')
