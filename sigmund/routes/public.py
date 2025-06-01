@@ -3,7 +3,6 @@ from flask import jsonify, Blueprint, request, Response
 from flask_cors import cross_origin
 from .. import config, utils, prompt
 from ..sigmund import Sigmund
-from .app import get_sigmund
 logger = logging.getLogger('sigmund')
 public_blueprint = Blueprint('public', __name__)
 
@@ -12,21 +11,30 @@ public_blueprint = Blueprint('public', __name__)
 @cross_origin()
 def search():
     data = request.json
-    config.db_cache = data.get('source', 'default')
     query = data.get('query', None)
     offset = data.get('offset', 0) * config.public_search_docs_max
+    source = data.get('source', 'default')
+    logger.info(f'public search source: {source}')
+    if 'public-with-forum' in source:
+        config.search_collections.add('forum')
+        config.settings_default['collection_forum'] = 'true'
+    config.search_max_distance = float('inf')
+    config.search_docs_max = config.public_search_docs_max + offset
     sigmund = Sigmund(user_id='dummy', persistent=False, encryption_key=None)
     sigmund.documentation.clear()
-    sigmund.documentation.search([query])
+    sigmund.documentation.search(query, howtos=False, foundation=False)
     docs = []
     urls = []
     logging.info(f'public search: {query} (offset={offset})')
     for doc in sigmund.documentation._documents[offset:]:
-        if doc.metadata['url'] in urls:
+        url = doc.get('url')
+        if not url:
+            continue
+        if url in urls:
             print('skipping duplicate')
             continue
-        urls.append(doc.metadata['url'])
-        doc.page_content = doc.page_content[
+        urls.append(url)
+        doc['content'] = doc['content'][
             :config.public_search_max_doc_length]
         docs.append(doc)
         if len(docs) >= config.public_search_docs_max:

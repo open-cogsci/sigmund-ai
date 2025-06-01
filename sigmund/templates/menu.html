@@ -2,49 +2,51 @@
 <div id="app">
   <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
     <div ref="menuCloseButton" class="close"><i class="fas fa-window-close"></i></div>
-    <div class="mode-selector">
-        <label>Mode:</label>
-        <div class="mode-buttons">
-            <button 
-                @click="mode = 'opensesame'" 
-                :class="{ active: mode === 'opensesame' }">
-                <img src="/static/opensesame.png" alt="OpenSesame Icon">
-                <span>OpenSesame expert</span>
-            </button>
-            <button 
-                @click="mode = 'academic'" 
-                :class="{ active: mode === 'academic' }">
-                <img src="/static/sigmund-avatar.png" alt="Academic Icon">
-                <span>Research assistant</span>
-            </button>
-        </div>
-    </div>    
-    <div class="tools-section" v-show="mode === 'academic'">
-        <label>Tools:</label>
-        <div class="tool-item">
-            <input type="checkbox" 
-                   id="tool-search-google-scholar" 
-                   v-model="tool_search_google_scholar">
-            <label for="tool-search-google-scholar">Google Scholar</label>
-        </div>
-        <div class="tool-item">
-            <input type="checkbox" 
-                   id="tool-execute-code" 
-                   v-model="tool_execute_code">
-            <label for="tool-execute-code">Code execution</label>
-        </div>
-        <div class="tool-item">
-            <input type="checkbox" 
-                   id="tool-generate-image" 
-                   v-model="tool_generate_image">
-            <label for="tool-generate-image">Image generation</label>
-        </div>           
-        <small>Only enable tools that you need for best performance</small>
+    <!-- Expert knowledge section -->
+    <div>
+      <small>For best performance, only enable knowledge and tools that you need</small>
+    </div>
+    <div>
+      <label>Expert knowledge:</label>
+      <div class="tool-item">
+          <input type="checkbox" 
+                 id="collection-opensesame" 
+                 v-model="collection_opensesame">
+          <label for="collection-opensesame">OpenSesame</label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox" 
+                 id="collection-datamatrix" 
+                 v-model="collection_datamatrix">
+          <label for="collection-datamatrix">Python coding and data analysis</label>
+      </div>
+    </div>
+    <hr class="menu-divider">    
+    <div>
+      <label>Tools:</label>
+      <div class="tool-item">
+          <input type="checkbox" 
+                 id="tool-search-google-scholar" 
+                 v-model="tool_search_google_scholar">
+          <label for="tool-search-google-scholar">Google Scholar</label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox" 
+                 id="tool-execute-code" 
+                 v-model="tool_execute_code">
+          <label for="tool-execute-code">Code execution</label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox" 
+                 id="tool-generate-image" 
+                 v-model="tool_generate_image">
+          <label for="tool-generate-image">Image generation</label>
+      </div>           
     </div>
     <hr class="menu-divider">
     <!-- Model selection -->
     <div class="model-selector">
-        <label>AI model:</label>
+      <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
         <div class="model-buttons">
             <button 
                 @click="modelConfig = 'openai'" 
@@ -81,8 +83,7 @@
                 <img src="/static/mistral.png" alt="Mistral Icon">
                 <span>Mistral<br><small>Medium<br>Conversations</small></span>
             </button>
-        </div>
-        <small>For OpenSesame, o3 is  most effective. For other tasks, each model has its own strengths.</small>
+        </div>        
     </div>    
     <hr class="menu-divider">
     <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
@@ -155,11 +156,11 @@ new Vue({
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
     forceModelConfigUpdate: 0,
-    mode: sigmundSettings.mode,
-    tool_download: sigmundSettings.tool_download === 'true',
     tool_execute_code: sigmundSettings.tool_execute_code === 'true',
     tool_generate_image: sigmundSettings.tool_generate_image === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
+    collection_opensesame: sigmundSettings.collection_opensesame === 'true',
+    collection_datamatrix: sigmundSettings.collection_datamatrix === 'true',
     shouldShowNewConversationButton: true,
     isLoadingConversations: true,
     searchQuery: ''
@@ -173,11 +174,11 @@ new Vue({
   },
   watch: {
     modelConfig(value) { setSetting('model_config', value); },
-    mode(value) { setSetting('mode', value); },
-    tool_download(value) { setSetting('tool_download', value); },
     tool_execute_code(value) { setSetting('tool_execute_code', value); },
     tool_generate_image(value) { setSetting('tool_generate_image', value); },
-    tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); }
+    tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); },
+    collection_opensesame(value) { setSetting('collection_opensesame', value); },
+    collection_datamatrix(value) { setSetting('collection_datamatrix', value); }
   },
   methods: {
     closeMenu(event) {

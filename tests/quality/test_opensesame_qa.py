@@ -55,7 +55,8 @@ def read_testcases():
 
 
 def score_testcase(description, question, requirements, n=3):
-    sigmund = Sigmund(user_id='pytest')
+    config.search_collections = {'opensesame'}
+    sigmund = Sigmund(user_id='pytest', tools=[])
     validation_model = model(sigmund, 'gpt-4')
     scores = []
     for i in range(n):

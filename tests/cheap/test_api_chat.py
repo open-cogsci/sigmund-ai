@@ -16,8 +16,12 @@ class TestApiChat(BaseRoutesTestCase):
         self.login()
         
     def test_chat_without_search(self):
-        self.client.post('/api/setting/set', json={'mode': 'academic'})
-        response = self.client.post('/api/chat/start', json={
+        self.client.post('/api/setting/set',
+            json={
+                  'collection_opensesame': 'false',
+                  'collection_datamatrix': 'false'
+            })
+        response = self.client.post('/api/chat/start', data={
             'message': 'hello'
         })
         assert response.status_code == 200
@@ -33,8 +37,12 @@ class TestApiChat(BaseRoutesTestCase):
                 assert data['action'] == 'close'
                 
     def test_chat_with_search(self):
-        self.client.post('/api/setting/set', json={'mode': 'opensesame'})
-        response = self.client.post('/api/chat/start', json={
+        self.client.post('/api/setting/set',
+            json={
+                  'collection_opensesame': 'true',
+                  'collection_datamatrix': 'true'
+            })
+        response = self.client.post('/api/chat/start', data={
             'message': 'hello'
         })
         assert response.status_code == 200
@@ -47,7 +55,7 @@ class TestApiChat(BaseRoutesTestCase):
             elif i == 1:
                 assert data['action'] == 'set_loading_indicator'
             elif i == 2:
-                assert data['response'] == '<p>Sigmund: dummy reply</p>'
+                assert 'dummy reply' in data['response']
             elif i == 3:
                 assert data['action'] == 'close'
 

@@ -45,7 +45,6 @@ class Messages:
                 'workspace_language': workspace_language,
                 'timestamp': utils.current_datetime(),
                 'sources': self._sigmund.documentation.to_json(),
-                'search_model': self._sigmund.model_config['search_model'],
                 'condense_model': self._sigmund.model_config['condense_model'],
                 'answer_model': self._sigmund.model_config['answer_model']}
         
@@ -96,7 +95,6 @@ class Messages:
         if system_prompt is None:
             system_prompt = self._system_prompt()
         model_prompt = [SystemMessage(content=system_prompt)]
-        msg_len = len(self._condensed_message_history)
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
             content = utils.remove_masked_elements(content)
@@ -171,17 +169,7 @@ class Messages:
         """The system prompt that is used for question answering consists of
         several fragments.
         """
-        # There is always and identity and a list of attached files
-        if self._sigmund.search_first:
-            system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITH_SEARCH]
-        else:
-            system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY_WITHOUT_SEARCH]
-        system_prompt.append(prompt.WORKSPACE_PROMPT)
-        # For models that support this, there is also an instruction indicating
-        # that a special marker can be sent to indicate that the response isn't
-        # done yet. Not all models support this to avoid infinite loops.
-        if self._sigmund.answer_model.supports_not_done_yet:
-            system_prompt.append(prompt.SYSTEM_PROMPT_NOT_DONE_YET)
+        system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY]
         # If available, documentation is also included in the prompt
         if len(self._sigmund.documentation):
             system_prompt.append(self._sigmund.documentation.prompt())

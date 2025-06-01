@@ -12,9 +12,10 @@ class BaseExpensiveTest(unittest.TestCase):
         from sigmund.database.models import drop_db, init_db
         drop_db()
         init_db()
-        self.sigmund = Sigmund(user_id='pytest', search_first=False)
         config.max_tokens_per_hour = float('inf')
         config.log_replies = True
+        config.search_enabled = False
+        self.sigmund = Sigmund(user_id='pytest')
         
     def _test_tool(self):
         pass
@@ -27,8 +28,12 @@ class BaseExpensiveTest(unittest.TestCase):
         config.settings_default['model_config'] = 'openai_o1'
         self._test_tool()
     
-    def test_anthropic(self):
+    def test_anthropic_regular(self):
         config.settings_default['model_config'] = 'anthropic'
+        self._test_tool()
+        
+    def test_anthropic_thinking(self):
+        config.settings_default['model_config'] = 'anthropic_thinking'
         self._test_tool()
     
     def test_mistral(self):

@@ -7,13 +7,18 @@ class TestApiConversation(BaseRoutesTestCase):
     
     def setUp(self):
         super().setUp()
-        config.settings_default['model_config'] = 'dummy'
+        config.settings_default['model_config'] = 'dummy'        
         self.login()
+        self.client.post('/api/setting/set',
+            json={
+                  'collection_opensesame': 'false',
+                  'collection_datamatrix': 'false'
+            })        
                 
     def test_new_conversation(self):
         # Add some content to the conversation to make it count
         self.client.post('/api/setting/set', json={'mode': 'academic'})
-        response = self.client.post('/api/chat/start', json={
+        response = self.client.post('/api/chat/start', data={
             'message': 'dummy'
         })
         for response in self.client.get('/api/chat/stream').iter_encoded():
@@ -35,7 +40,7 @@ class TestApiConversation(BaseRoutesTestCase):
     def test_delete_conversation(self):
         # Add some content to the conversation to make it count
         self.client.post('/api/setting/set', json={'mode': 'opensesame'})
-        response = self.client.post('/api/chat/start', json={
+        response = self.client.post('/api/chat/start', data={
             'message': 'dummy'
         })
         for response in self.client.get('/api/chat/stream').iter_encoded():

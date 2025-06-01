@@ -3,11 +3,12 @@ import json
 from types import GeneratorType
 from . import config
 from .reply import Reply, ActionReply
-from .documentation import Documentation, FAISSDocumentationSource
+from .documentation import Documentation
 from .messages import Messages
-from .model import model    
+from .model import model
+from . import tools as mod_tools
 from .database.manager import DatabaseManager
-from . import prompt, tools, utils
+from . import utils
 logger = logging.getLogger('sigmund')
 
 
@@ -32,53 +33,30 @@ class Sigmund:
     """
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: str = None,
-                 search_first: bool = None,
                  model_config: str = None,
-                 search_tools: list = None,
-                 answer_tools: list = None):
+                 tools: list = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
-        # Search first is stored as a str but should be a bool here
-        self.search_first = (
-            self.database.get_setting('mode') == 'opensesame'
-            if search_first is None else search_first)
         self.model_config = config.model_config[
             self.database.get_setting('model_config')
             if model_config is None else model_config
         ]
-        self.documentation = Documentation(
-            self, sources=[FAISSDocumentationSource(self)])
+        self.documentation = Documentation(self)
         self.messages = Messages(self, persistent)
-        if search_tools is None:
-            search_tools = config.search_tools
-        if answer_tools is None:
-            if self.search_first:
-                answer_tools = config.answer_tools_with_search
-            else:
-                answer_tools = [
-                    t for t in config.answer_tools_without_search
-                    if self.database.get_setting(f'tool_{t}') == 'true'
-                ]
+        if tools is None:
+            tools = [t for t in config.tools
+                     if self.database.get_setting(f'tool_{t}') == 'true']
         # Tools are class names from the tools module, which need to be
         # instantiated with sigmund (self) as first argument
-        self.search_tools = [getattr(tools, t)(self) for t in search_tools]
-        self.answer_tools = [getattr(tools, t)(self) for t in answer_tools]
-        # If there are search tools, the first one should always be used
-        if search_tools:
-            search_tool_choice = search_tools[0]
-        else:
-            search_tool_choice = None
+        self.tools = [getattr(mod_tools, t)(self) for t in tools]
         # If there are answer tools, the mode can choose freely
-        if answer_tools:
-            answer_tool_choice = 'auto'
+        if tools:
+            tool_choice = 'auto'
         else:
-            answer_tool_choice = None
-        self.search_model = model(self, self.model_config['search_model'],
-                                  tools=self.search_tools, 
-                                  tool_choice=search_tool_choice)
+            tool_choice = None
         self.answer_model = model(self, self.model_config['answer_model'],
-                                  tools=self.answer_tools,
-                                  tool_choice=answer_tool_choice)
+                                  tools=self.tools,
+                                  tool_choice=tool_choice)
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
     
@@ -116,7 +94,7 @@ class Sigmund:
                              workspace_content=workspace_content,
                              workspace_language=workspace_language,
                              message_id=message_id)
-        if self.search_first:
+        if config.search_enabled and self.documentation.enabled:
             for reply in self._search(message):
                 yield reply
         for reply in self._answer(attachments):
@@ -135,18 +113,7 @@ class Sigmund:
         self.documentation.clear()
         # First seach based on the user question
         logger.info('[search state] searching based on user message')
-        self.documentation.search([message])
-        # Then search based on the search-model queries derived from the user
-        # question
-        reply = self.search_model.predict(self.messages.prompt(
-            system_prompt=prompt.SYSTEM_PROMPT_SEARCH))
-        if config.log_replies:
-            logger.info(f'[search state] reply: {reply}')
-        if callable(reply):
-            reply()
-        else:
-            logger.warning('[search state] did not call search tool')
-        self.documentation.strip_irrelevant(message)
+        self.documentation.search(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
     
@@ -160,6 +127,13 @@ class Sigmund:
         tokens_consumed_before = self.answer_model.total_tokens_consumed
         reply = self.answer_model.predict(self.messages.prompt(),
                                           attachments=attachments)
+        if isinstance(reply, str) and self.documentation.poor_match:
+            reply = '''<div class="message-info" markdown="1">Expert knowledge is enabled, but Sigmund was unable to find useful documentation to answer your question. To get a more useful answer:
+            
+- Provide more details and relevant keywords
+- Or: Enable expert knowledge that is relevant to your question (see Menu)
+- Or: Disable all expert knowledge to discuss general subjects (see Menu)
+</div>\n\n''' + reply
         tokens_consumed = self.answer_model.total_tokens_consumed \
             - tokens_consumed_before
         logger.info(f'tokens consumed: {tokens_consumed}')
@@ -203,22 +177,8 @@ class Sigmund:
                 workspace_content=workspace_content,
                 workspace_language=workspace_language)
             yield Reply(reply, metadata, workspace_content, workspace_language)
-            # If the reply contains a NOT_DONE_YET marker, this is a way for the AI
-            # to indicate that it wants to perform additional actions. This makes 
-            # it easier to perform tasks consisting of multiple responses and 
-            # actions. The marker is stripped from the reply so that it's hidden
-            # from the user. We also check for a number of common linguistic 
-            # indicators that the AI isn't done yet, such "I will now". This is
-            # necessary because the explicit marker isn't reliably sent.
-            if self.answer_model.supports_not_done_yet and \
-                    prompt.NOT_DONE_YET_MARKER in reply:
-                reply = reply.replace(prompt.NOT_DONE_YET_MARKER, '')
-                logger.info(f'[{state} state] not-done-yet marker received')
-                needs_feedback = True
-            else:
-                needs_feedback = False
-        # If feedback is required, either because the tools require it or 
-        # because the AI sent a NOT_DONE_YET marker, go for another round.
+            needs_feedback = False
+        # If feedback is required by a tool, go for another round.
         if needs_feedback and not self._rate_limit_exceeded():
             if workspace_content is not None:
                 logger.info('workspace content has been updated for feedback')

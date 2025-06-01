@@ -100,38 +100,32 @@ mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 #   model
 model_config = {
     'openai': {
-        'search_model': 'gpt-4.1-mini',
         'condense_model': 'gpt-4.1-mini',
         'public_model': 'gpt-4.1-mini',
         'answer_model': 'gpt-4.1'
     },
     'openai_o1': {
-        'search_model': 'gpt-4.1-mini',
         'condense_model': 'gpt-4.1-mini',
         'public_model': 'gpt-4.1-mini',
         'answer_model': 'o3'
     },
     'anthropic': {
-        'search_model': 'claude-4-sonnet',
         'condense_model': 'claude-4-sonnet',
         'public_model': 'claude-3.5-haiku',
         'answer_model': 'claude-4-sonnet'
     },
     'anthropic_thinking': {
-        'search_model': 'claude-4-sonnet',
         'condense_model': 'claude-4-sonnet',
         'public_model': 'claude-3.5-haiku',
         'answer_model': 'claude-4-opus-thinking'
     },
     'mistral': {
-        'search_model': 'mistral-medium-latest',
         'condense_model': 'ministral-8b-2410',
         'public_model': 'gpt-4o-mini',
         'answer_model': 'mistral-medium-latest',
         'vision_model': 'pixtral-large-latest'
     },
     'dummy': {
-        'search_model': 'dummy',
         'condense_model': 'dummy',
         'public_model': 'dummy',
         'answer_model': 'dummy'
@@ -146,14 +140,8 @@ openai_kwargs = {}
 mistral_kwargs = {}
 
 # TOOLS
-# 
-# Tools should match the names of classes from sigmund.tools
-# Search tools are executed in the first documentation-search phase
-search_tools = ['search_documentation']
-# Answer tools are executed during the answer phase
-answer_tools_with_search = []
-answer_tools_without_search = ['search_google_scholar', 'execute_code',
-                               'generate_image']
+#
+tools = ['search_google_scholar', 'execute_code', 'generate_image']
 
 # SETTINGS
 #
@@ -161,45 +149,32 @@ answer_tools_without_search = ['search_google_scholar', 'execute_code',
 settings_default = {
     # Indicates the model configuration as specified above
     'model_config': 'openai',
-    # Indicates which tools are available in generic assistant mode
-    'mode': 'opensesame',
+    # Indicates which tools are enabled
     'tool_execute_code': 'true',
-    'tool_read_attachment': 'true',
     'tool_search_google_scholar': 'true',
-    'tool_generate_image': 'true'
+    'tool_generate_image': 'true',
+    # Indicates which library collections are enabled
+    'collection_opensesame': 'true',
+    'collection_datamatrix': 'true'
 }
 
 # DOCUMENTATION
 #
-# Topic sources are used to feed in specific chunks of documentation that are
-# relevant to a topic.
-topic_sources = {
-    'opensesame': 'sources/topics/opensesame.md',
-    'python': 'sources/topics/inline_script.py',
-    'inline_script': 'sources/topics/inline_script.py',
-    'osweb': 'sources/topics/inline_javascript.js',
-    'javascript': 'sources/topics/inline_javascript.js',
-    'inline_javascript': 'sources/topics/inline_javascript.js',
-    'datamatrix': 'sources/topics/datamatrix.py',
-    'data_analysis': 'sources/topics/datamatrix.py',
-    'questions_howto': 'sources/topics/questions-how-to.md',
-    'mouse_response_item': 'sources/topics/mouse_response_item.md',
-    'feedback_item': 'sources/topics/feedback_item.md',
-    'keyboard_response_item': 'sources/topics/keyboard_response_item.md',
-    'logger_item': 'sources/topics/logger_item.md',
-    'loop_item': 'sources/topics/loop_item.md',
-    'sampler_item': 'sources/topics/sampler_item.md',
-    'sketchpad_item': 'sources/topics/sketchpad_item.md',
-    'synth_item': 'sources/topics/synth_item.md',
-    'sequence_item': 'sources/topics/sequence_item.md',
-}
-# The number of documents that is considered for each search query
-search_docs_per_query = 20
-# The number of documents that is kept for all search queries combined
-search_docs_max = 6
-# The distance metric to search through documentation. Should be 'cosine' or
-# 'euclidean_distance'
-search_docs_distance_metric = 'cosine'
+
+# Enables library search
+search_enabled = True
+# The library is organized into collections
+search_collections = {'opensesame', 'datamatrix'}
+# The maximum distance should be determined empirically by comparing distances
+# between realistic queries and relevant document, and unrelated queries and the
+# documentation. 
+search_max_distance = 1.15
+# If no results are found, we try again with a higher threshold. This may be
+# necessary especially for short questions.
+search_max_distance_fallback = 1.35
+# The number of documents. This applies separately to regular documentation and
+# howtos, and does include foundation documents.
+search_docs_max = 4
 # The embedding model used for search. This has the name of an OpenAI embedding
 # model
 search_embedding_model = 'text-embedding-3-large'
@@ -207,16 +182,10 @@ search_embedding_model = 'text-embedding-3-large'
 # search
 public_search_docs_max = 6
 public_search_max_doc_length = 1000
-# The distance metric used for search. The cosine metric is useful because it
-# is somewhat invariant to changes in document length
-search_metric = 'cosine'
-# The cache folder for the library that contains documentation
-db_cache = 'default'
-db_cache_sources = {
-    'default': '.db.cache',
-    'public-with-forum': '.public-with-forum.db.cache',
-    'public-without-forum': '.public-without-forum.db.cache'
-}
+search_persist_directory = "library"
+search_embedding_provider = "openai"
+search_embedding_model = "text-embedding-3-large"
+
 
 
 def validate_user(username, password):
