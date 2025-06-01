@@ -1,0 +1,32 @@
+<!-- Login buttons -->
+<div class="login-selector">
+    <div class="login-buttons">
+        <button onclick="window.location.href='/google_login'">
+            <img src="/static/google.png" alt="OpenAI Icon">
+            <span>Sign in with Google<br><small>Use your existing Google account</small></span>
+        </button>
+        <button onclick="document.getElementById('login').style.display='block'"> 
+            <img src="/static/sigmund-avatar.png" alt="OpenAI Icon">
+            <span>Sign with CogSci forum<br><small>Use your existing account from forum.cogsci.nl</small></span>
+        </button>
+    </div>        
+    <small>Get unlimited access to the latest and most powerful models for €9/month </small>
+</div>    
+
+<!-- Login form (hidden by default) -->
+<div id="login">
+    <form method="POST" id="login-form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label }} {{ form.username(autocomplete='username') }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label }} {{ form.password(autocomplete='current-password') }}
+        </div>
+        <div class="form-group">
+            {{ form.submit() }}
+        </div>
+    </form>
+</div>
+
+<hr class="menu-divider">

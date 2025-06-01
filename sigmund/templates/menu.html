@@ -1,7 +1,10 @@
-{% raw %}
 <div id="app">
   <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
-    <div ref="menuCloseButton" class="close"><i class="fas fa-window-close"></i></div>
+    <div ref="menuCloseButton" class="close"><i class="fas fa-window-close"></i></div> 
+    {% if need_login %}
+      {% include 'login-div.html' %}
+    {% endif %}
+{% raw %}
     <!-- Expert knowledge section -->
     <div>
       <small>For best performance, only enable knowledge and tools that you need</small>
@@ -90,7 +93,6 @@
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <hr class="menu-divider">    
-    <div @click="navigateTo('/about')">About</div>
     <div @click="navigateTo('/terms')">Terms and conditions</div>
     <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
     <div @click="navigateTo('/api/conversation/export')">Download your data</div>

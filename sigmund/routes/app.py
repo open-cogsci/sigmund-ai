@@ -118,27 +118,22 @@ def login_handler(form, failed=False):
         login_user(user)
         logger.info('initializing encryption key')
         return redirect('/')
-    login_text = Path('sigmund/static/login.md').read_text()
-    if failed:
-        login_text = f'{config.login_failed_message}\n\n{login_text}'
-    logger.info('log-in screen')
-    return utils.render(
-        'login.html', form=form,
-        login_text=utils.md(login_text))
-    
-    
+    html_content = utils.render('welcome.html')
+    return utils.render('chat.html', message_history=html_content,
+                        subscription_required=config.subscription_required,
+                        form=form,
+                        need_login=True,
+                        username='unknown friend',
+                        settings='{}',
+                        workspace_content='',
+                        workspace_language='')    
+
+
 @app_blueprint.route('/about')
 def about():
     return utils.render(
         'info-page.html',
         content=utils.md(Path('sigmund/static/about.md').read_text()))
-    
-    
-@app_blueprint.route('/user_question_guide')
-def user_question_guide():
-    return utils.render(
-        'info-page.html',
-        content=utils.md(Path('sigmund/static/user_question_guide.md').read_text()))
     
 
 @app_blueprint.route('/terms')

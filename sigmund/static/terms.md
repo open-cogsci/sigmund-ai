@@ -15,7 +15,7 @@ The Sigmund server is physically located within the European Union, and is hoste
 
 ## How secure is Sigmund?
 
-Sigmund uses encryption for all network traffic. Messages and attachments are encrypted (see [About](/about)).
+Sigmund uses encryption for all network traffic. Messages are encrypted in a way that allows no-one, not even Sigmund's administrators, to read along.
 
 
 ## How is data on Sigmund backed up?
@@ -25,7 +25,7 @@ Sigmund does *not* guarantee that data will be preserved. We do not have the cap
 
 ## What user data is stored on Sigmund?
 
-A user account on Sigmund only contains a username, encrypted message and attachment data, and limited information necessary for subscriptions.
+A user account on Sigmund only contains a username, encrypted messages, and limited information necessary for subscriptions.
 
 
 ## Who owns user data on Sigmund?
@@ -47,7 +47,7 @@ Nothing. User data is stored solely for the purpose of providing the intended se
 
 ## Usage limits
 
-There is an hourly limit of 500,000 tokens per user. When this limit is exceeded, you need to wait for (at most) an hour until you can use Sigmund again. The hourly limit may be adjusted once we get a better picture of what kind of limits are needed to avoid excessive use.
+There is an hourly limit of tokens per user to avoid abuse. This limit is so high that you are unlikely to run into it during normal use. If you have nevertheless exceeded the limit, you simply need to wait for (at most) an hour until you can use Sigmund again.
 
 
 ## Availability

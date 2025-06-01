@@ -137,6 +137,7 @@
 
 
 .mode-buttons,
+.login-buttons,
 .model-buttons {
     padding: 0px!important;
     margin-top: 10px;
@@ -146,6 +147,7 @@
 }
 
 .mode-buttons button,
+.login-buttons button,
 .model-buttons button {
     flex-grow: 1;
     border: none;
@@ -161,12 +163,14 @@
 }
 
 .mode-buttons button.active,
+.login-buttons button.active,
 .model-buttons button.active {
     background-color: #007BFF; /* Highlight active button */
     color: white;
 }
 
 .mode-buttons button img,
+.login-buttons button img,
 .model-buttons button img {
     width: 40px; /* Size of the icon */
     height: 40px;
@@ -174,13 +178,19 @@
 }
 
 .mode-buttons button span,
+.login-buttons button span,
 .model-buttons button span {
     font-size: 14px; /* Text size */
 }
 
 .mode-buttons button:hover,
+.login-buttons button:hover,
 .model-buttons button:hover {
     background-color: #e0e0e0; /* Hover effect */
+}
+
+#login div {
+  padding: 0px;
 }
 
 /* When the screen is 600px wide or smaller, stack buttons vertically */
@@ -222,4 +232,15 @@
   padding: 4px;
   border: 1px solid #ccc;
   border-radius: 4px;
+}
+
+.menu #login {
+  display: none;
+}
+
+/* Fix for input width issues */
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in width calculation */
 }

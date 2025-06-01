@@ -13,8 +13,12 @@ function initMain(event) {
     updateCounter();
     
     messageInput.addEventListener('input', function() {
-        // Enable the send button if there are at least 3 characters in the message box
+        // Enable the send button if there are at least 3 characters in the 
+        // message box. This only happens when the need_login variable is not 
+        // True.
+        {% if not need_login %}
         sendButton.disabled = this.value.length < 3;
+        {% endif %}
     });
 
     // Trigger the send button when Enter is pressed inside the message box
