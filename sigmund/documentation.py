@@ -70,7 +70,8 @@ You have retrieved the following documentation to answer the user's question:
         logger.info('clearing documentation')
         self._documents = []
         
-    def search(self, query, fallback=False, foundation=True, howtos=True):
+    def search(self, query, fallback=False, foundation=True, howtos=True,
+               max_distance=None, max_distance_fallback=None, k=None):
         """First, we separately search for regular and howto documents, because
         these tend not to be fairly comparable (howtos tend to always win).
         Finally, we insert foundation documents that match the topic of the
@@ -79,17 +80,21 @@ You have retrieved the following documentation to answer the user's question:
         if not self._collections:
             logger.info('library search disabled')
             return
-        if not fallback:
+        if k is None:
+            k = config.search_docs_max
+        if max_distance is None:
             max_distance = config.search_max_distance
-        else:
-            max_distance = config.search_max_distance_fallback
+        if max_distance_fallback is None:
+            max_distance_fallback = config.search_max_distance_fallback
+        if fallback:
+            max_distance = max_distance_fallback
         regular_results = self._library.search(
-            query, foundation=False, howto=False, k=config.search_docs_max,
-            max_distance=max_distance, collection=self._collections)
+            query, foundation=False, howto=False, k=k,
+            max_distance=max_distance, collection=self._collections)        
         logger.info(f'found {len(regular_results)} regular results')
         if howtos:
             howto_results = self._library.search(
-                query, foundation=False, howto=True, k=config.search_docs_max,
+                query, foundation=False, howto=True, k=k,
                 max_distance=max_distance, collection=self._collections)
             logger.info(f'found {len(howto_results)} howto results')
         else:
@@ -104,4 +109,6 @@ You have retrieved the following documentation to answer the user's question:
         if not fallback and not self._documents:
             self.poor_match = True
             logger.warning('no results found, retrying with higher threshold')
-            self.search(query, fallback=True)
+            self.search(query, fallback=True, foundation=foundation, 
+                        howtos=howtos, max_distance=max_distance,
+                        max_distance_fallback=max_distance_fallback, k=k)

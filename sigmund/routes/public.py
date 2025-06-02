@@ -15,14 +15,14 @@ def search():
     offset = data.get('offset', 0) * config.public_search_docs_max
     source = data.get('source', 'default')
     logger.info(f'public search source: {source}')
-    if 'public-with-forum' in source:
-        config.search_collections.add('forum')
-        config.settings_default['collection_forum'] = 'true'
-    config.search_max_distance = float('inf')
-    config.search_docs_max = config.public_search_docs_max + offset
     sigmund = Sigmund(user_id='dummy', persistent=False, encryption_key=None)
     sigmund.documentation.clear()
-    sigmund.documentation.search(query, howtos=False, foundation=False)
+    if 'public-with-forum' in source:
+        sigmund.documentation._collections.add('forum')
+        logger.info('adding forum source for search')
+    sigmund.documentation.search(query, howtos=False, foundation=False,
+                                 k=config.public_search_docs_max + offset,
+                                 max_distance=float('inf'))
     docs = []
     urls = []
     logging.info(f'public search: {query} (offset={offset})')
