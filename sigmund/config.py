@@ -155,7 +155,8 @@ settings_default = {
     'tool_generate_image': 'true',
     # Indicates which library collections are enabled
     'collection_opensesame': 'true',
-    'collection_datamatrix': 'true'
+    'collection_datamatrix': 'true',
+    'collection_forum': 'false'
 }
 
 # DOCUMENTATION
@@ -164,7 +165,7 @@ settings_default = {
 # Enables library search
 search_enabled = True
 # The library is organized into collections
-search_collections = {'opensesame', 'datamatrix'}
+search_collections = {'opensesame', 'datamatrix', 'forum'}
 # The maximum distance should be determined empirically by comparing distances
 # between realistic queries and relevant document, and unrelated queries and the
 # documentation. 
