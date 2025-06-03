@@ -216,5 +216,289 @@
     "topic": "datamatrix",
     "howto": false,
     "foundation": true
+  },
+  {
+    "content": "# Python EyeLinkParser\n\nSebastiaan Math\u00f4t and contributors <br />\nCopyright 2016-2023  <br />\nhttp://www.cogsci.nl/smathot\n\n## About\n\nThe `python-eyelinkparser` module provides a framework to parse EyeLink data files in `.asc` format, that is, the format that you get after converting an `.edf` file with `edf2asc`. This module is mostly for personal use, and is not very well documented.\n\n## Installation\n\n```\npip install eyelinkparser\n```\n\n## Expected format\n\nThe parser assumes monocular recording.\n\n\n## Expected messages\n\nBy default, the parser assumes that particular messages are sent to the logfile. If you use different messages, you need to override functions in `_eyelinkparser.EyeLinkParser`. This is not explained here, but you can look in the source code to see how it works.\n\nTrial start:\n\n\tstart_trial [trialid]\n\t\nTrial end:\n\n\tend_trial\n\tstop_trial\n\t\nVariables:\n\n\tvar [name] [value]\n\t\nStart of a period of continuous data:\n\t\n\tstart_phase [name]\n\tphase [name]\n\t\nEnd of a period of continuous data:\n\n\tend_phase [name]\n\tstop_phase [name]\n\t\n\t\n\n## Function reference\n\n## <span style=\"color:purple\">eyelinkparser.EyeLinkParser</span>_(folder='data', ext=('.asc', '.edf', '.tar.xz'), downsample=None, maxtracelen=None, traceprocessor=None, phasefilter=None, phasemap={}, trialphase=None, edf2asc\\_binary='edf2asc', multiprocess=False, asc\\_encoding=None, pupil\\_size=True, gaze\\_pos=True, time\\_trace=True)_\n\nThe main parser class. This is generally not created directly, but\nthrough the `eyelinkparser.parse()` function, which takes the same keywords\nas the `EyeLinkParser` constructor (i.e. the keywords below).\n\n### Parameters\n\n* **folder: str, optional**\n\n  The folder that contains .edf or .asc data files, or files compressed\n  as .tar.xz archives.\n\n* **ext: str or tuple, optional**\n\n  Allowed file extensions, or a tuple of extensions, for data files.\n\n* **downsample: int or None, optional**\n\n  Indicates whether traces (if any) should be downsampled. For example, a\n  value of 10 means that the signal becomes 10 times shorter. Downsample\n  creates a simple traceprocessor, and can therefore not be used in\n  combination with the traceprocessor argument.\n\n* **maxtracelen: int or None, optional**\n\n  A maximum length for traces. Longer traces are truncated and a\n  `UserWarning` is emitted. This length refers to the trace after\n  downsampling/ processing.\n\n* **traceprocessor: callable or None, optional**\n\n  A function that is applied to each trace before the trace is written to\n  the SeriesColumn. This can be used to apply a series of operations that\n  are best done on the raw signal, such as first correcting blinks and\n  then downsampling the signal.\n\n  The function must accept two arguments: first a label for the trace,\n  which is 'pupil', 'xcoor', 'ycoor', or 'time'. This allows the function\n  to distinguish the different kinds of singals; second, the trace\n  itself.\n\n  See `eyelinkparser.defaulttraceprocessor` for a convenience function\n  that applies blink correction and downsampling.\n\n* **trialphase: str or None, optional**\n\n  Indicates the name of a phase that should be automatically started when\n  the trial starts, or `None` when no trial should be automatically\n  started. This is mostly convenient for processing trials that consist\n  of a single long epoch, or when no `start_phase` messages were written\n  to the log file.\n\n* **phasefilter: callable or None, optional**\n\n  A function that receives a phase name as argument, and returns a bool\n  indicating whether that phase should be retained.\n\n* **phasemap: dict, optional**\n\n  A dict in which keys are phase names that are renamed to the associated\n  values. This is mostly useful to merge subsequent traces, in which\n  case the key is the first trace and the value is the second trace.\n\n* **edf2asc\\_binary: str, optional**\n\n  The name of the edf2asc executable, which if available can be used to\n  automatically convert .edf files to .asc. If not available, the parser\n  can only parse .asc files.\n\n* **multiprocess: bool or int, optional**\n\n  Indicates whether each file should be processed in a different process.\n  This can speed up parsing considerably. If not `False`, this should be\n  an int to indicate the number of processes.\n\n* **asc\\_encoding: str or None, optional**\n\n  Indicates the character encoding of the `.asc` files, or `None` to use\n  system default.\n\n* **pupil\\_size: bool, optional**\n\n  Indicates whether pupil-size traces should be stored. If enabled, pupil\n  size is stored as `ptrace_[phase]` columns.\n\n* **gaze\\_pos: bool, optional**\n\n  Indicates whether horizontal and vertical gaze-position traces should\n  be stored. If enabled, gaze position is stored as `xtrace_[phase]` and\n  `ytrace_[phase]` columns.\n\n* **time\\_trace: bool, optional**\n\n  Indicates whether timestamp traces should be stored, which indicate the\n  timestamps of the corresponding pupil and gaze-position traces. If\n  enabled, timestamps are stored as `ptrace_[phase]` columns.\n\n### Examples\n\n```python\nimport eyelinkparser as ep\ndm = ep.parse(defaulttraceprocessor=ep.defaulttraceprocessor(\n    blinkreconstruct=True, downsample=True, mode='advanced'))\n```\n\n\n## Tutorial\n\nFor a tutorial about using EyeLinkParser, see:\n\n- <https://pydatamatrix.eu/eyelinkparser/>\n\n## License\n\n`python-eyelinkparser` is licensed under the [GNU General Public License\nv3](http://www.gnu.org/licenses/gpl-3.0.en.html).\n",
+    "url": "https://github.com/open-cogsci/eyelinkparser",
+    "collection": "datamatrix",
+    "howto": false,
+    "foundation": false,
+    "topics": [
+      "datamatrix"
+    ]
+  },
+  {
+    "content": "# Time Series Test\n\n*Statistical testing and plotting functions for time-series data in general, and data from cognitive-pupillometry and electroencephalography (EEG) experiments in particular. Based on linear mixed effects modeling (or regular multiple linear regression), crossvalidation, and cluster-based permutation testing.*\n\nSebastiaan Math\u00f4t (@smathot) <br />\nCopyright 2021 - 2024\n\n[![Publish to PyPi](https://github.com/smathot/time_series_test/actions/workflows/publish-package.yaml/badge.svg)](https://github.com/smathot/time_series_test/actions/workflows/publish-package.yaml)\n[![Tests](https://github.com/smathot/time_series_test/actions/workflows/run-unittests.yaml/badge.svg)](https://github.com/smathot/time_series_test/actions/workflows/run-unittests.yaml)\n\n\n## Contents\n\n- [Citation](#citation)\n- [About](#about)\n- [Dependencies](#dependencies)\n- [Usage](#usage)\n- [Function reference](#function-reference)\n- [License](#license)\n\n\n## Citation\n\nMath\u00f4t, S., & Vilotijevi\u0107, A. (2022). Methods in cognitive pupillometry: design, preprocessing, and analysis. *Behavior Research Methods*. <https://doi.org/10.1101/2022.02.23.481628>\n\n\n## About\n\nThis library provides two main functions for statistical testing of time-series data: `lmer_crossvalidation_test()` and `lmer_permutation_test()`. For a detailed description, see the manuscript above, but below a short introduction to both functions with their respective advantages and disadavantages.\n\n\n### When to use crossvalidation?\n\nIn general terms, `lmer_crossvalidation_test()` implements a statistical test for a specific-yet-common question when analyzing time-series data:\n\n> Do one or more independent variables affect a continuously recorded dependent variable (a 'time series') at any point in time?\n\nWhen to use this test:\n\n- For time series consisting of only a single component, that is, when each independent variable has only a single effect on the time series. An example of this is the effect of stimulus intensity on pupil size, when presenting light flashes of different intensities.\n- When you do not know a priori which time points to test.\n\nWhen *not* to use this test:\n\n- For time series that contain multiple components, that is, when each independent variable affects the time series in multiple ways that change over time. An example of this is the effect of visual attention on lateralized EEG recordings, where different EEG components emerge at different points in time.\n- When you know a priori which time points to test.\n\nMore specifically, `lmer_crossvalidation_test()` locates and statistically tests effects in time-series data. It does so by using crossvalidation to identify time points to test, and then using a linear mixed effects model to actually perform the statistical test. More specifically, the data is subdivided in a number of subsets (by default 4). It takes one of the subsets (the *test* set) out of the full dataset, and conducts a linear mixed effects model on each sample of the remaining data (the *training* set). The sample with the highest absolute z value in the training set is used as the sample-to-be-tested for the test set. This procedure is repeated for all subsets of the data, and for all fixed effects in the model. Finally, a single linear mixed effects model is conducted for each fixed effects on the samples that were thus identified.\n\nThis packages also provides a function (`plot()`) to visualize time-series data to visually annotate the results of `lmer_crossvalidation_test()`.\n\n\n### When to use `lmer_permutation_test()`?\n\n`lmer_permutation_test()` implements a fairly standard cluster-based permutation test, which differs from most other implementations in that it relies on linear mixed-effects modeling to calculate the test statistics. Therefore, this function tends to be extremely computationally intensive, but should also be more sensitive than cluster-based permutation tests that are based on average data. Its main advantage as compared to `lmer_crossvalidation_test()` is that it is also valid for data with multiple components, such as event-related potentials (ERPs).\n\n\n### Can the tests also be based on regular multiple regression (instead of linear mixed effects modeling)?\n\nYes. If you pass `groups=None` to any of the functions, the analysis will be based on a regular multiple linear regression instead of linear mixed effects modeling.\n\n\n## Installation\n\n```\npip install time_series_test\n```\n\n## Dependencies\n\n- [Python 3](https://www.python.org/)\n- [datamatrix](https://pydatamatrix.eu/)\n- [statsmodels](https://www.statsmodels.org/)\n- [matplotlib](https://matplotlib.org/)\n\n\n## Usage\n\nWe will use data from [Zhou, Lorist, and Math\u00f4t (2021)](https://doi.org/10.1101/2021.11.23.469689). In brief, this is data from a visual-working-memory experiment in which participant memorized one or more colors (set size: 1, 2, 3 or 4) of two different types (color type: proto, nonproto) while pupil size was being recorded during a 3s retention interval.\n\nThis dataset contains the following columns:\n\n- `pupil`, which is is our dependent measure. It is a baseline-corrected pupil time series of 300 samples, recorded at 100 Hz\n- `subject_nr`, which we will use as a random effect\n- `set_size`, which we will use as a fixed effect\n- `color_type`, which we will use as a fixed effect\n\nFirst, load the dataset:\n\n\n\n```python\nfrom datamatrix import io\ndm = io.readpickle('data/zhou_et_al_2021.pkl')\n```\n\n\n\nThe `plot()` function provides a convenient way to plot pupil size over time as a function of one or two factors, in this case set size and color type:\n\n\n\n```python\nimport time_series_test as tst\nfrom matplotlib import pyplot as plt\n\ntst.plot(dm, dv='pupil', hue_factor='set_size', linestyle_factor='color_type',\n         sampling_freq=100)\nplt.savefig('img/signal-plot-1.png')\n```\n\n\n\n![](https://github.com/smathot/time_series_test/raw/master/img/signal-plot-1.png)\n\nFrom this plot, we can tell that there appear to be effects in the 1500 to 2000 ms interval. To test this, we could perform a linear mixed effects model on this interval, which corresponds to samples 150 to 200.\n\nThe model below uses mean pupil size during the 150 - 200 sample range as dependent measure, set size and color type as fixed effects, and a random by-subject intercept. In the more familiar notation of the R package `lme4`, this corresponds to `mean_pupil ~ set_size * color_type + (1 | subject_nr)`. (To use more complex random-effects structures, you can use the `re_formula` argument to `mixedlm()`.)\n\n\n\n```python\nfrom statsmodels.formula.api import mixedlm\nfrom datamatrix import series as srs, NAN\n\ndm.mean_pupil = srs.reduce(dm.pupil[:, 150:200])\ndm_valid_data = dm.mean_pupil != NAN\nmodel = mixedlm(formula='mean_pupil ~ set_size * color_type',\n                data=dm_valid_data, groups='subject_nr').fit()\nprint(model.summary())\n```\n\n__Output:__\n``` .text\n                    Mixed Linear Model Regression Results\n=============================================================================\nModel:                    MixedLM       Dependent Variable:       mean_pupil \nNo. Observations:         7300          Method:                   REML       \nNo. Groups:               30            Scale:                    38610.3390 \nMin. group size:          235           Log-Likelihood:           -48952.3998\nMax. group size:          248           Converged:                Yes        \nMean group size:          243.3                                              \n-----------------------------------------------------------------------------\n                              Coef.   Std.Err.   z    P>|z|  [0.025   0.975] \n-----------------------------------------------------------------------------\nIntercept                    -144.024   17.438 -8.259 0.000 -178.202 -109.846\ncolor_type[T.proto]           -24.133   11.299 -2.136 0.033  -46.278   -1.987\nset_size                       49.979    2.906 17.200 0.000   44.284   55.675\nset_size:color_type[T.proto]   10.176    4.120  2.470 0.014    2.101   18.251\nsubject_nr Var               7217.423    9.882                               \n=============================================================================\n\n```\n\n\n\nThe model summary shows that, assuming an alpha level of .05, there are significant main effects of color type (z = -2.136, p = .033), set size (z = 17.2, p < .001), and a significant color-type by set-size interaction (z = 2.47, p = .014). However, we have selectively analyzed a sample range that we knew, based on a visual inspection of the data, to show these effects. This means that our analysis is circular: we have looked at the data to decide where to look! The `find()` function improves this by splitting the data into training and tests sets, as described under [About](#about), thus breaking the circularity.\n\n\n\n```python\nresults = tst.find(dm, 'pupil ~ set_size * color_type',\n                   groups='subject_nr', winlen=5)\n```\n\n\n\nThe return value of `find()` is a `dict`, where keys are effect labels and values are named tuples of the following:\n\n- `model`: a model as returned by `mixedlm().fit()`\n- `samples`: a `set` with the sample indices that were used\n- `p`: the p-value from the model\n- `z`: the z-value from the model\n\nThe `summarize()` function is a convenient way to get the results in a human-readable format.\n\n\n\n```python\nprint(tst.summarize(results))\n```\n\n__Output:__\n``` .text\nIntercept was tested at samples {95} \u2192 z = -13.1098, p = 2.892e-39, converged = yes\ncolor_type[T.proto] was tested at samples {160, 170, 175} \u2192 z = -2.0949, p = 0.03618, converged = yes\nset_size was tested at samples {185, 210, 195, 255} \u2192 z = 16.2437, p = 2.475e-59, converged = yes\nset_size:color_type[T.proto] was tested at samples {165, 175} \u2192 z = 2.5767, p = 0.009974, converged = yes\n```\n\n\n\nWe can pass the `results` to `plot()` to visualize the results:\n\n\n\n```python\nplt.clf()\ntst.plot(dm, dv='pupil', hue_factor='set_size', linestyle_factor='color_type',\n         results=results, sampling_freq=100)\nplt.savefig('img/signal-plot-2.png')\n```\n\n\n\n![](https://github.com/smathot/time_series_test/raw/master/img/signal-plot-2.png)\n\n\n## Function reference\n\n## <span style=\"color:purple\">time\\_series\\_test.lmer\\_crossvalidation\\_test</span>_(dm, formula, groups, re\\_formula=None, winlen=1, split=4, split\\_method='interleaved', samples\\_fe=True, samples\\_re=True, localizer\\_re=False, fit\\_method=None, suppress\\_convergence\\_warnings=False, fit\\_kwargs=None, \\*\\*kwargs)_\n\nConducts a single linear mixed effects model to a time series, where the\nto-be-tested samples are determined through crossvalidation.\n\nThis function uses `mixedlm()` from the `statsmodels` package. See the\nstatsmodels documentation for a more detailed explanation of the\nparameters.\n\n### Parameters\n\n* **dm: DataMatrix**\n\n  The dataset\n\n* **formula: str**\n\n  A formula that describes the dependent variable, which should be the\n  name of a series column in `dm`, and the fixed effects, which should\n  be regular (non-series) columns.\n\n* **groups: str or None or list of str**\n\n  The groups for the random effects, which should be regular (non-series)\n  columns in `dm`. If `None` is specified, then all analyses are based\n  on a regular multiple linear regression (instead of linear mixed \n  effects model).\n\n* **re\\_formula: str or None**\n\n  A formula that describes the random effects, which should be regular\n  (non-series) columns in `dm`.\n\n* **winlen: int, optional**\n\n  The number of samples that should be analyzed together, i.e. a \n  downsampling window to speed up the analysis.\n\n* **split: int, optional**\n\n  The number of splits that the analysis should be based on.\n\n* **split\\_method: str, optional**\n\n  If 'interleaved', the data is split in a regular interleaved fashion,\n  such that the first row goes to the first subset, the second row to the\n  second subset, etc. If 'random', the data is split randomly in subsets.\n  Interleaved splitting is deterministic (i.e. it results in the same\n  outcome each time), but random splitting is not.\n\n* **samples\\_fe: bool, optional**\n\n  Indicates whether sample indices are included as an additive factor\n  to the fixed-effects formula. If all splits yielded the same sample\n  index, this is ignored.\n\n* **samples\\_re: bool, optional**\n\n  Indicates whether sample indices are included as an additive factor\n  to the random-effects formula. If all splits yielded the same sample\n  index, this is ignored.\n\n* **localizer\\_re: bool, optional**\n\n  Indicates whether a random effects structure as specified using the\n  `re_formula` keyword should also be used for the localizer models,\n  or only for the final model.\n\n* **fit\\_kwargs: dict or None, optional**\n\n  A `dict` that is passed as keyword arguments to `mixedlm.fit()`. For\n  example, to specify the nm as the fitting method, specify\n  `fit_kwargs={'fit': 'nm'}`.\n\n* **fit\\_method: str, list of str, or None, optional**\n\n  Deprecated. Use `fit_kwargs` instead.\n\n* **suppress\\_convergence\\_warnings: bool, optional**\n\n  Installs a warning filter to suppress conververgence (and other)\n  warnings.\n\n* **\\*\\*kwargs: dict, optional**\n\n  Optional keywords to be passed to `mixedlm()`.\n\n### Returns\n\n* **_dict_**\n\n  A dict where keys are effect labels, and values are named tuples\n  of `model`, `samples`, `p`, and `z`.\n\n## <span style=\"color:purple\">time\\_series\\_test.lmer\\_permutation\\_test</span>_(dm, formula, groups, re\\_formula=None, winlen=1, suppress\\_convergence\\_warnings=False, fit\\_kwargs={}, iterations=1000, cluster\\_p\\_threshold=0.05, test\\_intercept=False, \\*\\*kwargs)_\n\nPerforms a cluster-based permutation test based on sample-by-sample\nlinear-mixed-effects analyses. The permutation test identifies clusters\nbased on p-value threshold and uses the absolute of the summed z-values of\nthe clusters as test statistic.\n\nIf no clusters reach the threshold, the test is skipped right away. By\ndefault the Intercept is ignored for this criterion, because the intercept\nusually has significant clusters that we're not interested in. However, you\ncan change this using the `test_intercept` keyword.\n\n*Warning:* This is generally an extremely time-consuming analysis because\nit requires thousands of lmers to be run.\n\nSee `lmer_crossvalidation()` for an explanation of the arguments.\n\n### Parameters\n\n* **dm: DataMatrix**\n\n* **formula: str**\n\n* **groups: str**\n\n* **re\\_formula: str or None, optional**\n\n* **winlen: int, optional**\n\n* **suppress\\_convergence\\_warnings: bool, optional**\n\n* **fit\\_kwargs: dict, optional**\n\n* **iterations: int, optional**\n\n  The number of permutations to run.\n\n* **cluster\\_p\\_threshold: float or None, optional**\n\n  The maximum p-value for a sample to be considered part of a cluster.\n\n* **test\\_intercept: bool, optional**\n\n  Indicates whether the intercept should be included when considering if\n  there are any clusters, as described above.\n\n* **\\*\\*kwargs: dict, optional**\n\n### Returns\n\n* **_dict_**\n\n  A dict with effects as keys and lists of clusters defined by\n  (start, end, z-sum, hit proportion) tuples. The p-value is\n  1 - hit proportion.\n\n## <span style=\"color:purple\">time\\_series\\_test.lmer\\_series</span>_(dm, formula, winlen=1, fit\\_kwargs={}, \\*\\*kwargs)_\n\nPerforms a sample-by-sample linear-mixed-effects analysis. See\n`lmer_crossvalidation()` for an explanation of the arguments.\n\n### Parameters\n\n* **dm: DataMatrix**\n\n* **formula: str**\n\n* **winlen: int, optional**\n\n* **fit\\_kwargs: dict, optional**\n\n* **\\*\\*kwargs: dict, optional**\n\n### Returns\n\n* **_DataMatrix_**\n\n  A DataMatrix with one row per effect, including the intercept, and\n  three series columns with the same depth as the dependent measure\n  specified in the formula:\n\n  - `est`: the slope\n  - `p`: the p value\n  - `z`: the z value\n  - `se`: the standard error\n\n## <span style=\"color:purple\">time\\_series\\_test.plot</span>_(dm, dv, hue\\_factor, results=None, linestyle\\_factor=None, hues=None, linestyles=None, alpha\\_level=0.05, annotate\\_intercept=False, annotation\\_hues=None, annotation\\_linestyle=':', legend\\_kwargs=None, annotation\\_legend\\_kwargs=None, x0=0, sampling\\_freq=1)_\n\nVisualizes a time series, where the signal is plotted as a function of\nsample number on the x-axis. One fixed effect is indicated by the hue\n(color) of the lines. An optional second fixed effect is indicated by the\nlinestyle. If the `results` parameter is used, significant effects are\nannotated in the figure.\n\n### Parameters\n\n* **dm: DataMatrix**\n\n  The dataset\n\n* **dv: str**\n\n  The name of the dependent variable, which should be a series column\n  in `dm`.\n\n* **hue\\_factor: str**\n\n  The name of a regular (non-series) column in `dm` that specifies the\n  hue (color) of the lines.\n\n* **results: dict, optional**\n\n  A `results` dict as returned by `lmer_crossvalidation()`.\n\n* **linestyle\\_factor: str, optional**\n\n  The name of a regular (non-series) column in `dm` that specifies the\n  linestyle of the lines for a two-factor plot.\n\n* **hues: str, list, or None, optional**\n\n  The name of a matplotlib colormap or a list of hues to be used as line\n  colors for the hue factor.\n\n* **linestyles: list or None, optional**\n\n  A list of linestyles to be used for the second factor.\n\n* **alpha\\_level: float, optional**\n\n  The alpha level (maximum p value) to be used for annotating effects\n  in the plot.\n\n* **annotate\\_intercept: bool, optional**\n\n  Specifies whether the intercept should also be annotated along with\n  the fixed effects.\n\n* **annotation\\_hues: str, list, or None, optional**\n\n  The name of a matplotlib colormap or a list of hues to be used for the\n  annotations if `results` is provided.\n\n* **annotation\\_linestyle: str, optional**\n\n  The linestyle for the annotations.\n\n* **legend\\_kwargs: None or dict, optional**\n\n  Optional keywords to be passed to `plt.legend()` for the factor legend.\n\n* **annotation\\_legend\\_kwargs: None or dict, optional**\n\n  Optional keywords to be passed to `plt.legend()` for the annotation\n  legend.\n\n* **x0: int, float**\n\n  The starting value on the x-axis.\n\n* **sampling\\_freq: int, float**\n\n  The sampling frequency.\n\n## <span style=\"color:purple\">time\\_series\\_test.summarize</span>_(results, detailed=False)_\n\nGenerates a string with a human-readable summary of a results `dict` as\nreturned by `lmer_crossvalidation()`.\n\n### Parameters\n\n* **results: dict**\n\n  A `results` dict as returned by `lmer_crossvalidation()`.\n\n* **detailed: bool, optional**\n\n  Indicates whether model details should be included in the summary.\n\n### Returns\n\n* **_str_**\n\n\n## License\n\n`time_series_test` is licensed under the [GNU General Public License\nv3](http://www.gnu.org/licenses/gpl-3.0.en.html).\n",
+    "url": "https://github.com/smathot/time_series_test",
+    "collection": "datamatrix",
+    "howto": false,
+    "foundation": false,
+    "topics": [
+      "datamatrix"
+    ]
+  },
+  {
+    "content": "# How to combine multiple datasets into a single DataMatrix\n\nWhen you have data from multiple experiments or sessions stored in separate folders, you often need to combine them into a single DataMatrix for analysis. This howto shows how to load multiple datasets and merge them while keeping track of their origin.\n\n```python\nfrom datamatrix import DataMatrix\n\n# Load data from different experiments/folders\ndm1 = get_dm('data_1')\ndm1.subject_nr += 1000  # Add offset to distinguish experiments\ndm2 = get_dm('data_2')\ndm2.subject_nr += 2000  # Different offset for experiment 2\ndm3 = get_dm('data_3')\ndm3.subject_nr += 3000  # Different offset for experiment 3\n\n# Combine all datamatrices using the << operator\ndm = dm1 << dm2 << dm3\n```",
+    "title": "How to combine multiple datasets into a single DataMatrix",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to filter out missing or invalid data\n\nReal-world data often contains missing values or invalid entries. This howto demonstrates how to remove rows with missing data using DataMatrix's intuitive selection syntax.\n\n```python\n# Remove rows where important columns have missing values\ndm = dm.correct != ''  # Remove empty strings\ndm = dm.cue_eccentricity != ''\ndm = dm.response_time != ''\n\n# Remove rows where values are not of expected type\ndm = dm.subject_nr == int  # Keep only integer subject numbers\n\n# You can also remove specific values\ndm = dm.practice != 'yes'  # Remove practice trials\n```",
+    "title": "How to filter out missing or invalid data",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to calculate z-scores per participant\n\nWhen analyzing data from multiple participants, you often need to standardize values within each participant. This howto shows how to calculate z-scores separately for each participant.\n\n```python\nfrom datamatrix import operations as ops\n\n# Initialize a column for z-scored values\ndm.z_baseline = ''\n\n# Loop through participants and calculate z-scores\nfor subject_nr, sdm in ops.split(dm.subject_nr):\n    # Calculate z-scores for this participant's data\n    dm.z_baseline[sdm] = ops.z(sdm.baseline)\n```",
+    "title": "How to calculate z-scores per participant",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to remove outliers based on z-scores\n\nAfter calculating z-scores, you typically want to remove extreme outliers. This howto demonstrates how to filter data based on z-score thresholds.\n\n```python\n# Remove outliers beyond 2 standard deviations\nprint(f'Before removing outliers: N(trial) = {len(dm)}')\ndm = dm.z_baseline >= -2\ndm = dm.z_baseline <= 2\nprint(f'After removing outliers: N(trial) = {len(dm)}')\n```",
+    "title": "How to remove outliers based on z-scores",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to work with time series data\n\nDataMatrix supports time series data through SeriesColumn objects. This howto shows how to extract specific time windows and calculate means across time points.\n\n```python\nfrom datamatrix import series as srs, NAN\n\n# Extract a specific time window (e.g., samples 75-300)\ndm.pupil_window = dm.pupil_stream[:, 75:300]\n\n# Calculate mean across a time window (e.g., samples 250-260)\ndm.mean_pupil = srs.reduce(dm.pupil_stream[:, 250:260])\n\n# Remove rows where the mean is NaN\ndm_valid = dm.mean_pupil != NAN\n```",
+    "title": "How to work with time series data",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to split data by experimental conditions\n\nExperimental data often needs to be analyzed separately for different conditions. This howto demonstrates how to split a DataMatrix based on condition values.\n\n```python\nfrom datamatrix import operations as ops\n\n# Split by a single condition with automatic detection of values\nfor group, group_dm in ops.split(dm.condition):\n    print(f'Analyzing condition: {group}')\n    # Perform analysis on group_dm\n\n# Split by specific values in a specific order\ndm_cond1, dm_cond2 = ops.split(dm.condition, 'eccentricity', 'location')\n```",
+    "title": "How to split data by experimental conditions",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to get summary statistics by group\n\nWhen analyzing grouped data, you often need summary statistics for each group. This howto shows how to iterate through groups and calculate statistics.\n\n```python\nfrom datamatrix import operations as ops\n\n# Calculate mean for each group\nfor group, group_dm in ops.split(dm.Group):\n    print(f'Mean heart rate for {group} is {group_dm[\"Heart Rate\"].mean} bpm')\n```",
+    "title": "How to get summary statistics by group",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to count unique values and participants\n\nUnderstanding your data structure often requires counting unique values. This howto demonstrates how to count participants and other categorical variables.\n\n```python\n# Count number of unique participants\nn_participants = dm.subject_nr.count\nprint(f'Number of participants: {n_participants}')\n\n# Check specific count\nassert dm.subject_nr.count == 100\n\n# Get list of unique values\nunique_conditions = dm.condition.unique\nprint(f'Conditions: {unique_conditions}')\n```",
+    "title": "How to count unique values and participants",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to perform row-wise and column-wise iterations\n\nDataMatrix provides multiple ways to iterate through your data. This howto shows different iteration patterns for various use cases.\n\n```python\n# Iterate through rows\nfor row in dm:\n    print(f'Subject {row.subject_nr}: RT = {row.response_time}')\n    \n# Iterate through columns\nfor colname, col in dm.columns:\n    if col.mean is not None:  # Check if column is numeric\n        print(f'{colname}: M = {col.mean:.2f}, SD = {col.std:.2f}')\n\n# Iterate through cells in a specific column\nfor cell in dm.response_time:\n    if cell > 1000:  # Flag slow responses\n        print(f'Slow response: {cell} ms')\n```",
+    "title": "How to perform row-wise and column-wise iterations",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to create new columns based on calculations\n\nCreating derived variables is a common task in data analysis. This howto demonstrates various ways to create new columns from existing data.\n\n```python\n# Simple arithmetic operations\ndm.rt_seconds = dm.response_time / 1000  # Convert ms to seconds\ndm.double_score = dm.score * 2\n\n# Conditional assignment\ndm.accuracy_category = ''\ndm.accuracy_category[dm.correct == 1] = 'correct'\ndm.accuracy_category[dm.correct == 0] = 'incorrect'\n\n# Using functions with the @ operator\ndm.log_rt = dm.response_time @ np.log\n```",
+    "title": "How to create new columns based on calculations",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to handle mixed data types in statistical analyses\n\nWhen running statistical analyses, you need to ensure your data is properly formatted. This howto shows how to prepare data for mixed-effects models and GLMs.\n\n```python\nfrom datamatrix import NAN\nfrom statsmodels.formula.api import mixedlm\nimport statsmodels.formula.api as smf\nimport statsmodels.api as sm\n\n# For mixed-effects models - ensure no NaN values\ndm_valid = dm.dependent_variable != NAN\n\n# Run mixed-effects model\nmodel = mixedlm(\n    formula='dependent_variable ~ predictor1 * predictor2',\n    data=dm_valid,\n    groups='subject_nr'\n).fit()\nprint(model.summary())\n\n# For logistic regression with binary outcomes\nglm_model = smf.glm(\n    formula='correct ~ condition',\n    data=dm,\n    family=sm.families.Binomial()\n).fit()\nprint(glm_model.summary())\n```",
+    "title": "How to handle mixed data types in statistical analyses",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to perform cross-validation for time-series analysis\n\nWhen analyzing time-series data, cross-validation helps identify significant time windows. This howto demonstrates how to use the find() function for temporal analysis.\n\n```python\nimport time_series_test as tst\n\n# Prepare time window\ndm.pupil_window = dm.pupil_stream[:, 75:300]\n\n# Run cross-validation analysis\nresults = tst.lmer_crossvalidation_test(\n    dm, \n    'pupil_window ~ predictor',  # Formula\n    groups='subject_nr',          # Group by participant\n    winlen=5,                     # Window length\n    suppress_convergence_warnings=True\n)\n\n# Summarize results\nprint(tst.summarize(results))\n```",
+    "title": "How to perform cross-validation for time-series analysis",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to filter rows based on column values\n\nWhen analyzing data, you often need to select only rows that meet certain criteria. DataMatrix allows you to filter data using intuitive comparison operators, which is useful for excluding outliers, selecting specific conditions, or focusing on subsets of your data.\n\n```python\nfrom datamatrix import DataMatrix\n\n# Create a sample dataset\ndm = DataMatrix(length=10)\ndm.accuracy = .7, .8, .65, .9, .55, .95, .72, .88, .6, .85\ndm.condition = 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B'\n\n# Select only rows where accuracy is above 0.7\ndm_high_accuracy = dm.accuracy > 0.7\nprint(f\"Rows with high accuracy: {len(dm_high_accuracy)}\")\n\n# Combine multiple conditions using & (and), | (or)\ndm_filtered = (dm.accuracy > 0.7) & (dm.condition == 'B')\nprint(f\"High accuracy in condition B: {len(dm_filtered)}\")\n\n# Select rows where accuracy is NOT equal to a value\ndm_not_equal = dm.accuracy != 0.6\n```",
+    "title": "How to filter rows based on column values",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to split data into groups\n\nSplitting data by categorical variables is essential for comparing groups or analyzing data separately by condition. DataMatrix provides the `ops.split()` function to easily divide your data based on column values, which is particularly useful for between-group comparisons.\n\n```python\nfrom datamatrix import DataMatrix, operations as ops\n\n# Create sample data with groups\ndm = DataMatrix(length=9)\ndm.group = 'control', 'control', 'control', 'treatment1', 'treatment1', 'treatment1', 'treatment2', 'treatment2', 'treatment2'\ndm.score = 10, 12, 11, 15, 16, 14, 20, 22, 21\n\n# Split into separate DataMatrix objects for each group\ndm_control, dm_treatment1, dm_treatment2 = ops.split(dm.group, 'control', 'treatment1', 'treatment2')\n\nprint(f\"Control group mean: {dm_control.score.mean}\")\nprint(f\"Treatment1 group mean: {dm_treatment1.score.mean}\")\nprint(f\"Treatment2 group mean: {dm_treatment2.score.mean}\")\n\n# Alternatively, iterate through groups when you don't know the values in advance\nfor group_name, group_dm in ops.split(dm.group):\n    print(f\"{group_name}: n={len(group_dm)}, mean={group_dm.score.mean}\")\n```",
+    "title": "How to split data into groups",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to create new columns based on conditions\n\nOften you need to create derived variables or recode existing data. DataMatrix allows you to create new columns and set their values based on conditions, which is useful for creating categorical variables from continuous ones or coding experimental conditions.\n\n```python\nfrom datamatrix import DataMatrix\n\ndm = DataMatrix(length=6)\ndm.response_time = 250, 450, 320, 680, 510, 390\n\n# Create a categorical column based on response time\ndm.speed_category = 'slow'  # Initialize all as 'slow'\ndm.speed_category[dm.response_time < 400] = 'fast'\ndm.speed_category[dm.response_time > 600] = 'very_slow'\n\n# Create a numeric coding based on multiple columns\ndm.condition_type = 'A', 'B', 'A', 'B', 'A', 'B'\ndm.difficulty = 'easy', 'easy', 'hard', 'hard', 'easy', 'hard'\n\n# Create numeric codes for analysis\ndm.condition_code = 0\ndm.condition_code[dm.condition_type == 'A'] = 1\ndm.condition_code[dm.condition_type == 'B'] = 2\n# Add extra coding for difficulty\ndm.condition_code[dm.difficulty == 'hard'] += 10\n```",
+    "title": "How to create new columns based on conditions",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to calculate group statistics\n\nAggregating data by groups is a common requirement in data analysis. DataMatrix provides the `ops.group()` function to calculate statistics for each group, which is useful for creating summary tables or preparing data for statistical tests.\n\n```python\nfrom datamatrix import DataMatrix, operations as ops\nfrom datamatrix import functional as fnc\n\n# Create sample data\ndm = DataMatrix(length=12)\ndm.subject = 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4\ndm.condition = 'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B', 'C'\ndm.score = 10, 12, 15, 11, 13, 16, 9, 11, 14, 12, 14, 17\n\n# Group by subject to get mean score per subject\ngrouped_by_subject = ops.group(dm, by=dm.subject)\nprint(f\"Grouped data has {len(grouped_by_subject)} subjects\")\n\n# Group by multiple columns\ngrouped = ops.group(dm, by=[dm.subject, dm.condition])\n# Note: grouped data will have list-like cells that need to be reduced\nprint(f\"Each cell contains: {grouped.score[0]}\")  # Shows list of values\n\n# Calculate mean for each group using a custom function\ndef mean_of_list(lst):\n    return sum(lst) / len(lst) if len(lst) > 0 else 0\n\ngrouped.mean_score = grouped.score @ mean_of_list\n```",
+    "title": "How to calculate group statistics",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to handle missing data\n\nReal-world data often contains missing values. DataMatrix uses `NAN` to represent missing data and provides ways to filter out or handle these values, which is crucial for ensuring your analyses aren't corrupted by missing data.\n\n```python\nfrom datamatrix import DataMatrix, NAN\n\n# Create data with missing values\ndm = DataMatrix(length=6)\ndm.value = 10, NAN, 25, 30, NAN, 45\n\n# Check which rows have valid (non-NAN) data\ndm_valid = dm.value != NAN\nprint(f\"Valid rows: {len(dm_valid)} out of {len(dm)}\")\n\n# Calculate mean (automatically ignores NAN)\nprint(f\"Mean of values: {dm.value.mean}\")\n\n# Count non-NAN values in a column\nimport numpy as np\ndef count_valid(col):\n    return np.sum([v == v for v in col])  # NaN != NaN in Python\n\nn_valid = count_valid(dm.value)\nprint(f\"Number of valid values: {n_valid}\")\n\n# Fill missing values with a default\ndm.value[dm.value != dm.value] = 0  # Replace NaN with 0\n```",
+    "title": "How to handle missing data",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to apply functions to columns\n\nTransforming data often requires applying functions to entire columns. DataMatrix provides the `@` operator for applying functions element-wise, which is useful for data transformations, standardization, or creating derived variables.\n\n```python\nfrom datamatrix import DataMatrix\nimport numpy as np\n\ndm = DataMatrix(length=5)\ndm.raw_score = 10, 20, 30, 40, 50\n\n# Apply a simple transformation\ndm.log_score = dm.raw_score @ np.log10\n\n# Apply a custom function\ndef standardize(x, mean=30, sd=10):\n    return (x - mean) / sd\n\ndm.z_score = dm.raw_score @ (lambda x: standardize(x))\n\n# Apply more complex transformations\ndef categorize(x):\n    if x < 20:\n        return 'low'\n    elif x < 40:\n        return 'medium'\n    else:\n        return 'high'\n\ndm.category = dm.raw_score @ categorize\n```",
+    "title": "How to apply functions to columns",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to work with time series data\n\nTime series data requires special handling. DataMatrix supports SeriesColumn objects for time-series data, with built-in functions for baseline correction, averaging, and time-window selection, making it ideal for analyzing temporal data like EEG, pupillometry, or reaction times over trials.\n\n```python\nfrom datamatrix import DataMatrix, SeriesColumn\nfrom datamatrix import series as srs\nimport numpy as np\n\n# Create time series data\ndm = DataMatrix(length=3)\ndm.pupil = SeriesColumn(depth=100)  # 100 time points\n\n# Simulate some data\nfor i, row in enumerate(dm):\n    # Create different patterns for each row\n    baseline = i * 0.1\n    signal = np.sin(np.linspace(0, 2*np.pi, 100)) * (i + 1)\n    row.pupil = baseline + signal + np.random.normal(0, 0.1, 100)\n\n# Baseline correction (subtract mean of first 10 samples)\ndm.pupil_baseline = srs.baseline(dm.pupil, dm.pupil, 0, 10)\n\n# Select a time window (samples 20-50)\ndm.response_period = dm.pupil[:, 20:50]\n\n# Reduce time series to single value (mean)\ndm.mean_response = srs.reduce(dm.response_period)\n\n# Apply function to each time point\ndm.abs_pupil = dm.pupil @ np.abs\n```",
+    "title": "How to work with time series data",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to iterate over rows\n\nIterating through individual observations is common when you need row-wise operations or complex conditional logic. DataMatrix provides intuitive row iteration that gives you access to all columns for each observation.\n\n```python\nfrom datamatrix import DataMatrix\n\ndm = DataMatrix(length=4)\ndm.subject_id = 'S01', 'S02', 'S03', 'S04'\ndm.accuracy = 0.8, 0.75, 0.9, 0.85\ndm.rt = 450, 520, 380, 410\n\n# Simple iteration to process each row\nfor row in dm:\n    print(f\"Subject {row.subject_id}: accuracy={row.accuracy}, RT={row.rt}\")\n    \n# Create new column based on row-wise calculation\nfor row in dm:\n    # Calculate efficiency score (accuracy/time)\n    row.efficiency = row.accuracy / (row.rt / 1000)\n    \n# Conditional processing based on multiple columns\nfor row in dm:\n    if row.accuracy > 0.8 and row.rt < 450:\n        row.performance = 'excellent'\n    elif row.accuracy > 0.7:\n        row.performance = 'good'\n    else:\n        row.performance = 'needs improvement'\n```",
+    "title": "How to iterate over rows",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to rename columns\n\nColumn names often need to be changed for clarity or compatibility. DataMatrix provides a simple `rename()` method for updating column names, which is useful when importing data with unclear names or preparing data for specific analysis packages.\n\n```python\nfrom datamatrix import DataMatrix, io\n\n# Load data that might have unclear column names\ndm = DataMatrix(length=5)\ndm.var1 = 10, 20, 30, 40, 50\ndm.var2 = 'A', 'B', 'A', 'B', 'A'\ndm.var3 = 1.1, 2.2, 3.3, 4.4, 5.5\n\n# Rename single column\ndm.rename('var1', 'response_time')\ndm.rename('var2', 'condition')\ndm.rename('var3', 'accuracy')\n\n# Check column names\nprint(f\"Column names: {dm.column_names}\")\n\n# Alternative: access columns with special characters or spaces\ndm['response time (ms)'] = dm.response_time\ndel dm.response_time  # Remove old column\n```",
+    "title": "How to rename columns",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to combine DataMatrix objects\n\nCombining data from multiple sources is often necessary. DataMatrix can be combined row-wise (concatenation) or column-wise (merging), which is useful for combining datasets from different experimental sessions or adding calculated variables.\n\n```python\nfrom datamatrix import DataMatrix, operations as ops\n\n# Create two datasets to combine\ndm1 = DataMatrix(length=3)\ndm1.subject = 1, 2, 3\ndm1.session = 1, 1, 1\ndm1.score = 10, 15, 12\n\ndm2 = DataMatrix(length=3)\ndm2.subject = 4, 5, 6\ndm2.session = 2, 2, 2\ndm2.score = 11, 16, 13\n\n# Combine row-wise (concatenate)\ndm_combined = dm1 << dm2\nprint(f\"Combined length: {len(dm_combined)}\")\n\n# Add columns from another DataMatrix (must have same length)\ndm_extra = DataMatrix(length=6)\ndm_extra.age = 20, 22, 21, 23, 19, 24\n\n# Copy columns\ndm_combined.age = dm_extra.age\n```",
+    "title": "How to combine DataMatrix objects",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to save and load data\n\nPersisting your processed data is essential for reproducibility. DataMatrix supports multiple file formats, with CSV and Excel being the most common, allowing easy data exchange with other tools and collaborators.\n\n```python\nfrom datamatrix import DataMatrix, io\n\n# Create sample data\ndm = DataMatrix(length=5)\ndm.participant = 'P01', 'P02', 'P03', 'P04', 'P05'\ndm.age = 22, 25, 21, 28, 24\ndm.score = 85.5, 90.2, 78.3, 92.1, 88.7\n\n# Save as CSV (readable by any software)\nio.writetxt(dm, 'my_data.csv')\n\n# Save as Excel\nio.writexlsx(dm, 'my_data.xlsx')\n\n# Load data back\ndm_loaded = io.readtxt('my_data.csv')\n# or\ndm_loaded = io.readxlsx('my_data.xlsx')\n\n# For large datasets, you might want to select columns when loading\ndm_subset = io.readtxt('my_data.csv')\ndm_subset = dm_subset[dm_subset.participant, dm_subset.score]  # Keep only specific columns\n```",
+    "title": "How to save and load data",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
+  },
+  {
+    "content": "# How to perform element-wise operations\n\nMathematical operations on columns are fundamental for data transformation. DataMatrix supports element-wise operations that automatically handle missing values, making it easy to create derived variables or normalize data.\n\n```python\nfrom datamatrix import DataMatrix\n\ndm = DataMatrix(length=5)\ndm.x = 10, 20, 30, 40, 50\ndm.y = 2, 4, 6, 8, 10\n\n# Basic arithmetic operations\ndm.sum = dm.x + dm.y\ndm.difference = dm.x - dm.y\ndm.product = dm.x * dm.y\ndm.ratio = dm.x / dm.y\n\n# Operations with constants\ndm.x_doubled = dm.x * 2\ndm.x_centered = dm.x - dm.x.mean\ndm.x_scaled = dm.x / dm.x.std\n\n# Combining operations\ndm.normalized = (dm.x - dm.x.mean) / dm.x.std\n\n# String concatenation also works with +\ndm.name = 'Subject_', 'Subject_', 'Subject_', 'Subject_', 'Subject_'\ndm.id = '001', '002', '003', '004', '005'\ndm.full_id = dm.name + dm.id\n```",
+    "title": "How to perform element-wise operations",
+    "topics": [
+      "datamatrix"
+    ],
+    "collection": "datamatrix",
+    "howto": true,
+    "source": "howtos",
+    "foundation": false
   }
 ]
