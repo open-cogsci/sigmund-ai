@@ -126,14 +126,7 @@ def login_handler(form, failed=False):
                         username='unknown friend',
                         settings='{}',
                         workspace_content='',
-                        workspace_language='')    
-
-
-@app_blueprint.route('/about')
-def about():
-    return utils.render(
-        'info-page.html',
-        content=utils.md(Path('sigmund/static/about.md').read_text()))
+                        workspace_language='')
     
 
 @app_blueprint.route('/terms')
