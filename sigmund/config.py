@@ -168,11 +168,15 @@ search_enabled = True
 search_collections = {'opensesame', 'datamatrix', 'forum'}
 # The maximum distance should be determined empirically by comparing distances
 # between realistic queries and relevant document, and unrelated queries and the
-# documentation. 
+# documentation.
 search_max_distance = 1.15
 # If no results are found, we try again with a higher threshold. This may be
 # necessary especially for short questions.
 search_max_distance_fallback = 1.35
+# The minimum length of the search query. If the query is shorter, we previous
+# messages are prepended until the query reaches the minimum length or there are
+# no more messages.
+search_min_query_length = 1000
 # The number of documents. This applies separately to regular documentation and
 # howtos, and does include foundation documents.
 search_docs_max = 4

@@ -95,7 +95,23 @@ class Sigmund:
                              workspace_language=workspace_language,
                              message_id=message_id)
         if config.search_enabled and self.documentation.enabled:
-            for reply in self._search(message):
+            # Search queries work best if they'r not too short. That's why we
+            # include preceding messages until the search query reaches the
+            # minimum length, or until there are no more messages. (The welcome
+            # message is always excluded.)
+            query_messages = []
+            query_len = 0
+            # Inversely loop through the message history, ignoring the very first
+            # message, because it is a welcome message.
+            for _, msg, _ in self.messages._message_history[-1:0:-1]:
+                query_messages.insert(0, msg)
+                query_len += len(msg)
+                if query_len > config.search_min_query_length:
+                    break
+            logger.info(f'using {len(query_messages)} message(s) for search query')
+            logger.info(f'query length: {query_len}')
+            query = '\n\n'.join(query_messages)
+            for reply in self._search(query):
                 yield reply
         for reply in self._answer(attachments):
             yield reply
