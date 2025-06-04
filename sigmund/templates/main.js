@@ -58,6 +58,37 @@ async function fetchWithRetry(url, options, retries = 3) {
     }
 }
 
+function showImageAttachments(message) {
+    const imagePromises = [];
+    attachments.forEach(file => {
+        // Check if the file is an image based on MIME type
+        if (file.type.startsWith('image/')) {
+            // Create a promise to read the image as data URL
+            const promise = new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    const imgTag = `<div class="image-generation mask"><img src="${dataUrl}"></div>`;
+                    resolve(imgTag);
+                };
+                reader.readAsDataURL(file);
+            });
+            imagePromises.push(promise);
+        }
+    });
+
+    // Wait for all images to be processed and append them to the message
+    Promise.all(imagePromises).then(imageTags => {
+        for (i = 0; i < imageTags.length; i++) {
+            const userMessageBox = document.createElement('div');
+            userMessageBox.innerHTML = imageTags[i];
+            userMessageBox.className = 'message-user message';
+            userMessageBox.setAttribute('data-message-id', generateUUID());
+            responseDiv.appendChild(userMessageBox);
+        }
+    });
+}
+
 async function sendMessage(message) {
     console.log('user message: ' + message)
     setFavicon('static/loading.svg');
@@ -108,6 +139,7 @@ async function sendMessage(message) {
             userMessageBox.appendChild(userWorkspaceDiv);
         }        
     }
+    showImageAttachments();
     // Show the loading indicator and animate it
     const loadingMessageBox = document.createElement('div');
     let baseMessage = "{{ ai_name }} is reading your message ";

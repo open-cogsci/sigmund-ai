@@ -45,12 +45,54 @@ function connectWebSocket() {
             try {
                 const data = JSON.parse(event.data);
                 if (data.action === 'user_message') {
+                    // Process any attachments
+                    if (data.attachments && data.attachments.length > 0) {
+                        // Convert base64 to File objects
+                        const files = data.attachments.map(att => {
+                            // Decode base64 string to binary
+                            const binary = atob(att.data);
+                            const bytes = new Uint8Array(binary.length);
+                            for (let i = 0; i < binary.length; i++) {
+                                bytes[i] = binary.charCodeAt(i);
+                            }
+                            // Create Blob and File objects
+                            const blob = new Blob([bytes], { type: att.mime_type });
+                            return new File([blob], att.filename, { type: att.mime_type });
+                        });
+                        
+                        // Add to global attachments array
+                        if (typeof attachments !== 'undefined') {
+                            attachments.push(...files);
+                            // Update UI to show attachment count if updateAttachmentDisplay exists
+                            if (typeof updateAttachmentDisplay === 'function') {
+                                updateAttachmentDisplay();
+                            }
+                        }
+                    }
+                    
+                    // Set message and workspace content
                     messageInput.value = data.message;
                     setWorkspace(data.workspace_content, data.workspace_language);
+                    
+                    // Send message (attachments will be included automatically)
                     sendMessage(data.message);
+                    
+                    // Clear message input after sending
+                    messageInput.value = '';
+                    
+                    // Note: attachments should be cleared by sendMessage function
+                    // after successfully sending the message
+                    
+                } else if (data.action === 'connector_name') {
+                    const name = data.message;
+                    document.getElementById('connected-status').innerHTML = ' Connected to ' + name;
+                } else if (data.action === 'disable_code_execution') {
+                    debugger;
+                    document.getElementById('tool-execute-code').checked = false;
                 }
             } catch (error) {
                 // If the message does not adhere to the expected format, ignore it.
+                console.error('Error processing WebSocket message:', error);
             }
         };
 
