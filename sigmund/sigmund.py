@@ -111,6 +111,7 @@ class Sigmund:
             logger.info(f'using {len(query_messages)} message(s) for search query')
             logger.info(f'query length: {query_len}')
             query = '\n\n'.join(query_messages)
+            query = query[:config.search_max_query_length]
             for reply in self._search(query):
                 yield reply
         for reply in self._answer(attachments):

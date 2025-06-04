@@ -177,6 +177,9 @@ search_max_distance_fallback = 1.35
 # messages are prepended until the query reaches the minimum length or there are
 # no more messages.
 search_min_query_length = 1000
+# We also have a maximum query length, because the embedding model has a maximum
+# number of tokens. We truncate longer queries.
+search_max_query_length = 10000
 # The number of documents. This applies separately to regular documentation and
 # howtos, and does include foundation documents.
 search_docs_max = 4
