@@ -8,6 +8,7 @@ from flask import redirect, url_for, session, Blueprint
 from flask_login import login_user, current_user, logout_user, UserMixin
 from .. import config
 from .. import utils
+from .. import process_sigmund_message
 from ..forms import LoginForm
 from ..sigmund import Sigmund
 import logging
@@ -42,7 +43,7 @@ def chat_page():
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role == 'assistant':
             html_body = utils.md(
-                f'{config.ai_name}: {utils.process_ai_message(message)}')
+                f'{config.ai_name}: {process_sigmund_message.process_ai_message(message)}')
             html_class = 'message-ai'
         else:
             html_body = '<p>' + utils.clean(f'You: {message}', 
