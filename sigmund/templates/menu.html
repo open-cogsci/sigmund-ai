@@ -15,7 +15,9 @@
           <input type="checkbox" 
                  id="collection-opensesame" 
                  v-model="collection_opensesame">
-          <label for="collection-opensesame">OpenSesame</label>
+          <label for="collection-opensesame">OpenSesame
+          <small><a href="https://osdoc.cogsci.nl/4.0/manual/sigmund/" target="_blank">Connect to OpenSesame</a></small>
+          </label>
       </div>
       <div class="tool-item">
           <input type="checkbox" 
@@ -35,15 +37,17 @@
       <label>Tools:</label>
       <div class="tool-item">
           <input type="checkbox" 
-                 id="tool-search-google-scholar" 
-                 v-model="tool_search_google_scholar">
-          <label for="tool-search-google-scholar">Google Scholar</label>
+                 id="tool-execute-code" 
+                 v-model="tool_execute_code">
+          <label for="tool-execute-code">Code execution
+          <small><a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">Connect to JupyterLab, Notebook, Spyder or Rapunzel</a></small>
+          </label>
       </div>
       <div class="tool-item">
           <input type="checkbox" 
-                 id="tool-execute-code" 
-                 v-model="tool_execute_code">
-          <label for="tool-execute-code">Code execution</label>
+                 id="tool-search-google-scholar" 
+                 v-model="tool_search_google_scholar">
+          <label for="tool-search-google-scholar">Google Scholar</label>
       </div>
       <div class="tool-item">
           <input type="checkbox" 
