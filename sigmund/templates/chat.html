@@ -8,7 +8,7 @@
     <script>
         {% include 'global_elements.js' %}
         {% include 'workspace.js' %}
-        {% include 'websocket_client.js' %}
+        {% if not need_login %}{% include 'websocket_client.js' %}{% endif %}
         {% include 'main.js' %}
     </script>
     <div id="container">

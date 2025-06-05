@@ -87,7 +87,6 @@ function connectWebSocket() {
                     const name = data.message;
                     document.getElementById('connected-status').innerHTML = ' Connected to ' + name;
                 } else if (data.action === 'disable_code_execution') {
-                    debugger;
                     document.getElementById('tool-execute-code').checked = false;
                 }
             } catch (error) {

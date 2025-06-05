@@ -38,7 +38,10 @@ function initMain(event) {
         sendMessage(message);
     });
     initWorkspace();
-    connectWebSocket();
+    // If we're not logged in, this function is not defined.
+    if (typeof connectWebSocket === 'function') {
+        connectWebSocket();
+    }
 }
 
 function generateUUID() {
