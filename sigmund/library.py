@@ -28,17 +28,40 @@ class Library:
             api_key: API key for the embedding provider (if needed)
         """
         self._json_metadata_fields = set()
+        self.persist_directory = persist_directory
+        self.embedding_provider = embedding_provider
+        self.embedding_model = embedding_model
+        self.collection_name = collection_name
+        self.client = None
+        
+        # Initialize the client and collection
+        self._initialize_client()
+        
+    def _initialize_client(self):
+        """Initialize or reinitialize the ChromaDB client and collection."""
+        logger.info("Initializing ChromaDB client...")
+        
+        # When re-initializing the client, the system cache needs to be cleared,
+        # otherwise database updates from an external process cause errors. 
+        # However, because we are using an internal API here, this may break.
+        if self.client is not None:
+            try:
+                self.client._admin_client.clear_system_cache()
+                logger.info("Cleared library cache")
+            except Exception as e:
+                logger.warning(f"Failed to clear library cache: {e}")
+        
         # Initialize ChromaDB with persistent storage
-        self.client = chromadb.PersistentClient(path=persist_directory)
+        self.client = chromadb.PersistentClient(path=self.persist_directory)
         
         # Set up embedding function based on provider
         self.embedding_function = self._get_embedding_function(
-            embedding_provider, embedding_model
+            self.embedding_provider, self.embedding_model
         )
         
         # Get or create collection
         self.collection = self.client.get_or_create_collection(
-            name=collection_name,
+            name=self.collection_name,
             embedding_function=self.embedding_function
         )
         logger.info(f'library contains {self.collection.count()} documents')
@@ -206,29 +229,46 @@ class Library:
             else:
                 where_clause = filters[0]
 
-        # Perform search
-        if query is not None:
-            # Semantic search with optional metadata filtering
-            results = self.collection.query(
-                query_texts=[query],
-                n_results=k,
-                where=where_clause
-            )
-        else:
-            # Metadata-only search
-            if not metadata_filters:
-                raise ValueError("Either query or metadata_filters must be provided")
+        try:
+            # Perform search
+            if query is not None:
+                # Semantic search with optional metadata filtering
+                results = self.collection.query(
+                    query_texts=[query],
+                    n_results=k,
+                    where=where_clause
+                )
+            else:
+                # Metadata-only search
+                if not metadata_filters:
+                    raise ValueError("Either query or metadata_filters must be provided")
 
-            results = self.collection.get(
-                where=where_clause,
-                limit=k
-            )
-            # Convert get() format to query() format for consistency
-            results = {
-                'documents': [results['documents']] if results['documents'] else [[]],
-                'metadatas': [results['metadatas']] if results['metadatas'] else [[]],
-                'distances': [[None] * len(results['documents'])] if results['documents'] else [[]]
-            }
+                results = self.collection.get(
+                    where=where_clause,
+                    limit=k
+                )
+                # Convert get() format to query() format for consistency
+                results = {
+                    'documents': [results['documents']] if results['documents'] else [[]],
+                    'metadatas': [results['metadatas']] if results['metadatas'] else [[]],
+                    'distances': [[None] * len(results['documents'])] if results['documents'] else [[]]
+                }
+                
+        except chromadb.errors.InternalError as e:
+            # Check if it's the specific ID error
+            if "Error finding id" in str(e):
+                logger.warning(f"Detected stale ChromaDB connection: {e}")
+                logger.info("Reinitializing ChromaDB client and retrying search...")
+                
+                # Reinitialize the client
+                self._initialize_client()
+                
+                # Retry the search (recursive call)
+                return self.search(query=query, k=k, max_distance=max_distance, **metadata_filters)
+            else:
+                # Re-raise if it's a different error
+                raise
+                
         # Print out lowest distance
         lowest_distance = None
         if results['distances'] and results['distances'][0]:
