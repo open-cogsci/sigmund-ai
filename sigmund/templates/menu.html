@@ -97,8 +97,12 @@
                 <span>Mistral<br><small>Medium<br>Conversations</small></span>
             </button>
         </div>        
-    </div>    
+    </div>
     <hr class="menu-divider">
+{% endraw %}    
+    {% if need_login %}
+    <div @click="navigateTo('/terms')">Terms and conditions</div>    
+    {% else %}
     <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
     <div @click="showConversations">Browse conversations</div>
     <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
@@ -107,6 +111,8 @@
     <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
     <div @click="navigateTo('/api/conversation/export')">Download your data</div>
     <div @click="navigateTo('/logout')">Log out</div>
+    {% endif %}
+{% raw %}    
   </div>
   <!-- Modal for browsing conversations -->
   <div class="modal" v-if="showModal" v-bind:class="{ 'active': showModal }">
