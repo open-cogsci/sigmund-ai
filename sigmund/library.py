@@ -140,7 +140,6 @@ class Library:
         for doc_data in documents:
             # Extract content (required field)
             if 'content' not in doc_data:
-                breakpoint()
                 logging.warning(
                     f"Skipping document without 'content' field: {doc_data}")
                 continue
