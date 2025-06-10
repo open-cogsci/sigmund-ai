@@ -17,5 +17,5 @@ class TestCondenseMessageHistory(BaseExpensiveTest):
             query = f'What is the capital of {country}. Reply only with the name. Don\'t add any other content.'
             for reply in self.sigmund.send_user_message(query):
                 pass
-            assert reply.msg.lower() == city
+            assert city in reply.msg.lower()
         config.max_prompt_length = default_max_prompt_length

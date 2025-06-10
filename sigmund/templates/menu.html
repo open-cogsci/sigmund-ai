@@ -96,6 +96,13 @@
                 <img src="/static/mistral.png" alt="Mistral Icon">
                 <span>Mistral<br><small>Medium<br>Conversations</small></span>
             </button>
+            <button 
+                @click="modelConfig = 'magistral'" 
+                :class="{ active: modelConfig === 'magistral' }">
+                <!-- Icon for Mistral model -->
+                <img src="/static/mistral.png" alt="Mistral Icon">
+                <span>Magistral<br><small>Medium<br>Problem solving</small></span>
+            </button>
         </div>        
     </div>
     <hr class="menu-divider">
