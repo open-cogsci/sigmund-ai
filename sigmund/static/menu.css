@@ -18,14 +18,20 @@
   border-radius: 4px;
   display: none;
   position: fixed; /* Changed from absolute to fixed */
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   border: 1px solid #ccc;
   background: #fff;
   padding: 10px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1000; /* Ensure the menu is above other content */
+}
+
+/* Large screens */
+@media (min-width: 768px) {
+  .menu {
+    left: 40%;
+    top: 50%;
+    transform: translate(-40%, -50%);
+  }
 }
 
 .menu.active {
@@ -165,7 +171,7 @@
 .mode-buttons button.active,
 .login-buttons button.active,
 .model-buttons button.active {
-    background-color: #007BFF; /* Highlight active button */
+    background-color: #00796b; /* Highlight active button */
     color: white;
 }
 
