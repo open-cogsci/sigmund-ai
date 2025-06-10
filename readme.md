@@ -4,29 +4,25 @@ Copyright 2023-2025 Sebastiaan Mathôt
 
 ![](artwork/sigmund-avatar-small.png)
 
-A Python library and web app for an LLM-based chatbot with two main modes:
-
-- __OpenSesame expert__: answers questions about OpenSesame based on documentation
-- __Research assistant__: a general purpose chatbot with several tools that are mainly useful for research
+A Python library and web app for an LLM-based chatbot:
 
 Features:
 
 - __Privacy__: all messages and uploaded attachments are encrypted so that no-one can listen in on your conversation
-- __Knowledge__ (in OpenSesame mode): access to documentation 
-- __Continuous conversation__: conversations are summarized w hen they become too long to fit into the prompt
+- __Expert knowledge__: access to documentation 
+- __Continuous conversation__: conversations are summarized when they become too long to fit into the prompt
 - __Tool use__ (in research-assistant mode):
     - __Code execution__: ability to execute Python and R code
     - __Google Scholar search__: ability to search for articles on Google Scholar
     - __Image generation__: ability to generate images
+- __Integrations_
+    - __Python__: [connect to JupyterLab, Notebook, Spyder or Rapunzel](https://github.com/open-cogsci/jupyter-extension-sigmund)
+    - __OpenSesame__: [directly integrate with OpenSesame](https://osdoc.cogsci.nl/4.0/manual/sigmund/)
     
 Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), and [Mistral](https://mistral.ai/) are supported. API keys from these respective providers are required.
 
 
-![](artwork/screenshot.png)
-
-## What can Sigmund do? And how does Sigmund work?
-
-For a description of how Sigmund works, see: <https://sigmundai.eu/about>. This page describes the default configuration.
+[output2.webm](https://github.com/user-attachments/assets/905233c3-5980-45f5-b8fb-dc769b4c3526)
 
 
 ## Configuration
