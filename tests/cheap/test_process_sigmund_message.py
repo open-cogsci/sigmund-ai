@@ -236,28 +236,28 @@ def test_normalize_bullet_points():
 def test_add_blank_line_after_colon_headers():
     # A text like this should be followed by a blank line
     input_text = """This is a list:
-    - point 1
-    - point 2
-    - point 3"""
+- point 1
+- point 2
+- point 3"""
     expected = """This is a list:
-    
-    - point 1
-    - point 2
-    - point 3"""
-    output = add_blank_line_after_colon(input_text)
+
+- point 1
+- point 2
+- point 3"""
+    output = add_blank_line_after_colon_headers(input_text)
     assert output == expected
 
     # A text like this should also be followed by a blank line
     input_text = """This is a list:
-        - point 1
-        - point 2
-        - point 3"""
+- point 1
+    - point 2
+    - point 3"""
     expected = """This is a list:
-    
-        - point 1
-        - point 2
-        - point 3"""
-    output = add_blank_line_after_colon(input_text)
+
+- point 1
+    - point 2
+    - point 3"""
+    output = add_blank_line_after_colon_headers(input_text)
     assert output == expected
 
     # A text like this should NOT be followed by a blank line because we are already in a list
@@ -269,7 +269,7 @@ def test_add_blank_line_after_colon_headers():
         - point 1
         - point 2
         - point 3"""
-    output = add_blank_line_after_colon(input_text)
+    output = add_blank_line_after_colon_headers(input_text)
     assert output == expected
 
 # Between 1 and 3 spaces before hyphen at the start of a row should become 4 spaces - this is the correct number of spaces for a second level markdown list
@@ -445,9 +445,9 @@ def test_fix_indentation_after_colon():
             - point 2
             - point 3"""
     expected = """This will be a list:
-    - point 1
-        - point 2
-        - point 3"""
+- point 1
+    - point 2
+    - point 3"""
     output = fix_indentation_after_colon(input_text)
     assert output == expected
 
@@ -457,9 +457,9 @@ def test_fix_indentation_after_colon():
         - point 2
         - point 3"""
     expected = """This will be a list:
-    - point 1
-    - point 2
-    - point 3"""
+- point 1
+- point 2
+- point 3"""
     output = fix_indentation_after_colon(input_text)
     assert output == expected
 

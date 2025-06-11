@@ -9,11 +9,12 @@ What are the problems?:
 """
 
 def normalize_bullet_points(text: str) -> str:
-    return re.sub(r"^(\s*)[•–♦○]\s+", r"\1- ", text, flags=re.MULTILINE)
+    return re.sub(r"^(\s*)[•–♦○└─]\s+", r"\1- ", text, flags=re.MULTILINE)
 
 def add_blank_line_after_colon_headers(text: str) -> str:
     # Add a newline after lines ending with ':' that do NOT start with optional spaces and a dash
-    return re.sub(r"^(?!\s*(?:-\s|\d+\.\s|\d+\)\s)).*?:\s*$", r"\g<0>\n", text, flags=re.MULTILINE)
+    # Only adding an empty line if next line is not a list line
+    return re.sub(r"^(?!\s*(?:-\s|\d+\.\s)).*?:\s*$\n(?=\s*(?:-\s|\d+\.\s))", r"\g<0>\n", text, flags=re.MULTILINE)
 
 #second level formatting inssues
 def fix_list_formatting_1(text: str) -> str:
@@ -30,7 +31,7 @@ def fix_list_formatting_4(text: str) -> str:
     return re.sub(r"^(?:     -)\s+", "        - ", text, flags=re.MULTILINE)
 
 def fix_list_formatting_5(text: str) -> str:
-    return re.sub(r"^(?:      –)\s+", "        - ", text, flags=re.MULTILINE)
+    return re.sub(r"^(?:      -)\s+", "        - ", text, flags=re.MULTILINE)
 
 def fix_list_formatting_6(text: str) -> str:
     return re.sub(r"^(?:       -)\s+", "        - ", text, flags=re.MULTILINE)
@@ -132,8 +133,7 @@ def fix_markdown_headings(text: str) -> str:
                 # Check if the line after next is also a "rule" line
                 if re.fullmatch(r'[─-]{10,}', next_line):
                     # Check if the heading candidate is non-empty
-                    if heading_candidat:
-                        e.strip()
+                    if heading_candidate.strip():
                         # It's a heading: turn the middle line into a heading
                         output.append(f"## {heading_candidate.strip()}")
                         output.append("")  # blank line after heading
