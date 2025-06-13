@@ -79,7 +79,7 @@ def fix_indentation_after_colon(text: str) -> str:
         #indent = len(line) - len(stripped)
 
         # Detect start of a paragraph that ends with ":" but not already a list item
-        if stripped.endswith(':') and not stripped.startswith('-') and not re.match(r'^\d+\.', stripped):
+        if stripped.endswith(':') and not stripped.startswith('-') and not re.match(r'^\d+\.', stripped) and not lines[-1] == line:
             inside_intro_block = True
             fixed_lines.append(line)
             indent = len(lines[i+1]) - len(lines[i+1].lstrip())
