@@ -439,6 +439,13 @@ def test_fix_list_formatting_12():
     assert output == expected
 
 def test_fix_indentation_after_colon():
+    
+    #Should not crash when last row in the text ends with a colon
+    input_text = """This will be the last row of the text:"""
+    expected = """This will be the last row of the text:"""
+    output = fix_indentation_after_colon(input_text)
+    assert output == expected
+    
     #Should dedent lists, so it is formatted correctly after
     input_text = """This will be a list:
         - point 1
