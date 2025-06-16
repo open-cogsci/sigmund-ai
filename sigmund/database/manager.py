@@ -105,17 +105,23 @@ class DatabaseManager:
                 # If it exists, decrypt and return the message
                 decrypted_data = self.encryption_manager.decrypt_data(message.data)
                 return json.loads(decrypted_data)
-            else:
-                # If it doesn't exist, assume it's an old-style message
-                # embedded in conversation data, and return as is
-                return message_id
+            # If the message doesn't exist, something is wrong.
+            logger.error(f"Message {message_id} does not exist")
+            return {}
         except Exception as e:
             logger.error(f"Error retrieving message {message_id}: {e}")
             return {}
             
     def get_message_history(self, conversation_data):
+        """Returns a list of message dicts, excluding empty ones"""
         message_ids = conversation_data.get('message_history', [])
-        return [self.get_message(msg_id) for msg_id in message_ids]
+        message_history = []
+        for msg_id in message_ids:
+            msg = self.get_message(msg_id)
+            if msg:
+                message_history.append(msg)
+        return message_history
+
     
     def add_message(self, conversation_id: int, message_data: dict) -> int:
         json_data = json.dumps(message_data)
@@ -136,9 +142,8 @@ class DatabaseManager:
             return {}    
         decrypted_data = self.encryption_manager.decrypt_data(conversation.data)
         conversation_data = json.loads(decrypted_data)
-        message_ids = conversation_data.get('message_history', [])
-        message_history = [self.get_message(msg_id) for msg_id in message_ids]
-        conversation_data['message_history'] = message_history
+        conversation_data['message_history'] = self.get_message_history(
+            conversation_data)
         return conversation_data
 
     def set_active_conversation(self, conversation_id: int) -> bool:
@@ -248,9 +253,7 @@ class DatabaseManager:
                 decrypted_data = self.encryption_manager.decrypt_data(
                     conversation.data)
                 conversation_data = json.loads(decrypted_data)
-                message_ids = conversation_data.get('message_history', [])
-                message_history = [self.get_message(msg_id)
-                                   for msg_id in message_ids]
+                message_history = self.get_message_history(conversation_data)
             except Exception as e:
                 logger.error(f"Error decrypting conversation data: {e}")
             else:
