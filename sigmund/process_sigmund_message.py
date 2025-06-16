@@ -1,12 +1,7 @@
 import re
+import logging
+logger = logging.getLogger('sigmund')
 
-"""
-What are the problems?:
-- Sometimes, wrong symbols are used to indicate lists (•,–,♦,○) - they should all be changed to '-' (normalize_bullet_points)
-- Sometimes, the indentation is wrong (Indentation should only be either 0 spaces, 4 spaces (level 2 list), 8 spaces (lvl 3 list) etc.)(fix_list_formatting_1-12)
-- After lines indicating that a list is following ('The next lines will be a list:') there is an empty line missing (add_blank_line_after_colon_headers)
-- Sometimes, lvl 1 lists are already indented by 4 spaces. That makes python think it's a code block. In those cases, the indentation needs to be adjusted (fix_indentation_after_colon)
-"""
 
 def normalize_bullet_points(text: str) -> str:
     return re.sub(r"^(\s*)[•–♦○└─]\s+", r"\1- ", text, flags=re.MULTILINE)
@@ -228,27 +223,30 @@ def dedent_code_blocks(message: str) -> str:
     return "".join(result)
 
 def process_ai_message(msg):
-    msg = normalize_bullet_points(msg)
-    msg = replace_round_bracket_with_dot(msg)
-    msg = fix_indentation_after_colon(msg)
-    msg = add_blank_line_after_colon_headers(msg)
-    # If the message doesn't start with a letter, then it may start with some 
-    # markdown character that we should properly interpret, and thus needs to 
-    # be on a newline preceded by an empty line.
-    if msg and not msg[0].isalpha():
-        msg = '\n\n' + msg
-    msg = dedent_code_blocks(msg)
-    msg = fix_markdown_headings(msg)
-    msg = fix_list_formatting_1(msg)
-    msg = fix_list_formatting_2(msg)
-    msg = fix_list_formatting_3(msg)
-    msg = fix_list_formatting_4(msg)
-    msg = fix_list_formatting_5(msg)
-    msg = fix_list_formatting_6(msg)
-    msg = fix_list_formatting_7(msg)
-    msg = fix_list_formatting_8(msg)
-    msg = fix_list_formatting_9(msg)
-    msg = fix_list_formatting_10(msg)
-    msg = fix_list_formatting_11(msg)
-    msg = fix_list_formatting_12(msg)
+    try:
+        msg = normalize_bullet_points(msg)
+        msg = replace_round_bracket_with_dot(msg)
+        msg = fix_indentation_after_colon(msg)
+        msg = add_blank_line_after_colon_headers(msg)
+        # If the message doesn't start with a letter, then it may start with some 
+        # markdown character that we should properly interpret, and thus needs to 
+        # be on a newline preceded by an empty line.
+        if msg and not msg[0].isalpha():
+            msg = '\n\n' + msg
+        msg = dedent_code_blocks(msg)
+        msg = fix_markdown_headings(msg)
+        msg = fix_list_formatting_1(msg)
+        msg = fix_list_formatting_2(msg)
+        msg = fix_list_formatting_3(msg)
+        msg = fix_list_formatting_4(msg)
+        msg = fix_list_formatting_5(msg)
+        msg = fix_list_formatting_6(msg)
+        msg = fix_list_formatting_7(msg)
+        msg = fix_list_formatting_8(msg)
+        msg = fix_list_formatting_9(msg)
+        msg = fix_list_formatting_10(msg)
+        msg = fix_list_formatting_11(msg)
+        msg = fix_list_formatting_12(msg)
+    except Exception as e:
+        logger.error(f"Error processing AI message: {e}")
     return msg
