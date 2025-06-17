@@ -15,7 +15,7 @@ Features:
     - __Code execution__: ability to execute Python and R code
     - __Google Scholar search__: ability to search for articles on Google Scholar
     - __Image generation__: ability to generate images
-- __Integrations_
+- __Integrations__
     - __Python__: [connect to JupyterLab, Notebook, Spyder or Rapunzel](https://github.com/open-cogsci/jupyter-extension-sigmund)
     - __OpenSesame__: [directly integrate with OpenSesame](https://osdoc.cogsci.nl/4.0/manual/sigmund/)
     
