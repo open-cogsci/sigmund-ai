@@ -8,6 +8,7 @@ from . import config
 from .redis_client import redis_client
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
     google_login_blueprint, public_blueprint
+from . import utils
 from .database.models import db
 import logging
 logger = logging.getLogger('sigmund')
@@ -53,5 +54,9 @@ def create_app(config_class=SigmundConfig):
         if user_agent is not None and 'bot' not in user_agent.lower():
             logger.info(f'request: {request.full_path}')
         return response
+        
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        return utils.render('error.html'), 500
 
     return app
