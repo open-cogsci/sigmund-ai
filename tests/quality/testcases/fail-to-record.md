@@ -1,7 +1,6 @@
-I am conducting an eye tracking study and I received the following message while running the experiment: Failed to start recording. What caused it?
+I am running an eye tracking study with the Eyelink tracker. However, I received an error message “Failed to start recording” after calibration. What would possibly cause the issue? 
 
-The answer should:  
-\- Identify possible causes of the error and provide solutions for them.  
-OR  
-\- Ask the user for more information about the elements of the experiment.
+The answer should:
 
+- Explain to the user what the error means
+- List most common causes of the error, such as the tracker is in the wrong mode (Calibration instead of Track), lost signal after calibration, previous experiment sessions was not closed
