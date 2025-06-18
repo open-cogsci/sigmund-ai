@@ -38,13 +38,18 @@ def init_testlog():
     testlog_folder = Path(__file__).parent / 'testlog'
     if not testlog_folder.exists():
         testlog_folder.mkdir()
-    testlog = Path(testlog_folder) / f'testlog.{datetime.now().strftime("%Y-%m-%d %H:%M")}.{config.settings_default["model_config"]}.log'
+    testlog = Path(testlog_folder) / f'testlog.{datetime.now().strftime("%Y-%m-%d %H-%M")}.{config.settings_default["model_config"]}.log'
 
 
 def read_testcases():
     output = {}
-    for path in (Path(__file__).parent / 'testcases').glob('*.md'):
-        test_case = path.read_text()
+    selected_case = os.getenv("TEST_CASE")  
+    test_cases_dir = Path(__file__).parent / 'testcases'
+
+    for path in test_cases_dir.glob('*.md'):
+        if selected_case and path.name != selected_case:
+            continue
+        test_case = path.read_text(encoding="utf-8")
         question, requirements = test_case.split('\n', 1)
         output[path.name] = {
             'question': question.strip(),
@@ -89,11 +94,13 @@ def score_testcase(description, question, requirements, n=3):
 def score_testcases(select_cases=None):
     results = []
     for description, testcase in read_testcases().items():
+        print(f"Running test case: {description}")
         if select_cases is not None and description not in select_cases:
             results.append((None, description))
             continue
         scores = score_testcase(description, **testcase)
         results.append((scores, description))
+
     with testlog.open('a') as fd:
         fd.write('\n\nSummary:\n')
         for scores, description in results:
@@ -121,7 +128,12 @@ def test_openai_o1():
     # Not actually o1 anymore
     config.settings_default['model_config'] = 'openai_o1'
     init_testlog()
-    score_testcases()
+    selected_case = os.getenv("TEST_CASE")  # Read from environment variable
+    if selected_case:
+        score_testcases(select_cases=[selected_case])
+    else:
+        score_testcases()
+
     
 
 def test_mistral():
