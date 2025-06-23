@@ -123,6 +123,11 @@ def extract_workspace(txt: str) -> tuple:
       
     Return txt, workspace_content, language
     """
+    open_pattern = r'^<workspace(?: language="(.+?)")?>'
+    if re.search(open_pattern, txt, re.DOTALL | re.MULTILINE) \
+            and '</workspace>' not in txt:
+        logger.warning('workspace closing tag appears to be missing')
+        txt += '\n</workspace>'
     # Checks for <workspace> tags
     pattern = r'^<workspace(?: language="(.+?)")?>(.*?)^</workspace>'
     match = re.search(pattern, txt, re.DOTALL | re.MULTILINE)
