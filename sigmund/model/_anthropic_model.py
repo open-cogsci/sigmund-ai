@@ -43,6 +43,12 @@ class AnthropicModel(BaseModel):
                 content = message['content']
                 content, thinking_signature, thinking_content = \
                     self.extract_thinking_block(content)
+                # It can happen that the response only contains thinking blocks
+                # and workspace content, resulting in empty regular content.
+                # Empty text blocks are not allowed, so in that case we add this
+                # filler message.
+                if not content.strip():
+                    content = 'I added content to the workspace.'
                 if thinking_signature is None:
                     continue
                 message['content'] = [
