@@ -71,10 +71,16 @@ print('hello world')
 </workspace>
 
 And a second workspace:
-    
+
 <workspace language="python">
 print('hello again world')
-</workspace>    
+</workspace>
+
+And a third workspace:
+
+<workspace>
+print('hello yet again world')
+</workspace>
 '''
     txt, content, language = extract_workspace(s)
     assert txt.strip() == '''Here's a double workspace example:
@@ -82,10 +88,16 @@ print('hello again world')
 
 
 And a second workspace:
-    
-<workspace language="python">
+
+```python
 print('hello again world')
-</workspace>'''
+```
+
+And a third workspace:
+
+```markdown
+print('hello yet again world')
+```'''
     assert content.strip() == "print('hello world')"
     assert language == 'python'
     s = '''Here's a simple workspace example:

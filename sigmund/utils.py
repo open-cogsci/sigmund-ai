@@ -137,6 +137,17 @@ def extract_workspace(txt: str) -> tuple:
         # Only replace the first occurrence (the one we extracted)
         text_without_workspace = re.sub(pattern, "", txt, count=1,
                                         flags=re.DOTALL | re.MULTILINE).strip()
+        
+        # Convert any remaining workspace tags to markdown code blocks
+        def replace_workspace_with_codeblock(m):
+            lang = m.group(1) if m.group(1) else 'markdown'
+            code_content = m.group(2).strip()
+            return f'```{lang}\n{code_content}\n```'
+        
+        text_without_workspace = re.sub(pattern, replace_workspace_with_codeblock, 
+                                      text_without_workspace, 
+                                      flags=re.DOTALL | re.MULTILINE)
+        
         # Empty messages can cause issues, so if stripping the workspace 
         # results in an empty message, we add a placeholder.
         if not text_without_workspace:
