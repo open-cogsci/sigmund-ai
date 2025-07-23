@@ -64,6 +64,30 @@ print('hello world')
     assert txt.strip() == "Here's a simple workspace example:"
     assert content.strip() == "print('hello world')"
     assert language == 'python'
+    s = '''Here's a double workspace example:
+
+<workspace language="python">
+print('hello world')
+</workspace>
+
+And a second workspace:
+    
+<workspace language="python">
+print('hello again world')
+</workspace>    
+'''
+    txt, content, language = extract_workspace(s)
+    assert txt.strip() == '''Here's a double workspace example:
+
+
+
+And a second workspace:
+    
+<workspace language="python">
+print('hello again world')
+</workspace>'''
+    assert content.strip() == "print('hello world')"
+    assert language == 'python'
     s = '''Here's a simple workspace example:
     
 ```python

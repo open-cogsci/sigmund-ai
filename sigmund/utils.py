@@ -134,7 +134,8 @@ def extract_workspace(txt: str) -> tuple:
     if match:
         language = match.group(1) if match.group(1) else 'markdown'
         content = match.group(2).strip()
-        text_without_workspace = re.sub(pattern, "", txt,
+        # Only replace the first occurrence (the one we extracted)
+        text_without_workspace = re.sub(pattern, "", txt, count=1,
                                         flags=re.DOTALL | re.MULTILINE).strip()
         # Empty messages can cause issues, so if stripping the workspace 
         # results in an empty message, we add a placeholder.
@@ -151,7 +152,6 @@ def extract_workspace(txt: str) -> tuple:
             return txt, content, language
     # Simply returns txt if no workspace is detected
     return txt, None, None
-
 
 def remove_masked_elements(content):
     # This pattern matches:
