@@ -57,6 +57,7 @@ def create_app(config_class=SigmundConfig):
         
     @app.errorhandler(Exception)
     def handle_exception(e):
+        logger.error(e)
         return utils.render('error.html'), 500
 
     return app
