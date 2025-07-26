@@ -1,3 +1,4 @@
+from ._base_model import BaseModel
 from .. import config
 
 
