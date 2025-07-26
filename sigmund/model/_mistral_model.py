@@ -85,6 +85,40 @@ class MistralModel(OpenAIModel):
             messages[-1]['content'] = content
         return BaseModel.predict(self, messages, attachments, track_tokens)
         
+    def get_response(self, response) -> [str, callable]:
+        content = response.choices[0].message.content
+        tool_message_prefix = ''
+        # During thinking, content consists of a mix of text and thinking 
+        # blocks, where thinking blocks themselves consist of chunks of text.
+        # For now, we simply concatenate everything into a single large 
+        # response. This is because there may be multiple thinking and text 
+        # blocks mixed in a single response, see also:
+        # - <https://github.com/mistralai/client-python/issues/252>
+        if isinstance(content, list):
+            text = []
+            tool_message_prefix = ''
+            for block in content:
+                if block.type == 'text':
+                    text.append(block.text)
+                    tool_message_prefix += block.text
+                if block.type == 'thinking':
+                    for thinking_chunk in block.thinking:
+                        text.append(thinking_chunk.text)
+                        tool_message_prefix += thinking_chunk.text
+            content = '\n'.join(text)
+        # If tool calls are present, we execute the tool using the current text
+        # as a prefix.
+        tool_calls = response.choices[0].message.tool_calls
+        if tool_calls:
+            function = tool_calls[0].function
+            for tool in self._tools:
+                if tool.name == function.name:
+                    return tool.bind(function.arguments,
+                                     message_prefix=tool_message_prefix + '\n\n')
+            logger.warning(f'invalid tool called: {function}')
+            return self.invalid_tool            
+        return content
+        
     def _tool_call_id(self, nr):
         # Must be a-z, A-Z, 0-9, with a length of 9
         return f'{nr:09d}'

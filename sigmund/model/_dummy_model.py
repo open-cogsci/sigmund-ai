@@ -7,7 +7,10 @@ class DummyModel(BaseModel):
         return response
     
     def invoke(self, messages):
-        return '''dummy reply
+        return '''<div class="thinking_block_signature">thinking_signature</div><div class="thinking_block_content">thinking_content</div> 
+        
+        
+dummy reply
         
 <p>This is a paragraph with some <code><p>example</p></code></p>
 

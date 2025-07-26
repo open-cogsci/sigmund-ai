@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import time
+import re
 from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
     FunctionMessage
 logger = logging.getLogger('sigmund')
@@ -119,3 +120,37 @@ class BaseModel:
             
         logger.info('predicting multiple using async')
         return loop.run_until_complete(wrap_gather())
+
+    @staticmethod
+    def embed_thinking_block(signature: str | None, content: str | None) -> str:
+        """Embeds information about an Anthropic thinking block as an HTML element."""
+        sig = f'<div class="thinking_block_signature">{signature}</div>' if signature else ""
+        cont = f'<div class="thinking_block_content">{content}</div>' if content else ""
+        return sig + cont
+    
+    @staticmethod
+    def extract_thinking_block(content: str) -> [str, str | None, str | None]:
+        """
+        Extracts signature/content spans if present and returns a tuple:
+          (cleaned_content, signature, content)
+        """
+        sig_pattern = r'<div\s+class="thinking_block_signature">(.*?)</div>'
+        cont_pattern = r'<div\s+class="thinking_block_content">(.*?)</div>'
+        signature = None
+        thinking_content = None
+    
+        sig_match = re.search(sig_pattern, content)
+        if sig_match:
+            signature = sig_match.group(1)
+            content = re.sub(sig_pattern, '', content, count=1)
+    
+        cont_match = re.search(cont_pattern, content, re.MULTILINE | re.DOTALL)
+        if cont_match:
+            thinking_content = cont_match.group(1)
+            content = re.sub(cont_pattern, '', content, count=1,
+                             flags=re.MULTILINE | re.DOTALL)
+    
+        cleaned = content.strip()
+        if signature or thinking_content:
+            return cleaned, signature, thinking_content
+        return content, None, None

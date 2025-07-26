@@ -1,5 +1,6 @@
 import re
 import logging
+from .model import BaseModel
 logger = logging.getLogger('sigmund')
 
 
@@ -251,6 +252,7 @@ def escape_html_tags(message: str) -> str:
 
 def process_ai_message(msg):
     try:
+        msg, signature, content = BaseModel.extract_thinking_block(msg)
         msg = normalize_bullet_points(msg)
         msg = replace_round_bracket_with_dot(msg)
         msg = fix_indentation_after_colon(msg)
