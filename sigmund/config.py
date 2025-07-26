@@ -232,9 +232,6 @@ def validate_user(username, password):
     return user_validation.validate(username, password)
 
 
-login_failed_message = '__User name or password incorrect. Please try again.__'
-
-
 # SUBSCRIPTIONS
 #
 # Enable this to activate the Stripe-based subscription functionality.

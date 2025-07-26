@@ -124,6 +124,7 @@ def login_handler(form, failed=False):
                         subscription_required=config.subscription_required,
                         form=form,
                         need_login=True,
+                        login_failed=failed,
                         username='unknown friend',
                         settings='{}',
                         workspace_content='',

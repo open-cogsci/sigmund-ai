@@ -250,3 +250,7 @@
     width: 100%;
     box-sizing: border-box; /* Include padding and border in width calculation */
 }
+
+.login-failed {
+  color: #B00020;
+}
