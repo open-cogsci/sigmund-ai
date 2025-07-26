@@ -278,3 +278,12 @@ def process_ai_message(msg):
     except Exception as e:
         logger.error(f"Error processing AI message: {e}")
     return msg
+
+
+def process_workspace_content(msg):
+    try:
+        if msg:
+            msg = escape_html_tags(msg)
+    except Exception as e:
+        logger.error(f"Error processing AI message: {e}")
+    return msg

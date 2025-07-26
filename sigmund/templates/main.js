@@ -129,11 +129,11 @@ async function sendMessage(message) {
 
             const workspaceContentPre = document.createElement('pre');
             workspaceContentPre.className = 'workspace-content';
-            workspaceContentPre.innerText = userWorkspaceContent;
+            workspaceContentPre.textContent = userWorkspaceContent;
 
             const workspaceLanguageDiv = document.createElement('div');
             workspaceLanguageDiv.className = 'workspace-language';
-            workspaceLanguageDiv.innerText = userWorkspaceLanguage;
+            workspaceLanguageDiv.textContent = userWorkspaceLanguage;
 
             userWorkspaceDiv.appendChild(workspaceLoadLink);
             userWorkspaceDiv.appendChild(workspaceContentPre);
@@ -240,10 +240,10 @@ async function sendMessage(message) {
             workspaceLoadLink.onclick = () => loadMessageWorkspace(metadata['message_id'])
             workspaceContentPre = document.createElement('pre');
             workspaceContentPre.className = 'workspace-content';
-            workspaceContentPre.innerHTML = data.workspace_content;
+            workspaceContentPre.textContent = data.workspace_content;
             workspaceLanguageDiv = document.createElement('div');
             workspaceLanguageDiv.className = 'workspace-language';
-            workspaceLanguageDiv.innerText = data.workspace_language;
+            workspaceLanguageDiv.textContent = data.workspace_language;
             workspaceDiv.appendChild(workspaceLoadLink);
             workspaceDiv.appendChild(workspaceContentPre);
             workspaceDiv.appendChild(workspaceLanguageDiv);

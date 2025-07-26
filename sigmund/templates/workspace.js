@@ -61,8 +61,8 @@ function setWorkspace(content, language) {
 
 function loadMessageWorkspace(id) {
     const div = document.getElementById('message-workspace-' + id);
-    const workspaceContent = div.querySelector('.workspace-content').innerText;
-    const workspaceLanguage = div.querySelector('.workspace-language').innerText;
+    const workspaceContent = div.querySelector('.workspace-content').textContent;
+    const workspaceLanguage = div.querySelector('.workspace-language').textContent;
     setWorkspace(workspaceContent, workspaceLanguage);
 };
 

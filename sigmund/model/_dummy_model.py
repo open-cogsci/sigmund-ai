@@ -16,6 +16,22 @@ class DummyModel(BaseModel):
 p { color: purple!important }
 </style>
 ```
+
+```js
+<script>
+alert("This is a codeblock example script that should not be executed")
+</script>
+```
+
+<script>
+alert("This is message example script that should not be executed")
+</script>
+
+<workspace>
+<script>
+alert("This is workspace script that should not be executed")
+</script>
+</workspace>
 '''
 
     async def _async_task(self):

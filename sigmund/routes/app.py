@@ -55,7 +55,7 @@ def chat_page():
         if workspace_content:
             workspace_div = f'''<div class="message-workspace" id="message-workspace-{message_id}">
                 <a href="#" onclick="loadMessageWorkspace('{message_id}')">Load workspace</a>
-                <pre class="workspace-content">{workspace_content}</pre>
+                <pre class="workspace-content">{process_sigmund_message.process_workspace_content(workspace_content)}</pre>
                 <div class="workspace-language">{workspace_language}</div>
                 </div>'''
         else:
