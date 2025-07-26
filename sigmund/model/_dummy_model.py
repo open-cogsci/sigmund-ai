@@ -7,7 +7,16 @@ class DummyModel(BaseModel):
         return response
     
     def invoke(self, messages):
-        return 'dummy reply'
+        return '''dummy reply
+        
+<p>This is a paragraph with some <code><p>example</p></code></p>
+
+```css
+<style>
+p { color: purple!important }
+</style>
+```
+'''
 
     async def _async_task(self):
         return 'dummy reply'

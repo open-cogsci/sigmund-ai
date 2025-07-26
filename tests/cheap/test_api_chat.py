@@ -32,7 +32,7 @@ class TestApiChat(BaseRoutesTestCase):
             if i == 0:
                 assert data['action'] == 'set_loading_indicator'
             elif i == 1:
-                assert data['response'] == '<p>Sigmund: dummy reply</p>'
+                assert 'dummy reply' in data['response']
             elif i == 2:
                 assert data['action'] == 'close'
                 

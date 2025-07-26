@@ -222,6 +222,33 @@ def dedent_code_blocks(message: str) -> str:
 
     return "".join(result)
 
+
+def escape_html_tags(message: str) -> str:
+    """
+    Takes a message, and escapes all HTML elements in the message so that
+    they are treated as literals rather than interpreted as HTML. Escaping
+    happens by replacing the HTML <> brackets with their HTML character
+    representations. And important caveat is that the elements should not be
+    escaped when they are embedded inside markdown code blocks.
+    """
+    # Pattern to match code blocks with ``` or ~~~, with optional language
+    # Uses DOTALL flag to make . match newlines
+    code_block_pattern = r'(```[^\n]*\n.*?```|~~~[^\n]*\n.*?~~~)'    
+    # Split the message by code blocks, keeping the delimiters
+    parts = re.split(code_block_pattern, message, flags=re.DOTALL)    
+    # Process each part
+    result = []
+    for i, part in enumerate(parts):
+        # Even indices are outside code blocks, odd indices are code blocks
+        if i % 2 == 0:
+            # Escape HTML characters outside code blocks
+            escaped = part.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            result.append(escaped)
+        else:
+            result.append(part)
+    return ''.join(result)
+
+
 def process_ai_message(msg):
     try:
         msg = normalize_bullet_points(msg)
@@ -247,6 +274,7 @@ def process_ai_message(msg):
         msg = fix_list_formatting_10(msg)
         msg = fix_list_formatting_11(msg)
         msg = fix_list_formatting_12(msg)
+        msg = escape_html_tags(msg)
     except Exception as e:
         logger.error(f"Error processing AI message: {e}")
     return msg

@@ -3,7 +3,8 @@ from sigmund.process_sigmund_message import process_ai_message, dedent_code_bloc
     add_blank_line_after_colon_headers, fix_list_formatting_1, fix_list_formatting_2, \
     fix_list_formatting_3, fix_list_formatting_4, fix_list_formatting_5, fix_list_formatting_6, \
     fix_list_formatting_7, fix_list_formatting_8, fix_list_formatting_9, \
-    fix_list_formatting_10, fix_list_formatting_11, fix_list_formatting_12
+    fix_list_formatting_10, fix_list_formatting_11, fix_list_formatting_12, \
+    escape_html_tags
 
 def test_fix_markdown_headings():
     """
@@ -605,3 +606,81 @@ def test():
 
     actual_output_3 = process_ai_message(test_case_3)    
     assert expected_output_3 == actual_output_3
+
+
+def test_escape_html_tags():
+    # Test 1: Basic HTML escaping (no code blocks)
+    assert escape_html_tags("<div>Hello</div>") == "&lt;div&gt;Hello&lt;/div&gt;"
+    assert escape_html_tags("Use <br> for line breaks") == "Use &lt;br&gt; for line breaks"
+    
+    # Test 2: Text with no HTML tags
+    assert escape_html_tags("Just plain text") == "Just plain text"
+    
+    # Test 3: Code block with ``` (no language)
+    text = "Here's some code:\n```\n<div>Not escaped</div>\n```"
+    expected = "Here's some code:\n```\n<div>Not escaped</div>\n```"
+    assert escape_html_tags(text) == expected
+    
+    # Test 4: Code block with ``` and language
+    text = "HTML example:\n```html\n<p>Paragraph</p>\n```"
+    expected = "HTML example:\n```html\n<p>Paragraph</p>\n```"
+    assert escape_html_tags(text) == expected
+    
+    # Test 5: Code block with ~~~
+    text = "Code:\n~~~\n<tag>Content</tag>\n~~~"
+    expected = "Code:\n~~~\n<tag>Content</tag>\n~~~"
+    assert escape_html_tags(text) == expected
+    
+    # Test 6: Code block with ~~~ and language
+    text = "Python:\n~~~python\ndef func():\n    return '<value>'\n~~~"
+    expected = "Python:\n~~~python\ndef func():\n    return '<value>'\n~~~"
+    assert escape_html_tags(text) == expected
+    
+    # Test 7: Mixed content
+    text = """<p>This should be escaped</p>
+```javascript
+<script>alert('Not escaped')</script>
+```
+<div>Also escaped</div>"""
+    expected = """&lt;p&gt;This should be escaped&lt;/p&gt;
+```javascript
+<script>alert('Not escaped')</script>
+```
+&lt;div&gt;Also escaped&lt;/div&gt;"""
+    assert escape_html_tags(text) == expected
+    
+    # Test 8: Multiple code blocks
+    text = """<tag1>Escape this</tag1>
+```
+<keep>This</keep>
+```
+<tag2>And this</tag2>
+~~~html
+<preserve>This too</preserve>
+~~~
+<tag3>But not this</tag3>"""
+    expected = """&lt;tag1&gt;Escape this&lt;/tag1&gt;
+```
+<keep>This</keep>
+```
+&lt;tag2&gt;And this&lt;/tag2&gt;
+~~~html
+<preserve>This too</preserve>
+~~~
+&lt;tag3&gt;But not this&lt;/tag3&gt;"""
+    assert escape_html_tags(text) == expected
+    
+    # Test 9: Empty code blocks
+    text = "Before\n```\n```\nAfter <tag>"
+    expected = "Before\n```\n```\nAfter &lt;tag&gt;"
+    assert escape_html_tags(text) == expected
+    
+    # Test 10: Code block at start/end of text
+    text = "```\n<code>Here</code>\n```\n<outside>This</outside>"
+    expected = "```\n<code>Here</code>\n```\n&lt;outside&gt;This&lt;/outside&gt;"
+    assert escape_html_tags(text) == expected
+    
+    print("All tests passed! ✅")
+
+# Run the tests
+test_escape_html_tags()
