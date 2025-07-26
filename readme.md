@@ -18,6 +18,7 @@ Features:
 - __Integrations__
     - __Python__: [connect to JupyterLab, Notebook, Spyder or Rapunzel](https://github.com/open-cogsci/jupyter-extension-sigmund)
     - __OpenSesame__: [directly integrate with OpenSesame](https://osdoc.cogsci.nl/4.0/manual/sigmund/)
+    - __Sigmund Analyst__: [directly integrate with Sigmund Analyst for data analysis](https://github.com/open-cogsci/sigmund-analyst)
     
 Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), and [Mistral](https://mistral.ai/) are supported. API keys from these respective providers are required.
 
@@ -37,14 +38,11 @@ For Python dependencies, see `pyproject.toml`. In addition to these, `pandoc` is
 
 ## Running (development)
 
-Download the source code, and in the folder of the source code execute the following:
+Download the source code, and copy `.env.example` to `.env`. Edit this file to specify at least the API keys, and depending on the functionality that you want activate, possibly also other variables. The only variable that is strictly required is the OpenAI API key, because OpenAI is used to create text embeddings, even when a different model is used for the conversation.
+
+Next, install the dependencies, build the documentation index, and launch the app!
 
 ```
-# Specify API keys for model providers. Even when using Anthropic (Claude) or
-# Mistral, an OpenAI key is provided when document search is enabled
-export OPENAI_API_KEY="your key here"
-export ANTHROPIC_API_KEY="your key here"
-export MISTRAL_API_KEY="your key here"
 pip install .               # install dependencies
 python index_library.py     # build library (documentation) index
 python app.py               # start the app

@@ -37,6 +37,7 @@ dependencies = [
     "mistralai",
     "pygments",
     "pyopenssl",
+    "python-dotenv",
     "redis",
     "requests",
     "scholarly",

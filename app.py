@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from sigmund.server import create_app
 from sigmund import config
 

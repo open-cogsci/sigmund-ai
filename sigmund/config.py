@@ -79,6 +79,8 @@ log_replies = os.environ.get('SIGMUND_LOG_REPLIES', False)
 openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
+# Force dummy model for development purposes
+dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 # Supported models are currently:
 # - gpt-3.5
 # - gpt-4o

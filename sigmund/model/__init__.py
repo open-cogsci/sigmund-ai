@@ -1,4 +1,4 @@
-from ._base_model import BaseModel
+from .. import config
 
 
 OPENAI_MODELS = {
@@ -31,6 +31,9 @@ ANTHROPIC_MODELS = {
 
 def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
+    if model == 'dummy' or config.dummy_model:
+        from ._dummy_model import DummyModel
+        return DummyModel(sigmund, **kwargs)
     if model in OPENAI_MODELS:
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, OPENAI_MODELS[model], **kwargs)
@@ -42,7 +45,4 @@ def model(sigmund, model, **kwargs):
     if 'mistral' in model or 'ministral' in model or 'magistral' in model:
         from ._mistral_model import MistralModel
         return MistralModel(sigmund, model, **kwargs)
-    if model == 'dummy':
-        from ._dummy_model import DummyModel
-        return DummyModel(sigmund, **kwargs)
     raise ValueError(f'Unknown model: {model}')
