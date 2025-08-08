@@ -37,10 +37,18 @@ class Sigmund:
                  tools: list = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
-        self.model_config = config.model_config[
-            self.database.get_setting('model_config')
-            if model_config is None else model_config
-        ]
+        # Available model configs may change with updates, but the user settings
+        # are not updated along with this. Therefore, if a model config doesn't
+        # exist, we reset to the default.
+        if model_config is None:
+            model_config = self.database.get_setting('model_config')
+        if model_config not in config.model_config:
+            logger.warning(
+                f'model_config {model_config} not found, resetting to default')
+            model_config = config.settings_default['model_config']
+            self.database.set_setting('model_config', model_config)
+        self.model_config = config.model_config[model_config]
+
         self.documentation = Documentation(self)
         self.messages = Messages(self, persistent)
         if tools is None:

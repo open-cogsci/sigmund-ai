@@ -24,10 +24,6 @@ class BaseExpensiveTest(unittest.TestCase):
         config.settings_default['model_config'] = 'openai'
         self._test_tool()
         
-    def test_openai_o1(self):
-        config.settings_default['model_config'] = 'openai_o1'
-        self._test_tool()
-    
     def test_anthropic_regular(self):
         config.settings_default['model_config'] = 'anthropic'
         self._test_tool()

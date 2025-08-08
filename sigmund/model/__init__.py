@@ -7,6 +7,8 @@ OPENAI_MODELS = {
     'o3': 'o3',
     'o3-mini': 'o3-mini',
     'o4-mini': 'o4-mini',
+    'gpt-5': 'gpt-5',
+    'gpt-5-mini': 'gpt-5-mini',
     'gpt-4.1': 'gpt-4.1',
     'gpt-4.1-mini': 'gpt-4.1-mini',
     'gpt-4': 'gpt-4o',
@@ -23,10 +25,12 @@ ANTHROPIC_MODELS = {
     'claude-3.7-sonnet': 'claude-3-7-sonnet-latest',
     'claude-3.7-sonnet-thinking': 'claude-3-7-sonnet-latest',
     'claude-3.5-haiku': 'claude-3-5-haiku-latest',
-    'claude-4-sonnet': 'claude-sonnet-4-20250514',
-    'claude-4-sonnet-thinking': 'claude-sonnet-4-20250514',
-    'claude-4-opus': 'claude-opus-4-20250514',
-    'claude-4-opus-thinking': 'claude-opus-4-20250514',
+    'claude-4-sonnet': 'claude-sonnet-4-0',
+    'claude-4-sonnet-thinking': 'claude-sonnet-4-0',
+    'claude-4-opus': 'claude-opus-4-0',
+    'claude-4-opus-thinking': 'claude-opus-4-0',
+    'claude-4-1-opus': 'claude-opus-4-1',
+    'claude-4-1-opus-thinking': 'claude-opus-4-1',
 }
 
 
