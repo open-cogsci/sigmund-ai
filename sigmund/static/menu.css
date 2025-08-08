@@ -209,7 +209,7 @@
 
 
 .scrollable-menu {
-    max-height: 100%; /* Set a maximum height */
+    max-height: 80vh;
     overflow-y: auto; /* Enables vertical scrolling when necessary */
 }
 
