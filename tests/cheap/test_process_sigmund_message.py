@@ -681,6 +681,72 @@ def test_escape_html_tags():
     assert escape_html_tags(text) == expected
     
     print("All tests passed! ✅")
+    
+# -------------------------
+# Pytest-style test cases
+# -------------------------
 
-# Run the tests
-test_escape_html_tags()
+def test_escapes_basic_html():
+    message = '<p>Hello & welcome</p>'
+    expected = '&lt;p&gt;Hello &amp; welcome&lt;/p&gt;'
+    assert escape_html_tags(message) == expected
+
+def test_preserves_allowed_div_thinking_block_signature():
+    message = 'before <em>z</em> <div class="thinking_block_signature"><b>Hi & bye</b></div> after'
+    expected = 'before &lt;em&gt;z&lt;/em&gt; <div class="thinking_block_signature"><b>Hi & bye</b></div> after'
+    assert escape_html_tags(message) == expected
+
+def test_preserves_allowed_div_with_additional_classes_and_attrs():
+    message = '<div id="x" class="foo message-info bar" data-x="1">Hello <i>World</i> & ok</div>'
+    expected = message
+    assert escape_html_tags(message) == expected
+
+def test_preserves_message_info_with_markdown_attr():
+    message = '<div class="message-info" markdown="1">A & B <span>C</span></div>'
+    expected = message
+    assert escape_html_tags(message) == expected
+
+def test_does_not_preserve_non_div_even_with_class():
+    message = '<span class="message-info">X & Y</span>'
+    expected = '&lt;span class="message-info"&gt;X &amp; Y&lt;/span&gt;'
+    assert escape_html_tags(message) == expected
+
+def test_preserves_code_blocks_triple_backticks_with_lang():
+    message = 'Start <b>1</b>\n```python\n<p>& stuff</p>\n```\nEnd <i>2</i>'
+    expected = 'Start &lt;b&gt;1&lt;/b&gt;\n```python\n<p>& stuff</p>\n```\nEnd &lt;i&gt;2&lt;/i&gt;'
+    assert escape_html_tags(message) == expected
+
+def test_preserves_code_blocks_tildes():
+    message = '~~~\n<a>&</a>\n~~~'
+    expected = '~~~\n<a>&</a>\n~~~'
+    assert escape_html_tags(message) == expected
+
+def test_mixed_content_properly_escaped_and_preserved():
+    message = (
+        '<h1>T</h1>\n'
+        '<div class="thinking_block_content">A & <span>B</span></div>\n'
+        '```js\n<div>not escaped here</div>&\n```\n'
+        '<div class="foo">bar & baz</div>\n'
+    )
+    expected = (
+        '&lt;h1&gt;T&lt;/h1&gt;\n'
+        '<div class="thinking_block_content">A & <span>B</span></div>\n'
+        '```js\n<div>not escaped here</div>&\n```\n'
+        '&lt;div class="foo"&gt;bar &amp; baz&lt;/div&gt;\n'
+    )
+    assert escape_html_tags(message) == expected
+
+def test_partial_class_name_is_not_preserved():
+    message = '<div class="thinking_block_signature_extra">X & Y</div>'
+    expected = '&lt;div class="thinking_block_signature_extra"&gt;X &amp; Y&lt;/div&gt;'
+    assert escape_html_tags(message) == expected
+
+def test_case_insensitive_matching_for_div_and_class():
+    message = '<DIV CLASS="MESSAGE-INFO">X & Y</DIV>'
+    expected = message
+    assert escape_html_tags(message) == expected
+
+def test_class_attribute_order_does_not_matter():
+    message = '<div data-foo="1" class="foo thinking_block_content">Z & Q</div>'
+    expected = message
+    assert escape_html_tags(message) == expected    

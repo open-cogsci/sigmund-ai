@@ -226,26 +226,35 @@ def dedent_code_blocks(message: str) -> str:
 
 def escape_html_tags(message: str) -> str:
     """
-    Takes a message, and escapes all HTML elements in the message so that
-    they are treated as literals rather than interpreted as HTML. Escaping
-    happens by replacing the HTML <> brackets with their HTML character
-    representations. And important caveat is that the elements should not be
-    escaped when they are embedded inside markdown code blocks.
+    Escapes HTML by replacing &, <, and > with their HTML entities, except:
+    - fenced code blocks (``` or ~~~) with optional language spec
+    - <div> elements whose class includes one of:
+      thinking_block_signature, thinking_block_content, message-info
     """
-    # Pattern to match code blocks with ``` or ~~~, with optional language
-    # Uses DOTALL flag to make . match newlines
-    code_block_pattern = r'(```[^\n]*\n.*?```|~~~[^\n]*\n.*?~~~)'    
-    # Split the message by code blocks, keeping the delimiters
-    parts = re.split(code_block_pattern, message, flags=re.DOTALL)    
-    # Process each part
+    # Match fenced code blocks (``` or ~~~), non-greedy across newlines
+    code_block_pattern = r'(?:```[^\n]*\n.*?```|~~~[^\n]*\n.*?~~~)'
+    # Match allowed divs we should NOT escape (class contains any of the target
+    # classes.
+    allowed_div_pattern = (
+        r'(?:<div\b[^>]*class="[^"]*\b(?:thinking_block_signature|thinking_block_content|message-info)\b[^"]*"[^>]*>.*?</div>)'
+    )
+    # Combined pattern: capture protected segments so we can preserve them
+    protected_pattern = f'({code_block_pattern}|{allowed_div_pattern})'
+    
+    parts = re.split(protected_pattern, message, flags=re.DOTALL | re.IGNORECASE)
     result = []
     for i, part in enumerate(parts):
-        # Even indices are outside code blocks, odd indices are code blocks
+        if part is None:
+            continue
         if i % 2 == 0:
-            # Escape HTML characters outside code blocks
-            escaped = part.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            # Outside protected segments: escape &, <, >
+            escaped = (part
+                       .replace('&', '&amp;')
+                       .replace('<', '&lt;')
+                       .replace('>', '&gt;'))
             result.append(escaped)
         else:
+            # Inside protected segments: leave as-is
             result.append(part)
     return ''.join(result)
 
