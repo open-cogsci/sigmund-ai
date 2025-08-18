@@ -236,7 +236,7 @@ def escape_html_tags(message: str) -> str:
     # Match allowed divs we should NOT escape (class contains any of the target
     # classes.
     allowed_div_pattern = (
-        r'(?:<div\b[^>]*class="[^"]*\b(?:thinking_block_signature|thinking_block_content|message-info)\b[^"]*"[^>]*>.*?</div>)'
+        r'(?:<div\b[^>]*class="[^"]*\b(?:thinking_block_signature|thinking_block_content|message-info|image-generation)\b[^"]*"[^>]*>.*?</div>)'
     )
     # Combined pattern: capture protected segments so we can preserve them
     protected_pattern = f'({code_block_pattern}|{allowed_div_pattern})'
