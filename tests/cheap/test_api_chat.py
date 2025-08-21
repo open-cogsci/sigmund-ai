@@ -12,7 +12,7 @@ class TestApiChat(BaseRoutesTestCase):
         response = self.client.post('/api/chat/start', json={
             'message': 'hello'
         })
-        assert response.status_code == 500
+        assert response.status_code == 401
         self.login()
         
     def test_chat_without_search(self):

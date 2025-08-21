@@ -42,7 +42,7 @@ def model(sigmund, model, **kwargs):
         kwargs['thinking'] = True
     if model == 'dummy' or config.dummy_model:
         from ._dummy_model import DummyModel
-        return DummyModel(sigmund, **kwargs)
+        return DummyModel(sigmund, 'dummy', **kwargs)
     if model in OPENAI_MODELS:
         from ._openai_model import OpenAIModel
         return OpenAIModel(sigmund, OPENAI_MODELS[model], **kwargs)
