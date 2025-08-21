@@ -11,8 +11,7 @@ class OpenAIModel(BaseModel):
 
     def __init__(self, sigmund, model, **kwargs):
         from openai import Client, AsyncClient
-        super().__init__(sigmund, **kwargs)
-        self._model = model
+        super().__init__(sigmund, model, **kwargs)
         if self._tool_choice not in (None, 'auto'):
             self._tool_choice = {"type": "function",
                                  "function": {"name": self._tool_choice}}
@@ -110,7 +109,11 @@ class OpenAIModel(BaseModel):
         kwargs = self._tool_args()
         kwargs.update(config.openai_kwargs)
         if self.json_mode:
-            kwargs['response_format'] = {"type": "json_object"}        
+            kwargs['response_format'] = {"type": "json_object"}
+        # Only GPT-5 currently supports reasoning effort
+        if self._model == 'gpt-5':
+            kwargs['reasoning_effort'] = \
+                'high' if self._thinking else 'minimal'
         return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):

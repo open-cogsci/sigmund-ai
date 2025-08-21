@@ -103,8 +103,13 @@ dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 model_config = {
     'openai': {
         'condense_model': 'gpt-5-mini',
-        'public_model': 'gpt-5-mini',
+        'public_model': 'gpt-5-nano',
         'answer_model': 'gpt-5'
+    },
+    'openai_thinking': {
+        'condense_model': 'gpt-5-mini',
+        'public_model': 'gpt-5-nano',
+        'answer_model': 'gpt-5-thinking'
     },
     'anthropic': {
         'condense_model': 'claude-4-sonnet',
@@ -124,7 +129,7 @@ model_config = {
     },
     'magistral': {
         'condense_model': 'ministral-8b-2410',
-        'public_model': 'gpt-4o-mini',
+        'public_model': 'gpt-5-nano',
         'answer_model': 'magistral-medium-latest',
         'vision_model': 'pixtral-large-latest'
     },

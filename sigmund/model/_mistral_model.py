@@ -14,8 +14,7 @@ class MistralModel(OpenAIModel):
 
     def __init__(self, sigmund, model, **kwargs):
         from mistralai import Mistral
-        BaseModel.__init__(self, sigmund, **kwargs)
-        self._model = model
+        BaseModel.__init__(self, sigmund, model, **kwargs)
         self._actual_model = self._model
         # Mistral doesn't allow a tool to be specified by name. So if this
         # happens, we instead use the 'any' option, which forces use of the

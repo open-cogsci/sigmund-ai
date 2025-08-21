@@ -7,8 +7,10 @@ OPENAI_MODELS = {
     'o3': 'o3',
     'o3-mini': 'o3-mini',
     'o4-mini': 'o4-mini',
+    'gpt-5-thinking': 'gpt-5',
     'gpt-5': 'gpt-5',
     'gpt-5-mini': 'gpt-5-mini',
+    'gpt-5-nano': 'gpt-5-nano',
     'gpt-4.1': 'gpt-4.1',
     'gpt-4.1-mini': 'gpt-4.1-mini',
     'gpt-4': 'gpt-4o',
@@ -36,6 +38,8 @@ ANTHROPIC_MODELS = {
 
 def model(sigmund, model, **kwargs):
     """A factory function that returns a Model instance."""
+    if model.endswith('-thinking'):
+        kwargs['thinking'] = True
     if model == 'dummy' or config.dummy_model:
         from ._dummy_model import DummyModel
         return DummyModel(sigmund, **kwargs)
@@ -44,8 +48,6 @@ def model(sigmund, model, **kwargs):
         return OpenAIModel(sigmund, OPENAI_MODELS[model], **kwargs)
     if model in ANTHROPIC_MODELS:
         from ._anthropic_model import AnthropicModel
-        if model.endswith('-thinking'):
-            kwargs['thinking'] = True
         return AnthropicModel(sigmund, ANTHROPIC_MODELS[model], **kwargs)
     if 'mistral' in model or 'ministral' in model or 'magistral' in model:
         from ._mistral_model import MistralModel

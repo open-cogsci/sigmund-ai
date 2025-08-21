@@ -17,8 +17,11 @@ class BaseModel:
     # Approximation to keep track of token costs
     characters_per_token = 4
     
-    def __init__(self, sigmund, tools=None, tool_choice='auto'):
+    def __init__(self, sigmund, model, thinking=False, tools=None,
+                 tool_choice='auto'):
         self._sigmund = sigmund
+        self._model = model
+        self._thinking = thinking
         self._tools = tools
         self._tool_choice = tool_choice
         self.total_tokens_consumed = 0

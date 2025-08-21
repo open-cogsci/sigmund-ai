@@ -9,11 +9,9 @@ class AnthropicModel(BaseModel):
     
     supports_not_done_yet = False
     
-    def __init__(self, sigmund, model, thinking=False, **kwargs):
+    def __init__(self, sigmund, model, **kwargs):
         from anthropic import Anthropic, AsyncAnthropic
-        super().__init__(sigmund, **kwargs)
-        self._thinking = thinking
-        self._model = model
+        super().__init__(sigmund, model, **kwargs)
         self._tool_use_id = 0
         self._client = Anthropic(api_key=config.anthropic_api_key)
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)

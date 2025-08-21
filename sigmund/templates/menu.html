@@ -66,7 +66,14 @@
                 :class="{ active: modelConfig === 'openai' }">
                 <!-- Icon for OpenAI model -->
                 <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5</small></span>
+                <span>OpenAI<br><small>GPT5<br>Conversations</small></span>
+            </button>
+            <button 
+                @click="modelConfig = 'openai_thinking'" 
+                :class="{ active: modelConfig === 'openai_thinking' }">
+                <!-- Icon for OpenAI model -->
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span>OpenAI<br><small>GPT5<br>Problem solving</small></span>
             </button>
             <button 
                 @click="modelConfig = 'anthropic'" 
