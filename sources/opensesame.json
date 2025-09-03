@@ -85,6 +85,20 @@
     "total_chunks": 1
   },
   {
+    "content": "# SigmundAI Copilot\n\ntitle: SigmundAI Copilot\n\n\n%--\nfigure:\n id: FigExample\n source: example.png\n caption: Debugging an issue with Sigmund.\n--%\n\n\n[SigmundAI.eu](https://sigmundai.eu) is an AI research assistant that has been designed to help you with OpenSesame. You can use Sigmund directly from within OpenSesame by installing an extension.\n\n\n[TOC]\n\n\n## Connecting to SigmundAI\n\nSigmund requires a monthly subscription, which can be cancelled at any time. Visit <https://sigmundai.eu> to subscribe.\n\n&#128150; Your subscription supports the development of open-source software! \n\nOnce you are logged in to Sigmund, the chat interface becomes visible. The chat interface automatically listens to incoming connections from OpenSesame.\n\n%--\nfigure:\n id: FigChatWindow\n source: chat-window.png\n caption: The chat interface of SigmundAI.eu.\n--%\n\nNext, activate the SigmundAI Copilot by clicking on the Sigmund icon.\n\n%--\nfigure:\n id: FigListening\n source: listening.png\n caption: OpenSesame is connecting to Sigmund.\n--%\n\nAfter a few seconds, a connection should be established. The Sigmund chat interface in the browser indicates that it is connected to OpenSesame. Within OpenSesame, an integrated chat interface appears.\n\n%--\nfigure:\n id: FigConnected\n source: connected.png\n caption: OpenSesame is connected to Sigmund.\n--%\n\n\n## Functionality\n\n### Sigmund can edit items and scripts\n\nFirst, select an item in OpenSesame by clicking on it in the overview area. Next, you can questions about it, and even ask Sigmund to modify the item directly. \n\nFor example, if you ask Sigmund to change the color of text on a SKETCHPAD to red, Sigmund will propose a simple change to the SKETCHPAD script. This change will appear in a so-called diff viewer, where you can review it and decide whether or not you want to apply the change. If you click Ok, the change will be applied, and the text will now be red.\n\n%--\nfigure:\n id: FigDiffViewer\n source: diff-viewer.png\n caption: When Sigmund suggests changes, you can first review the changes before deciding whether or not to accept them.\n--%\n\n\n### Sigmund can fix errors in your experiment\n\nIf an error occurs while running your experiment, you can ask Sigmund to fix the error. Sigmund will then analyze the error, and may suggest changes to fix it.\n\n\n%--\nfigure:\n id: FigError\n source: error.png\n caption: Sigmund can diagnose and fix errors in your experiment.\n--%\n\n\n### Fixing common issues\n\nIf you continuously see the message, \"Open https://sigmundai.eu in a browser and log in. OpenSesame will automatically connect\", this likely means that <https://sigmundai.eu> is not open or not active in a web browser. Many browsers automatically deactivate pages that are not being used. Opening (or reloading) the Sigmund AI tab should re-activate the page.\n\nIf you see the message \"Failed to listen to Sigmund. Maybe another application is already listening?\", this likely means that you already started OpenSesame (or another application that has connected to Sigmund). Only one application can connect to Sigmund at a time.",
+    "title": "SigmundAI Copilot",
+    "url": "https://osdoc.cogsci.nl/4.1/manual/sigmund",
+    "path": "content/pages/manual/sigmund.md",
+    "topics": [
+      "opensesame"
+    ],
+    "collection": "opensesame",
+    "foundation": false,
+    "howto": false,
+    "chunk": 1,
+    "total_chunks": 1
+  },
+  {
     "content": "# Runners\n\ntitle: Runners\n\n\n[TOC]\n\n\n## About runners\n\nThere are several technically different ways in which you can execute your experiment. Each of these corresponds to a *runner*. You can select a runner under Menu \u2192 Tools \u2192 Preferences \u2192 Runner.\n\nUnless you have a reason not to, you should use the *multiprocess* runner. However, if OpenSesame sometimes crashes, you can try whether selecting a different runner resolves this.\n\n\n## Available runners\n\n### Multiprocess\n\nThe *multiprocess* runner executes your experiment in a different process. The benefit of this approach is that your experiment can crash without bringing the user interface down with it. Another advantage of the *multiprocess* runner is that it allows the variable inspector to show your experimental variables while the experiment is running.\n\n### Inprocess\n\nThe *inprocess* runner executes the experiment in the same process as the user interface. The benefit of this approach is its simplicity. The downside is that the user interface may crash if the experiment crashes, and vice versa.\n\n### External\n\nThe *external* runner executes the experiment by launching opensesamerun as a separate application. The benefit of this approach is that your experiment can crash without bringing the user interface down with it.",
     "title": "Runners",
     "url": "https://osdoc.cogsci.nl/4.1/manual/runners",
@@ -817,10 +831,38 @@
     "total_chunks": 1
   },
   {
+    "content": "# Tobii\n\ntitle: Tobii\n\n## Installing Tobii research\n\n`tobii-research` is the Python library for Tobii support. Currently, `tobii-research` only supports Python 3.10 and earlier, whereas the standard packages of OpenSesame are built with Python 3.13. Therefore, you must use the Python 3.10 (or earlier) package of OpenSesame from [GitHub releases](https://github.com/open-cogsci/OpenSesame/releases).\n\nNext, `tobii-research` can be installed:\n\n```\npip install tobii-research\n```\n\nFor more information, see:\n\n- <http://www.tobii.com/en/eye-tracking-research/global/>\n\n\n## PyGaze\n\nAfter you have install `tobii-research`, you can use Tobii with PyGaze! See:\n\n- %link:pygaze%\n\n\n## Titta eye-tracking plugin\n\nBob Rosbag, Diederick C. Niehorster & Marcus Nystr\u00f6m have developed their own Tobii plug-ins for OpenSesame. These are somewhat similar to the PyGaze plugins, but offer some functionality that is not available through PyGaze, and may also be more stable. To install these plugins, run:\n\n```\npip install opensesame-plugin-titta-eyetracking\n```\n\nFor more information, please visit:\n\n- <https://github.com/dev-jam/opensesame-plugin-titta_eyetracking>",
+    "title": "Tobii",
+    "url": "https://osdoc.cogsci.nl/4.1/manual/eyetracking/tobii",
+    "path": "content/pages/manual/eyetracking/tobii.md",
+    "topics": [
+      "opensesame"
+    ],
+    "collection": "opensesame",
+    "foundation": false,
+    "howto": false,
+    "chunk": 1,
+    "total_chunks": 1
+  },
+  {
     "content": "# EyeTribe\n\ntitle: EyeTribe\n\nThe EyeTribe is supported through PyGaze. For more information, see:\n\n- %link:pygaze%",
     "title": "EyeTribe",
     "url": "https://osdoc.cogsci.nl/4.1/manual/eyetracking/eyetribe",
     "path": "content/pages/manual/eyetracking/eyetribe.md",
+    "topics": [
+      "opensesame"
+    ],
+    "collection": "opensesame",
+    "foundation": false,
+    "howto": false,
+    "chunk": 1,
+    "total_chunks": 1
+  },
+  {
+    "content": "# Eyelink\n\ntitle: Eyelink\n\n[TOC]\n\n## About EyeLink\n\nThe Eyelink series of eye trackers, produced by SR Research, are one of the most commonly used eye trackers in psychological research. SR Research provides Python bindings for the Eyelink (called PyLink), which are used by PyGaze. The license of PyLink is incompatible with the license used by OpenSesame. For that reason, PyLink is not included in the default distribution of OpenSesame, and needs to be installed separately.\n\n\n## Windows\n\n### Installing the EyeLink Developers Kit\n\nThe Eyelink Developers Kit (sometimes called Display Software) provides the libraries that are required to communicate with the Eyelink PC. You can find it here (free registration required):\n\n- <https://www.sr-research.com/support/thread-13.html>\n\nIf you extract the `.zip`, and then run the `.exe` installer, the EyeLink display will be installed in one of the following folders (depending on your version of Windows:\n\n```\nC:\\Program Files\\SR Research\\EyeLink\\\nC:\\Program Files (x86)\\SR Research\\EyeLink\n```\n\nIn this folder, there is a `libs` subfolder, which you need to add to the system Path (this may have been added to the path automatically, but check to make sure). You can do this by opening \"My Computer\", clicking on \"View system information\", opening the \"Advanced\" tab, clicking on \"Environment Variables\" and appending `;C:\\Program Files\\SR Research\\EyeLink\\libs` or (depending on your system) `;C:\\Program Files (x86)\\SR Research\\EyeLink\\libs` to the Path variable (under System variables).\n\n\n### Installing OpenSesame with PyLink\n\n`pylink` is the Python library for EyeLink support. Currently, `pylink` only supports Python 3.12 and earlier, whereas the standard packages of OpenSesame are built with Python 3.13. Therefore, you must use the Python 3.12 (or earlier) package of OpenSesame from [GitHub releases](https://github.com/open-cogsci/OpenSesame/releases).\n\nNext, `pylink` can be installed from the SR Research PyPi repository through `pip install`:\n\n```\npip install --index-url=https://pypi.sr-research.com sr-research-pylink\n```\n\nImportant: do *not* try to install `pylink` by running `pip install pylink`. Doing so will install a completely different package!\n\nYou can find more information about `pylink` on the SR Research forum (free registration required):\n\n- <https://www.sr-research.com/support/thread-8291.html>\n\n\n## Ubuntu\n\nThe EyeLink display software can be installed directly from a repository. This also installs PyLink and various convenient tools, such ast the `edf2asc` converter.\n\n```bash\nsudo add-apt-repository 'deb [arch=amd64] https://apt.sr-research.com SRResearch main'\nsudo apt-key adv --fetch-keys https://apt.sr-research.com/SRResearch_key\nsudo apt-get update\nsudo apt-get install eyelink-display-software\n```\n\nFor more information, please visit:\n\n- <https://www.sr-support.com/thread-13.html>\n\n\n## PyGaze\n\nAfter you have install the EyeLink display software and PyLink per the instructions above, you can use the EyeLink with PyGaze! See:\n\n- %link:pygaze%\n\n\n## SR Research eyelink plugin\n\nSR Research also provides their own EyeLink plug-ins for OpenSesame. These are somewhat similar to (and originally based on) the PyGaze plugins, but offer some functionality that is not available through PyGaze. To install these plugins, run:\n\n```\npip install opensesame-plugin-eyelink\n```\n\nFor more information, please visit:\n\n- <https://www.sr-research.com/support/thread-52.html>",
+    "title": "Eyelink",
+    "url": "https://osdoc.cogsci.nl/4.1/manual/eyetracking/eyelink",
+    "path": "content/pages/manual/eyetracking/eyelink.md",
     "topics": [
       "opensesame"
     ],
@@ -1167,6 +1209,21 @@
     "title": "Text",
     "url": "https://osdoc.cogsci.nl/4.1/manual/stimuli/text",
     "path": "content/pages/manual/stimuli/text.md",
+    "topics": [
+      "opensesame",
+      "inline_script"
+    ],
+    "collection": "opensesame",
+    "foundation": false,
+    "howto": false,
+    "chunk": 1,
+    "total_chunks": 1
+  },
+  {
+    "content": "# Video playback\n\ntitle: Video playback\n\n[TOC]\n\n\n## media_player_mpy plugin\n\nThe [MEDIA_PLAYER_MPY](https://github.com/open-cogsci/opensesame-plugin-mediaplayer) plugin is based on MoviePy. It is included by default with OpenSesame. (If you have a custom environment, you can get it by installing the `opensesame-plugin-media_player_mpy` package.)\n\n\n## OpenCV\n\nOpenCV is a powerful computer vision library, which contains (among many other things) routines for reading video files.\n\n- <http://docs.opencv.org/3.0-beta/doc/py_tutorials/py_tutorials.html>\n\nThe following example shows how to play back a video file, while drawing a red square on top of the video. This example assumes that you're using the legacy backend.\n\n```python\nimport cv2\nimport numpy\nimport pygame\n# Full path to the video file in file pool\npath = pool['myvideo.avi']\n# Open the video\nvideo = cv2.VideoCapture(path)\n# A loop to play the video file. This can also be a while loop until a key\n# is pressed. etc.\nfor i in range(100):\n    # Get a frame\n    retval, frame = video.read()\n    # Rotate it, because for some reason it otherwise appears flipped.\n    frame = numpy.rot90(frame)\n    # The video uses BGR colors and PyGame needs RGB\n    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)\n    # Create a PyGame surface\n    surf = pygame.surfarray.make_surface(frame)\n    # Now you can draw whatever you want onto the PyGame surface!\n    pygame.draw.rect(surf, (255,0,0), (100, 100, 200, 200))\n    # Show the PyGame surface!\n    exp.surface.blit(surf, (0, 0))\n    pygame.display.flip()\n```",
+    "title": "Video playback",
+    "url": "https://osdoc.cogsci.nl/4.1/manual/stimuli/video",
+    "path": "content/pages/manual/stimuli/video.md",
     "topics": [
       "opensesame",
       "inline_script"
