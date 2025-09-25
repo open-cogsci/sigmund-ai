@@ -1,6 +1,4 @@
 import os
-import re
-from . import utils
 import logging
 logger = logging.getLogger('sigmund')
 page_title = 'Sigmund AI'
@@ -81,18 +79,8 @@ anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 # Force dummy model for development purposes
 dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
-# Supported models are currently:
-# - gpt-3.5
-# - gpt-4o
-# - gpt-4o-mini
-# - claude-2.1
-# - claude-3-sonnet
-# - claude-3-opus
-# - claude-3.5-sonnet
-# - mistral-tiny
-# - mistral-small
-# - mistral-medium
-# - dummy
+# Supported models are continuously updated. See sigmund.model for more
+# information.
 # Model configuations are combinations of models that can be used together
 # - The search model is used to formulate search queries and evaluate whether
 #   documents are relevant. This can be a cheap model.
@@ -239,7 +227,7 @@ subscription_required = bool(
     int(os.environ.get('SIGMUND_SUBSCRIPTION_REQUIRED', 0)))
 # This is the duration of the subscription in days. This should be set to a bit
 # longer than a month to provide a grace period in case of payment issues.
-subscription_length = 40
+subscription_length = 50
 #
 # Stripe is a payment portal. The information below should not be shared
 #
