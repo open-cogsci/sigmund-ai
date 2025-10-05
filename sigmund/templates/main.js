@@ -92,7 +92,7 @@ function showImageAttachments(message) {
     });
 }
 
-async function sendMessage(message) {
+async function sendMessage(message, forwardReplyToSocket = false) {
     console.log('user message: ' + message)
     setFavicon('static/loading.svg');
     const user_message_id = generateUUID()
@@ -249,8 +249,9 @@ async function sendMessage(message) {
             workspaceDiv.appendChild(workspaceLanguageDiv);
             aiMessage.appendChild(workspaceDiv);            
         }
-        //
-        socketSendMessage("ai_message", data.response, data.workspace_content, data.workspace_language);
+        if (forwardReplyToSocket === true) {
+            socketSendMessage("ai_message", data.response, data.workspace_content, data.workspace_language);
+        }
         // Create a div for timestamp
         const timestampDiv = document.createElement('div');
         timestampDiv.className = 'message-timestamp';

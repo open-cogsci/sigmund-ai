@@ -75,7 +75,9 @@ function connectWebSocket() {
                     setWorkspace(data.workspace_content, data.workspace_language);
                     
                     // Send message (attachments will be included automatically)
-                    sendMessage(data.message);
+                    // and indicate that the reply should be forwarded to the 
+                    // socket.
+                    sendMessage(data.message, true);
                     
                     // Clear message input after sending
                     messageInput.value = '';
