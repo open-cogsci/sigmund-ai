@@ -64,6 +64,14 @@ print('hello world')
     assert txt.strip() == "Here's a simple workspace example:"
     assert content.strip() == "print('hello world')"
     assert language == 'python'
+    s = '''Here's a simple workspace example with a missing newline before closing tag:
+    
+<workspace language="javascript">
+console.log('hello world')</workspace>'''
+    txt, content, language = extract_workspace(s)
+    assert txt.strip() == "Here's a simple workspace example with a missing newline before closing tag:"
+    assert content.strip() == "console.log('hello world')"
+    assert language == 'javascript'
     s = '''Here's a double workspace example:
 
 <workspace language="python">

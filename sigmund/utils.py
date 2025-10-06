@@ -129,7 +129,7 @@ def extract_workspace(txt: str) -> tuple:
         logger.warning('workspace closing tag appears to be missing')
         txt += '\n</workspace>'
     # Checks for <workspace> tags
-    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)^</workspace>'
+    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)</workspace>'
     match = re.search(pattern, txt, re.DOTALL | re.MULTILINE)
     if match:
         language = match.group(1) if match.group(1) else 'markdown'
