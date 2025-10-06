@@ -1,6 +1,7 @@
 let socket;
 let retryInterval;
 const retryDelay = 5000;
+const maxMessages = 10;
 
 function connectWebSocket() {
     try {
@@ -18,9 +19,25 @@ function connectWebSocket() {
             // Rebuild conversation history
             let action;
             let message;
-			let workspace;
+			  let workspace;
             socketSendMessage("clear_messages");
-            for (let messageDiv of responseDiv.children) {
+            // Determine which messages to send (last maxMessages)
+            const allMessages = Array.from(responseDiv.children || []);
+            const total = allMessages.length;
+            let messagesToSend = allMessages;
+            if (total > maxMessages) {
+                messagesToSend = allMessages.slice(total - maxMessages);
+                // Send placeholder first
+                socketSendMessage(
+                    'ai_message',
+                    `Only the last ${maxMessages} messages are shown. The full conversation history is available in the web interface.`,
+                    null,
+                    null,
+                    true
+                );
+            }      
+            
+            for (let messageDiv of messagesToSend) {
 				workspace = messageDiv.querySelector('.message-workspace');
 				if (workspace !== null) {
 					workspace_content = messageDiv.querySelector('.workspace-content').textContent;
