@@ -61,7 +61,7 @@ large_tool_result_length = 50000
 #
 # The maximum number of tokens that can be consumed per hour by the answer
 # model.
-max_tokens_per_hour = 500000
+max_tokens_per_hour = 1_000_000
 max_tokens_per_hour_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
 anthropic_max_thinking_tokens = 2048
 
