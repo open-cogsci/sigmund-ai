@@ -326,68 +326,74 @@ class DatabaseManager:
             .scalar()
         return total_tokens if total_tokens is not None else 0
 
-    def update_subscription(self, stripe_customer_id: str,
-                            stripe_subscription_id: str, from_date=None,
-                            to_date=None):
-        """Updates a subscription. By default the subscriptions starts 
-        immediately and ends exactly one month from the current time. A user
-        has only one subscription, which means that a subscription should be
-        added if it doesn't exist, and updated if it already exists.
+    def add_subscription_record(self, stripe_customer_id: str,
+                                stripe_subscription_id: str,
+                                from_date=None, to_date=None):
+        """Always append a new subscription record. Do not update old rows.
+        from_date defaults to now; to_date defaults to now + subscription_length.
         """
         now = datetime.utcnow()
         from_date = from_date or now
         to_date = to_date or now + timedelta(days=config.subscription_length)
-        subscription = Subscription.query.filter_by(
-            user_id=self.user_id).first()
-        if subscription:
-            subscription.from_date = from_date
-            subscription.to_date = to_date
-        else:
-            subscription = Subscription(
-                user_id=self.user_id, from_date=from_date, to_date=to_date,
-                stripe_customer_id=stripe_customer_id,
-                stripe_subscription_id=stripe_subscription_id)
-            db.session.add(subscription)
+        subscription = Subscription(
+            user_id=self.user_id,
+            from_date=from_date,
+            to_date=to_date,
+            stripe_customer_id=stripe_customer_id,
+            stripe_subscription_id=stripe_subscription_id
+        )
+        db.session.add(subscription)
         db.session.commit()
+
+    def update_subscription(self, stripe_customer_id: str,
+                            stripe_subscription_id: str, from_date=None,
+                            to_date=None):
+        """Backwards-compatible wrapper that appends a new subscription record."""
+        return self.add_subscription_record(
+            stripe_customer_id=stripe_customer_id,
+            stripe_subscription_id=stripe_subscription_id,
+            from_date=from_date,
+            to_date=to_date
+        )
 
     def check_subscription(self) -> bool:
-        """Returns a bool indicating whether the user is currently subscribed.
-        """
+        """Return True if at least one subscription row is currently active."""
         now = datetime.utcnow()
-        subscription = Subscription.query.filter_by(
-            user_id=self.user_id).first()
-        return subscription and \
-            subscription.from_date <= now < subscription.to_date
-
-    def cancel_subscription(self):
-        """Sets the to_date of the subscription to the current time if the user
-        is currently subscribed.
-        """
-        if not self.check_subscription():
-            return
-        subscription = Subscription.query.filter_by(
-            user_id=self.user_id).first()
-        subscription.to_date = datetime.utcnow()
-        db.session.commit()
+        # Efficient existence check
+        return db.session.query(
+            db.exists().where(
+                (Subscription.user_id == self.user_id) &
+                (Subscription.from_date <= now) &
+                (Subscription.to_date > now)
+            )
+        ).scalar()
 
     def get_stripe_customer_id(self) -> str:
-        subscription_record = Subscription.query.filter(
-            Subscription.user_id == self.user_id
-        ).order_by(Subscription.from_date.desc()).first()
-        if subscription_record:
-            return subscription_record.stripe_customer_id
-        return None
+        """Return the stripe_customer_id of the subscription with the latest to_date.
+        If multiple share the same to_date, pick the latest from_date as tie-breaker.
+        """
+        subscription_record = (
+            Subscription.query
+            .filter(Subscription.user_id == self.user_id)
+            .order_by(Subscription.to_date.desc(), Subscription.from_date.desc())
+            .first()
+        )
+        return subscription_record.stripe_customer_id if subscription_record else None
 
     @staticmethod
-    def from_stripe_customer_id(stripe_customer_id: str) -> str:
-        subscription_record = Subscription.query.filter(
-            Subscription.stripe_customer_id == stripe_customer_id
-        ).order_by(Subscription.from_date.desc()).first()
+    def from_stripe_customer_id(stripe_customer_id: str):
+        """Return a DatabaseManager instance for the user most recently associated
+        with this stripe_customer_id (based on latest to_date, then from_date).
+        """
+        subscription_record = (
+            Subscription.query
+            .filter(Subscription.stripe_customer_id == stripe_customer_id)
+            .order_by(Subscription.to_date.desc(), Subscription.from_date.desc())
+            .first()
+        )
         if not subscription_record:
             return None
-        user_record = User.query.filter(
-            User.user_id == subscription_record.user_id
-        ).first()
+        user_record = User.query.filter(User.user_id == subscription_record.user_id).first()
         if not user_record:
             return None
         return DatabaseManager(None, username=user_record.username)

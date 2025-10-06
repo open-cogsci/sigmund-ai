@@ -124,10 +124,10 @@ def webhook():
         event = stripe.Webhook.construct_event(
             payload, sig_header, config.stripe_webhook_secret)
     except ValueError as e:
-        logger.error('invalid webhook payload')
+        logger.error(f'invalid webhook payload: {e}')
         return 'Invalid payload', 400
     except stripe.error.SignatureVerificationError as e:
-        logger.error('invalid webhook signature')
+        logger.error(f'invalid webhook signature: {e}')
         return 'Invalid signature', 400
     if not event:
         logger.error('webhook contains no event')
