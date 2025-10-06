@@ -8,9 +8,54 @@ def normalize_bullet_points(text: str) -> str:
     return re.sub(r"^(\s*)[•–♦○└─]\s+", r"\1- ", text, flags=re.MULTILINE)
 
 def add_blank_line_after_colon_headers(text: str) -> str:
-    # Add a newline after lines ending with ':' that do NOT start with optional spaces and a dash
-    # Only adding an empty line if next line is not a list line
-    return re.sub(r"^(?!\s*(?:-\s|\d+\.\s)).*?:\s*$\n(?=\s*(?:-\s|\d+\.\s))", r"\g<0>\n", text, flags=re.MULTILINE)
+    """
+    Insert a blank line after lines ending with a colon when they are immediately
+    followed by a list, to improve Markdown compatibility.
+
+    This function detects "header-like" lines that end with a colon (e.g., "Notes:")
+    and ensures there is exactly one empty line between that line and a following list
+    item (either a bullet list starting with "-" or a numbered list like "1. ...").
+    It does not modify lines that are themselves list items or cases where a blank
+    line already exists before the list.
+
+    Parameters
+    ----------
+    text : str
+        The full Markdown string to process.
+
+    Returns
+    -------
+    str
+        The modified Markdown string with a blank line inserted between colon-
+        terminated headers and immediately following list items, when applicable.
+
+    Notes
+    -----
+    - A "list item" is considered any line that, ignoring leading whitespace,
+      begins with "- " or "<number>. ".
+    - Matching is done line-by-line using multiline regular expressions.
+    - The function is conservative and only inserts a blank line when the
+      colon-terminated header is immediately followed by a list item.
+
+    Examples
+    --------
+    Input:
+        Title:
+        - First
+        - Second
+
+    Output:
+        Title:
+
+        - First
+        - Second
+    """
+    return re.sub(
+        r"^(?!\s*(?:-\s|\d+\.\s)).*?$\n(?=[ \t]*(?:-\s|\d+\.\s))",
+        r"\g<0>\n",
+        text,
+        flags=re.MULTILINE,
+    )
 
 #second level formatting inssues
 def fix_list_formatting_1(text: str) -> str:

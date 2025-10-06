@@ -247,6 +247,32 @@ def test_add_blank_line_after_colon_headers():
 - point 3"""
     output = add_blank_line_after_colon_headers(input_text)
     assert output == expected
+    
+    # A text like this should be followed by a blank line
+    input_text = """This is a list
+- point 1
+- point 2
+- point 3"""
+    expected = """This is a list
+
+- point 1
+- point 2
+- point 3"""
+    output = add_blank_line_after_colon_headers(input_text)
+    assert output == expected
+
+    # A text like this should be followed by a blank line
+    input_text = """**This is a list:**
+- point 1
+- point 2
+- point 3"""
+    expected = """**This is a list:**
+
+- point 1
+- point 2
+- point 3"""
+    output = add_blank_line_after_colon_headers(input_text)
+    assert output == expected
 
     # A text like this should also be followed by a blank line
     input_text = """This is a list:
