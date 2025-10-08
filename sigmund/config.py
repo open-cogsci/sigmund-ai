@@ -100,14 +100,14 @@ model_config = {
         'answer_model': 'gpt-5-thinking'
     },
     'anthropic': {
-        'condense_model': 'claude-4-sonnet',
+        'condense_model': 'claude-4-5-sonnet',
         'public_model': 'claude-3.5-haiku',
-        'answer_model': 'claude-4-sonnet'
+        'answer_model': 'claude-4-5-sonnet'
     },
     'anthropic_thinking': {
-        'condense_model': 'claude-4-sonnet',
+        'condense_model': 'claude-4-5-sonnet',
         'public_model': 'claude-3.5-haiku',
-        'answer_model': 'claude-4-1-opus-thinking'
+        'answer_model': 'claude-4-5-sonnet-thinking'
     },
     'mistral': {
         'condense_model': 'ministral-8b-2410',
