@@ -12,7 +12,8 @@
     <div>
       <label>Expert knowledge:</label>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="collection-opensesame" 
                  v-model="collection_opensesame">
           <label for="collection-opensesame">OpenSesame
@@ -20,13 +21,15 @@
           </label>
       </div>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="collection-datamatrix" 
                  v-model="collection_datamatrix">
           <label for="collection-datamatrix">Python coding and data analysis</label>
       </div>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="collection-forum" 
                  v-model="collection_forum">
           <label for="collection-forum">CogSci community forum</label>
@@ -36,7 +39,8 @@
     <div>
       <label>Tools:</label>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-execute-code" 
                  v-model="tool_execute_code">
           <label for="tool-execute-code">Code execution
@@ -44,13 +48,15 @@
           </label>
       </div>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-search-google-scholar" 
                  v-model="tool_search_google_scholar">
           <label for="tool-search-google-scholar">Google Scholar</label>
       </div>
       <div class="tool-item">
-          <input type="checkbox" 
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-generate-image" 
                  v-model="tool_generate_image">
           <label for="tool-generate-image">Image generation</label>
@@ -61,42 +67,48 @@
     <div class="model-selector">
       <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
         <div class="model-buttons">
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'openai'" 
                 :class="{ active: modelConfig === 'openai' }">
                 <!-- Icon for OpenAI model -->
                 <img src="/static/openai.png" alt="OpenAI Icon">
                 <span>OpenAI<br><small>GPT5<br>Conversations</small></span>
             </button>
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'openai_thinking'" 
                 :class="{ active: modelConfig === 'openai_thinking' }">
                 <!-- Icon for OpenAI model -->
                 <img src="/static/openai.png" alt="OpenAI Icon">
                 <span>OpenAI<br><small>GPT5<br>Problem solving</small></span>
             </button>
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'anthropic'" 
                 :class="{ active: modelConfig === 'anthropic' }">
                 <!-- Icon for Anthropic model -->
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
                 <span>Anthropic<br><small>Claude 4.5<br>Sonnet<br>Conversations</small></span>
             </button>
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'anthropic_thinking'" 
                 :class="{ active: modelConfig === 'anthropic_thinking' }">
                 <!-- Icon for Anthropic model -->
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
                 <span>Anthropic<br><small>Claude 4.5<br>Sonnet<br>Problem solving</small></span>
             </button>
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'mistral'" 
                 :class="{ active: modelConfig === 'mistral' }">
                 <!-- Icon for Mistral model -->
                 <img src="/static/mistral.png" alt="Mistral Icon">
                 <span>Mistral<br><small>Medium<br>Conversations</small></span>
             </button>
-            <button 
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'magistral'" 
                 :class="{ active: modelConfig === 'magistral' }">
                 <!-- Icon for Mistral model -->
