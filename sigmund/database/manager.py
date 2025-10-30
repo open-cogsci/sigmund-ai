@@ -144,31 +144,137 @@ class DatabaseManager:
         conversation_data = json.loads(decrypted_data)
         conversation_data['message_history'] = self.get_message_history(
             conversation_data)
-        return conversation_data
+        return conversation_data            
 
-    def set_active_conversation(self, conversation_id: int) -> bool:
+    def _get_conversation(self, conversation_id: int):
+        """Retrieves a conversation for the current user.
+
+        Parameters
+        ----------
+        conversation_id : int
+            The ID of the conversation to retrieve
+
+        Returns
+        -------
+        Conversation or None
+            The Conversation object if found and belongs to the user, None otherwise
+        """
         try:
-            # We first get the active conversation
             conversation = Conversation.query.filter_by(
                 conversation_id=conversation_id, user_id=self.user_id).one()
+            return conversation
         except NoResultFound:
             logger.warning(f"Conversation {conversation_id} not found or does "
                            f"not belong to user {self.user_id}")
-            return False
-        # And then update the current time for that conversation so that
-        # it ends on top
-        decrypted_data = self.encryption_manager.decrypt_data(
-            conversation.data)
-        conversation_data = json.loads(decrypted_data)
-        conversation_data['last_updated'] = time.time()
+            return None
+
+    def _decrypt_conversation_data(self, conversation):
+        """Decrypts and parses conversation data.
+
+        Parameters
+        ----------
+        conversation : Conversation
+            The conversation object with encrypted data
+
+        Returns
+        -------
+        dict
+            The decrypted and parsed conversation data as a dictionary
+        """
+        decrypted_data = self.encryption_manager.decrypt_data(conversation.data)
+        return json.loads(decrypted_data)
+
+    def _encrypt_conversation_data(self, conversation_data: dict):
+        """Encrypts conversation data.
+
+        Parameters
+        ----------
+        conversation_data : dict
+            The conversation data dictionary to encrypt
+
+        Returns
+        -------
+        bytes
+            The encrypted data
+        """
         json_data = json.dumps(conversation_data)
-        encrypted_data = self.encryption_manager.encrypt_data(
-            json_data.encode('utf-8'))
+        return self.encryption_manager.encrypt_data(json_data.encode('utf-8'))
+
+    def _update_conversation_data(self, conversation, conversation_data: dict):
+        """Updates and saves encrypted conversation data.
+
+        Parameters
+        ----------
+        conversation : Conversation
+            The conversation object to update
+        conversation_data : dict
+            The updated conversation data dictionary
+        """
+        encrypted_data = self._encrypt_conversation_data(conversation_data)
         conversation.data = encrypted_data
-        # Finally we change the active conversation for the user
+        db.session.commit()
+
+    def set_active_conversation(self, conversation_id: int) -> bool:
+        """Sets the active conversation for the current user.
+
+        This method retrieves the specified conversation, updates its last_updated
+        timestamp, encrypts the updated data, and sets it as the user's active
+        conversation.
+
+        Parameters
+        ----------
+        conversation_id : int
+            The ID of the conversation to set as active
+
+        Returns
+        -------
+        bool
+            True if the conversation was successfully set as active, False if
+            the conversation was not found or doesn't belong to the user
+        """
+        conversation = self._get_conversation(conversation_id)
+        if conversation is None:
+            return False
+    
+        # Update the last_updated timestamp
+        conversation_data = self._decrypt_conversation_data(conversation)
+        conversation_data['last_updated'] = time.time()
+        self._update_conversation_data(conversation, conversation_data)
+    
+        # Change the active conversation for the user
         user = User.query.filter_by(user_id=self.user_id).one()
         user.active_conversation_id = conversation.conversation_id
         db.session.commit()
+        return True
+
+    def set_conversation_title(self, conversation_id: int, title: str) -> bool:
+        """Updates the title of a conversation.
+
+        This method retrieves the specified conversation, decrypts its data,
+        updates the title field, and re-encrypts the data before committing
+        to the database.
+
+        Parameters
+        ----------
+        conversation_id : int
+            The ID of the conversation to update
+        title : str
+            The new title for the conversation
+
+        Returns
+        -------
+        bool
+            True if the title was successfully updated, False if the
+            conversation was not found or doesn't belong to the user
+        """
+        conversation = self._get_conversation(conversation_id)
+        if conversation is None:
+            return False
+    
+        # Update the title
+        conversation_data = self._decrypt_conversation_data(conversation)
+        conversation_data['title'] = title
+        self._update_conversation_data(conversation, conversation_data)
         return True
     
     def update_active_conversation(self, conversation_data: dict) -> bool:
@@ -185,7 +291,7 @@ class DatabaseManager:
         except NoResultFound:
             logger.warning(
                 f"No active conversation to update for user {self.user_id}")
-            return False            
+            return            
         logger.info(f'updating conversation {user.active_conversation_id}')
         logger.info('deleting old messages')
         # Batch delete all messages linked to this conversation, because we
@@ -211,7 +317,7 @@ class DatabaseManager:
         logger.info('committing conversation')
         db.session.commit()
         logger.info('done')
-        return True
+        return conversation.conversation_id
 
     def list_conversations(self, query=None) -> dict:
         conversations = {}

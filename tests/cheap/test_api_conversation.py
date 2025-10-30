@@ -16,8 +16,6 @@ class TestApiConversation(BaseRoutesTestCase):
             })        
                 
     def test_new_conversation(self):
-        # Add some content to the conversation to make it count
-        self.client.post('/api/setting/set', json={'mode': 'academic'})
         response = self.client.post('/api/chat/start', data={
             'message': 'dummy'
         })
@@ -38,8 +36,6 @@ class TestApiConversation(BaseRoutesTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete_conversation(self):
-        # Add some content to the conversation to make it count
-        self.client.post('/api/setting/set', json={'mode': 'opensesame'})
         response = self.client.post('/api/chat/start', data={
             'message': 'dummy'
         })
@@ -65,6 +61,16 @@ class TestApiConversation(BaseRoutesTestCase):
             f'/api/conversation/activate/{conversation_id}',
             follow_redirects=True)
         self.assertEqual(activate_resp.status_code, 200)
+        
+    def test_update_conversation_title(self):
+        self.client.get('/api/conversation/new', follow_redirects=True)
+        for i in range(2):
+            print(f'sending message {i + 1}')
+            response = self.client.post('/api/chat/start', data={
+                'message': 'dummy'
+            })
+            for response in self.client.get('/api/chat/stream').iter_encoded():
+                pass
 
 
 if __name__ == '__main__':

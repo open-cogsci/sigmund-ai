@@ -1,6 +1,7 @@
 import logging
 import uuid
 from cryptography.fernet import InvalidToken
+import multiprocessing as mp
 from . import prompt, config, utils
 logger = logging.getLogger('sigmund')
 
@@ -10,6 +11,7 @@ class Messages:
     def __init__(self, sigmund, persistent=False):
         self._sigmund = sigmund
         self._persistent = persistent
+        self._conversation_id = None
         self.workspace_content = None
         self.workspace_language = None
         if self._persistent:
@@ -166,22 +168,7 @@ class Messages:
                 prompt.SYSTEM_PROMPT_CONDENSED,
                 summary=self._condensed_text))
         # Combine all non-empty prompt chunks
-        return '\n\n'.join(chunk for chunk in system_prompt if chunk.strip())
-        
-    def _update_title(self):
-        """The conversation title is updated when there are at least two 
-        messages, excluding the system prompt and AI welcome message. Based on
-        the last messages, a summary title is then created.
-        """
-        if len(self) <= 2 or \
-                self._conversation_title != config.default_conversation_title:
-            return
-        title_prompt = [dict(role='system', content=prompt.TITLE_PROMPT)]
-        title_prompt += self.prompt()[2:]
-        self._conversation_title = self._sigmund.condense_model.predict(
-            title_prompt).strip('"\'')
-        if len(self._conversation_title) > 100:
-            self._conversation_title = self._conversation_title[:100] + '…'
+        return '\n\n'.join(chunk for chunk in system_prompt if chunk.strip())    
 
     def load(self):
         try:
@@ -208,11 +195,34 @@ class Messages:
             self.save()
     
     def save(self):
-        self._update_title()
         conversation = {
             'condensed_text': self._condensed_text,
             'message_history': self._message_history,
             'condensed_message_history': self._condensed_message_history,
             'title': self._conversation_title,
         }
-        self._sigmund.database.update_active_conversation(conversation)
+        self._conversation_id = self._sigmund.database.update_active_conversation(conversation)
+        # We update the title in a background process so that we don't block
+        # the conversation
+        mp.Process(target=self._update_title).start()
+
+    def _update_title(self):
+        """The conversation title is updated when there are at least two 
+        messages, excluding the system prompt and AI welcome message. Based on
+        the last messages, a summary title is then created.
+    
+        This method is run in a separate process to avoid blocking the main thread.
+        """
+        if len(self) <= 2 or \
+                self._conversation_title != config.default_conversation_title:
+            return
+        logger.info('updating conversation title')
+        title_prompt = [dict(role='system', content=prompt.TITLE_PROMPT)]
+        title_prompt += self.prompt()[2:]
+        self._conversation_title = self._sigmund.condense_model.predict(
+            title_prompt).strip('"\'')
+        if len(self._conversation_title) > 100:
+            self._conversation_title = self._conversation_title[:100] + '…'
+        self._sigmund.database.set_conversation_title(
+            self._conversation_id, self._conversation_title)
+        logger.info('completed updating conversation title')
