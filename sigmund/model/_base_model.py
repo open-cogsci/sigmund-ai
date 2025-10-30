@@ -2,8 +2,6 @@ import logging
 import asyncio
 import time
 import re
-from langchain.schema import SystemMessage, AIMessage, HumanMessage, \
-    FunctionMessage
 logger = logging.getLogger('sigmund')
 
 
@@ -56,17 +54,9 @@ class BaseModel:
     def convert_message(self, message):
         if isinstance(message, str):
             return dict(role='user', content=message)
-        if isinstance(message, SystemMessage):
-            role = 'system'
-        elif isinstance(message, AIMessage):
-            role = 'assistant'
-        elif isinstance(message, HumanMessage):
-            role = 'user'
-        elif isinstance(message, FunctionMessage):
-            role = 'tool'
-        else:
-            raise ValueError(f'Unknown message type: {message}')
-        return dict(role=role, content=message.content)        
+        if isinstance(message, dict):
+            return message
+        raise ValueError(f'Unknown message type: {message}')
 
     def predict(self, messages, attachments=None, track_tokens=True):
         t0 = time.time()

@@ -1,4 +1,3 @@
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from sigmund.utils import prepare_messages, extract_workspace, remove_masked_elements
 
 
@@ -8,47 +7,47 @@ def test_prepare_messages():
     assert prepare_messages(messages) == []
 
     # Test Case 2: Single message
-    messages = [SystemMessage(content="System message")]
+    messages = [dict(role="system", content="System message")]
     assert prepare_messages(messages) == messages
 
     # Test Case 3: First AI message not allowed
     messages = [
-        SystemMessage(content="System message"),
-        AIMessage(content="AI message"),
-        HumanMessage(content="Human message")
+        dict(role="system", content="System message"),
+        dict(role="assistant", content="AI message"),
+        dict(role="user", content="Human message")
     ]
     expected_output = [
-        SystemMessage(content="System message"),
-        HumanMessage(content="Human message")
+        dict(role="system", content="System message"),
+        dict(role="user", content="Human message")
     ]
     assert prepare_messages(messages, allow_ai_first=False) == expected_output
 
     # Test Case 4: Last AI message not allowed
     messages = [
-        SystemMessage(content="System message"),
-        HumanMessage(content="Human message"),
-        AIMessage(content="AI message")
+        dict(role="system", content="System message"),
+        dict(role="user", content="Human message"),
+        dict(role="assistant", content="AI message")
     ]
     expected_output = [
-        SystemMessage(content="System message"),
-        HumanMessage(content="Human message"),
-        AIMessage(content="AI message"),
-        HumanMessage(content="Please continue!")
+        dict(role="system", content="System message"),
+        dict(role="user", content="Human message"),
+        dict(role="assistant", content="AI message"),
+        dict(role="user", content="Please continue!")
     ]
     assert prepare_messages(messages, allow_ai_last=False) == expected_output
 
     # Test Case 5: Merge consecutive messages
     messages = [
-        SystemMessage(content="System message"),
-        HumanMessage(content="Human message 1"),
-        HumanMessage(content="Human message 2"),
-        AIMessage(content="AI message 1"),
-        AIMessage(content="AI message 2")
+        dict(role="system", content="System message"),
+        dict(role="user", content="Human message 1"),
+        dict(role="user", content="Human message 2"),
+        dict(role="assistant", content="AI message 1"),
+        dict(role="assistant", content="AI message 2")
     ]
     expected_output = [
-        SystemMessage(content="System message"),
-        HumanMessage(content="Human message 1\nHuman message 2"),
-        AIMessage(content="AI message 1\nAI message 2")
+        dict(role="system", content="System message"),
+        dict(role="user", content="Human message 1\nHuman message 2"),
+        dict(role="assistant", content="AI message 1\nAI message 2")
     ]
     assert prepare_messages(messages, merge_consecutive=True) == expected_output
     

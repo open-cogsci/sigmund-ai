@@ -2,8 +2,6 @@ import logging
 import uuid
 from cryptography.fernet import InvalidToken
 from . import prompt, config, utils
-from langchain.schema import HumanMessage, AIMessage, SystemMessage, \
-    FunctionMessage
 logger = logging.getLogger('sigmund')
 
 
@@ -94,26 +92,11 @@ class Messages:
         """
         if system_prompt is None:
             system_prompt = self._system_prompt()
-        model_prompt = [SystemMessage(content=system_prompt)]
+        model_prompt = [dict(role='system', content=system_prompt)]
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
             content = utils.remove_masked_elements(content)
-            if role == 'assistant':
-                model_prompt.append(AIMessage(content=content))
-            elif role == 'user':
-                # Prefix the last message with the current workspace
-                if self.workspace_content and \
-                        msg_nr == len(self._condensed_message_history) - 1:
-                    content = prompt.render(
-                        prompt.CURRENT_WORKPACE,
-                        workspace_content=self.workspace_content,
-                        workspace_language=self.workspace_language) + content
-                model_prompt.append(HumanMessage(content=content))
-            elif role == 'tool':
-                model_prompt.append(FunctionMessage(content=content,
-                                                    name='tool_function'))
-            else:
-                raise ValueError(f'Invalid role: {role}')
+            model_prompt.append(dict(role=role, content=content))
         return model_prompt
     
     def visible_messages(self):
@@ -133,15 +116,17 @@ class Messages:
         
     def _condense_message_history(self):
         system_prompt = self._system_prompt()
-        messages = [{"role": "system", "content": system_prompt}]
-        # Determine the effective length of the uncondensed prompt while
-        # excluding masked content
+        # Determine the effective length of the condensed prompt while
+        # excluding masked content. Makes content corresponds for example to
+        # image data, and other kinds of data that are shown to the user but not
+        # passed to the model.
         prompt_length = sum([
             len(utils.remove_masked_elements(content))
             for role, content in self._condensed_message_history
         ])
         logger.info(f'system prompt length: {len(system_prompt)}')
-        logger.info(f'prompt length (without system prompt): {prompt_length}')
+        logger.info(
+            f'condensed prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
             logger.info('no need to condense')
             return
@@ -191,7 +176,7 @@ class Messages:
         if len(self) <= 2 or \
                 self._conversation_title != config.default_conversation_title:
             return
-        title_prompt = [SystemMessage(content=prompt.TITLE_PROMPT)]
+        title_prompt = [dict(role='system', content=prompt.TITLE_PROMPT)]
         title_prompt += self.prompt()[2:]
         self._conversation_title = self._sigmund.condense_model.predict(
             title_prompt).strip('"\'')

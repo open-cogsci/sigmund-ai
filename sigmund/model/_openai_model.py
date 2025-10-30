@@ -113,7 +113,7 @@ class OpenAIModel(BaseModel):
         # Only GPT-5 currently supports reasoning effort
         if self._model == 'gpt-5':
             kwargs['reasoning_effort'] = \
-                'high' if self._thinking else 'minimal'
+                'medium' if self._thinking else 'minimal'
         return fnc(model=self._model, messages=messages, **kwargs)
         
     def invoke(self, messages):
