@@ -70,7 +70,7 @@ PUBLIC_SEARCH_PROMPT = '''For each of the documentation sections below, provide 
 {{ documentation }}
 '''
 
-CURRENT_WORKPACE = '''## Current workspace content
+CURRENT_WORKSPACE = '''## Current workspace content
 
 The workspace contains the following content:
 

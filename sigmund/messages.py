@@ -98,6 +98,14 @@ class Messages:
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
             content = utils.remove_masked_elements(content)
+            if role == 'user':
+                # Prefix the last message with the current workspace
+                if self.workspace_content and \
+                        msg_nr == len(self._condensed_message_history) - 1:
+                    content = prompt.render(
+                        prompt.CURRENT_WORKSPACE,
+                        workspace_content=self.workspace_content,
+                        workspace_language=self.workspace_language) + content
             model_prompt.append(dict(role=role, content=content))
         return model_prompt
     
@@ -150,7 +158,7 @@ class Messages:
                 else f'User said: {content}'
                 for role, content in condense_messages))
         result = self._sigmund.condense_model.predict(condense_prompt)
-        # Just in case a model gets confused and returns a tool call
+        # Just in case a model gets confused and returns a tool call.
         if not isinstance(result, str):
             logger.error(f'condense model returned non-string result: {result}')
             return
