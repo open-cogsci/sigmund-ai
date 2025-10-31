@@ -9,4 +9,5 @@ class TestApiSearch(BaseRoutesTestCase):
         super().setUp()
                 
     def test_setting(self):
-        response = self.client.get('/api/search/canvas%20python')
+        response = self.client.post('/public/search', json={'query': 'test'})
+        self.assertEqual(response.status_code, 200)

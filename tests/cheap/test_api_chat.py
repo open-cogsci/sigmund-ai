@@ -9,6 +9,7 @@ class TestApiChat(BaseRoutesTestCase):
         super().setUp()
         config.settings_default['model_config'] = 'dummy'
         # Check that before login we are not allowed to use the API
+        print('*** This should show an authorization error')
         response = self.client.post('/api/chat/start', json={
             'message': 'hello'
         })
