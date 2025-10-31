@@ -93,9 +93,10 @@ class OpenAIModel(BaseModel):
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:
             function = tool_calls[0].function
-            for tool in self._tools:
-                if tool.name == function.name:
-                    return tool.bind(function.arguments)
+            if self._tools:
+                for tool in self._tools:
+                    if tool.name == function.name:
+                        return tool.bind(function.arguments)
             logger.warning(f'invalid tool called: {function}')
             return self.invalid_tool
         return response.choices[0].message.content

@@ -149,8 +149,12 @@ class Messages:
                 f'You said: {content}' if role == 'system' 
                 else f'User said: {content}'
                 for role, content in condense_messages))
-        self._condensed_text = self._sigmund.condense_model.predict(
-            condense_prompt)
+        result = self._sigmund.condense_model.predict(condense_prompt)
+        # Just in case a model gets confused and returns a tool call
+        if not isinstance(result, str):
+            logger.error(f'condense model returned non-string result: {result}')
+            return
+        self._condensed_text = result.strip()
         
     def _system_prompt(self):
         """The system prompt that is used for question answering consists of
@@ -219,8 +223,13 @@ class Messages:
         logger.info('updating conversation title')
         title_prompt = [dict(role='system', content=prompt.TITLE_PROMPT)]
         title_prompt += self.prompt()[2:]
-        self._conversation_title = self._sigmund.condense_model.predict(
-            title_prompt).strip('"\'')
+        suggested_title = self._sigmund.condense_model.predict(title_prompt)
+        # The prediction may be a tool call, so we need to check if it is a str.
+        # This should not ordinarily happen, but sometimes models get confused.
+        if not isinstance(suggested_title, str):
+            logger.error(f'suggested conversation title is not str, but: {suggested_title}')
+            return
+        self._conversation_title = suggested_title.strip('"\'')
         if len(self._conversation_title) > 100:
             self._conversation_title = self._conversation_title[:100] + '…'
         self._sigmund.database.set_conversation_title(

@@ -160,11 +160,12 @@ class AnthropicModel(BaseModel):
         thinking_block = None
         for block in response.content:
             if block.type == 'tool_use':
-                for tool in self._tools:
-                    if tool.name == block.name:
-                        return tool.bind(
-                            json.dumps(block.input),
-                            message_prefix=tool_message_prefix + '\n\n')
+                if self._tools:
+                    for tool in self._tools:
+                        if tool.name == block.name:
+                            return tool.bind(
+                                json.dumps(block.input),
+                                message_prefix=tool_message_prefix + '\n\n')
                 return self.invalid_tool
             if block.type == 'text':
                 text.append(block.text)
