@@ -16,6 +16,7 @@ class DatabaseManager:
     
     def __init__(self, sigmund, username: str,
                  encryption_key: [str, bytes]=None):
+        self.transient_settings = {}
         self._sigmund = sigmund
         self.username = username
         self.encryption_manager = EncryptionManager(encryption_key)
@@ -510,15 +511,21 @@ class DatabaseManager:
         value as specified in the config or None if no default has been 
         specified.
         """
+        if key in self.transient_settings:
+            return self.transient_settings[key]
         setting = db.session.query(Setting).filter_by(
             user_id=self.user_id, key=key).first()
         return setting.value if setting \
             else config.settings_default.get(key, None)
 
-    def set_setting(self, key: str, value: str):
+    def set_setting(self, key: str, value: str, transient: bool = False):
         """Set a setting to specified value for the current user. If the
-        setting already exists, overwrite it.
+        setting already exists, overwrite it. When transient is True, the 
+        setting is not stored in the database, but only used for this session.
         """
+        if transient:
+            self.transient_settings[key] = value
+            return
         setting = Setting.query.filter_by(
             user_id=self.user_id, key=key).first()
         if setting:
@@ -536,4 +543,5 @@ class DatabaseManager:
             user_id=self.user_id).all()
         for setting in setting_objs:
             settings[setting.key] = setting.value
+        settings.update(self.transient_settings)
         return settings

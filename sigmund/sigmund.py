@@ -20,23 +20,23 @@ class Sigmund:
     user_id: A user name
     persistent: Indicates whether the current session should be persistent in
         the sense of using the database.
-    search_first: Indicates whether the answer phase should be preceded by a
-        documentation search phase. If None, the config default will be used.
+    encryption_key: A key to encrypt the database.
     model_config: Indicates the model configuration. If none, the config
         default will be used.
-    search_tools: A list of tools to be used by the documentation search (if
-        enabled). Values are class names from sigmund.tools. If None, the
-        config default will be used.
-    answer_tools: A list of tools to be used during the answer phase (if
-        enabled). Values are class names from sigmund.tools. If None, the
-        config default will be used.
+    tools: A list of tools to use. If None, the config default will be used.
+    transient_settings: A dictionary of settings that will be used for the
+        current session only.
     """
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: str = None,
                  model_config: str = None,
-                 tools: list = None):
+                 tools: list = None,
+                 transient_settings: dict = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
+        if transient_settings:
+            logger.info(f'using transient settings: {transient_settings}')
+            self.database.transient_settings = transient_settings
         # Available model configs may change with updates, but the user settings
         # are not updated along with this. Therefore, if a model config doesn't
         # exist, we reset to the default.
@@ -48,7 +48,6 @@ class Sigmund:
             model_config = config.settings_default['model_config']
             self.database.set_setting('model_config', model_config)
         self.model_config = config.model_config[model_config]
-
         self.documentation = Documentation(self)
         self.messages = Messages(self, persistent)
         if tools is None:

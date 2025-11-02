@@ -92,7 +92,7 @@ function showImageAttachments(message) {
     });
 }
 
-async function sendMessage(message, forwardReplyToSocket = false) {
+async function sendMessage(message, forwardReplyToSocket = false, transient_settings = null) {
     console.log('user message: ' + message)
     setFavicon('static/loading.svg');
     const user_message_id = generateUUID()
@@ -175,6 +175,7 @@ async function sendMessage(message, forwardReplyToSocket = false) {
     formData.append('workspace_content', workspace.getValue());
     formData.append('workspace_language', workspace.getOption('mode'));
     formData.append('message_id', user_message_id);
+    formData.append('transient_settings', transient_settings);
 
     // Append attached files
     attachments.forEach(file => {

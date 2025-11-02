@@ -59,6 +59,33 @@ class TestApiChat(BaseRoutesTestCase):
                 assert 'dummy reply' in data['response']
             elif i == 3:
                 assert data['action'] == 'close'
+                
+    def test_chat_transient_settings(self):
+        self.client.post('/api/setting/set',
+            json={
+                  'collection_opensesame': 'false',
+                  'collection_datamatrix': 'false'
+            })
+        response = self.client.post('/api/chat/start', data={
+            'message': 'hello',
+            'transient_settings': json.dumps({
+                  'collection_opensesame': 'true',
+                  'collection_datamatrix': 'true'
+            })
+        })
+        assert response.status_code == 200
+        response = self.client.get('/api/chat/stream')
+        assert response.status_code == 200
+        for i, line in enumerate(response.iter_encoded()):
+            data = json.loads(line.decode().lstrip('data:'))
+            if i == 0:
+                assert data['action'] == 'set_loading_indicator'
+            elif i == 1:
+                assert data['action'] == 'set_loading_indicator'
+            elif i == 2:
+                assert 'dummy reply' in data['response']
+            elif i == 3:
+                assert data['action'] == 'close'
 
 
 if __name__ == '__main__':

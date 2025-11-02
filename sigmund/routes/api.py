@@ -16,19 +16,20 @@ api_blueprint = Blueprint('api', __name__)
 @login_required
 def api_chat_start():
 
-    # For multipart/form-data, use request.form for text data
+    # Store request data in the session
     message = request.form.get('message', '')
     workspace_content = request.form.get('workspace_content', '')
     workspace_language = request.form.get('workspace_language', '')
     message_id = request.form.get('message_id', '')
-
-    # Example: store the user inputs in session
+    transient_settings = request.form.get('transient_settings', '{}')
+    transient_settings = json.loads(transient_settings)
     session['user_message']       = message
     session['workspace_content']  = workspace_content
     session['workspace_language'] = workspace_language
     session['message_id']         = message_id
+    session['transient_settings'] = transient_settings
 
-    sigmund = get_sigmund()
+    sigmund = get_sigmund(transient_settings=transient_settings)
     redis_client.delete(f'stream_cancel_{sigmund.user_id}')
 
     # Grab attached files from the request
@@ -73,9 +74,10 @@ def api_chat_stream():
     workspace_content = session.get('workspace_content', '')
     workspace_language = session.get('workspace_language', '')
     message_id = session.get('message_id', '')
+    transient_settings = session.get('transient_settings')
 
     # Retrieve attachments from Redis
-    sigmund = get_sigmund()
+    sigmund = get_sigmund(transient_settings=transient_settings)
     attachments_json = redis_client.get(f'attachments_{sigmund.user_id}')
     attachments = []
     if attachments_json:
