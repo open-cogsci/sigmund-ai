@@ -100,12 +100,12 @@ model_config = {
         'answer_model': 'gpt-5-thinking'
     },
     'anthropic': {
-        'condense_model': 'claude-4-5-sonnet',
+        'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
         'answer_model': 'claude-4-5-sonnet'
     },
     'anthropic_thinking': {
-        'condense_model': 'claude-4-5-sonnet',
+        'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
         'answer_model': 'claude-4-5-sonnet-thinking'
     },
@@ -139,7 +139,8 @@ mistral_kwargs = {}
 #
 tools = ['search_google_scholar', 'execute_code', 'generate_image',
          'opensesame_select_item', 'opensesame_new_item',
-         'opensesame_remove_item_from_parent', 'opensesame_rename_item']
+         'opensesame_remove_item_from_parent', 'opensesame_rename_item',
+         'opensesame_add_existing_item_to_parent']
 
 # SETTINGS
 #
@@ -148,16 +149,17 @@ settings_default = {
     # Indicates the model configuration as specified above
     'model_config': 'openai',
     # Indicates which tools are enabled
-    'tool_execute_code': 'true',
     'tool_search_google_scholar': 'true',
-    'tool_generate_image': 'true',
+    'tool_execute_code': 'false',
+    'tool_generate_image': 'false',
     'tool_opensesame_select_item': 'false',
     'tool_opensesame_new_item': 'false',
     'tool_opensesame_remove_item_from_parent': 'false',
     'tool_opensesame_rename_item': 'false',
+    'tool_opensesame_add_existing_item_to_parent': 'false',
     # Indicates which library collections are enabled
     'collection_opensesame': 'true',
-    'collection_datamatrix': 'true',
+    'collection_datamatrix': 'false',
     'collection_forum': 'false'
 }
 

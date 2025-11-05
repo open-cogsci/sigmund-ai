@@ -21,7 +21,7 @@ class opensesame_remove_item_from_parent(BaseTool):
     
     def __call__(self, parent_item_name, index):
         data = {
-            "command": "new_item",
+            "command": "remove_item_from_parent",
             "parent_item_name": parent_item_name,
             "index": index
         }

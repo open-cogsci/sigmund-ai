@@ -21,7 +21,7 @@ class opensesame_rename_item(BaseTool):
     
     def __call__(self, from_item_name, to_item_name):
         data = {
-            "command": "select_item",
+            "command": "rename_item",
             "from_item_name": from_item_name,
             "to_item_name": to_item_name
         }
