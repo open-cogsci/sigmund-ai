@@ -116,6 +116,15 @@ class AnthropicModel(BaseModel):
                 break
             logger.info('dropping duplicate user message')
             messages.remove(next_message)
+        # The first message is used as the system message. This has to be a 
+        # text-only, which means that any tool_use block needs to be removed.
+        # By extension, this means that any tool_result block in the subsequent
+        # user message should also be removed, because a tool_result block needs
+        # to be preceded by a tool_use block.
+        if isinstance(messages[0]['content'], list):
+            logger.info('removing tool use and result from first two messages')
+            messages[0]['content'] = messages[0]['content'][0]['text']
+            messages[1]['content'] = messages[1]['content'][0]['content'][0]['text']
         # print('*** after tool processing')
         # pprint.pprint(messages)
         # print('***')            
@@ -198,7 +207,7 @@ class AnthropicModel(BaseModel):
         kwargs.update(config.anthropic_kwargs)
         # If the first message is the system prompt, we need to separate this
         # from the user and assistant messages, because the Anthropic messages
-        # API takes this as a separate keyword argument
+        # API takes this as a separate keyword argument.
         if messages[0]['role'] == 'system':
             kwargs['system'] = messages[0]['content']
             messages = messages[1:]
@@ -213,6 +222,8 @@ class AnthropicModel(BaseModel):
             import pprint
             print('=== an error occurred while sending messages')
             pprint.pprint(messages)
+            print('=== system message')
+            print(kwargs['system'])
             print('***')
             raise
         
