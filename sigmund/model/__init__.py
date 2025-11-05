@@ -23,6 +23,7 @@ ANTHROPIC_MODELS = {
     # Haiku
     'claude-3-haiku': 'claude-3-haiku-20240307',
     'claude-3.5-haiku': 'claude-3-5-haiku-latest',
+    'claude-4-5-haiku': 'claude-haiku-4-5',
     # Sonnet
     'claude-3-sonnet': 'claude-3-sonnet-20240229',
     'claude-3.5-sonnet': 'claude-3-5-sonnet-latest',
