@@ -94,7 +94,7 @@ function connectWebSocket() {
                     // Send message (attachments will be included automatically)
                     // and indicate that the reply should be forwarded to the 
                     // socket.
-                    sendMessage(data.message, true, data.transient_settings);
+                    sendMessage(data.message, true, data.transient_settings, data.transient_system_prompt);
                     
                     // Clear message input after sending
                     messageInput.value = '';

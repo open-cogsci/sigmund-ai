@@ -22,11 +22,13 @@ class User(UserMixin):
         logger.info(f'initializing user id: {self.id}')
 
 
-def get_sigmund(db_cache='default', transient_settings=None):
+def get_sigmund(db_cache='default', transient_settings=None,
+                transient_system_prompt=None):
     config.db_cache = db_cache
     return Sigmund(user_id=current_user.get_id(), persistent=True,
                    encryption_key=session['encryption_key'],
-                   transient_settings=transient_settings)
+                   transient_settings=transient_settings,
+                   transient_system_prompt=transient_system_prompt)
     
 
 def chat_page():

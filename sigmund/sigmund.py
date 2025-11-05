@@ -26,17 +26,21 @@ class Sigmund:
     tools: A list of tools to use. If None, the config default will be used.
     transient_settings: A dictionary of settings that will be used for the
         current session only.
+    transient_system_prompt: A system prompt that will be added to the default
+        system prompt for the current session only.
     """
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: str = None,
                  model_config: str = None,
                  tools: list = None,
-                 transient_settings: dict = None):
+                 transient_settings: dict = None,
+                 transient_system_prompt: str = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
         if transient_settings:
             logger.info(f'using transient settings: {transient_settings}')
             self.database.transient_settings = transient_settings
+        self.transient_system_prompt = transient_system_prompt
         # Available model configs may change with updates, but the user settings
         # are not updated along with this. Therefore, if a model config doesn't
         # exist, we reset to the default.

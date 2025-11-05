@@ -169,6 +169,8 @@ class Messages:
         several fragments.
         """
         system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY]
+        if self._sigmund.transient_system_prompt:
+            system_prompt.append(self._sigmund.transient_system_prompt)
         # If available, documentation is also included in the prompt
         if len(self._sigmund.documentation):
             system_prompt.append(self._sigmund.documentation.prompt())
