@@ -207,7 +207,14 @@ class AnthropicModel(BaseModel):
                 "type": "enabled",
                 "budget_tokens": config.anthropic_max_thinking_tokens
             }
-        return fnc(model=self._model, messages=messages, **kwargs)
+        try:
+            return fnc(model=self._model, messages=messages, **kwargs)
+        except Exception:            
+            import pprint
+            print('=== an error occurred while sending messages')
+            pprint.pprint(messages)
+            print('***')
+            raise
         
     def invoke(self, messages):
         return self._anthropic_invoke(self._client.messages.create, messages)
