@@ -4,3 +4,5 @@ from ._execute_code import execute_code
 from ._generate_image import generate_image
 from ._opensesame_select_item import opensesame_select_item
 from ._opensesame_new_item import opensesame_new_item
+from ._opensesame_remove_item_from_parent import opensesame_remove_item_from_parent
+from ._opensesame_rename_item import opensesame_rename_item

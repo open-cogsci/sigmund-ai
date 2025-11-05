@@ -138,7 +138,8 @@ mistral_kwargs = {}
 # TOOLS
 #
 tools = ['search_google_scholar', 'execute_code', 'generate_image',
-         'opensesame_select_item', 'opensesame_new_item']
+         'opensesame_select_item', 'opensesame_new_item',
+         'opensesame_remove_item_from_parent', 'opensesame_rename_item']
 
 # SETTINGS
 #
@@ -152,6 +153,8 @@ settings_default = {
     'tool_generate_image': 'true',
     'tool_opensesame_select_item': 'false',
     'tool_opensesame_new_item': 'false',
+    'tool_opensesame_remove_item_from_parent': 'false',
+    'tool_opensesame_rename_item': 'false',
     # Indicates which library collections are enabled
     'collection_opensesame': 'true',
     'collection_datamatrix': 'true',

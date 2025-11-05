@@ -25,7 +25,7 @@ class opensesame_new_item(BaseTool):
             'description': 'The zero-based index of the new item inside the parent item.'
         },        
     }
-    required_arguments = ['item_name']
+    required_arguments = ['item_name', 'item_type', 'parent_item_name', 'index']
     
     def __call__(self, item_name, item_type, parent_item_name, index):
         data = {
@@ -37,5 +37,5 @@ class opensesame_new_item(BaseTool):
         }
         # We don't ask for feedback directly, because OpenSesame will reply
         # with a user message.
-        return f'Please create a new item named {item_name}.', \
-            json.dumps(data, indent=2), 'json', False
+        return (f'Using tool: {self.__class__.__name__}',
+                json.dumps(data, indent=2), 'json', False)

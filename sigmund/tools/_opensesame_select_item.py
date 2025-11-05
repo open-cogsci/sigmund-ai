@@ -22,5 +22,5 @@ class opensesame_select_item(BaseTool):
         }
         # We don't ask for feedback directly, because OpenSesame will reply
         # with a user message.
-        return f'Please select {item_name}.', json.dumps(data, indent=2), \
-            'json', False
+        return (f'Using tool: {self.__class__.__name__}',
+                json.dumps(data, indent=2), 'json', False)
