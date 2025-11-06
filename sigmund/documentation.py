@@ -24,7 +24,7 @@ class Documentation:
         
     @property
     def enabled(self):
-        return self._collections
+        return self._collections or self._foundation_document_topics
         
     def _doc_to_str(self, doc):
         s = '<document>\n'
@@ -78,7 +78,7 @@ You have retrieved the following documentation to answer the user's question:
         Finally, we insert foundation documents that match the topic of the
         search hits.
         """
-        if not self._collections:
+        if not self._collections and not self._foundation_document_topics:
             logger.info('library search disabled')
             return
         if k is None:
@@ -89,11 +89,14 @@ You have retrieved the following documentation to answer the user's question:
             max_distance_fallback = config.search_max_distance_fallback
         if fallback:
             max_distance = max_distance_fallback
-        regular_results = self._library.search(
-            query, foundation=False, howto=False, k=k,
-            max_distance=max_distance, collection=self._collections)        
-        logger.info(f'found {len(regular_results)} regular results')
-        if howtos:
+        if self._collections:
+            regular_results = self._library.search(
+                query, foundation=False, howto=False, k=k,
+                max_distance=max_distance, collection=self._collections)
+            logger.info(f'found {len(regular_results)} regular results')
+        else:
+            regular_results = []
+        if howtos and self._collections:
             howto_results = self._library.search(
                 query, foundation=False, howto=True, k=k,
                 max_distance=max_distance, collection=self._collections)
@@ -108,6 +111,9 @@ You have retrieved the following documentation to answer the user's question:
         else:
             foundation_results = []            
         self._documents = foundation_results + results
+        if config.log_replies:
+            for doc in self._documents:
+                logger.info(f'topic: {doc.get("topic", None)}, foundation: {doc.get("foundation", None)}, howto: {doc.get("howto", None)}, title: {doc.get("title", None)}')
         if not fallback and not self._documents:
             self.poor_match = True
             logger.warning('no results found, retrying with higher threshold')

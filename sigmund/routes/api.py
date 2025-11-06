@@ -24,8 +24,10 @@ def api_chat_start():
     transient_settings = request.form.get('transient_settings', '{}')
     transient_settings = json.loads(transient_settings)
     transient_system_prompt = request.form.get('transient_system_prompt', '')
-    foundation_document_topics = request.form.get('foundation_document_topics', '')
-    foundation_document_topics = json.loads(foundation_document_topics)
+    foundation_document_topics = request.form.get('foundation_document_topics',
+                                                  None)
+    if foundation_document_topics is not None:
+        foundation_document_topics = json.loads(foundation_document_topics)
     session['user_message']       = message
     session['workspace_content']  = workspace_content
     session['workspace_language'] = workspace_language

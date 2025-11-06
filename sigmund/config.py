@@ -21,13 +21,6 @@ flask_secret_key = os.environ.get('FLASK_SECRET_KEY', '0123456789ABCDEF')
 # with the user password
 encryption_salt = os.environ.get('SIGMUND_ENCRYPTION_SALT', '0123456789ABCDEF').encode()
 
-# FILES AND FOLDERS
-#
-# Contains the encrypted message history
-sessions_folder = 'sessions'
-# Contains the encrypted uploads
-uploads_folder = 'uploads'
-
 # PROMPT HISTORY
 #
 # The maximum length of a prompt in characters. If the prompt exceeds this 
@@ -36,13 +29,6 @@ max_prompt_length = 20000
 # The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
-# LIBRARY INDEXING
-#
-# The number of documents that are indexed at once and the delay after each
-# chunk. This is to avoid exceeded the rate limits of the OpenAI API
-chunk_size = 100
-chunk_throttle = .1
-
 # MESSAGES
 # The maximum length of a user message
 max_message_length = 10000
@@ -50,12 +36,6 @@ max_message_length = 10000
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant! How can I help you?'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
-# The number of previous messages for which tool results should be 
-# retained.
-keep_tool_results = 4
-# Tool results larger than this are not included in the prompt used for
-# generating
-large_tool_result_length = 50000
 
 # RATE LIMITS
 #
@@ -185,8 +165,8 @@ search_min_query_length = 1000
 # number of tokens. We truncate longer queries.
 search_max_query_length = 10000
 # The number of documents. This applies separately to regular documentation and
-# howtos, and does include foundation documents.
-search_docs_max = 4
+# howtos, and does not include foundation documents.
+search_docs_max = 2
 # The embedding model used for search. This has the name of an OpenAI embedding
 # model
 search_embedding_model = 'text-embedding-3-large'
