@@ -23,12 +23,14 @@ class User(UserMixin):
 
 
 def get_sigmund(db_cache='default', transient_settings=None,
-                transient_system_prompt=None):
+                transient_system_prompt=None,
+                foundation_document_topics=None):
     config.db_cache = db_cache
     return Sigmund(user_id=current_user.get_id(), persistent=True,
                    encryption_key=session['encryption_key'],
                    transient_settings=transient_settings,
-                   transient_system_prompt=transient_system_prompt)
+                   transient_system_prompt=transient_system_prompt,
+                   foundation_document_topics=foundation_document_topics)
     
 
 def chat_page():

@@ -28,13 +28,16 @@ class Sigmund:
         current session only.
     transient_system_prompt: A system prompt that will be added to the default
         system prompt for the current session only.
+    foundation_document_topics: A list of topics. Foundation documents matching 
+        these topics are always included in the context.
     """
     def __init__(self, user_id: str, persistent: bool = False,
                  encryption_key: str = None,
                  model_config: str = None,
                  tools: list = None,
                  transient_settings: dict = None,
-                 transient_system_prompt: str = None):
+                 transient_system_prompt: str = None,
+                 foundation_document_topics: list = None):
         self.user_id = user_id
         self.database = DatabaseManager(self, user_id, encryption_key)
         if transient_settings:
@@ -52,7 +55,8 @@ class Sigmund:
             model_config = config.settings_default['model_config']
             self.database.set_setting('model_config', model_config)
         self.model_config = config.model_config[model_config]
-        self.documentation = Documentation(self)
+        self.documentation = Documentation(
+            self, foundation_document_topics=foundation_document_topics)
         self.messages = Messages(self, persistent)
         if tools is None:
             tools = [t for t in config.tools

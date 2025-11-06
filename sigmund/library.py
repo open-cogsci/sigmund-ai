@@ -306,10 +306,12 @@ class Library:
 
         return formatted_results
         
-    def retrieve_foundation_documents(self, results):
-        topics = set()
+    def retrieve_foundation_documents(self,
+                                      results: dict | None = None,
+                                      topics: list | None = None) -> list:
+        topics = set() if topics is None else set(topics)
         for result in results:
-            topics |= set(result.get('topics', set()))
+            topics |= set(result.get('topics', set()))        
         foundation_results = []
         for topic in topics:
             results = self.search(None, k=1, topic=topic, foundation=True)

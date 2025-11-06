@@ -7,8 +7,9 @@ logger = logging.getLogger('sigmund')
 
 class Documentation:
     
-    def __init__(self, sigmund):
+    def __init__(self, sigmund, foundation_document_topics=None):
         self._sigmund = sigmund
+        self._foundation_document_topics = foundation_document_topics
         self._documents = []
         self.poor_match = False
         self._library = Library(
@@ -101,10 +102,11 @@ You have retrieved the following documentation to answer the user's question:
             howto_results = []
         results = regular_results + howto_results
         if foundation:
-            foundation_results = self._library.retrieve_foundation_documents(results)
+            foundation_results = self._library.retrieve_foundation_documents(
+                results, self._foundation_document_topics)
             logger.info(f'found {len(foundation_results)} foundation documents')
         else:
-            foundation_results = []
+            foundation_results = []            
         self._documents = foundation_results + results
         if not fallback and not self._documents:
             self.poor_match = True
