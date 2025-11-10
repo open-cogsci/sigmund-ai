@@ -28,7 +28,7 @@ class BaseModel:
         self.json_mode = False
         
     def invalid_tool(self) -> str:
-        return 'Invalid tool', None, False
+        return 'Invalid tool', None, 'markdown', False
         
     def get_response(self, response) -> [str, callable]:
         return response.content
