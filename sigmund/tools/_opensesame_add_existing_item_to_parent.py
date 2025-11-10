@@ -5,7 +5,7 @@ logger = logging.getLogger('sigmund')
 
 
 class opensesame_add_existing_item_to_parent(BaseTool):
-    """This tool allows you to add an existing item to a parent item, typically a loop or a sequence. This creates a linked copy of the item. After the item has been added you will be able to define its script."""
+    """Adds an existing item to a parent item, typically a loop or a sequence. This creates a linked copy of the item."""
     
     arguments = {
         'item_name': {
@@ -32,5 +32,5 @@ class opensesame_add_existing_item_to_parent(BaseTool):
         }
         # We don't ask for feedback directly, because OpenSesame will reply
         # with a user message.
-        return (f'Using tool: {self.__class__.__name__}',
+        return ('(Suggesting OpenSesame action)',
                 json.dumps(data, indent=2), 'json', False)

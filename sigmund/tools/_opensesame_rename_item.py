@@ -5,16 +5,16 @@ logger = logging.getLogger('sigmund')
 
 
 class opensesame_rename_item(BaseTool):
-    """This tool allows you to select an item in the OpenSesame user interface. """
+    """Renames an item."""
     
     arguments = {
         'from_item_name': {
             'type': 'string',
-            'description': 'The current name of the item to rename.'
+            'description': 'The current name of the item.'
         },
         'to_item_name': {
             'type': 'string',
-            'description': 'The target name of the item to rename.'
+            'description': 'The target name of the item.'
         }
     }
     required_arguments = ['from_item_name', 'to_item_name']

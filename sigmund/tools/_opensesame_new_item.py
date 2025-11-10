@@ -5,7 +5,7 @@ logger = logging.getLogger('sigmund')
 
 
 class opensesame_new_item(BaseTool):
-    """This tool allows you to create a new item and add it to a parent item, typically a loop or a sequence. After the item has been created you will be able to define its script."""
+    """Creates a new item and adds it to a parent item, which is typically a loop or a sequence. After the item has been created you will be able to define its script."""
     
     arguments = {
         'item_name': {
@@ -37,5 +37,5 @@ class opensesame_new_item(BaseTool):
         }
         # We don't ask for feedback directly, because OpenSesame will reply
         # with a user message.
-        return (f'Using tool: {self.__class__.__name__}',
+        return ('(Suggesting OpenSesame action)',
                 json.dumps(data, indent=2), 'json', False)

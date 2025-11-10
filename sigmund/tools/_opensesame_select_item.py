@@ -5,7 +5,7 @@ logger = logging.getLogger('sigmund')
 
 
 class opensesame_select_item(BaseTool):
-    """This tool allows you to select an item in the OpenSesame user interface. """
+    """Selects an item. After the item has been selected, you will be able to modify its script."""
     
     arguments = {
         'item_name': {
@@ -22,5 +22,5 @@ class opensesame_select_item(BaseTool):
         }
         # We don't ask for feedback directly, because OpenSesame will reply
         # with a user message.
-        return (f'Using tool: {self.__class__.__name__}',
+        return ('(Suggesting OpenSesame action)',
                 json.dumps(data, indent=2), 'json', False)
