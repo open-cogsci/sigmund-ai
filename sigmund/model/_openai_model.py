@@ -63,6 +63,25 @@ class OpenAIModel(BaseModel):
         if len(messages) > 1 and messages[1]['role'] == 'tool':
             logger.info('insert dummy assistant message before tool')
             messages.insert(1, {'role': 'assistant'})
+        # Delete all tool messages that are preceded by user messages. This can
+        # happen if the message history has been modified, for example through
+        # message deletions. # Tool messages are also not allowed to be first
+        clean_messages = []
+        for i, message in enumerate(messages):
+            if message['role'] != 'tool':
+                clean_messages.append(message)
+                continue
+            if i == 0:
+                logger.warning('first message is a tool message')
+                continue
+            prev_message = messages[i - 1]
+            if prev_message['role'] != 'assistant':
+                logger.warning('tool message not preceded by assistant message')
+                continue
+            clean_messages.append(message)
+        messages = clean_messages
+        # Make sure that tool messages are linked to preceding assistent 
+        # messages
         for i, message in enumerate(messages):
             if i == 0 or message['role'] != 'tool':
                 continue
