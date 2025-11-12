@@ -1,7 +1,5 @@
 import logging
-# import re
 import json
-import functools
 from typing import Optional, Tuple
 logger = logging.getLogger('sigmund')
 
