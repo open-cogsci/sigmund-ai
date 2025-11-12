@@ -1,6 +1,4 @@
-import json
-from .test_app import BaseRoutesTestCase
-from sigmund import config
+from ..cheap.test_app import BaseRoutesTestCase
 
 
 class TestApiSearch(BaseRoutesTestCase):
