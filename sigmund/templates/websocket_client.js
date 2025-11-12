@@ -115,6 +115,8 @@ function connectWebSocket() {
                     document.getElementById('tool-execute-code').checked = false;
                 } else if (data.action === 'clear_conversation') {
                     window.location.href = '/api/conversation/clear';
+                } else if (data.action === 'cancel_streaming') {
+                    cancelStreaming();
                 }
             } catch (error) {
                 // If the message does not adhere to the expected format, ignore it.
