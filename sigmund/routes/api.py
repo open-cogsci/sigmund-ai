@@ -12,6 +12,12 @@ logger = logging.getLogger('sigmund')
 api_blueprint = Blueprint('api', __name__)
 
 
+@api_blueprint.route('/health', methods=['GET'])
+@login_required
+def health():
+    return jsonify(success=True)
+
+
 @api_blueprint.route('/chat/start', methods=['POST'])
 @login_required
 def api_chat_start():

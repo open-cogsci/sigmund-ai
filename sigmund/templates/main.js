@@ -2,6 +2,7 @@
 let currentEventSource = null;
 let currentLoadingInterval = null;
 let currentLoadingMessageBox = null;
+let isStreaming = false;
 
 function initMain(event) {
 
@@ -280,6 +281,26 @@ function createAIMessageElement(data, metadata, forwardReplyToSocket) {
     return aiMessage;
 }
 
+function displayErrorMessage() {
+    const errorMessageBox = document.createElement('div');
+    errorMessageBox.className = 'message-ai message message-error';
+    errorMessageBox.setAttribute('data-message-id', generateUUID());
+
+    let errorHTML = `<p>The connection to the server has been lost. This might be because:</p>
+<ul>
+    <li>Your login session has expired</li>
+    <li>The server is temporarily unavailable</li>
+    <li>There's a network connectivity issue</li>
+</ul>
+<p>Please reload the page to reconnect.</p>
+<button onclick="location.reload()" class="modal-reload-button">Reload Page</button>
+`;
+
+    errorMessageBox.innerHTML = errorHTML;
+    responseDiv.appendChild(errorMessageBox);
+    errorMessageBox.scrollIntoViewIfNeeded();
+}
+
 function endStream() {
     clearAttachments();
     removeLoadingIndicator({
@@ -291,6 +312,7 @@ function endStream() {
         currentEventSource.close();
         currentEventSource = null;
     }
+    isStreaming = false;
 }
 
 function cancelStreaming() {
@@ -320,6 +342,7 @@ async function sendMessage(
 ) {
     console.log('user message: ' + message);
     setFavicon('static/loading.svg');
+    isStreaming = true;
     const user_message_id = generateUUID();
     messageCounter.innerText = '';
 
@@ -346,6 +369,7 @@ async function sendMessage(
         });
     } catch (e) {
         console.error('Failed to start chat session:', e);
+        isStreaming = false;
         return;
     }
 
@@ -376,12 +400,18 @@ async function sendMessage(
         setFavicon(originalFavicon);
     };
 
-    currentEventSource.onerror = function(error) {
-        console.error('EventSource failed:', error);
+    currentEventSource.onerror = function(event) {
+        console.error('EventSource failed:', event);
+
+        // Close the event source and clean up
         currentEventSource.close();
         removeLoadingIndicator(loadingInfo);
         enableMessageInput();
-        responseDiv.innerText = 'Sigmund: An error occurred, sorry! Please restart the conversation and try again.';
+        setFavicon(originalFavicon);
+        isStreaming = false;
+
+        // Display a generic error message
+        displayErrorMessage();
     };
 
     // Set up cancel button
