@@ -301,6 +301,25 @@ function displayErrorMessage() {
     errorMessageBox.scrollIntoViewIfNeeded();
 }
 
+function handleStreamingError(loadingInfo, error) {
+    console.error('Streaming error:', error);
+
+    // Close the event source if it exists
+    if (currentEventSource) {
+        currentEventSource.close();
+        currentEventSource = null;
+    }
+
+    // Clean up UI/loading state
+    removeLoadingIndicator(loadingInfo);
+    enableMessageInput();
+    setFavicon(originalFavicon);
+    isStreaming = false;
+
+    // Show a unified error message
+    displayErrorMessage();
+}
+
 function endStream() {
     clearAttachments();
     removeLoadingIndicator({
@@ -369,7 +388,7 @@ async function sendMessage(
         });
     } catch (e) {
         console.error('Failed to start chat session:', e);
-        isStreaming = false;
+        handleStreamingError(loadingInfo, e);
         return;
     }
 
@@ -401,17 +420,7 @@ async function sendMessage(
     };
 
     currentEventSource.onerror = function(event) {
-        console.error('EventSource failed:', event);
-
-        // Close the event source and clean up
-        currentEventSource.close();
-        removeLoadingIndicator(loadingInfo);
-        enableMessageInput();
-        setFavicon(originalFavicon);
-        isStreaming = false;
-
-        // Display a generic error message
-        displayErrorMessage();
+        handleStreamingError(loadingInfo, event);
     };
 
     // Set up cancel button
