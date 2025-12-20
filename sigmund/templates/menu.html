@@ -73,7 +73,7 @@
                 :class="{ active: modelConfig === 'openai' }">
                 <!-- Icon for OpenAI model -->
                 <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.1<br>Conversations</small></span>
+                <span>OpenAI<br><small>GPT5.2<br>Conversations</small></span>
             </button>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
@@ -81,7 +81,7 @@
                 :class="{ active: modelConfig === 'openai_thinking' }">
                 <!-- Icon for OpenAI model -->
                 <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.1<br>Problem solving</small></span>
+                <span>OpenAI<br><small>GPT5.2<br>Problem solving</small></span>
             </button>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
@@ -105,15 +105,7 @@
                 :class="{ active: modelConfig === 'mistral' }">
                 <!-- Icon for Mistral model -->
                 <img src="/static/mistral.png" alt="Mistral Icon">
-                <span>Mistral<br><small>Medium<br>Conversations</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'magistral'" 
-                :class="{ active: modelConfig === 'magistral' }">
-                <!-- Icon for Mistral model -->
-                <img src="/static/mistral.png" alt="Mistral Icon">
-                <span>Magistral<br><small>Medium<br>Problem solving</small></span>
+                <span>Mistral<br><small>Large 3<br>Conversations</small></span>
             </button>
         </div>        
     </div>

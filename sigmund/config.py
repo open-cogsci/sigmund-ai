@@ -72,12 +72,12 @@ model_config = {
     'openai': {
         'condense_model': 'gpt-5-mini',
         'public_model': 'gpt-5-nano',
-        'answer_model': 'gpt-5.1'
+        'answer_model': 'gpt-5.2'
     },
     'openai_thinking': {
         'condense_model': 'gpt-5-mini',
         'public_model': 'gpt-5-nano',
-        'answer_model': 'gpt-5.1-thinking'
+        'answer_model': 'gpt-5.2-thinking'
     },
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
@@ -90,15 +90,9 @@ model_config = {
         'answer_model': 'claude-4-5-sonnet-thinking'
     },
     'mistral': {
-        'condense_model': 'ministral-8b-2410',
-        'public_model': 'gpt-4o-mini',
-        'answer_model': 'mistral-medium-latest',
-        'vision_model': 'pixtral-large-latest'
-    },
-    'magistral': {
-        'condense_model': 'ministral-8b-2410',
-        'public_model': 'gpt-5-nano',
-        'answer_model': 'magistral-medium-latest',
+        'condense_model': 'mistral-small-latest',
+        'public_model': 'mistral-small-latest',
+        'answer_model': 'mistral-large-latest',
         'vision_model': 'pixtral-large-latest'
     },
     'dummy': {

@@ -133,12 +133,6 @@ def test_mistral():
     config.settings_default['model_config'] = 'mistral'
     init_testlog()
     score_testcases()
-    
-    
-def test_magistral():
-    config.settings_default['model_config'] = 'magistral'
-    init_testlog()
-    score_testcases()
 
 
 def test_anthropic_regular():

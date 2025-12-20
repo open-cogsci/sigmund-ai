@@ -7,6 +7,8 @@ OPENAI_MODELS = {
     'o3': 'o3',
     'o3-mini': 'o3-mini',
     'o4-mini': 'o4-mini',
+    'gpt-5.2-thinking': 'gpt-5.2',
+    'gpt-5.2': 'gpt-5.2',
     'gpt-5.1-thinking': 'gpt-5.1',
     'gpt-5.1': 'gpt-5.1',
     'gpt-5-thinking': 'gpt-5',
