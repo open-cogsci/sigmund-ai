@@ -29,6 +29,7 @@ dependencies = [
     "oauthlib",
     "openai",
     "mistralai",
+    "pillow",
     "pygments",
     "pyopenssl",
     "python-dotenv",

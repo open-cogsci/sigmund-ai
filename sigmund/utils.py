@@ -2,6 +2,8 @@ import html
 import logging
 import time
 import re
+import base64
+from io import BytesIO
 from flask import render_template, render_template_string
 import markdown
 from markdown.extensions.fenced_code import FencedCodeExtension
@@ -178,3 +180,55 @@ def remove_masked_elements(content):
 
 def current_datetime():
     return time.strftime('%a %d %b %Y %H:%M')
+
+
+def limit_image_size(img_data, max_size=3_000_000):
+    """
+    Scale down a base64-encoded image if its size exceeds max_size.
+
+    Args:
+        img_data (str): Base64-encoded image data
+        max_size (int): Maximum allowed size in bytes (default: 5,000,000)
+
+    Returns:
+        str: Base64-encoded image data (original or scaled down)
+    """
+    
+    if len(img_data) <= max_size:
+        return img_data
+    from PIL import Image
+    img_bytes = base64.b64decode(img_data)
+    img = Image.open(BytesIO(img_bytes))
+    # Start with 90% quality and reduce if needed
+    quality = 90
+    scale_factor = 0.9  # Start with 90% of original size
+    while True:
+        # Calculate new dimensions while maintaining aspect ratio
+        new_width = int(img.width * scale_factor)
+        new_height = int(img.height * scale_factor)
+        # Ensure minimum size of 1x1
+        new_width = max(1, new_width)
+        new_height = max(1, new_height)
+        # Resize the image
+        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+        # Save to bytes buffer with current quality
+        buffer = BytesIO()
+        resized_img.save(buffer, format=img.format, quality=quality,
+                         optimize=True)
+        buffer_size = buffer.tell()
+        # Check if we're under the size limit
+        if buffer_size <= max_size:
+            # Encode back to base64
+            return base64.b64encode(buffer.getvalue()).decode('utf-8')
+        # If not, reduce quality first, then scale factor
+        if quality > 10:
+            quality -= 10
+        else:
+            scale_factor -= 0.1
+        # Safety check to prevent infinite loop
+        if scale_factor <= 0.1:
+            break
+    # If we get here, we couldn't reduce enough - return the smallest possible
+    buffer = BytesIO()
+    resized_img.save(buffer, format=img.format, quality=10, optimize=True)
+    return base64.b64encode(buffer.getvalue()).decode('utf-8')

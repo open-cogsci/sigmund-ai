@@ -1,7 +1,7 @@
 // Allowed file extensions
 const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'png', 'jpg'];
 // Maximum file size in bytes (4 MB)
-const MAX_FILE_SIZE = 4 * 1024 * 1024;
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 const attachmentInput = document.getElementById('attachment-input');
 const attachmentList = document.getElementById('attachment-list');

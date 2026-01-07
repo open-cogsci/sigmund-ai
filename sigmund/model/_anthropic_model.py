@@ -147,7 +147,7 @@ class AnthropicModel(BaseModel):
                         'type': 'image',
                         'source': {'type': 'base64',
                                    'media_type': mimetype,
-                                   'data': data}
+                                   'data': utils.limit_image_size(data)}
                     })
                 elif attachment['type'] == 'document':
                     content.append({
