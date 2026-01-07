@@ -1,6 +1,6 @@
 # Sigmund AI
 
-Copyright 2023-2025 Sebastiaan Mathôt
+Copyright 2023-2026 Sebastiaan Mathôt
 
 ![](artwork/sigmund-avatar-small.png)
 
