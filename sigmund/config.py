@@ -93,7 +93,7 @@ model_config = {
         'condense_model': 'mistral-small-latest',
         'public_model': 'mistral-small-latest',
         'answer_model': 'mistral-large-latest',
-        'vision_model': 'pixtral-large-latest'
+        'vision_model': 'mistral-large-latest'
     },
     'dummy': {
         'condense_model': 'dummy',
