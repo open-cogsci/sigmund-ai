@@ -9,3 +9,4 @@ from ._opensesame_tools import (opensesame_add_existing_item_to_parent,
                                 opensesame_select_item,
                                 opensesame_set_global_var,
                                 opensesame_update_item_script)
+from ._ide_tools import ide_execute_code, ide_open_file
