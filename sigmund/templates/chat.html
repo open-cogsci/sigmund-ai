@@ -83,6 +83,14 @@
         </div>
     </div>
     <script>
+    {% if need_login %}
+    app.__vue__.toggleMenu()
+    {% else %}
+    // Show menu on new discussion
+    if (document.getElementById('response').children.length < 2) {
+        app.__vue__.toggleMenu()
+    }
+    {% endif %}
     {% include 'attachments.js' %}
     </script>
 </body>

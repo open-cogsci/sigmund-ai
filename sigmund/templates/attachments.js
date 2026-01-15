@@ -98,8 +98,3 @@ function clearAttachments() {
     attachments = [];
     renderAttachments();
 }
-
-// Show menu on new discussion
-if (document.getElementById('response').children.length < 2) {
-    app.__vue__.toggleMenu()
-}
