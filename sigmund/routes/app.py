@@ -47,11 +47,10 @@ def chat_page():
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role == 'assistant':
-            html_body = utils.md(
-                f'{config.ai_name}: {process_sigmund_message.process_ai_message(message)}')
+            html_body = utils.md(process_sigmund_message.process_ai_message(message))
             html_class = 'message-ai'
         else:
-            html_body = '<p>' + utils.clean(f'You: {message}', 
+            html_body = '<p>' + utils.clean(message, 
                                             escape_html=True,
                                             render=False) + '</p>'
             html_class = 'message-user'

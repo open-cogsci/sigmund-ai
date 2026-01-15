@@ -137,7 +137,7 @@ function displayUserMessage(message, messageId) {
     if (!message) return;
 
     const userMessageBox = document.createElement('div');
-    userMessageBox.innerText = 'You: ' + message;
+    userMessageBox.innerText = message;
     userMessageBox.className = 'message-user message';
     userMessageBox.setAttribute('data-message-id', messageId);
     responseDiv.appendChild(userMessageBox);

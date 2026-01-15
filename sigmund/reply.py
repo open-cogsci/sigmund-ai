@@ -23,7 +23,7 @@ class Reply(BaseReply):
     def to_json(self):
         return json.dumps(
             {'response': utils.md(
-                f'{config.ai_name}: {process_sigmund_message.process_ai_message(self.msg)}'),
+                process_sigmund_message.process_ai_message(self.msg)),
              'metadata': self.metadata,
              'workspace_content': self.workspace_content,
              'workspace_language': self.workspace_language
