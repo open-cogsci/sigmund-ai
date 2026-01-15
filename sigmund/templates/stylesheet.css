@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&family=Roboto+Condensed&family=Roboto+Flex&family=Lobster+Two&family=Madimi+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Flex:opsz,wght,XOPQ,XTRA,YOPQ,YTDE,YTFI,YTLC,YTUC@8..144,100..1000,96,468,79,-203,738,514,712&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
 body {
     background-color: #ECEFF1;
-    font-family: "Roboto Light", sans-serif;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
     margin: 0px;
 }
 
@@ -50,7 +51,7 @@ a:visited {
 #container select,
 #container button,
 #container input {
-    font-family: "Roboto Light", sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 .menu select {
