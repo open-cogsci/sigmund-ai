@@ -281,24 +281,33 @@ function createAIMessageElement(data, metadata, forwardReplyToSocket) {
     return aiMessage;
 }
 
-function displayErrorMessage() {
+function displayCustomErrorMessage(htmlContent) {
     const errorMessageBox = document.createElement('div');
     errorMessageBox.className = 'message-ai message message-error';
     errorMessageBox.setAttribute('data-message-id', generateUUID());
+    errorMessageBox.innerHTML = htmlContent;
+    responseDiv.appendChild(errorMessageBox);
+    errorMessageBox.scrollIntoViewIfNeeded();
+}
 
-    let errorHTML = `<p>The connection to the server has been lost. This might be because:</p>
+function displayErrorMessage() {
+    displayCustomErrorMessage(`<p>The connection to the server has been lost. This might be because:</p>
 <ul>
     <li>Your login session has expired</li>
     <li>The server is temporarily unavailable</li>
     <li>There's a network connectivity issue</li>
 </ul>
 <p>Please reload the page to reconnect.</p>
-<button onclick="location.reload()" class="modal-reload-button">Reload Page</button>
-`;
+<button onclick="location.reload()" class="modal-reload-button">Reload Page</button>`);
+}
 
-    errorMessageBox.innerHTML = errorHTML;
-    responseDiv.appendChild(errorMessageBox);
-    errorMessageBox.scrollIntoViewIfNeeded();
+function displayContentTooLargeError() {
+    displayCustomErrorMessage(`<p>Your message or attachments are too large to send. Please try:</p>
+<ul>
+    <li>Shortening your message</li>
+    <li>Removing or compressing attachments</li>
+    <li>Sending fewer files at a time</li>
+</ul>`);
 }
 
 function handleStreamingError(loadingInfo, error) {
@@ -381,14 +390,30 @@ async function sendMessage(
     // Prepare and send initial request
     const formData = prepareFormData(message, user_message_id, transient_settings, transient_system_prompt, foundation_document_topics);
 
+    let startResponse;
     try {
-        await fetchWithRetry('{{ server_url }}/api/chat/start', {
+        startResponse = await fetchWithRetry('{{ server_url }}/api/chat/start', {
             method: 'POST',
             body: formData
         });
     } catch (e) {
         console.error('Failed to start chat session:', e);
         handleStreamingError(loadingInfo, e);
+        return;
+    }
+
+    if (!startResponse.ok) {
+        console.error('Failed to start chat session, status:', startResponse.status);
+        removeLoadingIndicator(loadingInfo);
+        enableMessageInput();
+        setFavicon(originalFavicon);
+        isStreaming = false;
+
+        if (startResponse.status === 413) {
+            displayContentTooLargeError();
+        } else {
+            displayErrorMessage();
+        }
         return;
     }
 

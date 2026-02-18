@@ -4,6 +4,7 @@ import mimetypes
 import logging
 from flask import request, jsonify, Response, redirect, session, \
     stream_with_context, make_response, Blueprint
+from werkzeug.exceptions import RequestEntityTooLarge
 from flask_login import login_required
 from .. import config
 from ..redis_client import redis_client
@@ -23,15 +24,20 @@ def health():
 def api_chat_start():
 
     # Store request data in the session
-    message = request.form.get('message', '')
-    workspace_content = request.form.get('workspace_content', '')
-    workspace_language = request.form.get('workspace_language', '')
-    message_id = request.form.get('message_id', '')
-    transient_settings = request.form.get('transient_settings', '{}')
-    transient_settings = json.loads(transient_settings)
-    transient_system_prompt = request.form.get('transient_system_prompt', '')
-    foundation_document_topics = request.form.get('foundation_document_topics',
-                                                  None)
+    try:
+        message = request.form.get('message', '')
+        workspace_content = request.form.get('workspace_content', '')
+        workspace_language = request.form.get('workspace_language', '')
+        message_id = request.form.get('message_id', '')
+        transient_settings = request.form.get('transient_settings', '{}')
+        transient_settings = json.loads(transient_settings)
+        transient_system_prompt = request.form.get(
+            'transient_system_prompt', '')
+        foundation_document_topics = request.form.get(
+            'foundation_document_topics', None)
+    except RequestEntityTooLarge:
+        logger.error('Request too large')
+        return jsonify({'error': 'Request too large'}), 413
     if foundation_document_topics is not None:
         foundation_document_topics = json.loads(foundation_document_topics)
     session['user_message']       = message
@@ -124,7 +130,7 @@ def api_chat_cancel_stream():
     sigmund = get_sigmund()
     logger.info(f'cancelling stream for {sigmund.user_id}')
     redis_client.set(f'stream_cancel_{sigmund.user_id}', '1')
-    return jsonify({'status': 'cancelled'}), 200    
+    return jsonify({'status': 'cancelled'}), 200
     
     
 @api_blueprint.route('/conversation/new')
