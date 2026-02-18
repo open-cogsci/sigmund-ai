@@ -211,11 +211,15 @@ class AnthropicModel(BaseModel):
         if messages[0]['role'] == 'system':
             kwargs['system'] = messages[0]['content']
             messages = messages[1:]
-        if self._thinking:
-            kwargs['thinking'] = {
-                "type": "enabled",
-                "budget_tokens": config.anthropic_max_thinking_tokens
-            }
+        # Claude 4.6 Sonnet/ Opus use adaptive thinking
+        if '4-6' in self._model:
+            kwargs['thinking'] = {"type": "adaptive"}
+        else:
+            if self._thinking:
+                kwargs['thinking'] = {
+                    "type": "enabled",
+                    "budget_tokens": config.anthropic_max_thinking_tokens
+                }
         try:
             return fnc(model=self._model, messages=messages, **kwargs)
         except Exception:            

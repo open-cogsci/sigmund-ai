@@ -82,12 +82,12 @@ model_config = {
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-5-sonnet'
+        'answer_model': 'claude-4-6-sonnet'
     },
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-5-sonnet-thinking'
+        'answer_model': 'claude-4-6-opus-thinking'
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',

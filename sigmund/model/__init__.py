@@ -35,6 +35,7 @@ ANTHROPIC_MODELS = {
     'claude-3.7-sonnet-thinking': 'claude-3-7-sonnet-latest',
     'claude-4-sonnet': 'claude-sonnet-4-0',
     'claude-4-5-sonnet': 'claude-sonnet-4-5',
+    'claude-4-6-sonnet': 'claude-sonnet-4-6',
     'claude-4-sonnet-thinking': 'claude-sonnet-4-0',
     'claude-4-5-sonnet-thinking': 'claude-sonnet-4-5',
     # Opus
@@ -43,6 +44,8 @@ ANTHROPIC_MODELS = {
     'claude-4-opus-thinking': 'claude-opus-4-0',
     'claude-4-1-opus': 'claude-opus-4-1',
     'claude-4-1-opus-thinking': 'claude-opus-4-1',
+    'claude-4-6-opus': 'claude-opus-4-6',
+    'claude-4-6-opus-thinking': 'claude-opus-4-6',
 }
 
 

@@ -27,6 +27,9 @@ class BaseModel:
         self.completion_tokens_consumed = 0
         self.json_mode = False
         
+    def __repr__(self):
+        return f'{self.__class__.__name__}(model={self._model}, thinking={self._thinking})'
+        
     def invalid_tool(self) -> str:
         return 'Invalid tool', None, 'markdown', False
         
@@ -60,7 +63,7 @@ class BaseModel:
 
     def predict(self, messages, attachments=None, track_tokens=True):
         t0 = time.time()
-        logger.info(f'predicting with {self.__class__} model')
+        logger.info(f'predicting with {self}')
         reply = self.get_response(self.invoke(messages))
         msg_len = self.messages_length(messages)
         dt = time.time() - t0
