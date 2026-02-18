@@ -31,7 +31,7 @@ condense_chunk_length = 10000
 
 # MESSAGES
 # The maximum length of a user message
-max_message_length = 10000
+max_message_length = 10
 # A fixed welcome message
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant! How can I help you?'''
 # The default title of a new conversation
@@ -39,6 +39,8 @@ default_conversation_title = 'New conversation'
 
 # RATE LIMITS
 #
+# Maximum number of characters in a single message
+max_message_length = 500_000
 # The maximum number of tokens that can be consumed per hour by the answer
 # model.
 max_tokens_per_hour = 1_000_000

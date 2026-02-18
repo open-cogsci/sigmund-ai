@@ -2,6 +2,7 @@ import logging
 import asyncio
 import time
 import re
+from .. import config
 logger = logging.getLogger('sigmund')
 
 
@@ -63,9 +64,12 @@ class BaseModel:
 
     def predict(self, messages, attachments=None, track_tokens=True):
         t0 = time.time()
+        msg_len = self.messages_length(messages)
+        if msg_len > config.max_message_length:
+            logger.warning(f'message too long: {msg_len}')
+            return f'Sorry, the message or workspace contains too much text. Can you please shorten it?'
         logger.info(f'predicting with {self}')
         reply = self.get_response(self.invoke(messages))
-        msg_len = self.messages_length(messages)
         dt = time.time() - t0
         prompt_tokens = msg_len // self.characters_per_token
         reply_len = len(reply) if isinstance(reply, str) else 0
