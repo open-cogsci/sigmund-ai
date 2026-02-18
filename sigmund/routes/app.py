@@ -141,6 +141,12 @@ def terms():
         'info-page.html',
         content=utils.md(Path('sigmund/static/terms.md').read_text()))
 
+@app_blueprint.route('/connectors')
+def connectors():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('sigmund/static/connectors.md').read_text()))
+
 
 @app_blueprint.route('/login', methods=['GET', 'POST'])
 def login():

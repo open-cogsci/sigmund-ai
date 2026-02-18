@@ -1,6 +1,6 @@
 <div id="app">
   <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
-    <div ref="menuCloseButton" class="close"><i class="fas fa-window-close"></i></div> 
+    <div ref="menuCloseButton" class="close"><i class="fas fa-comment"></i>&nbsp;<small>Chat</small></div> 
     {% if need_login %}
       {% include 'login-div.html' %}
     {% endif %}
@@ -17,7 +17,6 @@
                  id="collection-opensesame" 
                  v-model="collection_opensesame">
           <label for="collection-opensesame">OpenSesame
-          <small><a href="https://osdoc.cogsci.nl/4.1/tutorials/beginner-sigmund/" target="_blank">Connect to OpenSesame</a></small>
           </label>
       </div>
       <div class="tool-item">
@@ -41,15 +40,6 @@
       <div class="tool-item">
           <input type="checkbox"
                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-execute-code" 
-                 v-model="tool_execute_code">
-          <label for="tool-execute-code">Code execution
-          <small><a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">Connect to JupyterLab, Notebook, Spyder or Rapunzel</a></small>
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-search-google-scholar" 
                  v-model="tool_search_google_scholar">
           <label for="tool-search-google-scholar">Google Scholar</label>
@@ -63,6 +53,16 @@
       </div>           
     </div>
     <hr class="menu-divider">
+    <div>
+      <small>Build experiments, analyze data, and run code with application connectors</small>
+    </div>    
+    <div>
+      <label>Connect to 
+        <a href="https://osdoc.cogsci.nl/tutorials/beginner-sigmund/" target="_blank">OpenSesame</a>,
+        <a href="https://github.com/open-cogsci/sigmund-analyst" target="_blank">Sigmund Analyst</a>,
+        <a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">JupyterLab</a>
+    </div>
+    <hr class="menu-divider">    
     <!-- Model selection -->
     <div class="model-selector">
       <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>

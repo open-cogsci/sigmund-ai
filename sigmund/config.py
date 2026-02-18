@@ -113,7 +113,7 @@ mistral_kwargs = {}
 
 # TOOLS
 #
-tools = ['search_google_scholar', 'execute_code', 'generate_image',
+tools = ['search_google_scholar', 'generate_image',
          'opensesame_select_item', 'opensesame_new_item',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
          'opensesame_add_existing_item_to_parent',
