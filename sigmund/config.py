@@ -25,7 +25,7 @@ encryption_salt = os.environ.get('SIGMUND_ENCRYPTION_SALT', '0123456789ABCDEF').
 #
 # The maximum length of a prompt in characters. If the prompt exceeds this 
 # length, the start will be summarized.
-max_prompt_length = 20000
+max_prompt_length = 100000
 # The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
@@ -113,8 +113,8 @@ mistral_kwargs = {}
 
 # TOOLS
 #
-tools = ['search_google_scholar', 'generate_image',
-         'opensesame_select_item', 'opensesame_new_item',
+tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
+         'generate_image', 'opensesame_select_item', 'opensesame_new_item',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
          'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
@@ -127,8 +127,9 @@ settings_default = {
     # Indicates the model configuration as specified above
     'model_config': 'openai',
     # Indicates which tools are enabled
-    'tool_search_google_scholar': 'true',
-    'tool_execute_code': 'false',
+    'tool_search_google_scholar': 'false',
+    'tool_search_openalex': 'false',
+    'tool_download_from_openalex': 'false',
     'tool_generate_image': 'false',
     'tool_opensesame_select_item': 'false',
     'tool_opensesame_new_item': 'false',
@@ -144,6 +145,10 @@ settings_default = {
     'collection_datamatrix': 'false',
     'collection_forum': 'false'
 }
+
+
+# OPENALEX
+openalex_api_key = os.environ.get('OPENALEX_API_KEY', None)
 
 # DOCUMENTATION
 #

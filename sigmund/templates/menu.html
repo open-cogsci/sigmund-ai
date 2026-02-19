@@ -7,7 +7,7 @@
 {% raw %}
     <!-- Expert knowledge section -->
     <div>
-      <small>For best performance, only enable knowledge and tools that you need</small>
+      <small>For best performance, only enable knowledge you need</small>
     </div>
     <div>
       <label>Expert knowledge:</label>
@@ -36,13 +36,29 @@
     </div>
     <hr class="menu-divider">    
     <div>
+      <small>For best performance, only enable tools you need</small>
+    </div>    
+    <div>
       <label>Tools:</label>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="tool-openalex" 
+                 v-model="tool_openalex">
+          <label for="tool-openalex">
+            Search and download scientific literature (OpenAlex)
+            <small>Recommended</small>
+          </label>
+      </div>
       <div class="tool-item">
           <input type="checkbox"
                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-search-google-scholar" 
                  v-model="tool_search_google_scholar">
-          <label for="tool-search-google-scholar">Google Scholar</label>
+          <label for="tool-search-google-scholar">
+            Search scientific literature (Google Scholar)
+            <small>Sometimes blocked</small>
+          </label>
       </div>
       <div class="tool-item">
           <input type="checkbox"
@@ -185,9 +201,9 @@ new Vue({
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
     forceModelConfigUpdate: 0,
-    tool_execute_code: sigmundSettings.tool_execute_code === 'true',
     tool_generate_image: sigmundSettings.tool_generate_image === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
+    tool_openalex: sigmundSettings.tool_search_openalex === 'true',
     collection_opensesame: sigmundSettings.collection_opensesame === 'true',
     collection_datamatrix: sigmundSettings.collection_datamatrix === 'true',
     collection_forum: sigmundSettings.collection_forum === 'true',
@@ -204,9 +220,12 @@ new Vue({
   },
   watch: {
     modelConfig(value) { setSetting('model_config', value); },
-    tool_execute_code(value) { setSetting('tool_execute_code', value); },
     tool_generate_image(value) { setSetting('tool_generate_image', value); },
     tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); },
+    tool_openalex(value) {
+      setSetting('tool_search_openalex', value); 
+      setSetting('tool_download_from_openalex', value); 
+    },
     collection_opensesame(value) { setSetting('collection_opensesame', value); },
     collection_datamatrix(value) { setSetting('collection_datamatrix', value); },
     collection_forum(value) { setSetting('collection_forum', value); }
