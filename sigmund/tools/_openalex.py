@@ -63,8 +63,9 @@ class search_openalex(BaseTool):
                         "oa_url": oa.get("oa_url"),
                     }
                     results.append(result)
-        message = (f'I found {len(results)} articles and added them to '
-                   f'the workspace.')
+        query_list = '\n'.join(f'- {q}' for q in queries)
+        message = (f'I searched for:\n\n{query_list}\n\nI found '
+                   f'{len(results)} articles and added them to the workspace.')
         results = json.dumps(results, indent='  ')
         return message, results, True
 
@@ -85,7 +86,7 @@ class download_from_openalex(BaseTool):
             openalex_id = f"https://openalex.org/{openalex_id}"
         work = Works()[openalex_id]
         if not work['has_content']['pdf']:
-            return "No full text available for this article.", "", True
+            return f"No full text available for {openalex_id}.", "", True
         try:
             pdf_content = work.pdf.get()
         except Exception as e:
@@ -100,18 +101,18 @@ class download_from_openalex(BaseTool):
         message = (f'I downloaded the full text of "{title}" and added '
                    f'it to the workspace.')
         return message, full_text, True
-        
-        
+
+
 def _ocr_extract(content, mimetype):
     """Extract text from a document using Mistral's OCR API.
-    
+
     Parameters
     ----------
     content : bytes
         The document content.
     mimetype : str
         The MIME type of the document.
-    
+
     Returns
     -------
     str
