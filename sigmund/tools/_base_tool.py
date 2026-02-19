@@ -61,6 +61,7 @@ class BaseTool:
                         break
                 tool_response = self(**kwargs)
             except Exception as e:
+                logger.error(f'failed to run tool: {e}')
                 message = 'Failed to run tool'
                 result = f'The following error occurred while trying to run tool:\n\n{e}'
                 needs_feedback = True
