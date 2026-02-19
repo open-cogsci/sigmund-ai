@@ -139,7 +139,7 @@ class BaseModel:
         signature = None
         thinking_content = None
     
-        sig_match = re.search(sig_pattern, content)
+        sig_match = re.search(sig_pattern, content, re.MULTILINE | re.DOTALL)
         if sig_match:
             signature = sig_match.group(1)
             content = re.sub(sig_pattern, '', content, count=1)
