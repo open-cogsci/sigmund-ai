@@ -46,6 +46,19 @@ class BaseTool:
                 # print('*** arguments')
                 # pprint.pprint(kwargs)
                 # print('***')
+                # 
+                # If Sigmund wrapped the arguments inside a named sub-dict
+                # (e.g. "args", "parameters", …), flatten it into the
+                # top-level dict so the dispatcher can forward the kwargs
+                # correctly.
+                ARG_WRAPPER_KEYS = {
+                    'args', 'arguments', 'kwargs', 'keyword_arguments',
+                    'keywords', 'parameters', 'params', 'options'
+                }
+                for key in ARG_WRAPPER_KEYS:
+                    if key in kwargs and isinstance(kwargs[key], dict):
+                        kwargs.update(kwargs.pop(key))
+                        break
                 tool_response = self(**kwargs)
             except Exception as e:
                 message = 'Failed to run tool'
