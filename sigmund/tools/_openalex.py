@@ -31,6 +31,9 @@ class search_openalex(BaseTool):
 
     def __call__(self, queries, max_results_per_query=10):
         results = []
+        if isinstance(queries, str):
+            queries = [queries]
+        logger.info(f'searching OpenAlex for {len(queries)} queries')
         for query in queries:
             pager = (Works()
                      .search(query)
