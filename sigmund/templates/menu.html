@@ -1,6 +1,6 @@
 <div id="app">
   <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
-    <div ref="menuCloseButton" class="close"><i class="fas fa-comment"></i>&nbsp;<small>Chat</small></div> 
+    <div ref="menuCloseButton" class="close"><small id="return-to-chat">Return to chat</small>&nbsp;<i class="fas fa-window-close"></i></div> 
     {% if need_login %}
       {% include 'login-div.html' %}
     {% endif %}

@@ -36,6 +36,10 @@
   .scrollable-menu {
     max-height: 80vh;
   }
+  
+  #return-to-chat {
+    display: none;
+  }
 }
 
 /* Small screens */
