@@ -11,6 +11,7 @@ from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.attr_list import AttrListExtension
 from markdown.extensions.md_in_html import MarkdownInHtmlExtension
+from markdown.extensions.tables import TableExtension
 from . import config
 from . import __version__
 logger = logging.getLogger('sigmund')
@@ -22,7 +23,8 @@ def md(text):
                                          CodeHiliteExtension(),
                                          TocExtension(),
                                          AttrListExtension(),
-                                         MarkdownInHtmlExtension()])
+                                         MarkdownInHtmlExtension(),
+                                         TableExtension()])
 
 
 def clean(text, escape_html=True, render=True):
