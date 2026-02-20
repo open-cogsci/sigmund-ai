@@ -63,10 +63,20 @@
       <div class="tool-item">
           <input type="checkbox"
                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-generate-image" 
-                 v-model="tool_generate_image">
-          <label for="tool-generate-image">Image generation</label>
-      </div>           
+                 id="tool-generate-image-flux" 
+                 v-model="tool_generate_image_flux">
+          <label for="tool-generate-image-flux">
+          Generate and edit images (Flux.2)
+          <small>Attach images to edit them</small>
+          </label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="tool-generate-image-dalle3" 
+                 v-model="tool_generate_image_dalle3">
+          <label for="tool-generate-image-dalle3">Generate images (Dall-E 3)</label>
+      </div>
     </div>
     <hr class="menu-divider">
     <div>
@@ -201,7 +211,8 @@ new Vue({
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
     forceModelConfigUpdate: 0,
-    tool_generate_image: sigmundSettings.tool_generate_image === 'true',
+    tool_generate_image_dalle3: sigmundSettings.tool_generate_image_dalle3 === 'true',
+    tool_generate_image_flux: sigmundSettings.tool_generate_image_flux === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
     tool_openalex: sigmundSettings.tool_search_openalex === 'true',
     collection_opensesame: sigmundSettings.collection_opensesame === 'true',
@@ -220,7 +231,8 @@ new Vue({
   },
   watch: {
     modelConfig(value) { setSetting('model_config', value); },
-    tool_generate_image(value) { setSetting('tool_generate_image', value); },
+    tool_generate_image_dalle3(value) { setSetting('tool_generate_image_dalle3', value); },
+    tool_generate_image_flux(value) { setSetting('tool_generate_image_flux', value); },
     tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); },
     tool_openalex(value) {
       setSetting('tool_search_openalex', value); 

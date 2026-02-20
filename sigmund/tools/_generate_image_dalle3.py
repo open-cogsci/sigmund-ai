@@ -5,8 +5,8 @@ from .. import config
 logger = logging.getLogger('sigmund')
 
 
-class generate_image(BaseTool):
-    """Generate an image based on a text description."""
+class generate_image_dalle3(BaseTool):
+    """Generate an image based on a text description using Dall-E 3."""
     
     arguments = {
         'prompt': {

@@ -174,7 +174,8 @@ class Sigmund:
             logger.info(f'[{state} state] reply: {reply}')
         # If the reply is a callable, then it's a tool that we need to run
         if callable(reply):
-            tool_message, tool_result, tool_language, needs_feedback = reply()
+            tool_message, tool_result, tool_language, needs_feedback = reply(
+                attachments)
             if needs_feedback:
                 logger.info(f'[{state} state] tools need feedback')
                 if not self.answer_model.supports_tool_feedback:

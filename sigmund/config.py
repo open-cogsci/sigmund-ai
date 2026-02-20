@@ -59,6 +59,7 @@ log_replies = os.environ.get('SIGMUND_LOG_REPLIES', False)
 openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
+bfl_api_key = os.environ.get('BFL_API_KEY', None)
 # Force dummy model for development purposes
 dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 # Supported models are continuously updated. See sigmund.model for more
@@ -114,9 +115,10 @@ mistral_kwargs = {}
 # TOOLS
 #
 tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
-         'generate_image', 'opensesame_select_item', 'opensesame_new_item',
+         'generate_image_dalle3', 'generate_image_flux',
+         'opensesame_select_item', 'opensesame_new_item',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
-         'opensesame_add_existing_item_to_parent',
+          'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
          'ide_execute_code', 'ide_open_file']
 
@@ -130,7 +132,8 @@ settings_default = {
     'tool_search_google_scholar': 'false',
     'tool_search_openalex': 'false',
     'tool_download_from_openalex': 'false',
-    'tool_generate_image': 'false',
+    'tool_generate_image_dalle3': 'false',
+    'tool_generate_image_flux': 'false',
     'tool_opensesame_select_item': 'false',
     'tool_opensesame_new_item': 'false',
     'tool_opensesame_remove_item_from_parent': 'false',

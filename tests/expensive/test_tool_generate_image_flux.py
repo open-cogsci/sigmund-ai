@@ -2,10 +2,10 @@ from .expensive_test_utils import BaseExpensiveTest
 from sigmund import config
 
 
-class TestGenerateImage(BaseExpensiveTest):
+class TestGenerateImageFlux(BaseExpensiveTest):
     
     def setUp(self):
-        config.settings_default['tool_generate_image'] = 'true'
+        config.settings_default['tool_generate_image_flux'] = 'true'
         super().setUp()    
     
     def _test_tool(self):

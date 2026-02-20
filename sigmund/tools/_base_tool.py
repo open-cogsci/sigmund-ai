@@ -39,7 +39,8 @@ class BaseTool:
         model should be called again to provide feedback based on the tool
         result.
         """
-        def bound_tool_function():
+        def bound_tool_function(attachments):
+            self._attachments = attachments
             try:
                 kwargs = json.loads(args)
                 # import pprint
