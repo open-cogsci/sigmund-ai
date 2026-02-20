@@ -125,6 +125,9 @@ class AnthropicModel(BaseModel):
             logger.info('removing tool use and result from first two messages')
             messages[0]['content'] = messages[0]['content'][0]['text']
             messages[1]['content'] = messages[1]['content'][0]['content'][0]['text']
+            if not messages[1]['content'].strip():
+                logger.info('filling leading empty user message')
+                messages[1]['content'] = '(This user message was empty.)'
         # print('*** after tool processing')
         # pprint.pprint(messages)
         # print('***')            
