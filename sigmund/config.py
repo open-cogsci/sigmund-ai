@@ -107,7 +107,7 @@ model_config = {
 # Model-specific keyword arguments that are passed to the message generation
 # functions
 anthropic_kwargs = {
-    'max_tokens': 8192
+    'max_tokens': 65536
 }
 openai_kwargs = {}
 mistral_kwargs = {}
