@@ -107,7 +107,7 @@ model_config = {
 # Model-specific keyword arguments that are passed to the message generation
 # functions
 anthropic_kwargs = {
-    'max_tokens': 65536
+    'max_tokens': 16000
 }
 openai_kwargs = {}
 mistral_kwargs = {}
@@ -120,7 +120,8 @@ tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
           'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
-         'ide_execute_code', 'ide_open_file']
+         'ide_execute_code', 'ide_open_file', 'ide_inspect_files',
+         'ide_list_files']
 
 # SETTINGS
 #
@@ -143,6 +144,8 @@ settings_default = {
     'tool_opensesame_set_global_var': 'false',
     'tool_ide_execute_code': 'false',
     'tool_ide_open_file': 'false',
+    'tool_ide_inspect_files': 'false',
+    'tool_ide_list_files': 'false',
     # Indicates which library collections are enabled
     'collection_opensesame': 'true',
     'collection_datamatrix': 'false',
