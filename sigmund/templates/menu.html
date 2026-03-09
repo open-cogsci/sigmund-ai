@@ -43,6 +43,16 @@
       <div class="tool-item">
           <input type="checkbox"
                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="tool-notes" 
+                 v-model="tool_notes">
+          <label for="tool-notes">
+            Memento
+            <small>Let Sigmund write notes for better memory</small>
+          </label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                  id="tool-openalex" 
                  v-model="tool_openalex">
           <label for="tool-openalex">
@@ -215,6 +225,7 @@ new Vue({
     tool_generate_image_flux: sigmundSettings.tool_generate_image_flux === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
     tool_openalex: sigmundSettings.tool_search_openalex === 'true',
+    tool_notes: sigmundSettings.tool_add_note === 'true',
     collection_opensesame: sigmundSettings.collection_opensesame === 'true',
     collection_datamatrix: sigmundSettings.collection_datamatrix === 'true',
     collection_forum: sigmundSettings.collection_forum === 'true',
@@ -237,6 +248,12 @@ new Vue({
     tool_openalex(value) {
       setSetting('tool_search_openalex', value); 
       setSetting('tool_download_from_openalex', value); 
+    },
+    tool_notes(value) {
+      setSetting('tool_add_note', value);
+      setSetting('tool_update_note', value);
+      setSetting('tool_remove_note', value);
+      setSetting('tool_save_workspace_as_note', value);
     },
     collection_opensesame(value) { setSetting('collection_opensesame', value); },
     collection_datamatrix(value) { setSetting('collection_datamatrix', value); },
