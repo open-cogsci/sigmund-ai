@@ -28,6 +28,7 @@ class Messages:
             
     def init_conversation(self):
         self._condensed_text = None
+        self._notes = {}
         metadata = self.metadata()
         metadata['answer_model'] = 'welcome-bot'
         self._conversation_title = config.default_conversation_title
@@ -123,6 +124,20 @@ class Messages:
 
     def welcome_message(self):
         return config.welcome_message
+    
+    # Notes management
+    
+    def set_note(self, label, content):
+        """Add or update a persistent note."""
+        self._notes[label] = content
+    
+    def remove_note(self, label):
+        """Remove a persistent note. Does nothing if label doesn't exist."""
+        self._notes.pop(label, None)
+    
+    def get_notes(self):
+        """Return a copy of the current notes dict."""
+        return dict(self._notes)
         
     def _condense_message_history(self):
         system_prompt = self._system_prompt()
@@ -174,6 +189,14 @@ class Messages:
         # If available, documentation is also included in the prompt
         if len(self._sigmund.documentation):
             system_prompt.append(self._sigmund.documentation.prompt())
+        # If there are persistent notes, include them        
+        if self._notes:
+            if config.log_replies:
+                for label in self._notes:
+                    logger.info(f'[note] {label}')
+            system_prompt.append(prompt.render(
+                prompt.SYSTEM_PROMPT_NOTES,
+                notes=self._notes))
         # And finally, if the message history has been condensed, this is also
         # included.
         if self._condensed_text:
@@ -205,6 +228,7 @@ class Messages:
         self._condensed_text = conversation['condensed_text']
         self._condensed_message_history = \
             conversation['condensed_message_history']
+        self._notes = conversation.get('notes', {})
         if self._persistent and modified:
             self.save()
     
@@ -214,6 +238,7 @@ class Messages:
             'message_history': self._message_history,
             'condensed_message_history': self._condensed_message_history,
             'title': self._conversation_title,
+            'notes': self._notes,
         }
         self._conversation_id = self._sigmund.database.update_active_conversation(conversation)
         # We update the title in a background process so that we don't block

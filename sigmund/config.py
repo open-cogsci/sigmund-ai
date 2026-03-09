@@ -25,7 +25,7 @@ encryption_salt = os.environ.get('SIGMUND_ENCRYPTION_SALT', '0123456789ABCDEF').
 #
 # The maximum length of a prompt in characters. If the prompt exceeds this 
 # length, the start will be summarized.
-max_prompt_length = 100000
+max_prompt_length = 100_000
 # The length of the prompt to be summarized.
 condense_chunk_length = 10000
 
@@ -121,7 +121,15 @@ tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
           'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
          'ide_execute_code', 'ide_open_file', 'ide_inspect_files',
-         'ide_list_files']
+         'ide_list_files',
+         'add_note', 'update_note', 'remove_note', 'save_workspace_as_note']
+
+# NOTES
+#
+# Maximum number of notes per conversation
+max_notes = 20
+# Maximum length of a single note in characters
+max_note_length = 100_000
 
 # SETTINGS
 #
@@ -146,6 +154,10 @@ settings_default = {
     'tool_ide_open_file': 'false',
     'tool_ide_inspect_files': 'false',
     'tool_ide_list_files': 'false',
+    'tool_add_note': 'true',
+    'tool_update_note': 'true',
+    'tool_remove_note': 'true',
+    'tool_save_workspace_as_note': 'true',
     # Indicates which library collections are enabled
     'collection_opensesame': 'true',
     'collection_datamatrix': 'false',
@@ -196,14 +208,14 @@ search_embedding_model = "text-embedding-3-large"
 def validate_user(username, password):
     """user_validation.validate() should connect to an authentication system
     that verifies the account. 
-    
+
     Parameters
     ----------
     username : str
         Lowercase. Whitespace has been stripped.
     password : str
         Whitespace has been stripped.
-        
+
     Returns
     -------
     str or None:

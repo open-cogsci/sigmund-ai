@@ -29,6 +29,16 @@ SYSTEM_PROMPT_CONDENSED = '''Below is a summary of the start of the conversation
 {{ summary }}
 </summary>'''
 
+SYSTEM_PROMPT_NOTES = '''# Notes
+
+You have the following persistent notes for this conversation:
+
+{% for label, content in notes.items() %}
+&lt;note label="{{ label }}"&gt;
+{{ content }}
+&lt;/note&gt;
+{% endfor %}'''
+
 CONDENSE_HISTORY = '''Summarize the following conversation:
 
 {{ history }}
