@@ -41,7 +41,7 @@ def predict(prompt, model: str, json: bool = False,
     model.json_mode = True
     for _ in range(max_json_retry):
         reply = model.predict(prompt)
-        reply = BaseModel.extract_thinking_block(reply)[0]
+        reply = BaseModel.strip_thinking_blocks(reply)
         if reply.startswith('```json'):
             reply = reply[7:]
         if reply.startswith('```'):

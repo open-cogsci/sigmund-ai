@@ -181,3 +181,10 @@ class BaseModel:
                 'text': 'I added content to the workspace.'
             })
         return blocks
+        
+    @classmethod
+    def strip_thinking_blocks(cls, content: str) -> str:
+        """Removes all thinking blocks from the content string and returns
+        the remaining text."""
+        return cls._thinking_block_pattern.sub('', content).strip()
+                
