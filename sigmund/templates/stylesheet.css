@@ -360,6 +360,7 @@ button#start {
     color: #90A4AE;
     padding-left: 10px;
     border-left: solid 1px #90A4AE;
+    margin-bottom: 10px;
 }
 
 .message-workspace,

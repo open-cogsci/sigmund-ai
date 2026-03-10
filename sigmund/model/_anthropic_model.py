@@ -17,10 +17,6 @@ class AnthropicModel(BaseModel):
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)
         
     def predict(self, messages, attachments=None, track_tokens=True):
-        # import pprint
-        # print('=== preparing tool messages')
-        # pprint.pprint(messages)
-        # print('---')        
         if isinstance(messages, str):
             return super().predict([self.convert_message(messages)],
                                    attachments, track_tokens)
@@ -38,33 +34,19 @@ class AnthropicModel(BaseModel):
                 if message['role'] != 'assistant':
                     continue                
                 content = message['content']
-                content, thinking_signature, thinking_content = \
-                    self.extract_thinking_block(content)
-                # It can happen that the response only contains thinking blocks
-                # and workspace content, resulting in empty regular content.
-                # Empty text blocks are not allowed, so in that case we add this
-                # filler message.
-                if not content.strip():
-                    content = 'I added content to the workspace.'
-                if thinking_signature is None:
+                blocks = self.extract_thinking_blocks(content)
+                if blocks is None:
                     continue
-                message['content'] = [
-                    {'type': 'thinking',
-                     'thinking': thinking_content,
-                     'signature': thinking_signature},
-                    {'type': 'text',
-                     'text': content}
-                ]
-                logger.info('extracted thinking block')
+                message['content'] = blocks
+                n_thinking = sum(
+                    1 for b in blocks if b['type'] == 'thinking')
+                logger.info(
+                    f'extracted {n_thinking} thinking block(s)')
         # The Anthropic messages API doesn't accept tool results in a separate
         # message. Instead, tool results are included as a special content 
         # block in a user message. Since two subsequent user messages aren't
         # allowed, we need to convert a tool message to a user message and if
         # necessary merge it with the next user message.
-        # import pprint
-        # print('*** after extracting thinking block')
-        # pprint.pprint(messages)
-        # print('***')
         while True:
             logger.info('entering message postprocessing loop')
             for i, message in enumerate(messages):
@@ -128,9 +110,6 @@ class AnthropicModel(BaseModel):
             if not messages[1]['content'].strip():
                 logger.info('filling leading empty user message')
                 messages[1]['content'] = '(This user message was empty.)'
-        # print('*** after tool processing')
-        # pprint.pprint(messages)
-        # print('***')            
         # Attachments are included with the last message. The content is now
         # no longer a single str, but a list of dict
         if attachments:
@@ -160,16 +139,13 @@ class AnthropicModel(BaseModel):
                                    'data': data}
                     })
             messages[-1]['content'] = content
-        # print('*** after attachment processing')
-        # import pprint
-        # pprint.pprint(messages)
-        # print('***')            
         return super().predict(messages, attachments, track_tokens)
         
     def get_response(self, response):
-        text = []
+        """Converts an Anthropic response into a flat HTML string,
+        preserving the interleaved order of thinking and text blocks."""
+        parts = []
         tool_message_prefix = ''
-        thinking_block = None
         for block in response.content:
             if block.type == 'tool_use':
                 if self._tools:
@@ -180,15 +156,14 @@ class AnthropicModel(BaseModel):
                                 message_prefix=tool_message_prefix + '\n\n')
                 return self.invalid_tool
             if block.type == 'text':
-                text.append(block.text)
+                parts.append(block.text)
                 tool_message_prefix += block.text
             if block.type == 'thinking':
-                thinking_block = self.embed_thinking_block(block.signature,
-                                                           block.thinking)
-                tool_message_prefix += thinking_block
-        if thinking_block is not None:
-            text.insert(0, thinking_block)
-        return '\n'.join(text)
+                thinking_html = self.embed_thinking_block(
+                    block.signature, block.thinking)
+                parts.append(thinking_html)
+                tool_message_prefix += thinking_html
+        return '\n'.join(parts)
         
     def _tool_args(self):
         if not self._tools:
@@ -224,7 +199,7 @@ class AnthropicModel(BaseModel):
                     "budget_tokens": config.anthropic_max_thinking_tokens
                 }
         try:
-            return fnc(model=self._model, messages=messages, **kwargs)
+            result = fnc(model=self._model, messages=messages, **kwargs)
         except Exception:            
             import pprint
             print('=== an error occurred while sending messages')
@@ -233,6 +208,12 @@ class AnthropicModel(BaseModel):
             print(kwargs['system'])
             print('***')
             raise
+            
+        import pprint
+        print('=== reply')
+        pprint.pprint(result)
+        print('***')
+        return result
         
     def invoke(self, messages):
         return self._anthropic_invoke(self._client.messages.create, messages)
