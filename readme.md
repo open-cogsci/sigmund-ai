@@ -13,8 +13,8 @@ Features:
 - __Continuous conversation__: conversations are summarized when they become too long to fit into the prompt
 - __Tool use__ (in research-assistant mode):
     - __Code execution__: ability to execute Python and R code
-    - __Google Scholar search__: ability to search for articles on Google Scholar
-    - __Image generation__: ability to generate images
+    - __Literature search__: ability to search for articles on OpenAlex and Google Scholar
+    - __Image generation__: ability to generate images with Flux.2 and Dall-E 3
 - __Integrations__
     - __Python__: [connect to JupyterLab, Notebook, Spyder or Rapunzel](https://github.com/open-cogsci/jupyter-extension-sigmund)
     - __OpenSesame__: [directly integrate with OpenSesame](https://osdoc.cogsci.nl/4.0/manual/sigmund/)
