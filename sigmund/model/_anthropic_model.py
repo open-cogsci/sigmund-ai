@@ -207,12 +207,11 @@ class AnthropicModel(BaseModel):
             print('=== system message')
             print(kwargs['system'])
             print('***')
-            raise
-            
-        import pprint
-        print('=== reply')
-        pprint.pprint(result)
-        print('***')
+            raise            
+        # import pprint
+        # print('=== reply')
+        # pprint.pprint(result)
+        # print('***')
         return result
         
     def invoke(self, messages):
