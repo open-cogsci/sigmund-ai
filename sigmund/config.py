@@ -75,12 +75,12 @@ model_config = {
     'openai': {
         'condense_model': 'gpt-5-mini',
         'public_model': 'gpt-5-nano',
-        'answer_model': 'gpt-5.2'
+        'answer_model': 'gpt-5.4'
     },
     'openai_thinking': {
         'condense_model': 'gpt-5-mini',
         'public_model': 'gpt-5-nano',
-        'answer_model': 'gpt-5.2-thinking'
+        'answer_model': 'gpt-5.4-thinking'
     },
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
