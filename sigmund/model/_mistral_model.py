@@ -24,7 +24,8 @@ class MistralModel(OpenAIModel):
             self._tool_choice = 'any'
         self._client = Mistral(api_key=config.mistral_api_key)
         
-    def predict(self, messages, attachments=None, track_tokens=True):
+    def predict(self, messages, attachments=None, track_tokens=True,
+                stream=False):
         if isinstance(messages, str):
             messages = [self.convert_message(messages)]
         else:
@@ -82,7 +83,8 @@ class MistralModel(OpenAIModel):
                     content.append({'type': 'document_url',
                                     'document_url': signed_url.url})
             messages[-1]['content'] = content
-        return BaseModel.predict(self, messages, attachments, track_tokens)
+        return BaseModel.predict(self, messages, attachments, track_tokens,
+                                 stream)
         
     def get_response(self, response) -> [str, callable]:
         content = response.choices[0].message.content

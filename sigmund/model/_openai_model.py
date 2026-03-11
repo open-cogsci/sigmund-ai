@@ -18,7 +18,8 @@ class OpenAIModel(BaseModel):
         self._client = Client(api_key=config.openai_api_key)
         self._async_client = AsyncClient(api_key=config.openai_api_key)
         
-    def predict(self, messages, attachments=None, track_tokens=True):
+    def predict(self, messages, attachments=None, track_tokens=True,
+                stream=False):
         # Strings need to be converted a list of length one with a single
         # message dict
         if isinstance(messages, str):
@@ -45,7 +46,7 @@ class OpenAIModel(BaseModel):
                             'file_data': attachment['url']
                         }})
             messages[-1]['content'] = content            
-        return super().predict(messages, attachments, track_tokens)
+        return super().predict(messages, attachments, track_tokens, stream)
         
     def _tool_call_id(self, nr):
         return f'call_{nr}'
