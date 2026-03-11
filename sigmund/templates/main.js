@@ -447,8 +447,6 @@ async function sendMessage(
         if (typeof data.stream !== 'undefined') {
             let streamingMsg = document.getElementById('streaming-message');
             if (!streamingMsg) {
-                // First chunk: hide loading indicator, create streaming div
-                removeLoadingIndicator(loadingInfo);
                 streamingMsg = document.createElement('div');
                 streamingMsg.id = 'streaming-message';
                 streamingMsg.className = 'message-ai message message-streaming';
@@ -460,6 +458,7 @@ async function sendMessage(
         }
 
         // Handle final AI message
+        removeLoadingIndicator(loadingInfo);
         const metadata = data.metadata;
         removeStreamingMessage();
         const aiMessage = createAIMessageElement(data, metadata, forwardReplyToSocket);
