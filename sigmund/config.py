@@ -136,7 +136,7 @@ max_note_length = 100_000
 # These are default values for settings, which are stored in the database.
 settings_default = {
     # Indicates the model configuration as specified above
-    'model_config': 'openai',
+    'model_config': 'anthropic',
     # Indicates which tools are enabled
     'tool_search_google_scholar': 'false',
     'tool_search_openalex': 'false',
