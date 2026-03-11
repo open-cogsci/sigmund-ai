@@ -281,6 +281,13 @@ function createAIMessageElement(data, metadata, forwardReplyToSocket) {
     return aiMessage;
 }
 
+function removeStreamingMessage() {
+    const streamingMsg = document.getElementById('streaming-message');
+    if (streamingMsg) {
+        streamingMsg.remove();
+    }
+}
+
 function displayCustomErrorMessage(htmlContent) {
     const errorMessageBox = document.createElement('div');
     errorMessageBox.className = 'message-ai message message-error';
@@ -319,7 +326,8 @@ function handleStreamingError(loadingInfo, error) {
         currentEventSource = null;
     }
 
-    // Clean up UI/loading state
+    // Clean up streaming message and UI/loading state
+    removeStreamingMessage();
     removeLoadingIndicator(loadingInfo);
     enableMessageInput();
     setFavicon(originalFavicon);
@@ -331,6 +339,7 @@ function handleStreamingError(loadingInfo, error) {
 
 function endStream() {
     clearAttachments();
+    removeStreamingMessage();
     removeLoadingIndicator({
         element: currentLoadingMessageBox,
         interval: currentLoadingInterval
@@ -434,8 +443,25 @@ async function sendMessage(
             return;
         }
 
-        // Handle AI message
+        // Handle streaming text chunks
+        if (typeof data.stream !== 'undefined') {
+            let streamingMsg = document.getElementById('streaming-message');
+            if (!streamingMsg) {
+                // First chunk: hide loading indicator, create streaming div
+                removeLoadingIndicator(loadingInfo);
+                streamingMsg = document.createElement('div');
+                streamingMsg.id = 'streaming-message';
+                streamingMsg.className = 'message-ai message message-streaming';
+                responseDiv.appendChild(streamingMsg);
+            }
+            streamingMsg.innerHTML = data.stream;
+            streamingMsg.scrollIntoViewIfNeeded();
+            return;
+        }
+
+        // Handle final AI message
         const metadata = data.metadata;
+        removeStreamingMessage();
         const aiMessage = createAIMessageElement(data, metadata, forwardReplyToSocket);
 
         // Append AI message after user message

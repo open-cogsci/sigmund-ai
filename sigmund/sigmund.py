@@ -2,7 +2,7 @@ import logging
 import json
 from types import GeneratorType
 from . import config
-from .reply import Reply, ActionReply
+from .reply import Reply, ActionReply, StreamReply
 from .documentation import Documentation
 from .messages import Messages
 from .model import model
@@ -14,7 +14,7 @@ logger = logging.getLogger('sigmund')
 
 class Sigmund:
     """The main chatbot class.
-    
+
     Parameters
     ----------
     user_id: A user name
@@ -74,14 +74,14 @@ class Sigmund:
                                   tool_choice=tool_choice)
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
-    
+
     def send_user_message(self, message: str, workspace_content: str = None,
                           workspace_language: str = 'text',
                           attachments: list = None,
                           message_id: str = None) -> GeneratorType:
         """The main function that takes a user message and returns one or 
         replies. This is a generator function where each yield gives a tuple.
-        
+
         This tuple can be (dict, dict, str) in which case the first dict 
         contains an action and a message key. This communicates to the client 
         that an action should be taking, such that the loading indicator should
@@ -131,13 +131,13 @@ class Sigmund:
                 yield reply
         for reply in self._answer(attachments):
             yield reply
-            
+
     def _rate_limit_exceeded(self):
         tokens_consumed_past_hour = self.database.get_activity()
         logger.info(
             f'tokens consumed in past hour: {tokens_consumed_past_hour}')
         return tokens_consumed_past_hour > config.max_tokens_per_hour
-    
+
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
         yield ActionReply(f'{config.ai_name} is searching ')
@@ -148,20 +148,27 @@ class Sigmund:
         self.documentation.search(message)
         logger.info(
             f'[search state] {len(self.documentation._documents)} documents, {len(self.documentation)} characters')
-    
+
     def _answer(self, attachments: [] = None,
                 state: str = 'answer') -> GeneratorType:
         """Implements the answer phase."""
         yield ActionReply(f'{config.ai_name} is thinking and typing ')
         logger.info(f'[{state} state] entering')
         # We first collect a regular reply to the user message. While doing so
-        # we also keep track of the number of tokens consumed.
+        # we also keep track of the number of tokens consumed. The prediction
+        # is streamed so that we can progressively send text to the client.
         tokens_consumed_before = self.answer_model.total_tokens_consumed
-        reply = self.answer_model.predict(self.messages.prompt(),
-                                          attachments=attachments)
+        stream = self.answer_model.predict(self.messages.prompt(),
+                                           attachments=attachments,
+                                           stream=True)
+        # The stream may return incomplete chunks, which we yield as 
+        # StreamReply objects.
+        for reply, complete in stream:
+            if not complete:
+                yield StreamReply(reply)
         if isinstance(reply, str) and self.documentation.poor_match:
             reply = '''<div class="message-info" markdown="1">Expert knowledge is enabled, but Sigmund was unable to find useful documentation to answer your question. To get a more useful answer:
-            
+
 - Provide more details and relevant keywords
 - Or: Enable expert knowledge that is relevant to your question (see Menu)
 - Or: Disable all expert knowledge to discuss general subjects (see Menu)

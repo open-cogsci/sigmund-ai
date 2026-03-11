@@ -6,20 +6,21 @@ logger = logging.getLogger('sigmund')
 
 
 class AnthropicModel(BaseModel):
-    
+
     supports_not_done_yet = False
-    
+
     def __init__(self, sigmund, model, **kwargs):
         from anthropic import Anthropic, AsyncAnthropic
         super().__init__(sigmund, model, **kwargs)
         self._tool_use_id = 0
         self._client = Anthropic(api_key=config.anthropic_api_key)
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)
-        
-    def predict(self, messages, attachments=None, track_tokens=True):
+
+    def predict(self, messages, attachments=None, track_tokens=True,
+                stream=False):
         if isinstance(messages, str):
             return super().predict([self.convert_message(messages)],
-                                   attachments, track_tokens)
+                                   attachments, track_tokens, stream=stream)
         messages = utils.prepare_messages(messages, allow_ai_first=False,
                                           allow_ai_last=False,
                                           merge_consecutive=True)
@@ -139,8 +140,9 @@ class AnthropicModel(BaseModel):
                                    'data': data}
                     })
             messages[-1]['content'] = content
-        return super().predict(messages, attachments, track_tokens)
-        
+        return super().predict(messages, attachments, track_tokens,
+                               stream=stream)
+
     def get_response(self, response):
         """Converts an Anthropic response into a flat HTML string,
         preserving the interleaved order of thinking and text blocks."""
@@ -164,7 +166,7 @@ class AnthropicModel(BaseModel):
                 parts.append(thinking_html)
                 tool_message_prefix += thinking_html
         return '\n'.join(parts)
-        
+
     def _tool_args(self):
         if not self._tools:
             return {}
@@ -179,8 +181,10 @@ class AnthropicModel(BaseModel):
                 }
                 alternative_format_tools.append(alt_tool)
         return {'tools': alternative_format_tools}
-        
-    def _anthropic_invoke(self, fnc, messages):
+
+    def _prepare_invoke_kwargs(self, messages):
+        """Prepares the keyword arguments and messages for the Anthropic API
+        call. Returns a (messages, kwargs) tuple."""
         kwargs = self._tool_args()
         kwargs.update(config.anthropic_kwargs)
         # If the first message is the system prompt, we need to separate this
@@ -198,25 +202,56 @@ class AnthropicModel(BaseModel):
                     "type": "enabled",
                     "budget_tokens": config.anthropic_max_thinking_tokens
                 }
-        try:
-            result = fnc(model=self._model, messages=messages, **kwargs)
-        except Exception:            
-            import pprint
-            print('=== an error occurred while sending messages')
-            pprint.pprint(messages)
-            print('=== system message')
-            print(kwargs['system'])
-            print('***')
-            raise            
-        # import pprint
-        # print('=== reply')
-        # pprint.pprint(result)
-        # print('***')
-        return result
+        return messages, kwargs
         
+    def _print_error(self, messages, kwargs):
+        import pprint
+        print('=== an error occurred while sending messages')
+        pprint.pprint(messages)
+        print('=== system message')
+        print(kwargs.get('system', '(none)'))
+        print('***')
+
     def invoke(self, messages):
-        return self._anthropic_invoke(self._client.messages.create, messages)
-        
-    def async_invoke(self, messages):
-        return self._anthropic_invoke(self._async_client.messages.create,
-                                      messages)
+        messages, kwargs = self._prepare_invoke_kwargs(messages)
+        try:
+            with self._client.messages.stream(
+                model=self._model, messages=messages, **kwargs
+            ) as stream:                
+                return stream.get_final_message()
+        except Exception:
+            self._print_error(messages, kwargs)
+            raise
+
+    def stream_invoke(self, messages):
+        """A generator that returns (text, complete) tuples. During streaming
+        complete is False. For the final message, it is True.
+        """
+        messages, kwargs = self._prepare_invoke_kwargs(messages)
+        try:
+            with self._client.messages.stream(
+                model=self._model, messages=messages, **kwargs
+            ) as stream:
+                all_text = ''
+                for text in stream.text_stream:
+                    if config.log_replies:
+                        logger.info(f'streaming: {text}')
+                    all_text += text
+                    yield all_text, False
+                if config.log_replies:
+                    logger.info('stream ended')
+                yield stream.get_final_message(), True
+        except Exception:
+            self._print_error(messages, kwargs)
+            raise
+
+    async def async_invoke(self, messages):
+        messages, kwargs = self._prepare_invoke_kwargs(messages)
+        try:
+            async with self._async_client.messages.stream(
+                model=self._model, messages=messages, **kwargs
+            ) as stream:
+                return await stream.get_final_message()
+        except Exception:
+            self._print_error(messages, kwargs)
+            raise

@@ -144,7 +144,7 @@ class OpenAIModel(BaseModel):
     def invoke(self, messages):
         return self._openai_invoke(
             self._client.chat.completions.create, messages=messages)
-        
+                
     def async_invoke(self, messages):
         return self._openai_invoke(
             self._async_client.chat.completions.create, messages=messages)

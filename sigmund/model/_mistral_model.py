@@ -137,7 +137,7 @@ class MistralModel(OpenAIModel):
         return fnc(model=self._actual_model, messages=messages, **kwargs)
     
     def invoke(self, messages):
-        return self._mistral_invoke(self._client.chat.complete, messages)
+        return self._mistral_invoke(self._client.chat.complete, messages)     
         
     def async_invoke(self, messages, attachments=None):
         return self._mistral_invoke(self._client.chat.complete_async, messages)
