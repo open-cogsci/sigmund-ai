@@ -56,7 +56,14 @@ class AnthropicModel(BaseModel):
                         raise ValueError(
                             'The first message cannot be a tool message')
                     logger.info('converting tool message to user message')
-                    tool_info = json.loads(message['content'])
+                    try:
+                        tool_info = json.loads(message['content'])
+                    except json.JSONDecodeError:
+                        # This appears to happen under rare edge cases
+                        logger.warning('tool message content is not valid JSON')
+                        tool_info = {'content': '',
+                                     'args': '',
+                                     'name': 'missing_tool'}
                     message['role'] = 'user'
                     if tool_info['content'] is None:
                         tool_info['content'] = ''
