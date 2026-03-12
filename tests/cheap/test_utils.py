@@ -107,6 +107,36 @@ print('hello yet again world')
 ```'''
     assert content.strip() == "print('hello world')"
     assert language == 'python'
+    s = '''Here's a nested workspace example:
+
+<workspace language="html">
+Outer
+<workspace>
+Inner
+</workspace>
+</workspace>
+
+And a second workspace:
+
+<workspace language="python">
+print('hello again world')
+</workspace>
+'''
+    txt, content, language = extract_workspace(s)
+    assert txt.strip() == '''Here's a nested workspace example:
+
+
+
+And a second workspace:
+
+```python
+print('hello again world')
+```'''
+    assert content.strip() == '''Outer
+<workspace>
+Inner
+</workspace>'''
+    assert language == 'html'
     s = '''Here's a simple workspace example:
     
 ```python

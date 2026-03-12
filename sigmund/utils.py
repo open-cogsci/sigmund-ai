@@ -101,54 +101,96 @@ def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
         messages.append(dict(role='user', content='Please continue!'))
     return messages
 
+def _find_balanced_workspace(txt, start=0):
+    """Find the first balanced <workspace>...</workspace> block starting from
+    position `start`. Returns (match_start, match_end, language, content) or
+    None if no balanced workspace is found.
+    """
+    open_pattern = re.compile(
+        r'^<workspace(?: language="(.+?)")?>', re.MULTILINE
+    )
+    close_tag = '</workspace>'
+    inner_open = re.compile(r'<workspace(?:\s[^>]*)?>')
+    match = open_pattern.search(txt, start)
+    if not match:
+        return None
+    language = match.group(1)
+    match_start = match.start()
+    content_start = match.end()
+    depth = 1
+    pos = content_start
+    while depth > 0:
+        next_open = inner_open.search(txt, pos)
+        next_close_idx = txt.find(close_tag, pos)
+        if next_close_idx == -1:
+            # No matching close tag found
+            return None
+        next_open_idx = next_open.start() if next_open else len(txt)
+        if next_open_idx < next_close_idx:
+            depth += 1
+            pos = next_open.end()
+        else:
+            depth -= 1
+            if depth == 0:
+                content = txt[content_start:next_close_idx]
+                match_end = next_close_idx + len(close_tag)
+                return match_start, match_end, language, content
+            pos = next_close_idx + len(close_tag)
+    return None
+
+
 def extract_workspace(txt: str) -> tuple:
     """Takes a string of text and extracts workspace content from it. There are
     a few ways in which this can occur:
-    
+
     - If the text contains a workspace indicated like this:
       <workspace language="language">
       your workspace content
       </workspace>`
-      Then language and the content should be extracted and returned as the 
+      Then language and the content should be extracted and returned as the
       second value of the tuple. If no language is specified, it defaults to
       'markdown'. The workspace tags and content should be stripped from txt.
-    - If the text doesn't contain an explicit workspace, but does contain 
+    - If the text doesn't contain an explicit workspace, but does contain
       markdown code blocks like this:
-      ```language 
+      ```language
       code here
       ```
       Then this code should be extracted as the workspace content and language,
       again falling back markdown if no language is provided. The markdown
       code blocks do not have to be stripped from txt.
-      
+
     Return txt, workspace_content, language
     """
-    open_pattern = r'^<workspace(?: language="(.+?)")?>'
-    if re.search(open_pattern, txt, re.DOTALL | re.MULTILINE) \
-            and '</workspace>' not in txt:
-        logger.warning('workspace closing tag appears to be missing')
-        txt += '\n</workspace>'
-    # Checks for <workspace> tags
-    pattern = r'^<workspace(?: language="(.+?)")?>(.*?)</workspace>'
-    match = re.search(pattern, txt, re.DOTALL | re.MULTILINE)
-    if match:
-        language = match.group(1) if match.group(1) else 'markdown'
-        content = match.group(2).strip()
-        # Only replace the first occurrence (the one we extracted)
-        text_without_workspace = re.sub(pattern, "", txt, count=1,
-                                        flags=re.DOTALL | re.MULTILINE).strip()
-        
-        # Convert any remaining workspace tags to markdown code blocks
-        def replace_workspace_with_codeblock(m):
-            lang = m.group(1) if m.group(1) else 'markdown'
-            code_content = m.group(2).strip()
-            return f'```{lang}\n{code_content}\n```'
-        
-        text_without_workspace = re.sub(pattern, replace_workspace_with_codeblock, 
-                                      text_without_workspace, 
-                                      flags=re.DOTALL | re.MULTILINE)
-        
-        # Empty messages can cause issues, so if stripping the workspace 
+    # Auto-close unclosed workspace tags (e.g. during streaming)
+    open_count = len(re.findall(r'<workspace(?:\s[^>]*)?>', txt))
+    close_count = txt.count('</workspace>')
+    if open_count > close_count:
+        txt += '\n</workspace>' * (open_count - close_count)
+    # Find the first balanced workspace block
+    result = _find_balanced_workspace(txt)
+    if result:
+        match_start, match_end, language, content = result
+        language = language or 'markdown'
+        content = content.strip()
+        # Remove the extracted workspace from the text
+        text_without_workspace = (
+            txt[:match_start] + txt[match_end:]
+        ).strip()
+        # Convert any remaining workspace blocks to markdown code blocks
+        while True:
+            remaining = _find_balanced_workspace(text_without_workspace)
+            if not remaining:
+                break
+            r_start, r_end, r_lang, r_content = remaining
+            r_lang = r_lang or 'markdown'
+            r_content = r_content.strip()
+            replacement = f'```{r_lang}\n{r_content}\n```'
+            text_without_workspace = (
+                text_without_workspace[:r_start]
+                + replacement
+                + text_without_workspace[r_end:]
+            )
+        # Empty messages can cause issues, so if stripping the workspace
         # results in an empty message, we add a placeholder.
         if not text_without_workspace:
             text_without_workspace = 'I added content to the workspace!'
