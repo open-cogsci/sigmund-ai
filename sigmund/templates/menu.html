@@ -5,36 +5,7 @@
       {% include 'login-div.html' %}
     {% endif %}
 {% raw %}
-    <!-- Expert knowledge section -->
-    <div>
-      <small>For best performance, only enable knowledge you need</small>
-    </div>
-    <div>
-      <label>Expert knowledge:</label>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-opensesame" 
-                 v-model="collection_opensesame">
-          <label for="collection-opensesame">OpenSesame
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-datamatrix" 
-                 v-model="collection_datamatrix">
-          <label for="collection-datamatrix">Python coding and data analysis</label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-forum" 
-                 v-model="collection_forum">
-          <label for="collection-forum">CogSci community forum</label>
-      </div>
-    </div>
-    <hr class="menu-divider">    
+    <!-- Tool section -->
     <div>
       <small>For best performance, only enable tools you need</small>
     </div>    
@@ -88,6 +59,36 @@
           <label for="tool-generate-image-dalle3">Generate images (Dall-E 3)</label>
       </div>
     </div>
+    <!-- Expert knowledge section -->
+    <div>
+      <small>For best performance, only enable knowledge you need</small>
+    </div>
+    <div>
+      <label>Expert knowledge:</label>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="collection-opensesame" 
+                 v-model="collection_opensesame">
+          <label for="collection-opensesame">OpenSesame
+          </label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="collection-datamatrix" 
+                 v-model="collection_datamatrix">
+          <label for="collection-datamatrix">Python coding and data analysis</label>
+      </div>
+      <div class="tool-item">
+          <input type="checkbox"
+                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                 id="collection-forum" 
+                 v-model="collection_forum">
+          <label for="collection-forum">CogSci community forum</label>
+      </div>
+    </div>
+    <hr class="menu-divider">        
     <hr class="menu-divider">
     <div>
       <small>Build experiments, analyze data, and run code with application connectors</small>
