@@ -159,7 +159,7 @@ settings_default = {
     'tool_remove_note': 'true',
     'tool_save_workspace_as_note': 'true',
     # Indicates which library collections are enabled
-    'collection_opensesame': 'true',
+    'collection_opensesame': 'false',
     'collection_datamatrix': 'false',
     'collection_forum': 'false'
 }
