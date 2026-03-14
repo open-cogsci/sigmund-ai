@@ -1,25 +1,80 @@
 let socket;
 let retryInterval;
+let showConnectedTimeout;
+let connectorName = 'OpenSesame';
+let manualDisconnect = false;
 const retryDelay = 5000;
 const maxMessages = 10;
 
+
+function updateConnectorStatus(status) {
+    const statusDiv = document.getElementById('connected-status');
+    if (status === 'connected') {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<i class="fas fa-plug"></i> Connected to '
+            + connectorName
+            + ' <button onclick="disconnectWebSocket()" title="Disconnect"'
+            + ' style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;">'
+            + '<i class="fas fa-times-circle"></i></button>';
+    } else if (status === 'stopped') {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<i class="fas fa-plug" style="color:#aaa;"></i> Connector stopped'
+            + ' <button onclick="restartWebSocket()" title="Restart connector"'
+            + ' style="background:none;border:none;cursor:pointer;color:inherit;font-size:inherit;">'
+            + '<i class="fas fa-play-circle"></i></button>';
+    } else {
+        statusDiv.style.display = 'none';
+    }
+}
+
+
+function disconnectWebSocket() {
+    manualDisconnect = true;
+    if (retryInterval) {
+        clearInterval(retryInterval);
+        retryInterval = null;
+    }
+    if (showConnectedTimeout) {
+        clearTimeout(showConnectedTimeout);
+        showConnectedTimeout = null;
+    }
+    if (socket) {
+        socket.close();
+    }
+    updateConnectorStatus('stopped');
+}
+
+
+function restartWebSocket() {
+    manualDisconnect = false;
+    updateConnectorStatus('disconnected');
+    connectWebSocket();
+}
+
+
 function connectWebSocket() {
+    if (manualDisconnect) return;
+
     try {
         socket = new WebSocket('ws://localhost:8080');
-        
+
         socket.onopen = function () {
             console.log('Connected to server');
             if (retryInterval) {
                 clearInterval(retryInterval); 
                 retryInterval = null;
             }
-            // CHANGED: Show the "connected-status" div on successful connection
-            document.getElementById('connected-status').style.display = 'block';
+            // Delay showing the connected status to avoid a brief flicker
+            // when the connection is immediately rejected (e.g. because
+            // another instance is already connected)
+            showConnectedTimeout = setTimeout(function() {
+                updateConnectorStatus('connected');
+            }, 500);
 
             // Rebuild conversation history
             let action;
             let message;
-			  let workspace;
+            let workspace;
             socketSendMessage("clear_messages");
             // Determine which messages to send (last maxMessages)
             const allMessages = Array.from(responseDiv.children || []);
@@ -36,7 +91,7 @@ function connectWebSocket() {
                     true
                 );
             }      
-            
+
             for (let messageDiv of messagesToSend) {
 				workspace = messageDiv.querySelector('.message-workspace');
 				if (workspace !== null) {
@@ -76,7 +131,7 @@ function connectWebSocket() {
                             const blob = new Blob([bytes], { type: att.mime_type });
                             return new File([blob], att.filename, { type: att.mime_type });
                         });
-                        
+
                         // Add to global attachments array
                         if (typeof attachments !== 'undefined') {
                             attachments.push(...files);
@@ -86,11 +141,11 @@ function connectWebSocket() {
                             }
                         }
                     }
-                    
+
                     // Set message and workspace content
                     messageInput.value = data.message;
                     setWorkspace(data.workspace_content, data.workspace_language);
-                    
+
                     // Send message (attachments will be included automatically)
                     // and indicate that the reply should be forwarded to the 
                     // socket.
@@ -101,16 +156,16 @@ function connectWebSocket() {
                         data.transient_system_prompt,
                         data.foundation_document_topics
                     );
-                    
+
                     // Clear message input after sending
                     messageInput.value = '';
-                    
+
                     // Note: attachments should be cleared by sendMessage function
                     // after successfully sending the message
-                    
+
                 } else if (data.action === 'connector_name') {
-                    const name = data.message;
-                    document.getElementById('connected-status').innerHTML = ' Connected to ' + name;
+                    connectorName = data.message;
+                    updateConnectorStatus('connected');
                 } else if (data.action === 'disable_code_execution') {
                     document.getElementById('tool-execute-code').checked = false;
                 } else if (data.action === 'clear_conversation') {
@@ -126,8 +181,15 @@ function connectWebSocket() {
 
         socket.onclose = function () {
             console.log('Disconnected from server');
-            document.getElementById('connected-status').style.display = 'none';
-            startReconnect();
+            // Cancel pending show-connected timeout to prevent flicker
+            if (showConnectedTimeout) {
+                clearTimeout(showConnectedTimeout);
+                showConnectedTimeout = null;
+            }
+            if (!manualDisconnect) {
+                updateConnectorStatus('disconnected');
+                startReconnect();
+            }
         };
 
         socket.onerror = function () {
@@ -164,7 +226,7 @@ function socketSendMessage(action, message, workspace_content, workspace_languag
 function copyAndStripDiv(originalDiv) {
   // Clone the original div (deep clone, so copy all descendants)
   const clonedDiv = originalDiv.cloneNode(true);
-  
+
   // List of classes to remove
   const classesToRemove = [
     'message-delete',
@@ -173,7 +235,7 @@ function copyAndStripDiv(originalDiv) {
     'message-timestamp',
     'message-answer-model'
   ];
-  
+
   // For each class we want to remove
   for (const className of classesToRemove) {
     const elements = clonedDiv.querySelectorAll(`.${className}`);
@@ -182,7 +244,7 @@ function copyAndStripDiv(originalDiv) {
       el.remove();
     }
   }
-  
+
   // Return the stripped clone
   return clonedDiv;
 }
