@@ -256,8 +256,15 @@ class Messages:
                 self._conversation_title != config.default_conversation_title:
             return
         logger.info('updating conversation title')
+        # To make sure that all models understand that the conversation should
+        # be summarized into the title, we add the title prompt to the system
+        # prompt as well as the last user message. If the prompt already ends
+        # with a user message, we strip it.
         title_prompt = [dict(role='system', content=prompt.TITLE_PROMPT)]
         title_prompt += self.prompt()[2:]
+        if title_prompt[-1]['role'] == 'user':
+            title_prompt.pop()
+        title_prompt.append(dict(role='user', content=prompt.TITLE_PROMPT))
         suggested_title = self._sigmund.condense_model.predict(title_prompt)
         # The prediction may be a tool call, so we need to check if it is a str.
         # This should not ordinarily happen, but sometimes models get confused.

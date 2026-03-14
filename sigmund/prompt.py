@@ -62,7 +62,7 @@ JUDGE_RELEVANCE = '''Is the document relevant for answering the question?
 
 Reply with a JSON string to indicate whether the document is relevant ({"relevant": true}) or not ({"relevant": false}). Do not include any additional text.'''
 
-TITLE_PROMPT = '''Provide a brief title that desribes the topic of the conversation below. Reply only with the title, do not add any additional text.'''
+TITLE_PROMPT = '''Provide a brief title that desribes the topic of this conversation. Reply only with a short title of a single line. Do *not* add any additional text.'''
 DESCRIBE_PROMPT = '''Provide a brief description of the following text:
         
 Filename: {{ name }}
