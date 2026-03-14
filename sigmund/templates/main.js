@@ -48,6 +48,8 @@ function initMain(event) {
     if (typeof connectWebSocket === 'function') {
         connectWebSocket();
     }
+    // Scroll to bottom on page load so the most recent messages are visible
+    scrollChatToBottom();
 }
 
 function generateUUID() {
@@ -78,6 +80,8 @@ function showImageAttachments(message) {
                 reader.onload = (e) => {
                     const dataUrl = e.target.result;
                     const imgTag = `<div class="image-generation mask"><img src="${dataUrl}"></div>`;
+                    // You changed the above to below:
+                    // const imgTag = ``;
                     resolve(imgTag);
                 };
                 reader.readAsDataURL(file);
@@ -294,7 +298,7 @@ function displayCustomErrorMessage(htmlContent) {
     errorMessageBox.setAttribute('data-message-id', generateUUID());
     errorMessageBox.innerHTML = htmlContent;
     responseDiv.appendChild(errorMessageBox);
-    errorMessageBox.scrollIntoViewIfNeeded();
+    scrollChatToBottom();
 }
 
 function displayErrorMessage() {
@@ -394,7 +398,7 @@ async function sendMessage(
 
     // Disable input
     disableMessageInput();
-    chatAreaDiv.scrollTo(0, chatAreaDiv.scrollHeight);
+    scrollChatToBottom();
 
     // Prepare and send initial request
     const formData = prepareFormData(message, user_message_id, transient_settings, transient_system_prompt, foundation_document_topics);
@@ -439,6 +443,7 @@ async function sendMessage(
                 endStream();
             } else if (data.action == 'set_loading_indicator') {
                 loadingInfo.setBaseMessage(data.message);
+                scrollChatToBottom();
             }
             return;
         }
@@ -453,7 +458,7 @@ async function sendMessage(
                 responseDiv.appendChild(streamingMsg);
             }
             streamingMsg.innerHTML = data.stream;
-            streamingMsg.scrollIntoViewIfNeeded();
+            scrollChatToBottom();
             return;
         }
 
@@ -465,7 +470,7 @@ async function sendMessage(
 
         // Append AI message after user message
         responseDiv.appendChild(aiMessage);
-        aiMessage.scrollIntoViewIfNeeded();
+        scrollChatToBottom();
         setFavicon(originalFavicon);
     };
 

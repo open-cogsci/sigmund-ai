@@ -1,3 +1,9 @@
+function scrollChatToBottom() {
+    if (window.chatAreaDiv) {
+        chatAreaDiv.scrollTo(0, chatAreaDiv.scrollHeight);
+    }
+}
+
 function globalElements(event) {
     window.responseDiv = document.getElementById('response');
     window.chatAreaDiv = document.getElementById('chat-area');
@@ -7,7 +13,6 @@ function globalElements(event) {
     window.messageInput = document.getElementById('message');
     window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
-    window.scrollTo(0, document.body.scrollHeight);
     window.workspaceLanguageSelect = document.getElementById('workspace-language');
     window.clearWorkspaceButton = document.getElementById('clear-workspace');
     window.copyWorkspaceButton = document.getElementById('copy-workspace');
