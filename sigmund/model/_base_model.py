@@ -39,7 +39,7 @@ class BaseModel:
     def __repr__(self):
         return f'{self.__class__.__name__}(model={self._model}, thinking={self._thinking})'
 
-    def invalid_tool(self) -> str:
+    def invalid_tool(self, *args, **kwargs) -> str:
         return 'Invalid tool', None, 'markdown', False
 
     def get_response(self, response) -> [str, callable]:
