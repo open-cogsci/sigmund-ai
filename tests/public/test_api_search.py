@@ -7,5 +7,7 @@ class TestApiSearch(BaseRoutesTestCase):
         super().setUp()
                 
     def test_setting(self):
-        response = self.client.post('/public/search', json={'query': 'test'})
+        response = self.client.post('/public/search',
+                                    json={'query': 'how to install tobii'})
         self.assertEqual(response.status_code, 200)
+        assert 'pygaze' in response.json['results'].lower()

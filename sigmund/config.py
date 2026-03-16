@@ -94,7 +94,7 @@ model_config = {
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',
-        'public_model': 'mistral-small-latest',
+        'public_model': 'mistral-medium-latest',
         'answer_model': 'mistral-large-latest',
         'vision_model': 'mistral-large-latest'
     },

@@ -15,23 +15,24 @@ def search():
     offset = data.get('offset', 0) * config.public_search_docs_max
     source = data.get('source', 'default')
     logger.info(f'public search source: {source}')
-    sigmund = Sigmund(user_id='dummy', persistent=False, encryption_key=None)
+    sigmund = Sigmund(user_id='dummy', persistent=False, encryption_key=None,
+                      model_config='mistral')
     sigmund.documentation.clear()
+    sigmund.documentation._collections.add('opensesame')
     if 'public-with-forum' in source:
         sigmund.documentation._collections.add('forum')
         logger.info('adding forum source for search')
-    sigmund.documentation.search(query, howtos=False, foundation=False,
+    sigmund.documentation.search(query, howtos=True, foundation=False,
                                  k=config.public_search_docs_max + offset,
                                  max_distance=float('inf'))
     docs = []
     urls = []
     logging.info(f'public search: {query} (offset={offset})')
-    for doc in sigmund.documentation._documents[offset:]:
+    for i, doc in enumerate(sigmund.documentation._documents[offset:]):
         url = doc.get('url')
         if not url:
-            continue
+            url = f'howto-{i}'
         if url in urls:
-            print('skipping duplicate')
             continue
         urls.append(url)
         doc['content'] = doc['content'][
