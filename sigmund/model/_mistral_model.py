@@ -2,6 +2,7 @@ import logging
 import tempfile
 import base64
 import os
+from types import SimpleNamespace
 from .. import config, utils
 from . import BaseModel
 from ._openai_model import OpenAIModel
@@ -9,11 +10,11 @@ logger = logging.getLogger('sigmund')
 
 
 class MistralModel(OpenAIModel):
-    
+
     supports_not_done_yet = False
 
     def __init__(self, sigmund, model, **kwargs):
-        from mistralai import Mistral
+        from mistralai.client import Mistral
         BaseModel.__init__(self, sigmund, model, **kwargs)
         self._actual_model = self._model
         # Mistral doesn't allow a tool to be specified by name. So if this
@@ -23,7 +24,7 @@ class MistralModel(OpenAIModel):
         if self._tool_choice not in [None, 'none', 'auto', 'any']:
             self._tool_choice = 'any'
         self._client = Mistral(api_key=config.mistral_api_key)
-        
+
     def predict(self, messages, attachments=None, track_tokens=True,
                 stream=False):
         if isinstance(messages, str):
@@ -85,7 +86,7 @@ class MistralModel(OpenAIModel):
             messages[-1]['content'] = content
         return BaseModel.predict(self, messages, attachments, track_tokens,
                                  stream)
-        
+
     def get_response(self, response) -> [str, callable]:
         content = response.choices[0].message.content
         tool_message_prefix = ''
@@ -120,12 +121,12 @@ class MistralModel(OpenAIModel):
             logger.warning(f'invalid tool called: {function}')
             return self.invalid_tool            
         return content
-        
+
     def _tool_call_id(self, nr):
         # Must be a-z, A-Z, 0-9, with a length of 9
         return f'{nr:09d}'
-        
-    def _mistral_invoke(self, fnc, messages):
+
+    def _invoke_kwargs(self, messages):
         # Mistral tends to get stuck in a loop where the same tool is called
         # over and over again. To fix this, we temporarily disallow tools when
         # the last message was a tool.	
@@ -136,10 +137,117 @@ class MistralModel(OpenAIModel):
         kwargs.update(config.mistral_kwargs)
         if self.json_mode:
             kwargs['response_format'] = {"type": "json_object"}
-        return fnc(model=self._actual_model, messages=messages, **kwargs)
-    
+        return kwargs
+
+    def _mistral_invoke(self, fnc, messages):
+        return fnc(model=self._actual_model, messages=messages,
+                   **self._invoke_kwargs(messages))
+
     def invoke(self, messages):
         return self._mistral_invoke(self._client.chat.complete, messages)     
-        
+
+    def stream_invoke(self, messages):
+        """A generator that returns (response, complete) tuples. During
+        streaming complete is False and the responses are text fragments from
+        regular text responses. For the final message, complete is True and
+        the response is the reconstructed response as would be returned by 
+        regular invoke().
+        """
+        stream = self._client.chat.stream(
+            model=self._actual_model, messages=messages,
+            **self._invoke_kwargs(messages))
+        # Content items are (type, data) tuples where type is 'text' or
+        # 'thinking'. For text, data is a string fragment. For thinking,
+        # data is a list of thinking-chunk objects (with .text attributes).
+        content_items = []
+        has_list_content = False
+        tool_calls_acc = {}
+        usage = None
+        all_text = ''
+        for event in stream:
+            chunk = event.data
+            if chunk.usage is not None:
+                usage = chunk.usage
+            if not chunk.choices:
+                continue
+            delta = chunk.choices[0].delta
+            # Content can be a plain string or a list of typed blocks
+            # (text / thinking) when the model uses extended thinking.
+            if delta.content:
+                if isinstance(delta.content, str):
+                    content_items.append(('text', delta.content))
+                    all_text += delta.content
+                    yield all_text, False
+                elif isinstance(delta.content, list):
+                    has_list_content = True
+                    for item in delta.content:
+                        if item.type == 'text' and item.text:
+                            content_items.append(('text', item.text))
+                            all_text += item.text
+                            yield all_text, False
+                        elif item.type == 'thinking':
+                            content_items.append(
+                                ('thinking', item.thinking or []))
+            # Accumulate streamed tool call fragments
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    idx = tc.index
+                    if idx not in tool_calls_acc:
+                        tool_calls_acc[idx] = SimpleNamespace(
+                            id=tc.id or '',
+                            type=tc.type or 'function',
+                            function=SimpleNamespace(
+                                name='', arguments=''))
+                    acc = tool_calls_acc[idx]
+                    if tc.id:
+                        acc.id = tc.id
+                    if tc.type:
+                        acc.type = tc.type
+                    if tc.function:
+                        if tc.function.name:
+                            acc.function.name = tc.function.name
+                        if tc.function.arguments:
+                            acc.function.arguments += tc.function.arguments
+        # Reconstruct the final response to match the structure returned by
+        # invoke(), so that get_response() works on it.
+        if not content_items:
+            final_content = None
+        elif not has_list_content:
+            # Simple string content (no thinking blocks)
+            final_content = ''.join(data for _, data in content_items)
+        else:
+            # Merge adjacent blocks of the same type into a compact list of
+            # SimpleNamespace objects compatible with get_response().
+            merged = []
+            for item_type, item_data in content_items:
+                if merged and merged[-1][0] == item_type:
+                    if item_type == 'text':
+                        merged[-1] = ('text', merged[-1][1] + item_data)
+                    else:
+                        merged[-1] = ('thinking',
+                                      merged[-1][1] + item_data)
+                else:
+                    merged.append((item_type, item_data))
+            final_content = []
+            for block_type, block_data in merged:
+                if block_type == 'text':
+                    final_content.append(
+                        SimpleNamespace(type='text', text=block_data))
+                else:
+                    final_content.append(
+                        SimpleNamespace(type='thinking',
+                                        thinking=block_data))
+        final_tool_calls = (
+            [tool_calls_acc[i] for i in sorted(tool_calls_acc)]
+            if tool_calls_acc else None
+        )
+        message = SimpleNamespace(
+            content=final_content,
+            tool_calls=final_tool_calls,
+            role='assistant')
+        choice = SimpleNamespace(message=message)
+        response = SimpleNamespace(choices=[choice], usage=usage)
+        yield response, True
+
     def async_invoke(self, messages, attachments=None):
         return self._mistral_invoke(self._client.chat.complete_async, messages)

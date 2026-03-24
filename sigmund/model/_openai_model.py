@@ -1,5 +1,6 @@
 import json
 import logging
+from types import SimpleNamespace
 from .. import config
 from . import BaseModel
 
@@ -17,7 +18,7 @@ class OpenAIModel(BaseModel):
                                  "function": {"name": self._tool_choice}}
         self._client = Client(api_key=config.openai_api_key)
         self._async_client = AsyncClient(api_key=config.openai_api_key)
-        
+
     def predict(self, messages, attachments=None, track_tokens=True,
                 stream=False):
         # Strings need to be converted a list of length one with a single
@@ -47,20 +48,16 @@ class OpenAIModel(BaseModel):
                         }})
             messages[-1]['content'] = content            
         return super().predict(messages, attachments, track_tokens, stream)
-        
+
     def _tool_call_id(self, nr):
         return f'call_{nr}'
-        
+
     def _prepare_tool_messages(self, messages):
         # OpenAI requires the tool message to be linked to the previous AI
         # message with a tool_call_id. The actual content doesn't appear to
         # matter, so here we dummy-link the messages
         # The system message cannot have tool_calls information, so in that 
         # case we add a dummy message. 
-        # import pprint
-        # print('=== preparing tool messages')
-        # pprint.pprint(messages)
-        # print('---')
         if len(messages) > 1 and messages[1]['role'] == 'tool':
             logger.info('insert dummy assistant message before tool')
             messages.insert(1, {'role': 'assistant'})
@@ -105,10 +102,8 @@ class OpenAIModel(BaseModel):
             message['content'] = tool_info['content']
             if message['content'] is None:
                 message['content'] = ''
-        # pprint.pprint(messages)
-        # print('=== end preparing tool messages')                
         return messages
-        
+
     def get_response(self, response):
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:
@@ -120,13 +115,14 @@ class OpenAIModel(BaseModel):
             logger.warning(f'invalid tool called: {function}')
             return self.invalid_tool
         return response.choices[0].message.content
-    
+
     def _tool_args(self):
         if not self._tools:
             return {}
         return {'tools': self.tools(), 'tool_choice': self._tool_choice}
-        
-    def _openai_invoke(self, fnc, messages):
+
+    def _openai_kwargs(self):
+        """Builds the common kwargs for OpenAI chat completion calls."""
         kwargs = self._tool_args()
         kwargs.update(config.openai_kwargs)
         if self.json_mode:
@@ -140,12 +136,77 @@ class OpenAIModel(BaseModel):
         elif self._model == 'gpt-5.1':
             kwargs['reasoning_effort'] = \
                 'medium' if self._thinking else 'low'
-        return fnc(model=self._model, messages=messages, **kwargs)
-        
+        return kwargs
+
+    def _openai_invoke(self, fnc, messages):
+        return fnc(model=self._model, messages=messages,
+                    **self._openai_kwargs())
+
     def invoke(self, messages):
         return self._openai_invoke(
             self._client.chat.completions.create, messages=messages)
-                
+        
+    def stream_invoke(self, messages):
+        """A generator that returns (response, complete) tuples. During
+        streaming complete is False and the responses are text fragments from
+        regular text responses. For the final message, complete is True and
+        the response is the reconstructed response as would be returned by 
+        regular invoke().
+        """
+        stream = self._client.chat.completions.create(
+            model=self._model, messages=messages, stream=True,
+            stream_options={"include_usage": True},
+            **self._openai_kwargs())
+        content_parts = []
+        tool_calls_acc = {}
+        usage = None
+        all_text = ''
+        for chunk in stream:
+            if chunk.usage is not None:
+                usage = chunk.usage
+            if not chunk.choices:
+                continue
+            delta = chunk.choices[0].delta
+            # Yield text content fragments as they arrive
+            if delta.content:
+                content_parts.append(delta.content)
+                all_text += delta.content
+                yield all_text, False
+            # Accumulate streamed tool call fragments
+            if delta.tool_calls:
+                for tc in delta.tool_calls:
+                    idx = tc.index
+                    if idx not in tool_calls_acc:
+                        tool_calls_acc[idx] = SimpleNamespace(
+                            id=tc.id or '',
+                            type=tc.type or 'function',
+                            function=SimpleNamespace(
+                                name='', arguments=''))
+                    acc = tool_calls_acc[idx]
+                    if tc.id:
+                        acc.id = tc.id
+                    if tc.type:
+                        acc.type = tc.type
+                    if tc.function:
+                        if tc.function.name:
+                            acc.function.name = tc.function.name
+                        if tc.function.arguments:
+                            acc.function.arguments += tc.function.arguments
+        # Reconstruct the final response to match the structure returned by
+        # invoke(), so that get_response() works on it.
+        final_content = ''.join(content_parts) if content_parts else None
+        final_tool_calls = (
+            [tool_calls_acc[i] for i in sorted(tool_calls_acc)]
+            if tool_calls_acc else None
+        )
+        message = SimpleNamespace(
+            content=final_content,
+            tool_calls=final_tool_calls,
+            role='assistant')
+        choice = SimpleNamespace(message=message)
+        response = SimpleNamespace(choices=[choice], usage=usage)
+        yield response, True
+
     def async_invoke(self, messages):
         return self._openai_invoke(
             self._async_client.chat.completions.create, messages=messages)

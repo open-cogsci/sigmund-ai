@@ -5,7 +5,7 @@ import json
 import base64
 import pyalex
 from pyalex import Works
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 logger = logging.getLogger('sigmund')
 pyalex.config.api_key = config.openalex_api_key
