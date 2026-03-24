@@ -673,3 +673,17 @@ button#start {
 .message-error strong {
     color: #d32f2f;
 }
+
+.why-sigmund {
+    background-color: #00796b;
+    color: white;
+    padding: 20px!important;
+    margin: 40px 10px 10px 10px;
+    border-radius: 4px;    
+}
+
+.why-sigmund p {
+    font-size: 1.2em;
+    font-family: "Roboto Condensed";
+    margin: 0px;
+}
