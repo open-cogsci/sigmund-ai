@@ -7,7 +7,7 @@ logger = logging.getLogger('sigmund')
 
 
 class Messages:
-    
+
     def __init__(self, sigmund, persistent=False):
         self._sigmund = sigmund
         self._persistent = persistent
@@ -18,14 +18,14 @@ class Messages:
             self.load()
         else:
             self.init_conversation()
-        
+
     def __len__(self):
         return len(self._message_history)
-        
+
     def __iter__(self):
         for msg in self._message_history:
             yield msg
-            
+
     def init_conversation(self):
         self._condensed_text = None
         self._notes = {}
@@ -37,7 +37,7 @@ class Messages:
         self._condensed_message_history = [
             [role, content] for role, content, metadata
             in self._message_history[:]]        
-            
+
     def metadata(self, workspace_content: str = None,
                  workspace_language: str = None, message_id: str = None):
         return {'message_id': str(uuid.uuid4()) 
@@ -48,7 +48,7 @@ class Messages:
                 'sources': self._sigmund.documentation.to_json(),
                 'condense_model': self._sigmund.model_config['condense_model'],
                 'answer_model': self._sigmund.model_config['answer_model']}
-        
+
     def append(self, role: str, message: str, workspace_content: str = None,
                workspace_language: str = None, message_id: str = None):
         metadata = self.metadata(workspace_content=workspace_content,
@@ -60,7 +60,7 @@ class Messages:
         if self._persistent:
             self.save()
         return metadata
-    
+
     def delete(self, message_id):
         message_to_remove = None
         condensed_message_to_remove = None
@@ -84,32 +84,45 @@ class Messages:
                     f'Could not find condensed message to remove for {message_id}')
         if self._persistent:
             self.save()
-            
+
     def prompt(self, system_prompt=None):
         """The prompt consists of the system prompt followed by a sequence of
         AI, user, and tool/ function messages.
-        
+
         If no system prompt is provided, one is automatically constructed.
         Typically, an explicit system_prompt is provided during the search
         phase, but not during the answer phase.
+        
+        Dynamic context (documentation, notes, condensed history) is prepended
+        to the last user message rather than included in the system prompt so
+        that the system prompt remains static and cacheable.
         """
-        if system_prompt is None:
+        auto_prompt = system_prompt is None
+        if auto_prompt:
             system_prompt = self._system_prompt()
         model_prompt = [dict(role='system', content=system_prompt)]
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
             content = utils.remove_masked_elements(content)
-            if role == 'user':
-                # Prefix the last message with the current workspace
-                if self.workspace_content and \
-                        msg_nr == len(self._condensed_message_history) - 1:
-                    content = prompt.render(
+            if role == 'user' and \
+                    msg_nr == len(self._condensed_message_history) - 1:
+                # Prefix the last user message with dynamic context and
+                # the current workspace
+                prefix_parts = []
+                if auto_prompt:
+                    context = self._user_message_context()
+                    if context:
+                        prefix_parts.append(context)
+                if self.workspace_content:
+                    prefix_parts.append(prompt.render(
                         prompt.CURRENT_WORKSPACE,
                         workspace_content=self.workspace_content,
-                        workspace_language=self.workspace_language) + content
+                        workspace_language=self.workspace_language))
+                if prefix_parts:
+                    content = ''.join(prefix_parts) + content
             model_prompt.append(dict(role=role, content=content))
         return model_prompt
-    
+
     def visible_messages(self):
         """Yields role, message, metadata while ignoring messages and 
         converting tool messages into user messages with tool result as 
@@ -124,32 +137,37 @@ class Messages:
 
     def welcome_message(self):
         return config.welcome_message
-    
+
     # Notes management
-    
+
     def set_note(self, label, content):
         """Add or update a persistent note."""
         self._notes[label] = content
-    
+
     def remove_note(self, label):
         """Remove a persistent note. Does nothing if label doesn't exist."""
         self._notes.pop(label, None)
-    
+
     def get_notes(self):
         """Return a copy of the current notes dict."""
         return dict(self._notes)
-        
+
     def _condense_message_history(self):
         system_prompt = self._system_prompt()
+        user_message_context = self._user_message_context()
         # Determine the effective length of the condensed prompt while
-        # excluding masked content. Makes content corresponds for example to
-        # image data, and other kinds of data that are shown to the user but not
-        # passed to the model.
+        # excluding masked content. Masked content corresponds for example to
+        # image data, and other kinds of data that are shown to the user but
+        # not passed to the model. The user_message_context is included in the
+        # length calculation because it will be prepended to the last user 
+        # message.
         prompt_length = sum([
             len(utils.remove_masked_elements(content))
             for role, content in self._condensed_message_history
-        ])
+        ]) + len(user_message_context)
         logger.info(f'system prompt length: {len(system_prompt)}')
+        logger.info(
+            f'user message context length: {len(user_message_context)}')
         logger.info(
             f'condensed prompt length (without system prompt): {prompt_length}')
         if prompt_length <= config.max_prompt_length:
@@ -178,34 +196,46 @@ class Messages:
             logger.error(f'condense model returned non-string result: {result}')
             return
         self._condensed_text = result.strip()
-        
+
     def _system_prompt(self):
-        """The system prompt that is used for question answering consists of
-        several fragments.
+        """The system prompt only contains the static identity to maximize
+        cache effectiveness. All dynamic content (documentation, notes,
+        condensed history) is moved to _user_message_context().
         """
-        system_prompt = [prompt.SYSTEM_PROMPT_IDENTITY]
+        return prompt.SYSTEM_PROMPT_IDENTITY
+
+    def _user_message_context(self):
+        """Builds dynamic context that is prepended to the last user message
+        in a <user_message_context> section. This keeps the system prompt 
+        static for caching purposes.
+        
+        Includes: transient system prompt, documentation, persistent notes,
+        and condensed conversation history.
+        """
+        context_parts = []
         if self._sigmund.transient_system_prompt:
-            system_prompt.append(self._sigmund.transient_system_prompt)
-        # If available, documentation is also included in the prompt
+            context_parts.append(self._sigmund.transient_system_prompt)
+        # If available, documentation is also included in the context
         if len(self._sigmund.documentation):
-            system_prompt.append(self._sigmund.documentation.prompt())
-        # If there are persistent notes, include them        
+            context_parts.append(self._sigmund.documentation.prompt())
+        # If there are persistent notes, include them
         if self._notes:
             if config.log_replies:
                 for label in self._notes:
                     logger.info(f'[note] {label}')
-            system_prompt.append(prompt.render(
+            context_parts.append(prompt.render(
                 prompt.SYSTEM_PROMPT_NOTES,
                 notes=self._notes))
-        # And finally, if the message history has been condensed, this is also
-        # included.
+        # If the message history has been condensed, include the summary
         if self._condensed_text:
-            logger.info('appending condensed text to system prompt')
-            system_prompt.append(prompt.render(
+            logger.info('appending condensed text to user message context')
+            context_parts.append(prompt.render(
                 prompt.SYSTEM_PROMPT_CONDENSED,
                 summary=self._condensed_text))
-        # Combine all non-empty prompt chunks
-        return '\n\n'.join(chunk for chunk in system_prompt if chunk.strip())    
+        if not context_parts:
+            return ''
+        context = '\n\n'.join(part for part in context_parts if part.strip())
+        return f'<user_message_context>\n{context}\n</user_message_context>\n\n'
 
     def load(self):
         try:
@@ -231,7 +261,7 @@ class Messages:
         self._notes = conversation.get('notes', {})
         if self._persistent and modified:
             self.save()
-    
+
     def save(self):
         conversation = {
             'condensed_text': self._condensed_text,
@@ -249,7 +279,7 @@ class Messages:
         """The conversation title is updated when there are at least two 
         messages, excluding the system prompt and AI welcome message. Based on
         the last messages, a summary title is then created.
-    
+
         This method is run in a separate process to avoid blocking the main thread.
         """
         if len(self) <= 2 or \
