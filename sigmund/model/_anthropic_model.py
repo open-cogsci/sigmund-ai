@@ -152,7 +152,19 @@ class AnthropicModel(BaseModel):
 
     def get_response(self, response):
         """Converts an Anthropic response into a flat HTML string,
-        preserving the interleaved order of thinking and text blocks."""
+        preserving the interleaved order of thinking and text blocks.
+        """
+        usage = response.usage
+        logger.info(
+            f'input tokens: {usage.input_tokens}, '
+            f'output: {usage.output_tokens}, '
+            f'cache read: {usage.cache_read_input_tokens}, '
+            f'cache creation: {usage.cache_creation_input_tokens}'
+        )
+        total_input_tokens = usage.cache_read_input_tokens + \
+            usage.cache_creation_input_tokens + usage.input_tokens
+        cache_use = 100 * usage.cache_read_input_tokens / total_input_tokens
+        logger.info(f'cache use: {cache_use:.2f}%')
         parts = []
         tool_message_prefix = ''
         for block in response.content:
@@ -200,6 +212,20 @@ class AnthropicModel(BaseModel):
         if messages[0]['role'] == 'system':
             kwargs['system'] = messages[0]['content']
             messages = messages[1:]
+        # Add a cache breakpoint to the second-to-last message. This caches
+        # the full prefix (system prompt + conversation history) up to but not
+        # including the final user message, which contains dynamic context
+        # (RAG docs, notes, workspace) and should not be cached.
+        if len(messages) >= 2:
+            penultimate = messages[-2]
+            if isinstance(penultimate['content'], str):
+                penultimate['content'] = [{
+                    'type': 'text',
+                    'text': penultimate['content']
+                }]
+            penultimate['content'][-1]['cache_control'] = {
+                'type': 'ephemeral'
+            }
         # Claude 4.6 Sonnet/ Opus use adaptive thinking
         if '4-6' in self._model:
             kwargs['thinking'] = {"type": "adaptive"}
@@ -210,7 +236,7 @@ class AnthropicModel(BaseModel):
                     "budget_tokens": config.anthropic_max_thinking_tokens
                 }
         return messages, kwargs
-        
+
     def _print_error(self, messages, kwargs):
         import pprint
         print('=== an error occurred while sending messages')
