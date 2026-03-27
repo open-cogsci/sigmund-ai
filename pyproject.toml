@@ -28,7 +28,7 @@ dependencies = [
     "markdown",
     "oauthlib",
     "openai",
-    "mistralai",
+    "mistralai>=2.1.3",
     "pillow",
     "pyalex",
     "pygments",
