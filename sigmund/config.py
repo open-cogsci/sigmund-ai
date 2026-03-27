@@ -197,7 +197,7 @@ search_docs_max = 2
 search_embedding_model = 'text-embedding-3-large'
 # The number of documents and maximum number of words that is kept for public 
 # search
-public_search_docs_max = 6
+public_search_docs_max = 4
 public_search_max_doc_length = 1000
 search_persist_directory = "library"
 search_embedding_provider = "openai"
