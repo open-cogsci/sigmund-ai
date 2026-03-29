@@ -223,6 +223,11 @@ class AnthropicModel(BaseModel):
                     'type': 'text',
                     'text': penultimate['content']
                 }]
+            # Cache control cannot be set on an empty message, so give it
+            # dummy content if necessary.
+            if not penultimate['content'][-1]['text'].strip():
+                logger.warning('empty message in cache breakpoint')
+                penultimate['content'][-1]['text'] = '(Empty message)'
             penultimate['content'][-1]['cache_control'] = {
                 'type': 'ephemeral'
             }
