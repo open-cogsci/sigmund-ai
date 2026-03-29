@@ -308,7 +308,7 @@ function displayErrorMessage() {
     <li>The server is temporarily unavailable</li>
     <li>There's a network connectivity issue</li>
 </ul>
-<p>Please reload the page to reconnect.</p>
+<p>Please reload the page to reconnect. If this doesn't resolve the issue, clear the current conversation (Menu → Clear conversation).</p>
 <button onclick="location.reload()" class="modal-reload-button">Reload Page</button>`);
 }
 
