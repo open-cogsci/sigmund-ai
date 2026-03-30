@@ -14,11 +14,13 @@ class BaseReply:
 class Reply(BaseReply):
     """Corresponds to a regular AI reply that is sent to the client."""
     def __init__(self, msg: str, metadata: dict,
-                 workspace_content: str=None, workspace_language: str='text'):
+                 workspace_content: str=None, workspace_language: str='text',
+                 usage: float=0):
         self.msg = msg
         self.metadata = metadata
         self.workspace_content = workspace_content
         self.workspace_language = workspace_language
+        self.usage = usage
 
     def to_json(self):
         return json.dumps(
@@ -26,7 +28,8 @@ class Reply(BaseReply):
                 process_sigmund_message.process_ai_message(self.msg)),
              'metadata': self.metadata,
              'workspace_content': self.workspace_content,
-             'workspace_language': self.workspace_language
+             'workspace_language': self.workspace_language,
+             'usage': self.usage
             }
         )
 

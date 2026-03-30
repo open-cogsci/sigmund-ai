@@ -687,3 +687,67 @@ button#start {
     font-family: "Roboto Condensed";
     margin: 0px;
 }
+
+#usage-counter {
+    position: relative;
+    height: 1.4em;
+    border-radius: 3px;
+    overflow: hidden;
+    border: solid 1px #ccc;
+}
+
+#usage-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+#usage-bar.usage-low {
+    background: #00796b; /* green */
+}
+
+#usage-bar.usage-medium {
+    background: #ff9800; /* orange */
+}
+
+#usage-bar.usage-high {
+    background: #f44336; /* red */
+}
+
+#usage-label {
+    font-family: "Roboto Condensed";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.7em;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+#usage-label.usage-low {
+    color: gray;
+}
+
+#usage-label.usage-medium,
+#usage-label.usage-high  {
+    color: white;
+}
+
+#usage-limit-warning {
+    background: #f44336;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+#usage-limit-warning a {
+    color: white; 
+}
+
+#usage-limit-warning.hidden {
+    display: none; 
+}

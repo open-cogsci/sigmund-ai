@@ -16,6 +16,9 @@
     </script>
     <div id="container">
         <div id="chat-area">
+            <div id="usage-limit-warning">
+                You have reached your weekly usage limit. This is a soft limit, which means that you can continue to use Sigmund. However, we kindly ask you to review <a href="/fair-use">this information on our fair-use policy</a>.
+            </div>        
             {% include 'header.html' %}
             <div id="sign-out">Welcome {{ username }}!
                 <button title="Menu" id="expand" onclick="app.__vue__.toggleMenu()">
@@ -25,14 +28,14 @@
             {% include 'menu.html' %}    
             <div id="response">{{ message_history | safe }}</div>
             <div id="loading-message"></div>
-            
+
             <!-- Attachments list -->
             <div id="attachment-list" style="margin-bottom: 10px;"></div>
-            
+
             <div id="message-box">
                 <div id="message-container">
                     <textarea id="message" placeholder="Enter your message"></textarea>
-                    
+
                     <!-- Hidden file input -->
                     <input 
                         type="file" 
@@ -41,7 +44,7 @@
                         multiple 
                         accept=".pdf,.doc,.docx,.png,.jpg"
                     >
-                    
+
                     <div id="button-container">
                         <button 
                             title="Attach" 
@@ -57,11 +60,15 @@
                     </div>
                 </div>
             </div>
-            
+            <!-- Usage progress bar: data-usage should be a number 0-1 -->
+            <div id="usage-counter" data-usage="{{ usage }}">
+                <div id="usage-bar"></div>
+                <div id="usage-label"></div>
+            </div>
             <div id="message-counter" style="text-align: right;"></div>
             {% include 'footer.html' %}
         </div>
-        
+
         <div id="code-editor">
             <div id="connected-status"><i class="fas fa-plug"></i> Connected to OpenSesame</div>
             <div id="code-editor-options">
@@ -77,7 +84,7 @@
                 <button id="clear-workspace" title="Clear"><i class="fas fa-eraser"></i></button>
                 <button id="copy-workspace" title="Clear"><i class="fas fa-copy"></i></button>
             </div>
-            
+
             <textarea id="workspace" data-mode="{{ workspace_language }}">{{ workspace_content }}</textarea>
             <div id="workspace-placeholder">Use this workspace to share text and code</div>
         </div>

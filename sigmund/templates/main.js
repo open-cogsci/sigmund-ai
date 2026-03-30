@@ -50,6 +50,14 @@ function initMain(event) {
     }
     // Scroll to bottom on page load so the most recent messages are visible
     scrollChatToBottom();
+    
+    // Initialize on load
+    updateUsageBar();
+    // Watch for dynamic updates to data-usage
+    new MutationObserver(updateUsageBar).observe(
+        document.getElementById('usage-counter'),
+        { attributes: true, attributeFilter: ['data-usage'] }
+    );    
 }
 
 function generateUUID() {
@@ -467,6 +475,9 @@ async function sendMessage(
         const metadata = data.metadata;
         removeStreamingMessage();
         const aiMessage = createAIMessageElement(data, metadata, forwardReplyToSocket);
+        
+        // Update usage
+        document.getElementById('usage-counter').dataset.usage = data.usage;
 
         // Append AI message after user message
         responseDiv.appendChild(aiMessage);
@@ -515,6 +526,33 @@ function expandMessageBox() {
 function setFavicon(url) {
     let faviconLink = document.querySelector('link[rel="icon"]');
     faviconLink.href = url;
+}
+
+// Usage progress bar
+function updateUsageBar() {
+    const counter = document.getElementById('usage-counter');
+    const bar = document.getElementById('usage-bar');
+    const label = document.getElementById('usage-label');
+    const warning = document.getElementById('usage-limit-warning');
+    if (!counter || !bar || !label) return;
+    const value = Math.round(100 * parseFloat(counter.dataset.usage));
+    if (isNaN(value)) return;
+    const pct = Math.min(100, Math.max(0, value));
+    bar.style.width = pct + '%';
+    label.innerText = pct + '% of weekly usage (soft limit)';
+    bar.classList.remove('usage-low', 'usage-medium', 'usage-high');
+    label.classList.remove('usage-low', 'usage-medium', 'usage-high');
+    warning.classList.toggle('hidden', pct < 99);
+    if (pct < 60) {
+        bar.classList.add('usage-low');
+        label.classList.add('usage-low');
+    } else if (pct < 99) {
+        bar.classList.add('usage-medium');
+        label.classList.add('usage-medium');
+    } else {
+        bar.classList.add('usage-high');
+        label.classList.add('usage-high');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', globalElements);

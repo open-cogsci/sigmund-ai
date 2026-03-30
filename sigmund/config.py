@@ -37,14 +37,10 @@ welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant!
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 
-# RATE LIMITS
+# LIMITS
 #
 # Maximum number of characters in a single message
 max_message_length = 500_000
-# The maximum number of tokens that can be consumed per hour by the answer
-# model.
-max_tokens_per_hour = 1_000_000
-max_tokens_per_hour_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
 anthropic_max_thinking_tokens = 2048
 
 # LOGGING
@@ -73,13 +69,13 @@ dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 #   model
 model_config = {
     'openai': {
-        'condense_model': 'gpt-5-mini',
-        'public_model': 'gpt-5-nano',
+        'condense_model': 'gpt-5.4-mini',
+        'public_model': 'gpt-5.4-nano',
         'answer_model': 'gpt-5.4'
     },
     'openai_thinking': {
-        'condense_model': 'gpt-5-mini',
-        'public_model': 'gpt-5-nano',
+        'condense_model': 'gpt-5.4-mini',
+        'public_model': 'gpt-5.4-nano',
         'answer_model': 'gpt-5.4-thinking'
     },
     'anthropic': {
@@ -111,6 +107,66 @@ anthropic_kwargs = {
 }
 openai_kwargs = {}
 mistral_kwargs = {}
+
+# The model token rate is used to convert model-specific consumption to a 
+# standardized usage measure. The model names below are those defined in the 
+# model module (not the aliases used above). The soft token limit is set such
+# that it corresponds to 10 dollars over a 7 day range.
+# The maximum number of tokens that can be consumed per hour by the answer
+# model.
+hourly_token_limit = 1e6
+hourly_limit_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
+soft_token_limit = 1e7
+hard_token_limit = 10e7
+hard_limit_exceeded_message = 'You have reached the maximum usage limit. This is a hard limit. Please contact the administrator.'
+soft_token_range = 7
+model_token_rate = {
+    'claude-haiku-4-5': {
+        'output': 5,
+        'input': 1,
+        'cache_read_input': 1 * .1,
+        'cache_write_input': 1 * 1.25
+    },
+    'claude-sonnet-4-5': {
+        'output': 15,
+        'input': 3,
+        'cache_read_input': 3 * .1,
+        'cache_write_input': 3 * 1.25
+    },
+    'claude-opus-4-6': {
+        'output': 25,
+        'input': 5,
+        'cache_read_input': 5 * .1,
+        'cache_write_input': 5 * 1.25
+    },
+    'gpt-5.4': {
+        'output': 15,
+        'input': 2.5,
+        'cache_read_input': 2.5 * .1
+    },
+    'gpt-5-mini': {
+        'output': 4.5,
+        'input': .75,
+        'cache_read_input': .75 * .1
+    },
+    'gpt-5-nano': {
+        'output': 1.25,
+        'input': .20,
+        'cache_read_input': .25 * .1
+    },
+    'mistral-large-latest': {
+        'output': 1.5,
+        'input': .5,
+    },
+    'mistral-medium-latest': {
+        'output': 2,
+        'input': .4,
+    },
+    'mistral-small-latest': {
+        'output': .6,
+        'input': .15,
+    }
+}
 
 # TOOLS
 #

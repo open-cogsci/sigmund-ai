@@ -19,8 +19,7 @@ class OpenAIModel(BaseModel):
         self._client = Client(api_key=config.openai_api_key)
         self._async_client = AsyncClient(api_key=config.openai_api_key)
 
-    def predict(self, messages, attachments=None, track_tokens=True,
-                stream=False):
+    def predict(self, messages, attachments=None, stream=False):
         # Strings need to be converted a list of length one with a single
         # message dict
         if isinstance(messages, str):
@@ -47,7 +46,7 @@ class OpenAIModel(BaseModel):
                             'file_data': attachment['url']
                         }})
             messages[-1]['content'] = content            
-        return super().predict(messages, attachments, track_tokens, stream)
+        return super().predict(messages, attachments, stream)
 
     def _tool_call_id(self, nr):
         return f'call_{nr}'
@@ -105,6 +104,21 @@ class OpenAIModel(BaseModel):
         return messages
 
     def get_response(self, response):
+        # Calculate the activity (standardized token use) for this call
+        usage = response.usage
+        token_rate = config.model_token_rate.get(self._model)
+        if token_rate is None:
+            logger.error(f'no token rate defined for model {self._model}')
+        else:
+            cache_read_input_tokens = usage.prompt_tokens_details.cached_tokens
+            input_tokens = usage.prompt_tokens - cache_read_input_tokens
+            activity = int(input_tokens * token_rate['input'] + \
+                usage.completion_tokens * token_rate['output'] + \
+                cache_read_input_tokens * token_rate['cache_read_input'])
+            cache_use = 100 * cache_read_input_tokens / usage.prompt_tokens
+            logger.info(f'activity: {activity} (cache use: {cache_use:.2f}%)')
+            self._sigmund.database.add_activity(activity)   
+        # Process response        
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:
             function = tool_calls[0].function

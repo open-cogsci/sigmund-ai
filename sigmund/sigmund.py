@@ -98,8 +98,12 @@ class Sigmund:
             return Reply('Done', None, None, None)
         if config.log_replies:
             logger.info(f'[user message] {message}')
-        if self._rate_limit_exceeded():
-            yield Reply(config.max_tokens_per_hour_exceeded_message,
+        if self._hard_limit_exceeded():
+            yield Reply(config.hard_limit_exceeded_message,
+                        self.messages.metadata())
+            return
+        if self._hourly_limit_exceeded():
+            yield Reply(config.hourly_limit_exceeded_message,
                         self.messages.metadata())
             return
         self.messages.workspace_content = workspace_content
@@ -132,11 +136,20 @@ class Sigmund:
         for reply in self._answer(attachments):
             yield reply
 
-    def _rate_limit_exceeded(self):
-        tokens_consumed_past_hour = self.database.get_activity()
-        logger.info(
-            f'tokens consumed in past hour: {tokens_consumed_past_hour}')
-        return tokens_consumed_past_hour > config.max_tokens_per_hour
+    def _hourly_limit_exceeded(self):        
+        return self.database.get_activity(
+            time_delta={'hours': 1}
+        ) > config.hourly_token_limit
+        
+    def _hard_limit_exceeded(self):
+        return self.database.get_activity(
+            time_delta={'days': 7}
+        ) > config.hard_token_limit
+        
+    def usage(self):
+        return self.database.get_activity(
+            time_delta={'days': 7}
+        ) / config.soft_token_limit
 
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
@@ -154,10 +167,8 @@ class Sigmund:
         """Implements the answer phase."""
         yield ActionReply(f'{config.ai_name} is thinking and typing ')
         logger.info(f'[{state} state] entering')
-        # We first collect a regular reply to the user message. While doing so
-        # we also keep track of the number of tokens consumed. The prediction
+        # We first collect a regular reply to the user message. The prediction
         # is streamed so that we can progressively send text to the client.
-        tokens_consumed_before = self.answer_model.total_tokens_consumed
         stream = self.answer_model.predict(self.messages.prompt(),
                                            attachments=attachments,
                                            stream=True)
@@ -173,10 +184,6 @@ class Sigmund:
 - Or: Enable expert knowledge that is relevant to your question (see Menu)
 - Or: Disable all expert knowledge to discuss general subjects (see Menu)
 </div>\n\n''' + reply
-        tokens_consumed = self.answer_model.total_tokens_consumed \
-            - tokens_consumed_before
-        logger.info(f'tokens consumed: {tokens_consumed}')
-        self.database.add_activity(tokens_consumed)        
         if config.log_replies:
             logger.info(f'[{state} state] reply: {reply}')
         # If the reply is a callable, then it's a tool that we need to run
@@ -206,7 +213,7 @@ class Sigmund:
             else:
                 metadata = self.messages.append('assistant', tool_message)
             yield Reply(tool_message, metadata, workspace_content,
-                        workspace_language)
+                        workspace_language, self.usage())
         # Otherwise the reply is a regular AI message
         else:
             reply, workspace_content, workspace_language = \
@@ -216,10 +223,15 @@ class Sigmund:
                 message=reply,
                 workspace_content=workspace_content,
                 workspace_language=workspace_language)
-            yield Reply(reply, metadata, workspace_content, workspace_language)
+            yield Reply(reply, metadata, workspace_content, workspace_language,
+                        self.usage())
             needs_feedback = False
         # If feedback is required by a tool, go for another round.
-        if needs_feedback and not self._rate_limit_exceeded():
+        if (
+            needs_feedback and
+            not self._hourly_limit_exceeded() and
+            not self._hard_limit_exceeded()
+        ):
             if workspace_content is not None:
                 logger.info('workspace content has been updated for feedback')
                 self.messages.workspace_content = workspace_content

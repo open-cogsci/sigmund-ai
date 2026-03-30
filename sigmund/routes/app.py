@@ -100,7 +100,8 @@ def chat_page():
                         username=username,
                         settings=json.dumps(settings),
                         workspace_content=workspace_content,
-                        workspace_language=workspace_language)
+                        workspace_language=workspace_language,
+                        usage=sigmund.usage())
 
 
 def login_handler(form, failed=False):
@@ -140,6 +141,14 @@ def terms():
     return utils.render(
         'info-page.html',
         content=utils.md(Path('sigmund/static/terms.md').read_text()))
+
+
+@app_blueprint.route('/fair-use')
+def fair_use():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('sigmund/static/fair-use.md').read_text()))
+
 
 @app_blueprint.route('/connectors')
 def connectors():

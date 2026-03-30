@@ -25,8 +25,7 @@ class MistralModel(OpenAIModel):
             self._tool_choice = 'any'
         self._client = Mistral(api_key=config.mistral_api_key)
 
-    def predict(self, messages, attachments=None, track_tokens=True,
-                stream=False):
+    def predict(self, messages, attachments=None, stream=False):
         if isinstance(messages, str):
             messages = [self.convert_message(messages)]
         else:
@@ -84,10 +83,19 @@ class MistralModel(OpenAIModel):
                     content.append({'type': 'document_url',
                                     'document_url': signed_url.url})
             messages[-1]['content'] = content
-        return BaseModel.predict(self, messages, attachments, track_tokens,
-                                 stream)
+        return BaseModel.predict(self, messages, attachments, stream)
 
     def get_response(self, response) -> [str, callable]:
+        # Calculate the activity (standardized token use) for this call
+        usage = response.usage
+        token_rate = config.model_token_rate.get(self._model)
+        if token_rate is None:
+            logger.error(f'no token rate defined for model {self._model}')
+        else:
+            activity = int(usage.prompt_tokens * token_rate['input'] + \
+                usage.completion_tokens * token_rate['output'])
+            logger.info(f'activity: {activity}')
+            self._sigmund.database.add_activity(activity)           
         content = response.choices[0].message.content
         tool_message_prefix = ''
         # During thinking, content consists of a mix of text and thinking 

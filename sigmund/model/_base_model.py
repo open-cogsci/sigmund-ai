@@ -30,9 +30,6 @@ class BaseModel:
         self._thinking = thinking
         self._tools = tools
         self._tool_choice = tool_choice
-        self.total_tokens_consumed = 0
-        self.prompt_tokens_consumed = 0
-        self.completion_tokens_consumed = 0
         self.json_mode = False
         self._stream_result = None
 
@@ -81,35 +78,18 @@ class BaseModel:
             return msg_len, 'Sorry, the message or workspace contains too much text. Can you please shorten it?'
         return msg_len, None
 
-    def _track_and_log(self, msg_len, reply, dt, track_tokens):
-        """Logs timing info and optionally tracks token usage."""
-        prompt_tokens = msg_len // self.characters_per_token
-        reply_len = len(reply) if isinstance(reply, str) else 0
-        logger.info(f'predicting {reply_len + msg_len} took {dt} s')
-        if track_tokens:
-            completion_tokens = reply_len // self.characters_per_token
-            total_tokens = prompt_tokens + completion_tokens
-            self.total_tokens_consumed += total_tokens
-            self.prompt_tokens_consumed += prompt_tokens
-            self.completion_tokens_consumed += completion_tokens
-            logger.info(f'total tokens (approx.): {total_tokens}')
-            logger.info(f'prompt tokens (approx.): {prompt_tokens}')
-            logger.info(f'completion tokens (approx.): {completion_tokens}')
-
-    def predict(self, messages, attachments=None, track_tokens=True,
-                stream=False):
+    def predict(self, messages, attachments=None, stream=False):
         if stream:
-            return self._stream_predict(messages, track_tokens)
+            return self._stream_predict(messages)
         msg_len, error = self._check_message_length(messages)
         if error:
             return error
         t0 = time.time()
         logger.info(f'predicting with {self}')
         reply = self.get_response(self.invoke(messages))
-        self._track_and_log(msg_len, reply, time.time() - t0, track_tokens)
         return reply
 
-    def _stream_predict(self, messages, track_tokens):
+    def _stream_predict(self, messages):
         """Generator that yields (text, complete) chunks during streaming."""
         msg_len, error = self._check_message_length(messages)
         if error:
@@ -122,7 +102,6 @@ class BaseModel:
                 break
             yield reply, False
         reply = self.get_response(reply)
-        self._track_and_log(msg_len, reply, time.time() - t0, track_tokens)
         yield reply, True
 
     def predict_multiple(self, prompts):

@@ -45,9 +45,9 @@ Nothing. User data is stored solely for the purpose of providing the intended se
 
 # Terms of use
 
-## Usage limits
+## Fair use
 
-There is an hourly limit of tokens per user to avoid abuse. This limit is so high that you are unlikely to run into it during normal use. If you have nevertheless exceeded the limit, you simply need to wait for (at most) an hour until you can use Sigmund again.
+See [Fair use](/fair-use).
 
 
 ## Availability

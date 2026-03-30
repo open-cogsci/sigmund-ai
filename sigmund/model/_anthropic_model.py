@@ -16,11 +16,10 @@ class AnthropicModel(BaseModel):
         self._client = Anthropic(api_key=config.anthropic_api_key)
         self._async_client = AsyncAnthropic(api_key=config.anthropic_api_key)
 
-    def predict(self, messages, attachments=None, track_tokens=True,
-                stream=False):
+    def predict(self, messages, attachments=None, stream=False):
         if isinstance(messages, str):
             return super().predict([self.convert_message(messages)],
-                                   attachments, track_tokens, stream=stream)
+                                   attachments, stream=stream)
         messages = utils.prepare_messages(messages, allow_ai_first=False,
                                           allow_ai_last=False,
                                           merge_consecutive=True)
@@ -147,24 +146,28 @@ class AnthropicModel(BaseModel):
                                    'data': data}
                     })
             messages[-1]['content'] = content
-        return super().predict(messages, attachments, track_tokens,
-                               stream=stream)
+        return super().predict(messages, attachments, stream=stream)
 
     def get_response(self, response):
         """Converts an Anthropic response into a flat HTML string,
         preserving the interleaved order of thinking and text blocks.
         """
+        # Calculate the activity (standardized token use) for this call
         usage = response.usage
-        logger.info(
-            f'input tokens: {usage.input_tokens}, '
-            f'output: {usage.output_tokens}, '
-            f'cache read: {usage.cache_read_input_tokens}, '
-            f'cache creation: {usage.cache_creation_input_tokens}'
-        )
-        total_input_tokens = usage.cache_read_input_tokens + \
-            usage.cache_creation_input_tokens + usage.input_tokens
-        cache_use = 100 * usage.cache_read_input_tokens / total_input_tokens
-        logger.info(f'cache use: {cache_use:.2f}%')
+        token_rate = config.model_token_rate.get(self._model)
+        if token_rate is None:
+            logger.error(f'no token rate defined for model {self._model}')
+        else:
+            activity = int(usage.input_tokens * token_rate['input'] + \
+                usage.output_tokens * token_rate['output'] + \
+                usage.cache_creation_input_tokens * token_rate['cache_write_input'] + \
+                usage.cache_read_input_tokens * token_rate['cache_read_input'])
+            total_input_tokens = usage.cache_read_input_tokens + \
+                usage.cache_creation_input_tokens + usage.input_tokens
+            cache_use = 100 * usage.cache_read_input_tokens / total_input_tokens
+            logger.info(f'activity: {activity} (cache use: {cache_use:.2f}%)')
+            self._sigmund.database.add_activity(activity)        
+        # Process the response
         parts = []
         tool_message_prefix = ''
         for block in response.content:
@@ -223,14 +226,14 @@ class AnthropicModel(BaseModel):
                     'type': 'text',
                     'text': penultimate['content']
                 }]
-            # Cache control cannot be set on an empty message, so give it
-            # dummy content if necessary.
-            if not penultimate['content'][-1]['text'].strip():
+            last_block = penultimate['content'][-1]
+            # Only apply the empty-text fallback to text blocks; tool_use
+            # blocks do not have a text field and must not have one injected.
+            if last_block.get('type') == 'text' \
+                    and not last_block.get('text', '').strip():
                 logger.warning('empty message in cache breakpoint')
-                penultimate['content'][-1]['text'] = '(Empty message)'
-            penultimate['content'][-1]['cache_control'] = {
-                'type': 'ephemeral'
-            }
+                last_block['text'] = '(Empty message)'
+            last_block['cache_control'] = {'type': 'ephemeral'}
         # Claude 4.6 Sonnet/ Opus use adaptive thinking
         if '4-6' in self._model:
             kwargs['thinking'] = {"type": "adaptive"}

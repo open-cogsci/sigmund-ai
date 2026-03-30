@@ -420,13 +420,13 @@ class DatabaseManager:
         db.session.add(new_activity)
         db.session.commit()
 
-    def get_activity(self, after_time=None) -> int:
+    def get_activity(self, time_delta) -> int:
         """Retrieves the total number of tokens consumed since a particular 
         time, using the past hour as a default if no after_time is provided.
         """
-        if after_time is None:
-            after_time = datetime.utcnow() - timedelta(hours=1)
-
+        if time_delta is None:
+            time_delta = {'hours': 1}        
+        after_time = datetime.utcnow() - timedelta(**time_delta)
         total_tokens = db.session.query(func.sum(Activity.tokens_consumed)) \
             .filter(Activity.user_id == self.user_id) \
             .filter(Activity.time >= after_time) \
