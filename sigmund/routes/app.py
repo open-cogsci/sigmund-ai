@@ -133,7 +133,8 @@ def login_handler(form, failed=False):
                         username='unknown friend',
                         settings='{}',
                         workspace_content='',
-                        workspace_language='')
+                        workspace_language='',
+                        usage='0')
     
 
 @app_blueprint.route('/terms')

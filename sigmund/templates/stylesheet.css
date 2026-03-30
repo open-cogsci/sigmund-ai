@@ -748,6 +748,10 @@ button#start {
     color: white; 
 }
 
-#usage-limit-warning.hidden {
-    display: none; 
+#usage-limit-warning {
+    display: none;
+}
+
+#usage-limit-warning.shown {
+    display: block!important; 
 }

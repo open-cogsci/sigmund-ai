@@ -536,13 +536,15 @@ function updateUsageBar() {
     const warning = document.getElementById('usage-limit-warning');
     if (!counter || !bar || !label) return;
     const value = Math.round(100 * parseFloat(counter.dataset.usage));
-    if (isNaN(value)) return;
+    if (isNaN(value)) {
+        value = 0;
+    }
     const pct = Math.min(100, Math.max(0, value));
     bar.style.width = pct + '%';
     label.innerText = pct + '% of weekly usage (soft limit)';
     bar.classList.remove('usage-low', 'usage-medium', 'usage-high');
     label.classList.remove('usage-low', 'usage-medium', 'usage-high');
-    warning.classList.toggle('hidden', pct < 99);
+    warning.classList.toggle('shown', pct >= 99);
     if (pct < 60) {
         bar.classList.add('usage-low');
         label.classList.add('usage-low');
