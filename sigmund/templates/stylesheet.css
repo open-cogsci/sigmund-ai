@@ -104,6 +104,10 @@ a:visited {
     margin-bottom: 8px;
 }
 
+#message-counter {
+    display: none;
+}
+
 #footer-bar a {
     color: gray;
 }
