@@ -144,12 +144,12 @@ model_token_rate = {
         'input': 2.5,
         'cache_read_input': 2.5 * .1
     },
-    'gpt-5-mini': {
+    'gpt-5.4-mini': {
         'output': 4.5,
         'input': .75,
         'cache_read_input': .75 * .1
     },
-    'gpt-5-nano': {
+    'gpt-5.4-nano': {
         'output': 1.25,
         'input': .20,
         'cache_read_input': .25 * .1

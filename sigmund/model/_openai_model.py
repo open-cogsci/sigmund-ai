@@ -107,7 +107,9 @@ class OpenAIModel(BaseModel):
         # Calculate the activity (standardized token use) for this call
         usage = response.usage
         token_rate = config.model_token_rate.get(self._model)
-        if token_rate is None:
+        if usage is None:
+            logger.error(f'no usage tracked for model {self._model}')            
+        elif token_rate is None:
             logger.error(f'no token rate defined for model {self._model}')
         else:
             cache_read_input_tokens = usage.prompt_tokens_details.cached_tokens
