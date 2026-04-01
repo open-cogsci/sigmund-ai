@@ -40,6 +40,7 @@ ANTHROPIC_MODELS = {
     'claude-4-sonnet': 'claude-sonnet-4-0',
     'claude-4-5-sonnet': 'claude-sonnet-4-5',
     'claude-4-6-sonnet': 'claude-sonnet-4-6',
+    'claude-4-6-sonnet-thinking': 'claude-sonnet-4-6',
     'claude-4-sonnet-thinking': 'claude-sonnet-4-0',
     'claude-4-5-sonnet-thinking': 'claude-sonnet-4-5',
     # Opus
