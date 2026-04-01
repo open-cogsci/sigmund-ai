@@ -81,7 +81,7 @@ model_config = {
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-6-sonnet'
+        'answer_model': 'claude-4-6-sonnet-thinking'
     },
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
