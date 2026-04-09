@@ -6,7 +6,8 @@ db_initialized = False
 
 
 def predict(prompt, model: str, json: bool = False,
-            max_json_retry: int = 5) -> str | dict:
+            max_json_retry: int = 5,
+            strip_thinking_blocks: bool = True) -> str | dict:
     """Provides a static interface to predict a single response.
 
     Parameters
@@ -20,6 +21,8 @@ def predict(prompt, model: str, json: bool = False,
     max_json_retry : int, optional
         The maximum number of retries to attempt if the response is not valid
         JSON, by default 5.
+    strip_thinking_blocks : bool, optional
+        Whether to strip thinking blocks from the response, by default True.
 
     Returns
     -------
@@ -27,21 +30,20 @@ def predict(prompt, model: str, json: bool = False,
         The predicted response. If json=True, the response is a dict, otherwise
         it is a str.
     """
-    from .database.models import init_db
     from .model import model as sigmund_model
     global db_initialized
     if not db_initialized:
+        from .database.models import init_db
         init_db()
         db_initialized = True
     model = sigmund_model(None, model)
-    if not json:
-        return model.predict(prompt)
+    if not json: 
+        return model.strip_thinking_blocks(model.predict(prompt))
     import json
     from .model import BaseModel
     model.json_mode = True
     for _ in range(max_json_retry):
-        reply = model.predict(prompt)
-        reply = BaseModel.strip_thinking_blocks(reply)
+        reply = model.strip_thinking_blocks(model.predict(prompt))
         if reply.startswith('```json'):
             reply = reply[7:]
         if reply.startswith('```'):
