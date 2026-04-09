@@ -37,10 +37,9 @@ def predict(prompt, model: str, json: bool = False,
         init_db()
         db_initialized = True
     model = sigmund_model(None, model)
-    if not json: 
+    if not json:
         return model.strip_thinking_blocks(model.predict(prompt))
     import json
-    from .model import BaseModel
     model.json_mode = True
     for _ in range(max_json_retry):
         reply = model.strip_thinking_blocks(model.predict(prompt))

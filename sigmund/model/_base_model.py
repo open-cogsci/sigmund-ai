@@ -1,6 +1,4 @@
 import logging
-import asyncio
-import time
 import re
 from .. import config
 logger = logging.getLogger('sigmund')
@@ -21,10 +19,10 @@ class BaseModel:
         r'<div\s+class="thinking_block_signature">(.*?)</div>\s*'
         r'<div\s+class="thinking_block_content">(.*?)</div>',
         re.DOTALL
-    )    
+    )
 
     def __init__(self, sigmund, model, thinking=False, tools=None,
-                 tool_choice='auto'):
+                 tool_choice='auto', strip_thinking_blocks=False):
         self._sigmund = sigmund
         self._model = model
         self._thinking = thinking
@@ -32,6 +30,7 @@ class BaseModel:
         self._tool_choice = tool_choice
         self.json_mode = False
         self._stream_result = None
+        self._strip_thinking_blocks = strip_thinking_blocks
 
     def __repr__(self):
         return f'{self.__class__.__name__}(model={self._model}, thinking={self._thinking})'
@@ -84,9 +83,10 @@ class BaseModel:
         msg_len, error = self._check_message_length(messages)
         if error:
             return error
-        t0 = time.time()
         logger.info(f'predicting with {self}')
         reply = self.get_response(self.invoke(messages))
+        if self._strip_thinking_blocks:
+            reply = self.strip_thinking_blocks(reply)
         return reply
 
     def _stream_predict(self, messages):
@@ -95,50 +95,15 @@ class BaseModel:
         if error:
             yield error, True
             return
-        t0 = time.time()
         logger.info(f'predicting with {self} (streaming)')
         for reply, complete in self.stream_invoke(messages):
             if complete:
                 break
             yield reply, False
         reply = self.get_response(reply)
+        if self._strip_thinking_blocks:
+            reply = self.strip_thinking_blocks(reply)        
         yield reply, True
-
-    def predict_multiple(self, prompts):
-        """Predicts multiple simple (non-message history) prompts using asyncio
-        if possible.
-        """
-        prompts = [[self.convert_message(prompt)] for prompt in prompts]
-        try:
-            loop = asyncio.get_event_loop()
-            if not loop.is_running():
-                logger.info('re-using async event loop')
-                use_async = True
-            else:
-                logger.info('async event loop is already running')
-                use_async = False
-        except RuntimeError:
-            logger.info('creating async event loop')
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            use_async = True
-
-        if not use_async:
-            logger.info('predicting multiple without async')
-            return [self.get_response(self.invoke(prompt))
-                                              for prompt in prompts]
-
-        async def wrap_gather():
-            tasks = [self.async_invoke(prompt) for prompt in prompts]
-            try:
-                predictions = await asyncio.gather(*tasks)
-            except Exception as e:
-                logger.warning(f'failed to gather predictions: {e}')
-                return []
-            return [self.get_response(p) for p in predictions]
-
-        logger.info('predicting multiple using async')
-        return loop.run_until_complete(wrap_gather())
 
     @staticmethod
     def embed_thinking_block(signature: str | None,
