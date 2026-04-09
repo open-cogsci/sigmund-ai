@@ -119,7 +119,8 @@ class OpenAIModel(BaseModel):
                 cache_read_input_tokens * token_rate['cache_read_input'])
             cache_use = 100 * cache_read_input_tokens / usage.prompt_tokens
             logger.info(f'activity: {activity} (cache use: {cache_use:.2f}%)')
-            self._sigmund.database.add_activity(activity)   
+            if self._sigmund is not None:
+                self._sigmund.database.add_activity(activity)   
         # Process response        
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:

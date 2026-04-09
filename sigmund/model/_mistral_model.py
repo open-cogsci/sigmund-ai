@@ -95,7 +95,8 @@ class MistralModel(OpenAIModel):
             activity = int(usage.prompt_tokens * token_rate['input'] + \
                 usage.completion_tokens * token_rate['output'])
             logger.info(f'activity: {activity}')
-            self._sigmund.database.add_activity(activity)           
+            if self._sigmund is not None:
+                self._sigmund.database.add_activity(activity)           
         content = response.choices[0].message.content
         tool_message_prefix = ''
         # During thinking, content consists of a mix of text and thinking 

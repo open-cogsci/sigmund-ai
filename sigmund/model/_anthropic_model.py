@@ -166,7 +166,8 @@ class AnthropicModel(BaseModel):
                 usage.cache_creation_input_tokens + usage.input_tokens
             cache_use = 100 * usage.cache_read_input_tokens / total_input_tokens
             logger.info(f'activity: {activity} (cache use: {cache_use:.2f}%)')
-            self._sigmund.database.add_activity(activity)        
+            if self._sigmund is not None:
+                self._sigmund.database.add_activity(activity)        
         # Process the response
         parts = []
         tool_message_prefix = ''
