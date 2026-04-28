@@ -236,7 +236,7 @@ class AnthropicModel(BaseModel):
                 last_block['text'] = '(Empty message)'
             last_block['cache_control'] = {'type': 'ephemeral'}
         # Claude 4.6 Sonnet/ Opus use adaptive thinking
-        if '4-6' in self._model:
+        if '4-6' in self._model or '4-7' in self._model:
             kwargs['thinking'] = {"type": "adaptive"}
         else:
             if self._thinking:

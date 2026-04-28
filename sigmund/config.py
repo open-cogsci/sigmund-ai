@@ -76,7 +76,7 @@ model_config = {
     'openai_thinking': {
         'condense_model': 'gpt-5.4-mini',
         'public_model': 'gpt-5.4-nano',
-        'answer_model': 'gpt-5.4-thinking'
+        'answer_model': 'gpt-5.5-thinking'
     },
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
@@ -86,7 +86,7 @@ model_config = {
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-6-opus-thinking'
+        'answer_model': 'claude-4-7-opus-thinking'
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',

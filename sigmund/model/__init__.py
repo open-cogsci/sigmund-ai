@@ -7,6 +7,8 @@ OPENAI_MODELS = {
     'o3': 'o3',
     'o3-mini': 'o3-mini',
     'o4-mini': 'o4-mini',
+    'gpt-5.5-thinking': 'gpt-5.5',
+    'gpt-5.5': 'gpt-5.5',
     'gpt-5.4-thinking': 'gpt-5.4',
     'gpt-5.4': 'gpt-5.4',
     'gpt-5.4-mini': 'gpt-5.4-mini',
@@ -51,6 +53,8 @@ ANTHROPIC_MODELS = {
     'claude-4-1-opus-thinking': 'claude-opus-4-1',
     'claude-4-6-opus': 'claude-opus-4-6',
     'claude-4-6-opus-thinking': 'claude-opus-4-6',
+    'claude-4-7-opus': 'claude-opus-4-7',
+    'claude-4-7-opus-thinking': 'claude-opus-4-7',
 }
 
 
