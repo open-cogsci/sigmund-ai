@@ -139,6 +139,12 @@ model_token_rate = {
         'cache_read_input': 5 * .1,
         'cache_write_input': 5 * 1.25
     },
+    'claude-opus-4-7': {
+        'output': 25,
+        'input': 5,
+        'cache_read_input': 5 * .1,
+        'cache_write_input': 5 * 1.25
+    },
     'gpt-5.5': {
         'output': 30,
         'input': 5,
