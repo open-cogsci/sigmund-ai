@@ -139,6 +139,11 @@ model_token_rate = {
         'cache_read_input': 5 * .1,
         'cache_write_input': 5 * 1.25
     },
+    'gpt-5.5': {
+        'output': 30,
+        'input': 5,
+        'cache_read_input': 5 * .1
+    },
     'gpt-5.4': {
         'output': 15,
         'input': 2.5,
