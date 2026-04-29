@@ -92,10 +92,12 @@ class Messages:
         If no system prompt is provided, one is automatically constructed.
         Typically, an explicit system_prompt is provided during the search
         phase, but not during the answer phase.
-        
+
         Dynamic context (documentation, notes, condensed history) is prepended
         to the last user message rather than included in the system prompt so
-        that the system prompt remains static and cacheable.
+        that the system prompt remains static and cacheable. The exception is
+        documentation that is explicitly marked as belonging in the system
+        prompt (system_prompt=True), which is included in the system prompt.
         """
         auto_prompt = system_prompt is None
         if auto_prompt:
@@ -198,26 +200,36 @@ class Messages:
         self._condensed_text = result.strip()
 
     def _system_prompt(self):
-        """The system prompt only contains the static identity to maximize
-        cache effectiveness. All dynamic content (documentation, notes,
-        condensed history) is moved to _user_message_context().
+        """The system prompt contains the static identity, plus any
+        documentation that has been explicitly marked as belonging in the
+        system prompt (i.e. stable documentation that should be cached). All
+        other dynamic content (volatile documentation, notes, condensed
+        history) is moved to _user_message_context().
         """
-        return prompt.SYSTEM_PROMPT_IDENTITY
+        parts = [prompt.SYSTEM_PROMPT_IDENTITY]
+        # Include documentation marked as belonging in the system prompt
+        doc_prompt = self._sigmund.documentation.prompt(system_prompt=True)
+        if doc_prompt:
+            parts.append(doc_prompt)
+        return '\n\n'.join(parts)
 
     def _user_message_context(self):
         """Builds dynamic context that is prepended to the last user message
         in a <user_message_context> section. This keeps the system prompt 
         static for caching purposes.
-        
-        Includes: transient system prompt, documentation, persistent notes,
+
+        Includes: transient system prompt, volatile documentation (i.e.
+        documentation that is NOT marked as system_prompt), persistent notes,
         and condensed conversation history.
         """
         context_parts = []
         if self._sigmund.transient_system_prompt:
             context_parts.append(self._sigmund.transient_system_prompt)
-        # If available, documentation is also included in the context
-        if len(self._sigmund.documentation):
-            context_parts.append(self._sigmund.documentation.prompt())
+        # If available, documentation that should not live in the system
+        # prompt is included in the user message context
+        doc_prompt = self._sigmund.documentation.prompt(system_prompt=False)
+        if doc_prompt:
+            context_parts.append(doc_prompt)
         # If there are persistent notes, include them
         if self._notes:
             if config.log_replies:

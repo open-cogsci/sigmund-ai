@@ -6,7 +6,7 @@ logger = logging.getLogger('sigmund')
 
 
 class Documentation:
-    
+
     def __init__(self, sigmund, foundation_document_topics=None):
         self._sigmund = sigmund
         self._foundation_document_topics = foundation_document_topics
@@ -21,11 +21,11 @@ class Documentation:
             if self._sigmund.database.get_setting(f'collection_{c}') == 'true'
         }
         logger.info(f'using collections: {self._collections}')
-        
+
     @property
     def enabled(self):
         return self._collections or self._foundation_document_topics
-        
+
     def _doc_to_str(self, doc):
         s = '<document>\n'
         if doc.get('title'):
@@ -33,44 +33,61 @@ class Documentation:
         if doc.get('url'):
             s += f'Source: {doc["url"]}\n\n'
         return s + doc['content'] + '\n</document>'
-        
+
+    def _filter_documents(self, system_prompt):
+        """Return documents matching the system_prompt flag.
+
+        When system_prompt is True, return only documents whose
+        'system_prompt' field is True. Otherwise return documents whose
+        'system_prompt' field is missing or False.
+        """
+        if system_prompt:
+            return [doc for doc in self._documents
+                    if doc.get('system_prompt')]
+        return [doc for doc in self._documents
+                if not doc.get('system_prompt')]
+
     def __str__(self):
         if not self._documents:
             return ''
         return '\n\n'.join(self._doc_to_str(doc) for doc in self._documents)
-        
+
     def to_json(self):
         return json.dumps([{'page_content': doc['content'],
                             'url': doc.get('url')}
                            for doc in self])
-        
+
     def __iter__(self):
         return (doc for doc in self._documents)
-    
+
     def __len__(self):
         return sum(len(doc['content']) for doc in self._documents)
-        
+
     def __contains__(self, doc):
         return doc in self._documents
-    
-    def prompt(self):        
+
+    def prompt(self, system_prompt=False):
+        docs = self._filter_documents(system_prompt)
+        if not docs:
+            return ''
+        documentation = '\n\n'.join(self._doc_to_str(doc) for doc in docs)
         return f'''# Documentation
 
 You have retrieved the following documentation to answer the user's question:
 
 <documentation>
-{str(self)}
+{documentation}
 </documentation>'''
-    
+
     def append(self, doc):
         if any(doc['content'] == d['content'] for d in self):
             return
         self._documents.append(doc)        
-    
+
     def clear(self):
         logger.info('clearing documentation')
         self._documents = []
-        
+
     def search(self, query, fallback=False, foundation=True, howtos=True,
                max_distance=None, max_distance_fallback=None, k=None):
         """First, we separately search for regular and howto documents, because
