@@ -55,6 +55,14 @@ class BaseModel:
 
     def async_invoke(self, messages, attachments=None):
         raise NotImplementedError()
+        
+    def handle_invoke_exception(self, e: Exception) -> str:
+        """Receives an Exception that resulted from invoking a model. If a str is
+        returned, this is used as an informative message to notify the user what
+        went wrong. If None is returned, the Exception simply propagates, 
+        resulting in an error message in the user interface.
+        """
+        return
 
     def messages_length(self, messages) -> int:
         if isinstance(messages, str):
@@ -79,12 +87,24 @@ class BaseModel:
 
     def predict(self, messages, attachments=None, stream=False):
         if stream:
-            return self._stream_predict(messages)
+            try:
+                return self._stream_predict(messages)
+            except Exception as e:
+                response = self.handle_invoke_exception(e)
+                if response:
+                    return response
+                raise
         msg_len, error = self._check_message_length(messages)
         if error:
             return error
         logger.info(f'predicting with {self}')
-        reply = self.get_response(self.invoke(messages))
+        try:
+            reply = self.get_response(self.invoke(messages))
+        except Exception as e:
+            response = self.handle_invoke_exception(e)
+            if response:
+                return response
+            raise
         if self._strip_thinking_blocks:
             reply = self.strip_thinking_blocks(reply)
         return reply
@@ -96,10 +116,17 @@ class BaseModel:
             yield error, True
             return
         logger.info(f'predicting with {self} (streaming)')
-        for reply, complete in self.stream_invoke(messages):
-            if complete:
-                break
-            yield reply, False
+        try:
+            for reply, complete in self.stream_invoke(messages):
+                if complete:
+                    break
+                yield reply, False
+        except Exception as e:
+            response = self.handle_invoke_exception(e)
+            if response:
+                yield response, True
+                return
+            raise
         reply = self.get_response(reply)
         if self._strip_thinking_blocks:
             reply = self.strip_thinking_blocks(reply)        

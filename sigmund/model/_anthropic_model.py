@@ -269,6 +269,13 @@ class AnthropicModel(BaseModel):
         """A generator that returns (text, complete) tuples. During streaming
         complete is False. For the final message, it is True.
         """
+        # Simulate an APIStatusError without request object
+        # from anthropic import APIStatusError
+        # class CustomException(APIStatusError):
+            # def __init__(self):
+                # self.status_code = 529
+        # raise CustomException()
+        
         messages, kwargs = self._prepare_invoke_kwargs(messages)
         try:
             with self._client.messages.stream(
@@ -297,3 +304,8 @@ class AnthropicModel(BaseModel):
         except Exception:
             self._print_error(messages, kwargs)
             raise
+            
+    def handle_invoke_exception(self, e):
+        from anthropic import APIStatusError
+        if isinstance(e, APIStatusError) and e.status_code == 529:
+            return 'Sorry, the Anthropic server is temporarily overloaded. Please try again later!'
