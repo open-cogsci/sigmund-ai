@@ -2,7 +2,6 @@
 let currentEventSource = null;
 let currentLoadingInterval = null;
 let currentLoadingMessageBox = null;
-let isStreaming = false;
 
 function initMain(event) {
 

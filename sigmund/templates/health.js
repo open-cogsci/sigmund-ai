@@ -1,3 +1,4 @@
+let isStreaming = false;
 let healthCheckInterval = null;
 let consecutiveFailures = 0;
 const MAX_CONSECUTIVE_FAILURES = 3;
