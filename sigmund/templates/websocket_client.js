@@ -3,9 +3,9 @@ let retryInterval;
 let showConnectedTimeout;
 let connectorName = 'OpenSesame';
 let manualDisconnect = false;
+let connectedStatusHeight = 0;
 const retryDelay = 5000;
 const maxMessages = 10;
-
 
 function updateConnectorStatus(status) {
     const statusDiv = document.getElementById('connected-status');
@@ -25,8 +25,19 @@ function updateConnectorStatus(status) {
     } else {
         statusDiv.style.display = 'none';
     }
+    updateConnectorStatusHeight();
 }
 
+function updateConnectorStatusHeight() {
+    // Measure the height of the connected-status div and set it as a CSS variable
+    const connectedStatus = document.getElementById('connected-status');
+    if (connectedStatus) {
+        connectedStatusHeight = connectedStatus.offsetHeight;
+    } else {
+        connectedStatusHeight = 0;
+    }
+    document.documentElement.style.setProperty('--connected-status-height', `${connectedStatusHeight}px`);
+}
 
 function disconnectWebSocket() {
     manualDisconnect = true;

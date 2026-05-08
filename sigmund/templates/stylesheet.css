@@ -560,7 +560,7 @@ button#start {
     }
     
     .CodeMirror {
-        height: 100vh!important;
+        height: calc(100vh - var(--connected-status-height, 0px))!important;
     }
 
     #code-editor {
