@@ -1,13 +1,15 @@
 # Fair use
 
-If you use Sigmund very heavily, you may receive a warning that you exceeded your weekly usage limit. Don't worry! This is a soft limit, which means you can continue to use Sigmund. However, when this happens, we kindly ask that you use Sigmund a bit less!
+If you use Sigmund heavily, you may run into usage limits.
 
-Here are some tricks to reduce your usage of Sigmund:
+- __The hourly usage limit is hard.__ You have to wait for at most an hour until you can use Sigmund again. This is a way to protect against run-away conversations, such as when Sigmund gets stuck in a feedback loop.
+- __The weekly usage limit is soft.__ You can continue to use Sigmund, and the warning will automatically disappear after a few days of reduced use. If you run into this limit, we kindly ask that you use Sigmund less.
+- In addition, if we detect excessive usage, we may block your account and reach out to clarify what is happening. This is a way to avoid abuse. This will __not__ happen if you use Sigmund normally.
 
-- __Do more with fewer prompts.__ You can get Sigmund to work more effectively by taking a moment to formulate good prompts.
-- __Use a conversation model.__ Most tasks do not require a problem-solving model such as Claude Opus. Conversation models are more cost-effective.
-- __Try Mistral Large.__ This is by far the most cost-effective model. It is not as smart as the models from OpenAI and Anthropic. However, it will perform many complex tasks just fine!
+How to keep your usage under control:
 
-Usage is calculated over seven days. If you reduce your use of Sigmund now, the usage-limit warning will automatically disappear after a few days. 
+- __Ask specific questions and provide sufficient context.__ Vague questions are hard to answer, also for Sigmund. As a result, Sigmund may start using many tools to better understand the context. For example, Sigmund may open many items in OpenSesame, inspect many files in Sigmund Analyst, or perform many searches on OpenAlex. This consumes many usage tokens and is often unnecessary. To avoid this, formulate clear questions that provide all or most of the context Sigmund needs.
+- __Use a cost-efficient model.__ Most tasks do not require a problem-solving model. Conversation models are more cost-effective. We recommend trying Mistral.
+
 
 Remember: we rely on your cooperation to keep Sigmund affordable!
