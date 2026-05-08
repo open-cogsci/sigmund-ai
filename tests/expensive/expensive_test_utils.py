@@ -36,6 +36,10 @@ class BaseExpensiveTest(unittest.TestCase):
         config.settings_default['model_config'] = 'anthropic_thinking'
         self._test_tool()
     
-    def test_mistral(self):
+    def test_mistral_regular(self):
         config.settings_default['model_config'] = 'mistral'
+        self._test_tool()
+        
+    def test_mistral_thinking(self):
+        config.settings_default['model_config'] = 'mistral_thinking'
         self._test_tool()

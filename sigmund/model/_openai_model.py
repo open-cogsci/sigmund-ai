@@ -144,15 +144,6 @@ class OpenAIModel(BaseModel):
         kwargs.update(config.openai_kwargs)
         if self.json_mode:
             kwargs['response_format'] = {"type": "json_object"}
-        # Only GPT-5+ currently supports reasoning effort. For GPT-5, the 
-        # lowest setting is minimal, for GPT-5.1, it is low. (Or none, but we
-        # want at least a little reasoning.)
-        if self._model == 'gpt-5':
-            kwargs['reasoning_effort'] = \
-                'medium' if self._thinking else 'minimal'
-        elif self._model == 'gpt-5.1':
-            kwargs['reasoning_effort'] = \
-                'medium' if self._thinking else 'low'
         return kwargs
 
     def _openai_invoke(self, fnc, messages):

@@ -90,9 +90,13 @@ model_config = {
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',
-        'public_model': 'mistral-medium-latest',
-        'answer_model': 'mistral-large-latest',
-        'vision_model': 'mistral-large-latest'
+        'public_model': 'mistral-small-latest',
+        'answer_model': 'mistral-medium-3-5',
+    },
+    'mistral_thinking': {
+        'condense_model': 'mistral-small-latest',
+        'public_model': 'mistral-small-latest',
+        'answer_model': 'mistral-medium-3-5-thinking',
     },
     'dummy': {
         'condense_model': 'dummy',
@@ -114,7 +118,7 @@ mistral_kwargs = {}
 # that it corresponds to 10 dollars over a 7 day range.
 # The maximum number of tokens that can be consumed per hour by the answer
 # model.
-hourly_token_limit = 1e6
+hourly_token_limit = 2e6
 hourly_limit_exceeded_message = 'You have reached the hourly usage limit. Please wait and try again later!'
 soft_token_limit = 1e7
 hard_token_limit = 10e7
@@ -132,12 +136,6 @@ model_token_rate = {
         'input': 3,
         'cache_read_input': 3 * .1,
         'cache_write_input': 3 * 1.25
-    },
-    'claude-opus-4-6': {
-        'output': 25,
-        'input': 5,
-        'cache_read_input': 5 * .1,
-        'cache_write_input': 5 * 1.25
     },
     'claude-opus-4-7': {
         'output': 25,
@@ -165,13 +163,9 @@ model_token_rate = {
         'input': .20,
         'cache_read_input': .25 * .1
     },
-    'mistral-large-latest': {
-        'output': 1.5,
-        'input': .5,
-    },
-    'mistral-medium-latest': {
-        'output': 2,
-        'input': .4,
+    'mistral-medium-3-5': {
+        'output': 7.5,
+        'input': 1.5,
     },
     'mistral-small-latest': {
         'output': .6,

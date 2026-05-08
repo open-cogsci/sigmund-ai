@@ -57,15 +57,7 @@ class MistralModel(OpenAIModel):
                 # actual data
                 url = attachment['url']
                 data = url[url.find(',') + 1:]                
-                if attachment['type'] == 'image':
-                    # Vision requires a special model (pixtral). This model also
-                    # understands text and documents, so whenever there is a 
-                    # single attachment, we switch to using this model.
-                    self._actual_model = \
-                        config.model_config['mistral']['vision_model']
-                    content.append({'type': 'image_url',
-                                    'image_url': attachment['url']})
-                elif attachment['type'] == 'document':
+                if attachment['type'] == 'document':
                     # Documents have to be uploaded first, and then provided as
                     # a url
                     tmp_file = tempfile.NamedTemporaryFile(delete=False)
@@ -146,6 +138,8 @@ class MistralModel(OpenAIModel):
         kwargs.update(config.mistral_kwargs)
         if self.json_mode:
             kwargs['response_format'] = {"type": "json_object"}
+        if self._thinking:
+            kwargs['reasoning_effort'] = 'high'
         return kwargs
 
     def _mistral_invoke(self, fnc, messages):
