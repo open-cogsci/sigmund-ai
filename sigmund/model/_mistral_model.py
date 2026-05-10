@@ -57,9 +57,12 @@ class MistralModel(OpenAIModel):
                 # actual data
                 url = attachment['url']
                 data = url[url.find(',') + 1:]                
-                if attachment['type'] == 'document':
-                    # Documents have to be uploaded first, and then provided as
-                    # a url
+                if attachment['type'] == 'image':
+                    content.append({'type': 'image_url',
+                                    'image_url': attachment['url']})                
+                elif attachment['type'] == 'document':
+                    # Documents have to be uploaded first, and then provided 
+                    # as a url
                     tmp_file = tempfile.NamedTemporaryFile(delete=False)
                     tmp_file.write(base64.b64decode(data))
                     tmp_file.close()
