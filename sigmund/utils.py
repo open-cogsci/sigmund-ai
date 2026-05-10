@@ -43,6 +43,7 @@ def render(path, **kwargs):
         server_url=config.server_url,
         max_message_length=config.max_message_length,
         version=__version__,
+        theme='monokai',
         **kwargs)
 
 

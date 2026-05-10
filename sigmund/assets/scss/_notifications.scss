@@ -1,0 +1,89 @@
+// ============================================================
+// Notifications & Status Indicators
+// ============================================================
+
+#message-counter,
+#footer-bar {
+    color: gray;
+    font-size: 0.7em;
+    text-align: right;
+    font-family: $font-condensed;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#message-counter {
+    display: none;
+}
+
+#footer-bar a {
+    color: gray;
+}
+
+#page-notification {
+    border-radius: $border-radius;
+    color: #fff;
+    background-color: $color-primary;
+    box-shadow: $box-shadow;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 0.8em;
+
+    a {
+        color: #fff;
+    }
+}
+
+// Usage counter
+#usage-counter {
+    position: relative;
+    height: 1.4em;
+    border-radius: 3px;
+    overflow: hidden;
+    border: solid 1px $color-border;
+}
+
+#usage-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.3s ease;
+
+    &.usage-low    { background: $color-primary; }
+    &.usage-medium { background: $color-warning; }
+    &.usage-high   { background: $color-error; }
+}
+
+#usage-label {
+    font-family: $font-condensed;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.7em;
+    white-space: nowrap;
+    z-index: 10;
+
+    &.usage-low { color: gray; }
+
+    &.usage-medium,
+    &.usage-high { color: white; }
+}
+
+#usage-limit-warning {
+    background: $color-error;
+    color: white;
+    padding: 10px;
+    border-radius: $border-radius;
+    margin-bottom: 10px;
+    display: none;
+
+    a {
+        color: white;
+    }
+
+    &.shown {
+        display: block !important;
+    }
+}

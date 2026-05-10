@@ -1,0 +1,51 @@
+// ============================================================
+// Message Box
+// ============================================================
+
+#message-box {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    min-height: 120px;
+    position: sticky;
+    bottom: 0;
+    padding: 10px;
+    background-color: $color-message-box;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+}
+
+.expanded-message-box {
+    height: 80vh;
+}
+
+#message-container {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    padding: 10px;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    background-color: white;
+}
+
+#button-container {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+
+textarea#message {
+    border: none;
+    flex-grow: 1;
+    height: 100%;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:disabled {
+        background: none;
+    }
+}

@@ -1,0 +1,138 @@
+// ============================================================
+// Menu
+// ============================================================
+
+.menu-icon {
+    cursor: pointer;
+    position: fixed;
+    background-color: white;
+    top: 10px;
+    right: 10px;
+    padding: 5px;
+    border-radius: $border-radius;
+    border: 1px solid $color-border;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        color: $color-primary;
+    }
+}
+
+.menu {
+    border-radius: $border-radius;
+    display: none;
+    position: fixed;
+    border: 1px solid $color-border;
+    background: #fff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+
+    &.active {
+        display: block;
+    }
+
+    div {
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #e8e8e8;
+        }
+    }
+
+    select {
+        font-size: 1em;
+        background: none;
+        border: none;
+
+        &:focus-visible {
+            outline: none;
+        }
+    }
+
+    .tool-item {
+        padding: 5px 0;
+    }
+
+    .model-buttons,
+    .login-buttons {
+        margin-bottom: 10px;
+    }
+
+    small,
+    small a {
+        font-family: $font-condensed;
+        color: #aaa;
+    }
+
+    #login {
+        display: none;
+    }
+}
+
+.menu-divider {
+    border: none;
+    height: 1px;
+    background-color: #e8e8e8;
+    margin: 8px 0;
+}
+
+.scrollable-menu {
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $color-border;
+        border-radius: 10px;
+
+        &:hover {
+            background-color: #999;
+        }
+    }
+}
+
+.search-conversations {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+
+    input {
+        flex-grow: 1;
+        padding: 4px;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+    }
+}
+
+// Large screens
+@media (min-width: $breakpoint-lg) {
+    .menu {
+        left: 50%;
+        top: 50%;
+        padding: 10px;
+        transform: translate(-50%, -50%);
+    }
+
+    .scrollable-menu {
+        max-height: 80vh;
+    }
+
+    #return-to-chat {
+        display: none;
+    }
+}
+
+// Small screens
+@media (max-width: $breakpoint-sm) {
+    .menu {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        transform: none;
+    }
+}

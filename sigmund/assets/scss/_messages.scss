@@ -1,0 +1,122 @@
+// ============================================================
+// Messages
+// ============================================================
+
+.message-loading {
+    color: gray;
+}
+
+.message-loading,
+.message-user,
+.message-ai {
+    margin-bottom: 10px;
+}
+
+.message-ai,
+.message-user {
+    border-radius: $border-radius;
+    padding: 10px;
+    box-shadow: $box-shadow;
+}
+
+.message-ai {
+    margin-right: 10%;
+    background-color: $color-white;
+}
+
+.message-user {
+    color: $color-primary;
+    white-space: pre-wrap;
+    margin-left: 10%;
+    background-color: $color-message-box;
+}
+
+.message-info {
+    margin-bottom: 10px;
+    font-size: 0.8em;
+    color: $color-muted-dark;
+}
+
+.message-error {
+    border-left: 4px solid $color-error;
+    background-color: #ffebee;
+
+    strong {
+        color: $color-error;
+    }
+}
+
+.message-delete {
+    float: right;
+    padding: 0;
+    border: none;
+    background: none;
+    display: none;
+    font-size: 0.6em;
+    color: $color-muted;
+}
+
+.message-user:hover,
+.message-ai:hover {
+    .message-delete {
+        display: block;
+    }
+}
+
+.message-workspace,
+.message-timestamp,
+.message-answer-model,
+.message-sources {
+    font-family: $font-condensed;
+    font-size: 0.6em;
+    text-align: right;
+    color: $color-muted;
+    white-space: normal;
+}
+
+.message-workspace {
+    .workspace-content,
+    .workspace-language {
+        display: none;
+    }
+}
+
+.message .message-notification {
+    border-top: solid 1px $color-muted;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: $color-muted;
+    font-size: 0.8em;
+}
+
+.message .image-generation {
+    margin: 10px 0;
+    border: solid 1px $color-muted;
+    border-radius: $border-radius;
+    padding: 8px;
+    background-color: white;
+
+    img {
+        width: 100%;
+    }
+}
+
+.thinking_block_signature {
+    display: none;
+}
+
+.thinking_block_content {
+    font-family: $font-condensed;
+    font-size: 0.6em;
+    color: $color-muted;
+    padding-left: 10px;
+    border-left: solid 1px $color-muted;
+    margin-bottom: 10px;
+}
+
+#user-message {
+    border-top: solid 1px;
+    padding-top: 10px;
+    font-size: 0.6em;
+    margin-bottom: -10px;
+}

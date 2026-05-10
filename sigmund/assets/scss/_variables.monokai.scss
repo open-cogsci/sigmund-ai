@@ -1,0 +1,31 @@
+// ============================================================
+// Variables — Monokai
+// ============================================================
+
+// Colors
+$color-bg:          #272822;
+$color-primary:     #a6e22e;
+$color-link:        #66d9e8;
+$color-heading:     #f92672;
+$color-error:       #f92672;
+$color-warning:     #e6db74;
+$color-muted:       #75715e;
+$color-muted-dark:  #49483e;
+$color-border:      #49483e;
+$color-message-box: #3e3d32;
+$color-white:       #f8f8f2;
+$color-chat-bg:     #3e3d32;
+$color-code-bg:     #1e1f1c;
+
+// Typography
+$font-primary:   "Roboto", sans-serif;
+$font-condensed: "Roboto Condensed";
+
+// Breakpoints
+$breakpoint-lg: 768px;
+$breakpoint-sm: 767px;
+$breakpoint-xs: 600px;
+
+// Misc
+$border-radius: 4px;
+$box-shadow:    0 0 10px rgba(0, 0, 0, 0.4);

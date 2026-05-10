@@ -1,0 +1,31 @@
+// ============================================================
+// Library & Example Queries
+// ============================================================
+
+#library {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#example-queries {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.example-query {
+    flex: 1 0 30%;
+    margin: 10px;
+    font-size: 0.6em;
+    padding: 10px;
+    color: black;
+    background: white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    cursor: pointer;
+
+    &:hover {
+        color: #fff;
+        background-color: $color-primary;
+    }
+}

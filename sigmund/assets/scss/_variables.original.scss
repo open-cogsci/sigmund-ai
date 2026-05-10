@@ -1,0 +1,31 @@
+// ============================================================
+// Variables
+// ============================================================
+
+// Colors
+$color-bg:          #ECEFF1;
+$color-primary:     #00796b;
+$color-link:        #0288d1;
+$color-heading:     #bf360c;
+$color-error:       #d32f2f;
+$color-warning:     #ff9800;
+$color-muted:       #90A4AE;
+$color-muted-dark:  #607D8B;
+$color-border:      #ccc;
+$color-message-box: #FFFDE7;
+$color-white:       #ffffff;
+$color-chat-bg:     #e0e0e0;
+$color-code-bg:     #f0f0f0;
+
+// Typography
+$font-primary:   "Roboto", sans-serif;
+$font-condensed: "Roboto Condensed";
+
+// Breakpoints
+$breakpoint-lg: 768px;
+$breakpoint-sm: 767px;
+$breakpoint-xs: 600px;
+
+// Misc
+$border-radius: 4px;
+$box-shadow:    0 0 10px rgba(0, 0, 0, 0.1);

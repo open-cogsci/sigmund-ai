@@ -1,0 +1,114 @@
+// ============================================================
+// Buttons
+// ============================================================
+
+.link-button,
+.link-button:visited {
+    display: block;
+    padding: 10px;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    color: #fff;
+    background-color: $color-primary;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+input#submit,
+button#start {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: #fff;
+    background-color: $color-primary;
+    border-radius: $border-radius;
+    cursor: pointer;
+}
+
+button#attach,
+button#cancel,
+button#expand,
+button#send {
+    font-size: 1.2em;
+    height: 100%;
+    border: none;
+    color: $color-primary;
+    background: none;
+    cursor: pointer;
+}
+
+button#cancel {
+    display: none;
+}
+
+button#send:disabled {
+    color: #cccccc;
+}
+
+// Toggle button groups
+.mode-buttons,
+.login-buttons,
+.model-buttons {
+    padding: 0 !important;
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+
+    button {
+        flex-grow: 1;
+        border: none;
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s;
+
+        img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        span {
+            font-size: 14px;
+        }
+
+        &.active {
+            background-color: $color-primary;
+            color: white;
+        }
+
+        &:hover {
+            background-color: #e0e0e0;
+        }
+    }
+}
+
+.model-buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.model-buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    button {
+        flex: 1;
+    }
+}
+
+@media (max-width: $breakpoint-xs) {
+    .model-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

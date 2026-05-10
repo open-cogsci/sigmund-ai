@@ -1,0 +1,31 @@
+// ============================================================
+// Variables — Solarized Dark
+// ============================================================
+
+// Colors
+$color-bg:          #002b36;
+$color-primary:     #2aa198;
+$color-link:        #268bd2;
+$color-heading:     #cb4b16;
+$color-error:       #dc322f;
+$color-warning:     #b58900;
+$color-muted:       #586e75;
+$color-muted-dark:  #073642;
+$color-border:      #073642;
+$color-message-box: #073642;
+$color-white:       #fdf6e3;
+$color-chat-bg:     #073642;
+$color-code-bg:     #01333e;
+
+// Typography
+$font-primary:   "Roboto", sans-serif;
+$font-condensed: "Roboto Condensed";
+
+// Breakpoints
+$breakpoint-lg: 768px;
+$breakpoint-sm: 767px;
+$breakpoint-xs: 600px;
+
+// Misc
+$border-radius: 4px;
+$box-shadow:    0 0 10px rgba(0, 0, 0, 0.4);
