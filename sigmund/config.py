@@ -225,7 +225,7 @@ max_note_length = 100_000
 # These are default values for settings, which are stored in the database.
 settings_default = {
     # Theme
-    'theme' : 'original',
+    'theme' : 'monokai',
     # Indicates the model configuration as specified above
     'model_config': 'anthropic',
     # Indicates which tools are enabled

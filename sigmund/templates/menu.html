@@ -5,6 +5,53 @@
       {% include 'login-div.html' %}
     {% endif %}
 {% raw %}
+    <!-- Model selection -->
+    <div class="model-selector">
+      <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
+        <div class="model-buttons" class='responsive'>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'openai'" 
+                :class="{ active: modelConfig === 'openai' }">
+                <!-- Icon for OpenAI model -->
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span>OpenAI<br><small>GPT5.4<br>Conversations</small></span>
+            </button>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'openai_thinking'" 
+                :class="{ active: modelConfig === 'openai_thinking' }">
+                <!-- Icon for OpenAI model -->
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span>OpenAI<br><small>GPT5.5<br>Problem solving</small></span>
+            </button>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'anthropic'" 
+                :class="{ active: modelConfig === 'anthropic' }">
+                <!-- Icon for Anthropic model -->
+                <img src="/static/anthropic.png" alt="Anthropic Icon">
+                <span>Anthropic<br><small>Claude 4.6<br>Sonnet<br>Conversations</small></span>
+            </button>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'anthropic_thinking'" 
+                :class="{ active: modelConfig === 'anthropic_thinking' }">
+                <!-- Icon for Anthropic model -->
+                <img src="/static/anthropic.png" alt="Anthropic Icon">
+                <span>Anthropic<br><small>Claude 4.7<br>Opus<br>Problem solving</small></span>
+            </button>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'mistral'" 
+                :class="{ active: modelConfig === 'mistral' }">
+                <!-- Icon for Mistral model -->
+                <img src="/static/mistral.png" alt="Mistral Icon">
+                <span>Mistral<br><small>Medium 3.5<br>Conversations</small></span>
+            </button>
+        </div>        
+    </div>
+    <hr class="menu-divider">
     <!-- Tool section -->
     <div>
       <small>For best performance, only enable tools you need</small>
@@ -100,53 +147,6 @@
         <a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">JupyterLab</a>
     </div>
     <hr class="menu-divider">    
-    <!-- Model selection -->
-    <div class="model-selector">
-      <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
-        <div class="model-buttons" class='responsive'>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai'" 
-                :class="{ active: modelConfig === 'openai' }">
-                <!-- Icon for OpenAI model -->
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.4<br>Conversations</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai_thinking'" 
-                :class="{ active: modelConfig === 'openai_thinking' }">
-                <!-- Icon for OpenAI model -->
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.5<br>Problem solving</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'anthropic'" 
-                :class="{ active: modelConfig === 'anthropic' }">
-                <!-- Icon for Anthropic model -->
-                <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 4.6<br>Sonnet<br>Conversations</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'anthropic_thinking'" 
-                :class="{ active: modelConfig === 'anthropic_thinking' }">
-                <!-- Icon for Anthropic model -->
-                <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 4.7<br>Opus<br>Problem solving</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'mistral'" 
-                :class="{ active: modelConfig === 'mistral' }">
-                <!-- Icon for Mistral model -->
-                <img src="/static/mistral.png" alt="Mistral Icon">
-                <span>Mistral<br><small>Medium 3.5<br>Conversations</small></span>
-            </button>
-        </div>        
-    </div>
-    <hr class="menu-divider">
     <!-- Theme selection -->
     <div class="model-selector">
       <small>Choose a color theme</small>

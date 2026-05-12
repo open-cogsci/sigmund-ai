@@ -4,7 +4,8 @@ body {
   color: #000000;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  margin: 0; }
+  margin: 0;
+  scrollbar-color: #90a4ae #eceff1; }
 
 h1 {
   font-size: 1.4em; }
@@ -342,7 +343,7 @@ button#send:disabled {
   margin-bottom: 30px; }
 
 .login-failed {
-  color: #B00020; }
+  color: #d32f2f; }
 
 #login div {
   padding: 0; }
