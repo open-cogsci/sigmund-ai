@@ -21,25 +21,27 @@
 
 .message-ai {
     margin-right: 10%;
-    background-color: $color-white;
+    background-color: $color-bg-message-ai;
+    color: $color-fg-message-ai;
 }
 
 .message-user {
     color: $color-primary;
     white-space: pre-wrap;
     margin-left: 10%;
-    background-color: $color-message-box;
+    background-color: $color-bg-message-user;
+    color: $color-fg-message-user;
 }
 
 .message-info {
     margin-bottom: 10px;
     font-size: 0.8em;
-    color: $color-muted-dark;
+    color: $color-message-info;
 }
 
 .message-error {
     border-left: 4px solid $color-error;
-    background-color: #ffebee;
+    background-color: $color-bg-message-ai;
 
     strong {
         color: $color-error;

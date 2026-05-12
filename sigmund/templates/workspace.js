@@ -5,7 +5,7 @@ function initWorkspace() {
     workspace = CodeMirror.fromTextArea(workspaceTextArea, {
       lineNumbers: false,
       mode: language,
-      theme: "{{ theme }}",
+      theme: "{{ theme_codemirror }}",
       tabSize: 4,
       lineWrapping: true
     })

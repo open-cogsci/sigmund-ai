@@ -9,7 +9,7 @@
     <div>
       <small>For best performance, only enable tools you need</small>
     </div>    
-    <div>
+    <div class='responsive'>
       <label>Tools:</label>
       <div class="tool-item">
           <input type="checkbox"
@@ -59,11 +59,12 @@
           <label for="tool-generate-image-dalle3">Generate images (Dall-E 3)</label>
       </div>
     </div>
+    <hr class="menu-divider">    
     <!-- Expert knowledge section -->
     <div>
       <small>For best performance, only enable knowledge you need</small>
     </div>
-    <div>
+    <div class='responsive'>
       <label>Expert knowledge:</label>
       <div class="tool-item">
           <input type="checkbox"
@@ -89,11 +90,10 @@
       </div>
     </div>
     <hr class="menu-divider">        
-    <hr class="menu-divider">
     <div>
       <small>Build experiments, analyze data, and run code with application connectors</small>
     </div>    
-    <div>
+    <div class='responsive'>
       <label>Connect to 
         <a href="https://osdoc.cogsci.nl/tutorials/beginner-sigmund/" target="_blank">OpenSesame</a>,
         <a href="https://github.com/open-cogsci/sigmund-analyst" target="_blank">Sigmund Analyst</a>,
@@ -103,7 +103,7 @@
     <!-- Model selection -->
     <div class="model-selector">
       <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
-        <div class="model-buttons">
+        <div class="model-buttons" class='responsive'>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'openai'" 
@@ -147,30 +147,55 @@
         </div>        
     </div>
     <hr class="menu-divider">
+    <!-- Theme selection -->
+    <div class="model-selector">
+      <small>Choose a color theme</small>
+        <div class="model-buttons">
+            <button
+                @click="themeConfig = 'original'"
+                :class="{ active: themeConfig === 'original' }">
+                <span>Original<br><small>Light/ Dark</small></span>
+            </button>
+            <button
+                @click="themeConfig = 'monokai'"
+                :class="{ active: themeConfig === 'monokai' }">
+                <span>Monokai<br><small>Dark</small></span>
+            </button>
+            <button
+                @click="themeConfig = 'solarized-light'"
+                :class="{ active: themeConfig === 'solarized-light' }">
+                <span>Solarized<br><small>Light</small></span>
+            </button>
+            <button
+                @click="themeConfig = 'solarized-dark'"
+                :class="{ active: themeConfig === 'solarized-dark' }">
+                <span>Solarized<br><small>Dark</small></span>
+            </button>
+        </div>
+    </div>
+    <hr class="menu-divider">
 {% endraw %}    
     {% if need_login %}
-    <div @click="navigateTo('/terms')">Terms and conditions</div>    
+    <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>    
     {% else %}
-    <div v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
-    <div @click="showConversations">Browse conversations</div>
-    <div @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
+    <div class='responsive' v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
+    <div class='responsive' @click="showConversations">Browse conversations</div>
+    <div class='responsive' @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
     <hr class="menu-divider">    
-    <div @click="navigateTo('/terms')">Terms and conditions</div>
-    <div @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
-    <div @click="navigateTo('/api/conversation/export')">Download your data</div>
-    <div @click="navigateTo('/logout')">Log out</div>
+    <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>
+    <div class='responsive' @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
+    <div class='responsive' @click="navigateTo('/api/conversation/export')">Download your data</div>
+    <div class='responsive' @click="navigateTo('/logout')">Log out</div>
     {% endif %}
 {% raw %}    
   </div>
   <!-- Modal for browsing conversations -->
   <div class="modal" v-if="showModal" v-bind:class="{ 'active': showModal }">
-    <div class="modal-content">
-      <div id='conversation-heading'>Conversations
-        <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>
-      </div>
+    <div class="modal-content conversations">
       <!-- Search input and button -->
       <div class="search-conversations">
-          <input v-model="searchQuery" @keydown.enter="fetchConversations" type="text" placeholder="Search …">
+          <input v-model="searchQuery" @keydown.enter="fetchConversations" type="text" placeholder="Search conversations …">
+          <div class="close" @click="closeModal"><i class="fas fa-window-close"></i></div>          
       </div>      
       <div id="loadingConversationsMessage" v-show="isLoadingConversations">Loading conversations …</div>
       <div v-for="(conversation, index) in sortedConversations" :key="conversation.id">
@@ -187,6 +212,11 @@
 {% endraw %}
 
 <script>
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : 'default';
+}
+
 function setSetting(key, value) {
   const data = {};
   data[key] = String(value);
@@ -221,6 +251,7 @@ new Vue({
     showManageSubscriptions: {{ subscription_required|lower }},
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
+    themeConfig: getCookie('theme'),
     forceModelConfigUpdate: 0,
     tool_generate_image_dalle3: sigmundSettings.tool_generate_image_dalle3 === 'true',
     tool_generate_image_flux: sigmundSettings.tool_generate_image_flux === 'true',
@@ -243,6 +274,10 @@ new Vue({
   },
   watch: {
     modelConfig(value) { setSetting('model_config', value); },
+    themeConfig(value) {
+      document.cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000`;
+      location.reload();
+    },
     tool_generate_image_dalle3(value) { setSetting('tool_generate_image_dalle3', value); },
     tool_generate_image_flux(value) { setSetting('tool_generate_image_flux', value); },
     tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); },

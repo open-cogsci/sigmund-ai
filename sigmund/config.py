@@ -4,6 +4,34 @@ logger = logging.getLogger('sigmund')
 page_title = 'Sigmund AI'
 ai_name = 'Sigmund'
 
+# THEME
+#
+# The stylesheet defines the main application stylesheet. Pygments is the
+# stylesheet used for syntax highlighting in messages. CodeMirror is the 
+# style of the workspace.
+themes = {
+    'original' : {
+        'stylesheet': 'original',
+        'pygments': 'monokai',
+        'codemirror': 'monokai'
+    },
+    'monokai' : {
+        'stylesheet': 'monokai',
+        'pygments': 'monokai',
+        'codemirror': 'monokai'
+    },
+    'solarized-light' : {
+        'stylesheet': 'solarized-light',
+        'pygments': 'solarized-light',
+        'codemirror': 'solarized light'
+    },
+    'solarized-dark' : {
+        'stylesheet': 'solarized-dark',
+        'pygments': 'solarized-dark',
+        'codemirror': 'solarized dark'
+    }
+}
+
 # SERVER
 #
 # The external server address, that is, the URL that users visit
@@ -196,6 +224,8 @@ max_note_length = 100_000
 #
 # These are default values for settings, which are stored in the database.
 settings_default = {
+    # Theme
+    'theme' : 'original',
     # Indicates the model configuration as specified above
     'model_config': 'anthropic',
     # Indicates which tools are enabled

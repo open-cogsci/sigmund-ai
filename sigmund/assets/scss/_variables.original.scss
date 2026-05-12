@@ -1,31 +1,92 @@
 // ============================================================
-// Variables
+// Variables — Original
 // ============================================================
 
-// Colors
-$color-bg:          #ECEFF1;
-$color-primary:     #00796b;
-$color-link:        #0288d1;
-$color-heading:     #bf360c;
-$color-error:       #d32f2f;
-$color-warning:     #ff9800;
-$color-muted:       #90A4AE;
-$color-muted-dark:  #607D8B;
-$color-border:      #ccc;
-$color-message-box: #FFFDE7;
-$color-white:       #ffffff;
-$color-chat-bg:     #e0e0e0;
-$color-code-bg:     #f0f0f0;
+// ------------------------------------------------------------
+// Original Palette
+// ------------------------------------------------------------
+$original-white:        #ffffff;
+$original-bg-warm:      #fffde7;  // warm light yellow — message input bg
+$original-bg:           #eceff1;  // blue-grey 50 — main background
+$original-bg-code:      #f0f0f0;  // light grey — code background
+$original-bg-dark:      #e0e0e0;  // grey 300 — chat panel background
+$original-border:       #cccccc;
+$original-muted:        #90a4ae;  // blue-grey 200
+$original-muted-dark:   #607d8b;  // blue-grey 500
+$original-fg:           #000000;
+$original-teal:         #00796b;  // teal 700 — primary
+$original-blue:         #0288d1;  // light blue 700 — links
+$original-deep-orange:  #bf360c;  // deep orange 900 — headings
+$original-red:          #d32f2f;  // red 700 — errors
+$original-orange:       #ff9800;  // orange 500 — warnings
 
+// ------------------------------------------------------------
+// General colors
+// ------------------------------------------------------------
+$color-bg:          $original-bg;
+$color-fg:          $original-fg;
+$color-primary:     $original-teal;
+$color-link:        $original-blue;
+$color-heading:     $original-deep-orange;
+$color-error:       $original-red;
+$color-warning:     $original-orange;
+$color-muted:       $original-muted;
+$color-muted-dark:  $original-muted-dark;
+$color-border:      $original-border;
+$color-white:       $original-white;
+
+// ------------------------------------------------------------
+// Colors
+// ------------------------------------------------------------
+// Top-level distinction between chat and code (workspace) panels
+$color-chat-bg:     $original-bg-dark;
+$color-code-bg:     $original-bg-code;
+// Chat message bubbles. Message info appears in small letters and
+// de-emphasized colors below the message text.
+$color-bg-message-ai:           $original-white;
+$color-fg-message-ai:           $original-fg;
+$color-bg-message-user:         $original-white;
+$color-fg-message-user:         $original-teal;
+$color-message-info:            $original-muted;
+// Chat message input container
+$color-message-box:             $original-bg-warm;
+$color-bg-message-container:    $original-white;
+$color-fg-message-container:    $original-teal;
+// Main menu, which appears as a modal dialog
+$color-bg-menu:                 $original-white;
+$color-fg-menu:                 $original-fg;
+$color-hover-menu:              $original-bg-dark;
+$color-menu-divider:            $original-muted;
+$color-bg-menu-button:          $original-bg;
+$color-fg-menu-button:          $original-fg;
+$color-bg-menu-button-selected: $original-teal;
+$color-fg-menu-button-selected: $original-white;
+// Reload button in error message that appears inside chat bubble
+$color-bg-reload-button:        $original-bg-dark;
+$color-fg-reload-button:        $original-fg;
+$color-hover-reload-button:     $original-bg-dark;
+// Modal dialogs, for example for conversation browsing
+$color-bg-modal:                $original-white;
+$color-fg-modal:                $original-fg;
+$color-bg-modal-input:          $original-white;
+$color-highlight-modal-input:   $original-teal;
+$color-fg-modal-input:          $original-fg;
+
+// ------------------------------------------------------------
 // Typography
+// ------------------------------------------------------------
 $font-primary:   "Roboto", sans-serif;
 $font-condensed: "Roboto Condensed";
 
+// ------------------------------------------------------------
 // Breakpoints
+// ------------------------------------------------------------
 $breakpoint-lg: 768px;
 $breakpoint-sm: 767px;
 $breakpoint-xs: 600px;
 
+// ------------------------------------------------------------
 // Misc
+// ------------------------------------------------------------
 $border-radius: 4px;
 $box-shadow:    0 0 10px rgba(0, 0, 0, 0.1);

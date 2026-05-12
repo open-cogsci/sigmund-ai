@@ -35,7 +35,12 @@ def clean(text, escape_html=True, render=True):
     return text
     
 
-def render(path, **kwargs):
+def render(path, theme=None, **kwargs):
+    if theme is None or theme not in config.themes:
+        theme = config.settings_default['theme']
+    kwargs['theme_stylesheet'] = config.themes[theme]['stylesheet']
+    kwargs['theme_pygments'] = config.themes[theme]['pygments']
+    kwargs['theme_codemirror'] = config.themes[theme]['codemirror']
     return render_template(
         path,
         ai_name=config.ai_name,
@@ -43,7 +48,6 @@ def render(path, **kwargs):
         server_url=config.server_url,
         max_message_length=config.max_message_length,
         version=__version__,
-        theme='monokai',
         **kwargs)
 
 

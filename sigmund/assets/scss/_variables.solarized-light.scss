@@ -2,30 +2,94 @@
 // Variables — Solarized Light
 // ============================================================
 
-// Colors
-$color-bg:          #fdf6e3;
-$color-primary:     #2aa198;
-$color-link:        #268bd2;
-$color-heading:     #cb4b16;
-$color-error:       #dc322f;
-$color-warning:     #b58900;
-$color-muted:       #93a1a1;
-$color-muted-dark:  #657b83;
-$color-border:      #93a1a1;
-$color-message-box: #eee8d5;
-$color-white:       #ffffff;
-$color-chat-bg:     #eee8d5;
-$color-code-bg:     #eee8d5;
+// ------------------------------------------------------------
+// Solarized Light Palette
+// ------------------------------------------------------------
+$solarized-base03:  #002b36;  // darkest (unused in light)
+$solarized-base02:  #073642;  // dark (unused in light)
+$solarized-base01:  #586e75;  // emphasized body text
+$solarized-base00:  #657b83;  // body text
+$solarized-base0:   #839496;  // body secondary
+$solarized-base1:   #93a1a1;  // comments / secondary
+$solarized-base2:   #eee8d5;  // background
+$solarized-base3:   #fdf6e3;  // surfaces (sit on top of background)
+$solarized-yellow:  #b58900;
+$solarized-orange:  #cb4b16;
+$solarized-red:     #dc322f;
+$solarized-magenta: #d33682;
+$solarized-violet:  #6c71c4;
+$solarized-blue:    #268bd2;
+$solarized-cyan:    #2aa198;
+$solarized-green:   #859900;
+$solarized-code-bg: #f0ead8;  // slightly deeper cream
 
+// ------------------------------------------------------------
+// General colors
+// ------------------------------------------------------------
+$color-bg:          $solarized-base2;
+$color-fg:          $solarized-base00;
+$color-primary:     $solarized-cyan;
+$color-link:        $solarized-blue;
+$color-heading:     $solarized-blue;
+$color-error:       $solarized-red;
+$color-warning:     $solarized-orange;
+$color-muted:       $solarized-base1;
+$color-muted-dark:  $solarized-base2;
+$color-border:      $solarized-base2;
+$color-white:       $solarized-base3;
+
+// ------------------------------------------------------------
+// Colors
+// ------------------------------------------------------------
+// Top-level distinction between chat and code (workspace) panels
+$color-chat-bg:     $solarized-base2;
+$color-code-bg:     $solarized-code-bg;
+// Chat message bubbles. Message info appears in small letters and
+// de-emphasized colors below the message text.
+$color-bg-message-ai:           $solarized-base3;
+$color-fg-message-ai:           $solarized-base00;
+$color-bg-message-user:         $solarized-base3;
+$color-fg-message-user:         $solarized-cyan;
+$color-message-info:            $solarized-base1;
+// Chat message input container
+$color-message-box:             $solarized-base2;
+$color-bg-message-container:    $solarized-base3;
+$color-fg-message-container:    $solarized-blue;
+// Main menu, which appears as a modal dialog
+$color-bg-menu:                 $solarized-base3;
+$color-fg-menu:                 $solarized-base00;
+$color-hover-menu:              $solarized-base2;
+$color-menu-divider:            $solarized-base1;
+$color-bg-menu-button:          $solarized-base2;
+$color-fg-menu-button:          $solarized-base01;
+$color-bg-menu-button-selected: $solarized-cyan;
+$color-fg-menu-button-selected: $solarized-base3;
+// Reload button in error message that appears inside chat bubble
+$color-bg-reload-button:        $solarized-base2;
+$color-fg-reload-button:        $solarized-base00;
+$color-hover-reload-button:     $solarized-base2;
+// Modal dialogs, for example for conversation browsing
+$color-bg-modal:                $solarized-base3;
+$color-fg-modal:                $solarized-base00;
+$color-bg-modal-input:          $solarized-base3;
+$color-highlight-modal-input:   $solarized-cyan;
+$color-fg-modal-input:          $solarized-base00;
+
+// ------------------------------------------------------------
 // Typography
+// ------------------------------------------------------------
 $font-primary:   "Roboto", sans-serif;
 $font-condensed: "Roboto Condensed";
 
+// ------------------------------------------------------------
 // Breakpoints
+// ------------------------------------------------------------
 $breakpoint-lg: 768px;
 $breakpoint-sm: 767px;
 $breakpoint-xs: 600px;
 
+// ------------------------------------------------------------
 // Misc
+// ------------------------------------------------------------
 $border-radius: 4px;
-$box-shadow:    0 0 10px rgba(0, 0, 0, 0.1);
+$box-shadow:    0 0 10px rgba(0, 0, 0, 0.15);

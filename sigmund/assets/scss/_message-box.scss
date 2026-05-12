@@ -27,7 +27,7 @@
     padding: 10px;
     border: 1px solid $color-border;
     border-radius: $border-radius;
-    background-color: white;
+    background-color: $color-bg-message-container;
 }
 
 #button-container {
@@ -40,6 +40,8 @@ textarea#message {
     border: none;
     flex-grow: 1;
     height: 100%;
+    background-color: $color-bg-message-container;
+    color: $color-fg-message-container;
 
     &:focus {
         outline: none;

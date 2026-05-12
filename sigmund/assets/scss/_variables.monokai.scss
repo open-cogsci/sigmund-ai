@@ -2,30 +2,88 @@
 // Variables — Monokai
 // ============================================================
 
-// Colors
-$color-bg:          #272822;
-$color-primary:     #a6e22e;
-$color-link:        #66d9e8;
-$color-heading:     #f92672;
-$color-error:       #f92672;
-$color-warning:     #e6db74;
-$color-muted:       #75715e;
-$color-muted-dark:  #49483e;
-$color-border:      #49483e;
-$color-message-box: #3e3d32;
-$color-white:       #f8f8f2;
-$color-chat-bg:     #3e3d32;
-$color-code-bg:     #1e1f1c;
+// ------------------------------------------------------------
+// Monokai Palette
+// ------------------------------------------------------------
+$monokai-bg:          #272822;
+$monokai-surface:     #3e3d32;
+$monokai-highlight:   #49483e;
+$monokai-comment:     #75715e;
+$monokai-fg:          #f8f8f2;
+$monokai-yellow:      #e6db74;
+$monokai-orange:      #fd971f;
+$monokai-red:         #f92672;
+$monokai-purple:      #ae81ff;
+$monokai-blue:        #66d9e8;
+$monokai-green:       #a6e22e;
+$monokai-violet:      #AB9DF2;
+$monokai-code-bg:     #1e1f1c;
 
+// General colors
+$color-bg:          $monokai-bg;
+$color-fg:          $monokai-fg;
+$color-primary:     $monokai-yellow;
+$color-link:        $monokai-blue;
+$color-heading:     $monokai-yellow;
+$color-error:       $monokai-red;
+$color-warning:     $monokai-yellow;
+$color-muted:       $monokai-comment;
+$color-muted-dark:  $monokai-highlight;
+$color-border:      $monokai-highlight;
+$color-white:       $monokai-surface;
+
+// ------------------------------------------------------------
+// Colors
+// ------------------------------------------------------------
+// Top-level distinction between chat and code (workspace) panels
+$color-chat-bg:     $monokai-bg;
+$color-code-bg:     $monokai-code-bg;
+// Chat message bubbles. Message info appears in small letters and 
+// de-emphasized colors below the message text.
+$color-bg-message-ai:     		$monokai-surface;
+$color-fg-message-ai:     		$monokai-fg;
+$color-bg-message-user:   		$monokai-surface;
+$color-fg-message-user:		  	$monokai-yellow;
+$color-message-info:   	   		$monokai-highlight; 
+// Chat message input container
+$color-message-box: 			$monokai-bg;
+$color-bg-message-container:	$monokai-surface;
+$color-fg-message-container:	$monokai-yellow;
+$color-bg-menu:            		$monokai-surface;
+// Main menu, which appears as a modal dialog
+$color-fg-menu:						$monokai-fg;
+$color-hover-menu:					$monokai-bg;
+$color-menu-divider:				$monokai-highlight;
+$color-bg-menu-button:				$monokai-highlight;
+$color-fg-menu-button:				$monokai-fg;
+$color-bg-menu-button-selected:	$monokai-bg;
+$color-fg-menu-button-selected:	$color-primary;
+// Reload button in error message that appears inside chat bubble
+$color-bg-reload-button:		$monokai-highlight;
+$color-fg-reload-button:		$monokai-fg;
+$color-hover-reload-button:		$monokai-bg;
+// Modal dialogs, for example for conversation browsing
+$color-bg-modal:            	$monokai-surface;
+$color-fg-modal:				$monokai-fg;
+$color-bg-modal-input:     		$monokai-surface;
+$color-highlight-modal-input:  $monokai-highlight;
+$color-fg-modal-input:     		$monokai-fg;
+
+// ------------------------------------------------------------
 // Typography
+// ------------------------------------------------------------
 $font-primary:   "Roboto", sans-serif;
 $font-condensed: "Roboto Condensed";
 
+// ------------------------------------------------------------
 // Breakpoints
+// ------------------------------------------------------------
 $breakpoint-lg: 768px;
 $breakpoint-sm: 767px;
 $breakpoint-xs: 600px;
 
+// ------------------------------------------------------------
 // Misc
+// ------------------------------------------------------------
 $border-radius: 4px;
 $box-shadow:    0 0 10px rgba(0, 0, 0, 0.4);

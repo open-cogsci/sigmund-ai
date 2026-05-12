@@ -15,11 +15,34 @@
     select,
     input[type="text"],
     input[type="password"] {
+        outline: none;
         padding: 10px;
         margin-bottom: 10px;
         border: 1px solid $color-border;
         border-radius: $border-radius;
+        background-color: $color-bg-modal-input;
+        color: $color-fg-modal-input;
+        &:focus {
+            background-color: $color-highlight-modal-input;
+        }        
     }
+    input[type="submit"] {
+        background-color: $color-bg-reload-button;
+        color: $color-fg-reload-button;
+        padding: 12px 30px;
+        border: none;
+        border-radius: $border-radius;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+        transition: background-color 0.3s;
+    
+        &:hover {
+            background-color: $color-hover-reload-button;
+        }    
+    }      
 }
 
 .form-group {

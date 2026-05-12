@@ -53,7 +53,7 @@ class Sigmund:
             logger.warning(
                 f'model_config {model_config} not found, resetting to default')
             model_config = config.settings_default['model_config']
-            self.database.set_setting('model_config', model_config)
+            self.database.set_setting('model_config', model_config)        
         self.model_config = config.model_config[model_config]
         self.documentation = Documentation(
             self, foundation_document_topics=foundation_document_topics)
@@ -74,6 +74,7 @@ class Sigmund:
                                   tool_choice=tool_choice)
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
+        self.theme = self.database.get_setting('theme')
 
     def send_user_message(self, message: str, workspace_content: str = None,
                           workspace_language: str = 'text',

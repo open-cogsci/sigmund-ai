@@ -23,9 +23,38 @@
     display: none;
     position: fixed;
     border: 1px solid $color-border;
-    background: #fff;
+    background: $color-bg-menu;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    z-index: 1000;  
+    
+    input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 1em;
+        height: 1em;
+        border: 2px solid $color-bg;
+        background-color: $color-bg;
+        border-radius: 3px;
+        cursor: pointer;
+        position: relative;
+        vertical-align: middle;
+        transition: background-color 0.2s ease;
+    
+        &:checked {
+            background-color: $color-primary;
+            border-color: $color-primary;
+    
+            &::before {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 0.75em;
+                color: $color-bg;
+                line-height: 1;
+            }
+        }
+    }    
 
     &.active {
         display: block;
@@ -36,8 +65,8 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
 
-        &:hover {
-            background-color: #e8e8e8;
+        &.responsive:hover {
+            background-color: $color-hover-menu;
         }
     }
 
@@ -58,12 +87,33 @@
     .model-buttons,
     .login-buttons {
         margin-bottom: 10px;
+        button {
+            background-color: $color-bg-menu-button;
+            color: $color-fg-menu-button;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            
+            &.active {
+                background-color: $color-bg-menu-button-selected;
+                color: $color-fg-menu-button-selected;                
+                small {
+                    color: $color-fg-menu-button-selected;
+                }
+            }
+            &:hover {
+                background-color: $color-hover-menu;
+                color: $color-fg-menu-button; 
+                small {
+                    color: $color-fg-menu-button; 
+                }
+            }   
+        }        
     }
 
     small,
     small a {
         font-family: $font-condensed;
-        color: #aaa;
+        color: $color-fg-menu;
     }
 
     #login {
@@ -74,7 +124,7 @@
 .menu-divider {
     border: none;
     height: 1px;
-    background-color: #e8e8e8;
+    background-color: $color-menu-divider;
     margin: 8px 0;
 }
 

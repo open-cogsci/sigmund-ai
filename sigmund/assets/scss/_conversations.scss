@@ -1,0 +1,24 @@
+// ============================================================
+// Conversations
+// ============================================================
+
+.conversations {
+    input {
+        margin-right: 10px;
+        outline: none;
+        background-color: $color-bg-modal-input;
+        color: $color-fg-modal-input;
+        &:focus {
+            background-color: $color-highlight-modal-input;
+        }
+    }
+
+    .conversation-title {
+        color: $color-fg;
+        cursor: pointer;
+        line-height: 1.5em;        
+        &:hover {
+            color: $color-primary;
+        }
+    }
+}

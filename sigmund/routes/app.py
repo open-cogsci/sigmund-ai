@@ -4,7 +4,7 @@ from pathlib import Path
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from flask import redirect, url_for, session, Blueprint
+from flask import redirect, url_for, session, Blueprint, request
 from flask_login import login_user, current_user, logout_user, UserMixin
 from .. import config
 from .. import utils
@@ -22,6 +22,10 @@ class User(UserMixin):
         logger.info(f'initializing user id: {self.id}')
 
 
+def get_theme():
+    return request.cookies.get('theme', config.settings_default['theme'])
+
+
 def get_sigmund(db_cache='default', transient_settings=None,
                 transient_system_prompt=None,
                 foundation_document_topics=None):
@@ -31,7 +35,7 @@ def get_sigmund(db_cache='default', transient_settings=None,
                    transient_settings=transient_settings,
                    transient_system_prompt=transient_system_prompt,
                    foundation_document_topics=foundation_document_topics)
-    
+
 
 def chat_page():
     sigmund = get_sigmund()
@@ -83,7 +87,7 @@ def chat_page():
             answer_model_div = f'<div class="message-answer-model">{metadata["answer_model"]}</div>'
         else:
             answer_model_div = ''
-            
+
         html_content += f'<div class="message {html_class}" data-message-id="{message_id}">{delete_button}{html_body}{workspace_div}{timestamp_div}{answer_model_div}{sources_div}</div>'
     # The user's settings are the defaults updated with the user-specific 
     # settings from the database
@@ -101,7 +105,8 @@ def chat_page():
                         settings=json.dumps(settings),
                         workspace_content=workspace_content,
                         workspace_language=workspace_language,
-                        usage=sigmund.usage())
+                        usage=sigmund.usage(),
+                        theme=get_theme())
 
 
 def login_handler(form, failed=False):
@@ -134,28 +139,32 @@ def login_handler(form, failed=False):
                         settings='{}',
                         workspace_content='',
                         workspace_language='',
-                        usage='0')
-    
+                        usage='0',
+                        theme=get_theme())
+
 
 @app_blueprint.route('/terms')
 def terms():
     return utils.render(
         'info-page.html',
-        content=utils.md(Path('sigmund/static/terms.md').read_text()))
+        content=utils.md(Path('sigmund/static/terms.md').read_text()),
+        theme=get_theme())
 
 
 @app_blueprint.route('/fair-use')
 def fair_use():
     return utils.render(
         'info-page.html',
-        content=utils.md(Path('sigmund/static/fair-use.md').read_text()))
+        content=utils.md(Path('sigmund/static/fair-use.md').read_text()),
+        theme=get_theme())
 
 
 @app_blueprint.route('/connectors')
 def connectors():
     return utils.render(
         'info-page.html',
-        content=utils.md(Path('sigmund/static/connectors.md').read_text()))
+        content=utils.md(Path('sigmund/static/connectors.md').read_text()),
+        theme=get_theme())
 
 
 @app_blueprint.route('/login', methods=['GET', 'POST'])
