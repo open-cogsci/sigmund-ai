@@ -11,6 +11,7 @@ from ._opensesame_tools import (opensesame_add_existing_item_to_parent,
                                 opensesame_set_global_var,
                                 opensesame_update_item_script)
 from ._ide_tools import (ide_execute_code, ide_open_file, ide_inspect_files,
-                         ide_list_files)
+                         ide_list_files, ide_write_file,
+                         ide_execute_shell_command)
 from ._notes import (add_note, update_note, remove_note,
                      save_workspace_as_note)

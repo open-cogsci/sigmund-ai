@@ -86,3 +86,43 @@ class ide_list_files(BaseIDETool):
         }
     }
     required_arguments = ["path"]
+
+
+class ide_write_file(BaseIDETool):
+    """Writes content to a file on the user's local system. Use this tool to create or overwrite a file with specific content."""
+
+    arguments = {
+        'path': {
+            'type': 'string',
+            'description': 'The path to the file where the content will be written.'
+        },
+        'content': {
+            'type': 'string',
+            'description': 'The content to write to the file.'
+        },
+        'encoding': {
+            'type': 'string',
+            'description': 'The text encoding to use when writing the file. (default="utf-8")'
+        }
+    }
+    required_arguments = ["path", "content"]
+
+
+class ide_execute_shell_command(BaseIDETool):
+    """Executes a shell command on the user's local system and returns the output. Use this tool to run terminal commands, scripts, or system-level operations."""
+
+    arguments = {
+        'shell_command': {
+            'type': 'string',
+            'description': 'The shell command to execute.'
+        },
+        'timeout': {
+            'type': 'integer',
+            'description': 'The maximum time (in seconds) to wait for the command to complete. (default=30)'
+        },
+        'working_directory': {
+            'type': 'string',
+            'description': 'The directory in which the command will be executed. (default=current working directory)'
+        }
+    }
+    required_arguments = ["command"]

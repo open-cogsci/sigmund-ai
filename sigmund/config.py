@@ -210,7 +210,7 @@ tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
           'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
          'ide_execute_code', 'ide_open_file', 'ide_inspect_files',
-         'ide_list_files',
+         'ide_list_files', 'ide_write_file', 'ide_execute_shell_command',
          'add_note', 'update_note', 'remove_note', 'save_workspace_as_note']
 
 # NOTES
@@ -245,6 +245,8 @@ settings_default = {
     'tool_ide_open_file': 'false',
     'tool_ide_inspect_files': 'false',
     'tool_ide_list_files': 'false',
+    'tool_ide_write_file': 'false',
+    'tool_ide_execute_shell_command': 'false',
     'tool_add_note': 'true',
     'tool_update_note': 'true',
     'tool_remove_note': 'true',
