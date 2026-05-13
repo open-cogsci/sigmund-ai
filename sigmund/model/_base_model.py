@@ -1,5 +1,6 @@
 import logging
 import re
+import html
 from .. import config
 logger = logging.getLogger('sigmund')
 
@@ -138,7 +139,7 @@ class BaseModel:
         """Embeds a single thinking block as HTML divs."""
         sig = (f'<div class="thinking_block_signature">{signature}</div>'
                if signature else "")
-        cont = (f'<div class="thinking_block_content">{content}</div>'
+        cont = (f'<div class="thinking_block_content">{html.escape(content)}</div>'
                 if content else "")
         return sig + cont
 
