@@ -25,7 +25,18 @@
     border: 1px solid $color-border;
     background: $color-bg-menu;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1000;  
+    z-index: 1000; 
+    
+    .close {
+        margin-top: 5px;
+        margin-right: 10px;
+    }
+    
+    .model-recommendations {
+        font-family: $font-condensed;;
+        font-size: small;
+        display: block;
+    }   
     
     input[type="checkbox"] {
         appearance: none;
@@ -184,5 +195,14 @@
         left: 0;
         top: 0;
         transform: none;
+        
+        .close {
+            float: none;
+            text-align: center;
+        }
+        
+        .why-sigmund {
+            margin-top: 20px!important;
+        }
     }
 }

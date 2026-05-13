@@ -7,48 +7,68 @@
 {% raw %}
     <!-- Model selection -->
     <div class="model-selector">
-      <small>To save energy and protect the environment, use problem-solving models only for complex reasoning</small>
+      <small>Help save energy and protect the environment: use the simplest model that's good enough for your task</small>
         <div class="model-buttons" class='responsive'>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai'" 
-                :class="{ active: modelConfig === 'openai' }">
-                <!-- Icon for OpenAI model -->
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.4<br>Conversations</small></span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai_thinking'" 
-                :class="{ active: modelConfig === 'openai_thinking' }">
-                <!-- Icon for OpenAI model -->
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span>OpenAI<br><small>GPT5.5<br>Problem solving</small></span>
-            </button>
+                @click="modelConfig = 'mistral'" 
+                :class="{ active: modelConfig === 'mistral' }">
+                <!-- Icon for Mistral model -->
+                <span>Mistral<br><small>Medium 3.5</small></span>
+                <img src="/static/mistral.png" alt="Mistral Icon">
+                <span class="model-recommendations">
+                Fast and energy-efficient.
+                Recommended for conversations.
+                </span>
+            </button>        
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'anthropic'" 
                 :class="{ active: modelConfig === 'anthropic' }">
                 <!-- Icon for Anthropic model -->
+                <span>Anthropic<br><small>Claude 4.6 Sonnet</small></span>
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 4.6<br>Sonnet<br>Conversations</small></span>
+                <span class="model-recommendations">
+                Slow and energy-intensive.
+                Recommended for complex tasks.
+                </span>                
             </button>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'anthropic_thinking'" 
                 :class="{ active: modelConfig === 'anthropic_thinking' }">
                 <!-- Icon for Anthropic model -->
+                <span>Anthropic<br><small>Claude 4.7 Opus</small></span>
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span>Anthropic<br><small>Claude 4.7<br>Opus<br>Problem solving</small></span>
+                <span class="model-recommendations">
+                Very slow and energy-intensive.
+                Only recommended when everything else fails.
+                </span>                    
             </button>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'mistral'" 
-                :class="{ active: modelConfig === 'mistral' }">
-                <!-- Icon for Mistral model -->
-                <img src="/static/mistral.png" alt="Mistral Icon">
-                <span>Mistral<br><small>Medium 3.5<br>Conversations</small></span>
+                @click="modelConfig = 'openai'" 
+                :class="{ active: modelConfig === 'openai' }">
+                <!-- Icon for OpenAI model -->
+                <span>OpenAI<br><small>GPT5.4</small></span>
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span class="model-recommendations">
+                Slow and energy-intensive.
+                Recommended for complex tasks.
+                </span>                    
             </button>
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'openai_thinking'" 
+                :class="{ active: modelConfig === 'openai_thinking' }">
+                <!-- Icon for OpenAI model -->
+                <span>OpenAI<br><small>GPT5.5</small></span>
+                <img src="/static/openai.png" alt="OpenAI Icon">
+                <span class="model-recommendations">
+                Very slow and energy-intensive.
+                Only recommended when everything else fails.
+                </span>                   
+            </button>            
         </div>        
     </div>
     <hr class="menu-divider">
@@ -212,9 +232,9 @@
 {% endraw %}
 
 <script>
-function getCookie(name) {
+function getCookie(name, defaultValue) {
   const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-  return match ? decodeURIComponent(match[1]) : 'default';
+  return match ? decodeURIComponent(match[1]) : defaultValue;
 }
 
 function setSetting(key, value) {
@@ -251,7 +271,7 @@ new Vue({
     showManageSubscriptions: {{ subscription_required|lower }},
     isUploading: false,
     modelConfig: sigmundSettings.model_config,
-    themeConfig: getCookie('theme'),
+    themeConfig: getCookie('theme', 'monokai'),
     forceModelConfigUpdate: 0,
     tool_generate_image_dalle3: sigmundSettings.tool_generate_image_dalle3 === 'true',
     tool_generate_image_flux: sigmundSettings.tool_generate_image_flux === 'true',

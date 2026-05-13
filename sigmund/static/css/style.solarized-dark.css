@@ -31,14 +31,6 @@ a:visited {
 .hidden-data {
   display: none; }
 
-.pretty-text {
-  font-family: "Lobster Two";
-  background-color: #ffd600;
-  border-radius: 4px;
-  padding: 8px;
-  float: right;
-  margin: 0 0 20px 20px !important; }
-
 .codehilite pre {
   overflow: auto;
   line-height: 150%;
@@ -272,6 +264,10 @@ button#send:disabled {
     .model-buttons button:hover {
       background-color: #e0e0e0; }
 
+.model-buttons img {
+  margin-bottom: 10px !important;
+  margin-top: 10px; }
+
 .model-buttons-wrapper {
   display: flex;
   flex-direction: column; }
@@ -369,6 +365,13 @@ button#send:disabled {
   background: #073642;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1000; }
+  .menu .close {
+    margin-top: 5px;
+    margin-right: 10px; }
+  .menu .model-recommendations {
+    font-family: "Roboto Condensed";
+    font-size: small;
+    display: block; }
   .menu input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
@@ -482,7 +485,12 @@ button#send:disabled {
     height: 100%;
     left: 0;
     top: 0;
-    transform: none; } }
+    transform: none; }
+    .menu .close {
+      float: none;
+      text-align: center; }
+    .menu .why-sigmund {
+      margin-top: 20px !important; } }
 .message-loading {
   color: gray; }
 

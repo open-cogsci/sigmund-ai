@@ -90,6 +90,11 @@ button#send:disabled {
     }
 }
 
+.model-buttons img {
+    margin-bottom: 10px!important;
+    margin-top: 10px;
+}
+
 .model-buttons-wrapper {
     display: flex;
     flex-direction: column;

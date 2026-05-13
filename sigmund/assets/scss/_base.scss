@@ -34,16 +34,6 @@ a:visited {
     display: none;
 }
 
-.pretty-text {
-    font-family: "Lobster Two";
-    background-color: #ffd600;
-    border-radius: $border-radius;
-    padding: 8px;
-    float: right;
-    margin: 0 0 20px 20px !important;
-}
-
-// The original had two separate .codehilite pre rules; merged here.
 .codehilite pre {
     overflow: auto;
     line-height: 150%;
