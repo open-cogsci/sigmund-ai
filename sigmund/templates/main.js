@@ -534,7 +534,7 @@ function updateUsageBar() {
     const label = document.getElementById('usage-label');
     const warning = document.getElementById('usage-limit-warning');
     if (!counter || !bar || !label) return;
-    const value = Math.round(100 * parseFloat(counter.dataset.usage));
+    let value = Math.round(100 * parseFloat(counter.dataset.usage));
     if (isNaN(value)) {
         value = 0;
     }
