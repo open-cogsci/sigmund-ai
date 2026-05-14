@@ -12,3 +12,20 @@
 		}
 	}
 }
+
+#show-workspace button {
+    background-color: $color-bg-reload-button;
+    color: $color-fg-reload-button;
+    padding: 5px;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    width: 100%;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: $color-hover-reload-button;
+    }
+}

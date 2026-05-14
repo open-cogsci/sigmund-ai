@@ -32,6 +32,37 @@ function initWorkspace() {
     });
     workspace.on('change', updateWorkspacePlaceholder);
     updateWorkspacePlaceholder();
+    
+    // Define the media queries
+    const largeScreenQuery = window.matchMedia('(min-width: 768px)');
+    const smallScreenQuery = window.matchMedia('(max-width: 767px)');    
+    // Reset layout when screen size changes
+    largeScreenQuery.addEventListener('change', (e) => {
+        if (e.matches) {
+            console.log('resetting to large-screen layout');
+            showWorkspaceButton.style.display = 'none';
+            hideWorkspaceButton.style.display = 'none';
+            codeEditorDiv.style.display = 'block';
+            chatAreaDiv.style.display = 'block';
+        }
+    });    
+    smallScreenQuery.addEventListener('change', (e) => {
+        if (e.matches) {
+            console.log('resetting to small-screen layout');
+            showWorkspaceButton.style.display = 'block';
+            hideWorkspaceButton.style.display = 'inline';
+            codeEditorDiv.style.display = 'none';
+        }
+    });   
+    // Initialize show/hide buttons
+    showWorkspaceButton.addEventListener("click", function() {
+        codeEditorDiv.style.display = "block";
+        chatAreaDiv.style.display = 'none';
+    });
+    hideWorkspaceButton.addEventListener("click", function() {
+        codeEditorDiv.style.display = "none";
+        chatAreaDiv.style.display = 'block';
+    });    
 };
 
 

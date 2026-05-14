@@ -18,4 +18,7 @@ function globalElements(event) {
     window.copyWorkspaceButton = document.getElementById('copy-workspace');
     window.workspacePlaceholder = document.getElementById('workspace-placeholder');
     window.originalFavicon = document.querySelector('link[rel="icon"]').href;
+    window.codeEditorDiv = document.getElementById('code-editor');
+    window.showWorkspaceButton = document.getElementById("show-workspace");
+    window.hideWorkspaceButton = document.getElementById("hide-workspace");    
 }

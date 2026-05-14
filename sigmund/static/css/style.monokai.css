@@ -70,11 +70,13 @@ a:visited {
   background-color: #272822;
   overflow: auto;
   overflow-x: hidden;
-  padding: 10px 10px 0 10px; }
+  padding: 10px 10px 0 10px;
+  height: calc(100vh - 10px); }
 
 #code-editor {
   background-color: #1e1f1c;
-  overflow: auto; }
+  overflow: auto;
+  height: 100vh; }
 
 #code-editor-options {
   position: absolute;
@@ -155,30 +157,29 @@ a:visited {
     font-family: "Roboto Condensed";
     margin: 0; }
 
+.CodeMirror {
+  height: calc(100vh - var(--connected-status-height, 0px)) !important; }
+
 @media (min-width: 768px) {
   #container {
     flex-direction: row; }
 
-  .CodeMirror {
-    height: calc(100vh - var(--connected-status-height, 0px)) !important; }
-
   #code-editor {
-    flex: 1;
-    height: 100vh; }
+    flex: 1; }
 
   #chat-area {
-    width: 600px;
-    height: calc(100vh - 10px); }
+    width: 600px; }
 
   #workspace-placeholder {
     top: 10%;
-    width: calc(-620px + 100vw); } }
+    width: calc(-620px + 100vw); }
+
+  #hide-workspace,
+  #show-workspace {
+    display: none; } }
 @media (max-width: 767px) {
   #code-editor {
-    height: 190px; }
-
-  #chat-area {
-    height: calc(100vh - 200px); }
+    display: none; }
 
   #workspace-placeholder {
     top: calc(100vh - 200px);
@@ -797,5 +798,19 @@ textarea#message {
     margin-bottom: 0px; }
     #code-editor-options select:focus, #code-editor-options select:active {
       color: #e6db74; }
+
+#show-workspace button {
+  background-color: #49483e;
+  color: #f8f8f2;
+  padding: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 0px;
+  margin-bottom: 10px;
+  width: 100%;
+  transition: background-color 0.3s; }
+  #show-workspace button:hover {
+    background-color: #272822; }
 
 /*# sourceMappingURL=style.monokai.css.map */
