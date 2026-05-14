@@ -2,6 +2,7 @@ import logging
 import uuid
 from cryptography.fernet import InvalidToken
 import multiprocessing as mp
+import json
 from . import prompt, config, utils
 logger = logging.getLogger('sigmund')
 
@@ -36,7 +37,55 @@ class Messages:
                                   metadata]]
         self._condensed_message_history = [
             [role, content] for role, content, metadata
-            in self._message_history[:]]        
+            in self._message_history[:]]
+        
+    def handle_incoming_tool_result(
+            self, tool_result_content: str, workspace_content: str,
+            workspace_language: str) -> bool:
+        """Accepts an incoming tool result from a remote tool call. To do 
+        this the workspace content of the second-last message should be 
+        updated (because it contains the remote tool command). And the tool
+        result content of the last message should be updated with actual 
+        tool result content.
+        
+        Return True if succesfull, False otherwise.
+        """
+        # The message history is too short, perhaps because it has been
+        # condensed
+        if (
+            len(self._message_history) < 2 or
+            len(self._condensed_message_history) < 2
+        ):
+            logger.warning('message history is too short')
+            return False
+        # Update the workspace of the assistant message that sent the command
+        assistant_role, assistant_message, assistant_metadata \
+            = self._message_history[-2]
+        if assistant_role != 'assistant':
+            logger.warning('second-last message is not an assistant message')
+            return False
+        assistant_metadata['workspace_content'] = workspace_content
+        assistant_metadata['workspace_language'] = workspace_language
+        self.workspace_content = workspace_content
+        self.workspace_language = workspace_language
+        self._message_history[-2] = [assistant_role,
+                                     assistant_message,
+                                     assistant_metadata]
+        self._condensed_message_history[-2] = [assistant_role,
+                                               assistant_message]
+        # Update the tool result of the tool message
+        tool_role, tool_message, tool_metadata = self._message_history[-1]
+        if tool_role != 'tool':
+            logger.warning('last message is not a tool message')
+            return False
+        # The tool message is a JSON-encoded string that contains the data
+        # of the actual tool call
+        tool_data = json.loads(tool_message)
+        tool_data['content'] = tool_result_content
+        tool_message = json.dumps(tool_data)
+        self._message_history[-1] = [tool_role, tool_message, tool_metadata]
+        self._condensed_message_history[-1] = [tool_role, tool_message]
+        return True
 
     def metadata(self, workspace_content: str = None,
                  workspace_language: str = None, message_id: str = None):
@@ -123,6 +172,8 @@ class Messages:
                 if prefix_parts:
                     content = ''.join(prefix_parts) + content
             model_prompt.append(dict(role=role, content=content))
+        # import pprint
+        # pprint.pprint(model_prompt)
         return model_prompt
 
     def visible_messages(self):

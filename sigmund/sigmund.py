@@ -90,13 +90,7 @@ class Sigmund:
         str contains an AI message and the dict contains metadata for the 
         message. The third element corresponds to the content of the workspace,
         and can be None if empty.
-        """
-        # A temporary hack to prune messages for accounts
-        if message == 'prune_detached_messages()':
-            yield ActionReply(
-                f'{config.ai_name} is pruning detached messages ')
-            self.database.prune_detached_messages()
-            return Reply('Done', None, None, None)
+        """        
         if config.log_replies:
             logger.info(f'[user message] {message}')
         if self._hard_limit_exceeded():
@@ -107,13 +101,28 @@ class Sigmund:
             yield Reply(config.hourly_limit_exceeded_message,
                         self.messages.metadata())
             return
-        self.messages.workspace_content = workspace_content
-        self.messages.workspace_language = workspace_language
-        self.messages.append('user', 
-                             message=message,
-                             workspace_content=workspace_content,
-                             workspace_language=workspace_language,
-                             message_id=message_id)
+        tool_result_marker = '::tool_result::'
+        if message.startswith(tool_result_marker):
+            logger.info('treating user message as tool result')
+            message = message[len(tool_result_marker):]
+            if not self.messages.handle_incoming_tool_result(
+                    message, workspace_content, workspace_language):
+                logger.warning('could not handle tool result, treating as user message')
+                for reply in self.send_user_message(message,
+                                                    workspace_content,
+                                                    workspace_language,
+                                                    attachments,
+                                                    message_id):
+                    yield reply
+                return
+        else:
+            self.messages.workspace_content = workspace_content
+            self.messages.workspace_language = workspace_language
+            self.messages.append('user', 
+                                 message=message,
+                                 workspace_content=workspace_content,
+                                 workspace_language=workspace_language,
+                                 message_id=message_id)
         if config.search_enabled and self.documentation.enabled:
             # Search queries work best if they'r not too short. That's why we
             # include preceding messages until the search query reaches the
