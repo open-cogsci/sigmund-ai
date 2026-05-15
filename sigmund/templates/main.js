@@ -145,7 +145,7 @@ function createDeleteButton(messageId) {
 }
 
 function displayUserMessage(message, messageId) {
-    if (!message) return;
+    if (!message || message.startsWith('::tool_result::')) return;
 
     const userMessageBox = document.createElement('div');
     userMessageBox.innerText = message;

@@ -113,7 +113,6 @@ class generate_image_flux(BaseTool):
                 image_b64 = base64.b64encode(
                     image_response.content).decode('utf-8')
                 html = (
-                    f'Here\'s an image for "{prompt}"!\n'
                     f'<div class="image-generation mask">'
                     f'<img src="data:image/png;base64,{image_b64}">'
                     f'</div>'

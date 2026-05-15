@@ -32,8 +32,7 @@ class add_note(BaseTool):
             return (f'Failed to create note: content exceeds maximum length '
                     f'({config.max_note_length} characters).', None, True)
         messages.set_note(label, content)
-        message = f'I created a persistent note for myself ({label}).'
-        return message, None, True
+        return None, None, True
 
     def _auto_label(self, messages):
         existing = messages.get_notes()
@@ -67,8 +66,7 @@ class update_note(BaseTool):
             return (f'Failed to update note: content exceeds maximum length '
                     f'({config.max_note_length} characters).', None, True)
         messages.set_note(label, content)
-        message = f'I updated my persistent note ({label}).'
-        return message, None, True
+        return None, None, True
 
 
 class remove_note(BaseTool):
@@ -88,8 +86,7 @@ class remove_note(BaseTool):
             return (f'Failed to remove note: no note with label "{label}" '
                     f'exists.', None, True)
         messages.remove_note(label)
-        message = f'I removed my persistent note ({label}).'
-        return message, None, True
+        return None, None, True
 
 
 class save_workspace_as_note(BaseTool):
@@ -134,8 +131,6 @@ class save_workspace_as_note(BaseTool):
             return (f'Failed to create note: content exceeds maximum length '
                     f'({config.max_note_length} characters).', None, True)
         messages.set_note(label, content)
-        message = (f'I saved the workspace content as a persistent note '
-                   f'({label}).')
         if clear_workspace:
-            return message, 'Workspace converted to note.', True
-        return message, None, True
+            return None, 'Workspace converted to note.', True
+        return None, None, True

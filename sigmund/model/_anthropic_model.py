@@ -170,24 +170,20 @@ class AnthropicModel(BaseModel):
                 self._sigmund.database.add_activity(activity)        
         # Process the response
         parts = []
-        tool_message_prefix = ''
         for block in response.content:
             if block.type == 'tool_use':
                 if self._tools:
                     for tool in self._tools:
                         if tool.name == block.name:
-                            return tool.bind(
-                                json.dumps(block.input),
-                                message_prefix=tool_message_prefix + '\n\n')
+                            return tool.bind(json.dumps(block.input),
+                                             message_prefix='\n'.join(parts))
                 return self.invalid_tool
             if block.type == 'text':
                 parts.append(block.text)
-                tool_message_prefix += block.text
             if block.type == 'thinking':
                 thinking_html = self.embed_thinking_block(
                     block.signature, block.thinking)
                 parts.append(thinking_html)
-                tool_message_prefix += thinking_html
         return '\n'.join(parts)
 
     def _tool_args(self):

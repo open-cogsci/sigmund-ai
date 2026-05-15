@@ -101,10 +101,13 @@ class Sigmund:
             yield Reply(config.hourly_limit_exceeded_message,
                         self.messages.metadata())
             return
+        # The tool result marker allows external applications to return a 
+        # tool result through a user message. Rather than treating the result
+        # as a new message, it is then merged into a previous tool message.
         tool_result_marker = '::tool_result::'
         if message.startswith(tool_result_marker):
             logger.info('treating user message as tool result')
-            message = message[len(tool_result_marker):]
+            message = message[len(tool_result_marker):]            
             if not self.messages.handle_incoming_tool_result(
                     message, workspace_content, workspace_language):
                 logger.warning('could not handle tool result, treating as user message')

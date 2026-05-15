@@ -121,14 +121,16 @@ class OpenAIModel(BaseModel):
             logger.info(f'activity: {activity} (cache use: {cache_use:.2f}%)')
             if self._sigmund is not None:
                 self._sigmund.database.add_activity(activity)   
-        # Process response        
+        # Process response
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:
             function = tool_calls[0].function
             if self._tools:
                 for tool in self._tools:
                     if tool.name == function.name:
-                        return tool.bind(function.arguments)
+                        return tool.bind(
+                            function.arguments,
+                            message_prefix=response.choices[0].message.content)
             logger.warning(f'invalid tool called: {function}')
             return self.invalid_tool
         return response.choices[0].message.content

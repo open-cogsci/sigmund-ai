@@ -75,11 +75,14 @@ class BaseTool:
                     message, result, language, needs_feedback = tool_response
                 else:
                     raise ValueError(f'Invalid tool response: {tool_response}')
+            if message is None:
+                message = ''
+            message += f'\n\n⚙️ `{self.__class__.__name__}()`'
+            if message_prefix is not None:
+                message = message_prefix + '\n\n' + message
             result = {'name': self.name,
                       'args': args,
                       'content': result}
-            if message_prefix is not None:
-                message = message_prefix + message
             return message, result, language, needs_feedback
         return bound_tool_function
         

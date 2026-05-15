@@ -91,9 +91,8 @@ class MistralModel(OpenAIModel):
                 usage.completion_tokens * token_rate['output'])
             logger.info(f'activity: {activity}')
             if self._sigmund is not None:
-                self._sigmund.database.add_activity(activity)           
+                self._sigmund.database.add_activity(activity)
         content = response.choices[0].message.content
-        tool_message_prefix = ''
         # During thinking, content consists of a mix of text and thinking 
         # blocks, where thinking blocks themselves consist of chunks of text.
         # For now, we simply concatenate everything into a single large 
@@ -102,15 +101,12 @@ class MistralModel(OpenAIModel):
         # - <https://github.com/mistralai/client-python/issues/252>
         if isinstance(content, list):
             text = []
-            tool_message_prefix = ''
             for block in content:
                 if block.type == 'text':
                     text.append(block.text)
-                    tool_message_prefix += block.text
                 if block.type == 'thinking':
                     for thinking_chunk in block.thinking:
                         text.append(thinking_chunk.text)
-                        tool_message_prefix += thinking_chunk.text
             content = '\n'.join(text)
         # If tool calls are present, we execute the tool using the current text
         # as a prefix.
@@ -121,9 +117,9 @@ class MistralModel(OpenAIModel):
                 for tool in self._tools:
                     if tool.name == function.name:
                         return tool.bind(function.arguments,
-                                         message_prefix=tool_message_prefix + '\n\n')
+                                         message_prefix=content)
             logger.warning(f'invalid tool called: {function}')
-            return self.invalid_tool            
+            return self.invalid_tool
         return content
 
     def _tool_call_id(self, nr):

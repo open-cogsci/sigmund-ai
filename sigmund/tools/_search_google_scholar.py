@@ -30,6 +30,5 @@ class search_google_scholar(BaseTool):
                 results.append(info)
                 if i >= 3:
                     break
-        message = f'I found {len(results)} articles and added them to the workspace.'
         results = json.dumps(results, indent='  ')
-        return message, results, True
+        return None, results, True

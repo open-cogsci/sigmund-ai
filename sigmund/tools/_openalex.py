@@ -64,10 +64,8 @@ class search_openalex(BaseTool):
                     }
                     results.append(result)
         query_list = '\n'.join(f'- {q}' for q in queries)
-        message = (f'I searched for:\n\n{query_list}\n\nI found '
-                   f'{len(results)} articles and added them to the workspace.')
         results = json.dumps(results, indent='  ')
-        return message, results, True
+        return None, results, True
 
 
 class download_from_openalex(BaseTool):

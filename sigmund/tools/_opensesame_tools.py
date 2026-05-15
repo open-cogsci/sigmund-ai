@@ -14,8 +14,7 @@ class BaseOpenSesameTool(BaseTool):
         data.update(kwargs)
         # We don't ask for feedback directly, because OpenSesame will reply with
         # a user message.
-        return ('(Suggesting OpenSesame action)', json.dumps(data, indent=2),
-                'json', False)
+        return None, json.dumps(data, indent=2), 'json', False
 
     @property
     def required_arguments(self):
