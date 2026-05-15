@@ -1,7 +1,6 @@
 from ._base_tool import BaseTool
 from ._search_google_scholar import search_google_scholar
 from ._openalex import search_openalex, download_from_openalex
-from ._generate_image_dalle3 import generate_image_dalle3
 from ._generate_image_flux import generate_image_flux
 from ._opensesame_tools import (opensesame_add_existing_item_to_parent,
                                 opensesame_new_item,

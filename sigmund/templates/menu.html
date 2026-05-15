@@ -118,13 +118,6 @@
           <small>Attach images to edit them</small>
           </label>
       </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-generate-image-dalle3" 
-                 v-model="tool_generate_image_dalle3">
-          <label for="tool-generate-image-dalle3">Generate images (Dall-E 3)</label>
-      </div>
     </div>
     <hr class="menu-divider">    
     <!-- Expert knowledge section -->
@@ -273,7 +266,6 @@ new Vue({
     modelConfig: sigmundSettings.model_config,
     themeConfig: getCookie('theme', 'monokai'),
     forceModelConfigUpdate: 0,
-    tool_generate_image_dalle3: sigmundSettings.tool_generate_image_dalle3 === 'true',
     tool_generate_image_flux: sigmundSettings.tool_generate_image_flux === 'true',
     tool_search_google_scholar: sigmundSettings.tool_search_google_scholar === 'true',
     tool_openalex: sigmundSettings.tool_search_openalex === 'true',
@@ -298,7 +290,6 @@ new Vue({
       document.cookie = `theme=${encodeURIComponent(value)}; path=/; max-age=31536000`;
       location.reload();
     },
-    tool_generate_image_dalle3(value) { setSetting('tool_generate_image_dalle3', value); },
     tool_generate_image_flux(value) { setSetting('tool_generate_image_flux', value); },
     tool_search_google_scholar(value) { setSetting('tool_search_google_scholar', value); },
     tool_openalex(value) {

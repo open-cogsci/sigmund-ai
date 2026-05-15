@@ -204,7 +204,7 @@ model_token_rate = {
 # TOOLS
 #
 tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
-         'generate_image_dalle3', 'generate_image_flux',
+         'generate_image_flux',
          'opensesame_select_item', 'opensesame_new_item',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
           'opensesame_add_existing_item_to_parent',
@@ -232,7 +232,6 @@ settings_default = {
     'tool_search_google_scholar': 'false',
     'tool_search_openalex': 'false',
     'tool_download_from_openalex': 'false',
-    'tool_generate_image_dalle3': 'false',
     'tool_generate_image_flux': 'false',
     'tool_opensesame_select_item': 'false',
     'tool_opensesame_new_item': 'false',
