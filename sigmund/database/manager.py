@@ -135,7 +135,7 @@ class DatabaseManager:
     
     def get_active_conversation(self) -> dict:
         try:
-            user = User.query.filter_by(user_id=self.user_id).one()
+            user = self._get_user()
             conversation = Conversation.query.filter_by(
                 conversation_id=user.active_conversation_id).one()
         except NoResultFound:
@@ -145,7 +145,10 @@ class DatabaseManager:
         conversation_data = json.loads(decrypted_data)
         conversation_data['message_history'] = self.get_message_history(
             conversation_data)
-        return conversation_data            
+        return conversation_data
+        
+    def _get_user(self):
+        return User.query.filter_by(user_id=self.user_id).one()
 
     def _get_conversation(self, conversation_id: int):
         """Retrieves a conversation for the current user.
@@ -243,7 +246,7 @@ class DatabaseManager:
         self._update_conversation_data(conversation, conversation_data)
     
         # Change the active conversation for the user
-        user = User.query.filter_by(user_id=self.user_id).one()
+        user = self._get_user()
         user.active_conversation_id = conversation.conversation_id
         db.session.commit()
         return True
@@ -285,7 +288,7 @@ class DatabaseManager:
         when a new message is added, but rather is reconstructed.
         """
         try:
-            user = User.query.filter_by(user_id=self.user_id).one()
+            user = self._get_user()
             conversation = Conversation.query.filter_by(
                 conversation_id=user.active_conversation_id
             ).one()
@@ -322,7 +325,7 @@ class DatabaseManager:
 
     def list_conversations(self, query=None) -> dict:
         conversations = {}
-        user = User.query.filter_by(user_id=self.user_id).one()
+        user = self._get_user()
         for conversation in \
                 Conversation.query.filter_by(user_id=self.user_id).all():
             try:
@@ -392,7 +395,7 @@ class DatabaseManager:
     
     def delete_conversation(self, conversation_id: int) -> bool:
         try:
-            user = User.query.filter_by(user_id=self.user_id).one()
+            user = self._get_user()
             conversation = Conversation.query.filter_by(
                 conversation_id=conversation_id, user_id=self.user_id).one()
             if user.active_conversation_id == conversation.conversation_id:
@@ -432,6 +435,10 @@ class DatabaseManager:
             .filter(Activity.time >= after_time) \
             .scalar()
         return total_tokens if total_tokens is not None else 0
+        
+    def get_suspended(self) -> bool:
+        """Returns the suspended status of the user."""
+        return self._get_user().suspended
 
     def add_subscription_record(self, stripe_customer_id: str,
                                 stripe_subscription_id: str,

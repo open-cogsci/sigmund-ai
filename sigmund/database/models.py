@@ -17,9 +17,10 @@ if os.environ.get('USE_FLASK_SQLALCHEMY', False):
     LargeBinary = db.LargeBinary
     DateTime = db.DateTime
     Model = db.Model
+    Boolean = db.Boolean
 else:
     from sqlalchemy import create_engine, Column, Integer, String, \
-        ForeignKey, LargeBinary, DateTime
+        ForeignKey, LargeBinary, DateTime, Boolean
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.orm import scoped_session, sessionmaker
     import logging
@@ -48,6 +49,8 @@ class User(Model):
     username = Column(String(80), unique=True, nullable=False)
     active_conversation_id = Column(
         Integer, ForeignKey('conversation.conversation_id'), index=True)
+    suspended = Column(Boolean, default=False, server_default='0',
+                       nullable=False)
 
 
 class Conversation(Model):

@@ -101,6 +101,10 @@ class Sigmund:
             yield Reply(config.hourly_limit_exceeded_message,
                         self.messages.metadata())
             return
+        if self.suspended():
+            yield Reply(config.suspended_message,
+                        self.messages.metadata())
+            return
         # The tool result marker allows external applications to return a 
         # tool result through a user message. Rather than treating the result
         # as a new message, it is then merged into a previous tool message.
@@ -163,6 +167,9 @@ class Sigmund:
         return self.database.get_activity(
             time_delta={'days': 7}
         ) / config.soft_token_limit
+        
+    def suspended(self):
+        return self.database.get_suspended()
 
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""

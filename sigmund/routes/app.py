@@ -42,6 +42,8 @@ def chat_page():
     if config.subscription_required and \
             not sigmund.database.check_subscription():
         return redirect(url_for('subscribe.subscribe'), code=303)
+    if sigmund.suspended():
+        return redirect(url_for('app.suspended'), code=303)        
     html_content = ''
     previous_timestamp = None
     previous_answer_model = None
@@ -148,6 +150,14 @@ def terms():
     return utils.render(
         'info-page.html',
         content=utils.md(Path('sigmund/static/terms.md').read_text()),
+        theme=get_theme())
+
+
+@app_blueprint.route('/suspended')
+def suspended():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('sigmund/static/suspended.md').read_text()),
         theme=get_theme())
 
 

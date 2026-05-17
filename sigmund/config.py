@@ -146,10 +146,11 @@ mistral_kwargs = {}
 # that it corresponds to 10 dollars over a 7 day range.
 # The maximum number of tokens that can be consumed per hour by the answer
 # model.
+suspended_message = 'Sorry, I can\'t reply right now, because we detected unusual activity on your account. Please visit [this page](/suspended) to learn more.'
 hourly_token_limit = 2e6
 hourly_limit_exceeded_message = 'Sorry, I can\'t reply right now, because you have reached the hourly usage limit. Don\'t worry, within at most an hour we\'ll be able to talk to again.\n\nIn the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. 🚦⏳🤗'
 soft_token_limit = 1e7
-hard_token_limit = 10e7
+hard_token_limit = 5e7
 hard_limit_exceeded_message = 'You have reached the maximum usage limit. This is a hard limit. Please contact the administrator.'
 soft_token_range = 7
 model_token_rate = {
