@@ -362,3 +362,14 @@ google_client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 google_discovery_url = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
+
+# ADMIN
+#
+# A list of user IDs that have access to the admin dashboard at /admin.
+# Set via SIGMUND_ADMIN_USER_IDS as a comma-separated list of integer IDs,
+# e.g. SIGMUND_ADMIN_USER_IDS=1,42
+admin_user_ids = [
+    int(uid.strip())
+    for uid in os.environ.get('SIGMUND_ADMIN_USER_IDS', '').split(',')
+    if uid.strip().isdigit()
+]

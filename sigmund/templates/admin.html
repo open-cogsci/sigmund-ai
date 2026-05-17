@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    <div id="centered-container">
+        {% include 'header.html' %}
+        <div id="start-text">
+            <p><a href="/"><i class="fas fa-home"></i> Back to main page</a></p>
+            <h1>🛡️ Admin Dashboard</h1>
+            <p><small>Updated {{ now.strftime('%Y-%m-%d %H:%M:%S') }} UTC &mdash; auto-refreshing every 60&nbsp;s</small></p>
+
+            <h2>Active users (past hour): {{ active_count_hour }}</h2>
+            {% if active_usernames_hour %}
+            <ul>
+                {% for name in active_usernames_hour %}
+                <li>{{ name }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p><em>No users active in the past hour.</em></p>
+            {% endif %}
+
+            <h2>Platform statistics</h2>
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Total users</td><td>{{ total_users }}</td></tr>
+                    <tr><td>Suspended users</td><td>{{ suspended_users }}</td></tr>
+                    <tr><td>Active users (24 h)</td><td>{{ users_active_24h }}</td></tr>
+                    <tr><td>Active users (7 d)</td><td>{{ users_active_7d }}</td></tr>
+                    <tr><td>Active users (30 d)</td><td>{{ users_active_30d }}</td></tr>
+                    <tr><td>Total conversations</td><td>{{ total_conversations }}</td></tr>
+                    <tr><td>Avg. conversations / user</td><td>{{ avg_convos_per_user }}</td></tr>
+                    <tr><td>Total messages</td><td>{{ total_messages }}</td></tr>
+                    <tr><td>Avg. messages / conversation</td><td>{{ avg_msgs_per_convo }}</td></tr>
+                    <tr><td>Tokens consumed (24 h)</td><td>{{ "{:,}".format(tokens_24h) }}</td></tr>
+                    <tr><td>Tokens consumed (7 d)</td><td>{{ "{:,}".format(tokens_7d) }}</td></tr>
+                    <tr><td>Tokens consumed (all time)</td><td>{{ "{:,}".format(tokens_all_time) }}</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Active subscriptions: {{ active_subscription_count }}</h2>
+            {% if subscriber_rows %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Tokens (7 d)</th>
+                        <th>Tokens (24 h)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in subscriber_rows %}
+                    <tr{% if row.suspended %} style="opacity:0.5"{% endif %}>
+                        <td>{{ row.username }}</td>
+                        <td>{{ "{:,}".format(row.tokens_7d) }}</td>
+                        <td>{{ "{:,}".format(row.tokens_24h) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p><em>No active subscribers.</em></p>
+            {% endif %}
+        </div>
+        {% include 'footer.html' %}
+    </div>
+    <script>
+        setTimeout(function () { window.location.reload(); }, 60000);
+    </script>
+</body>
+</html>

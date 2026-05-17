@@ -8,7 +8,7 @@ from werkzeug.exceptions import HTTPException, NotFound
 from . import config
 from .redis_client import redis_client
 from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
-    google_login_blueprint, public_blueprint
+    google_login_blueprint, public_blueprint, admin_blueprint
 from . import utils
 from .database.models import db
 import logging
@@ -37,7 +37,8 @@ def create_app(config_class=SigmundConfig):
     app.register_blueprint(subscribe_blueprint, url_prefix='/subscribe')
     app.register_blueprint(google_login_blueprint, url_prefix='/google_login')
     app.register_blueprint(public_blueprint, url_prefix='/public')
-    # Initialize the databasea
+    app.register_blueprint(admin_blueprint, url_prefix='/admin')
+    # Initialize the database
     db.init_app(app)
     with app.app_context():
         db.create_all()
