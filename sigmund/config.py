@@ -114,7 +114,7 @@ model_config = {
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-7-opus-thinking'
+        'answer_model': 'claude-4-8-opus-thinking'
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',
@@ -166,7 +166,7 @@ model_token_rate = {
         'cache_read_input': 3 * .1,
         'cache_write_input': 3 * 1.25
     },
-    'claude-opus-4-7': {
+    'claude-opus-4-8': {
         'output': 25,
         'input': 5,
         'cache_read_input': 5 * .1,
