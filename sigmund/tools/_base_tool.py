@@ -77,7 +77,7 @@ class BaseTool:
                     raise ValueError(f'Invalid tool response: {tool_response}')
             if message is None:
                 message = ''
-            message += f'\n\n⚙️ `{self.__class__.__name__}()`'
+            message += f'\n\n<div class="mask tool-call-indicator">⚙️ <code>{self.__class__.__name__}()</code></div>'
             if message_prefix is not None:
                 message = message_prefix + '\n\n' + message
             result = {'name': self.name,

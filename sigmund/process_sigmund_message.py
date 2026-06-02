@@ -274,14 +274,15 @@ def escape_html_tags(message: str) -> str:
     Escapes HTML by replacing &, <, and > with their HTML entities, except:
     - fenced code blocks (``` or ~~~) with optional language spec
     - <div> elements whose class includes one of:
-      thinking_block_signature, thinking_block_content, message-info
+      thinking_block_signature, thinking_block_content, message-info,
+      image-generation, or tool-call-indicator
     """
     # Match fenced code blocks (``` or ~~~), non-greedy across newlines
     code_block_pattern = r'(?:```[^\n]*\n.*?```|~~~[^\n]*\n.*?~~~)'
     # Match allowed divs we should NOT escape (class contains any of the target
     # classes.
     allowed_div_pattern = (
-        r'(?:<div\b[^>]*class="[^"]*\b(?:thinking_block_signature|thinking_block_content|message-info|image-generation)\b[^"]*"[^>]*>.*?</div>)'
+        r'(?:<div\b[^>]*class="[^"]*\b(?:thinking_block_signature|thinking_block_content|message-info|image-generation|tool-call-indicator)\b[^"]*"[^>]*>.*?</div>)'
     )
     # Combined pattern: capture protected segments so we can preserve them
     protected_pattern = f'({code_block_pattern}|{allowed_div_pattern})'
