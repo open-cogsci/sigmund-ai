@@ -3,6 +3,18 @@
 
 # Privacy and security
 
+
+## Does Sigmund send my data to third-party AI model providers?
+
+Yes, Sigmund relies on AI models provided by third parties. Depending on which model you select, Sigmund uses Mistral, Anthropic, or OpenAI. This means that your data is sent to their servers. Importantly, the terms and conditions under which this happens clearly state that your data will not be used for any purpose other than replying. Your data will *not* be used to train AI models.
+
+An important exception is the Flux.2 model series used for generating images. This is provided BlackForestLabs (BFL), which unfortunately reserves the right to train their models on your data. BFL does not have access to the full conversation, but only to the image prompt, and only when an image is actually generated. Nevertheless, this is an important caveat to be aware of.
+
+When you enable expert knowledge, part of the conversation is always sent to OpenAI (also when you have another model provider selected in the menu) to generate so-called text embeddings to search the documentation.
+
+The terms of service of the various AI providers can be difficult to find and interpret. A simplified overview can be found on [openrouter.ai](https://openrouter.ai/docs/guides/privacy/provider-logging).
+
+
 ## Does Sigmund use cookies and trackers?
 
 Sigmund uses cookies to manage your log in. jsdelivr.net and cloudfare.com are used as content-delivery-network (CDN) services. No third-party trackers are used.
