@@ -311,11 +311,12 @@ function displayCustomErrorMessage(htmlContent) {
 function displayErrorMessage() {
     displayCustomErrorMessage(`<p>The connection to the server has been lost. This might be because:</p>
 <ul>
-    <li>Your login session has expired</li>
+    <li>The AI model provider is overloaded</li>
+    <li>You are not connected to the internet</li>
     <li>The server is temporarily unavailable</li>
-    <li>There's a network connectivity issue</li>
+    <li>Your login session has expired</li>
 </ul>
-<p>Please reload the page to reconnect. If this doesn't resolve the issue, clear the current conversation (Menu → Clear conversation).</p>
+<p>Please reload the page to reconnect. If this doesn't resolve the issue, clear the current conversation (Menu → Clear conversation) or select a different model.</p>
 <button onclick="location.reload()" class="modal-reload-button">Reload Page</button>`);
 }
 
