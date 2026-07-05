@@ -17,13 +17,12 @@ OPENAI_MODELS = {
 }
 ANTHROPIC_MODELS = {
     'claude-4-5-haiku': 'claude-haiku-4-5',
-    'claude-4-6-sonnet': 'claude-sonnet-4-6',
-    'claude-4-6-sonnet-thinking': 'claude-sonnet-4-6',
-    'claude-4-7-opus': 'claude-opus-4-7',
-    'claude-4-7-opus-thinking': 'claude-opus-4-7',
     'claude-4-8-opus': 'claude-opus-4-8',
     'claude-4-8-opus-thinking': 'claude-opus-4-8',
-    'claude-5-fable': 'claude-fable-5'
+    'claude-5-fable': 'claude-fable-5',
+    'claude-5-fable-thinking': 'claude-fable-5',
+    'claude-5-sonnet': 'claude-sonnet-5',
+    'claude-5-sonnet-thinking': 'claude-sonnet-5'
 }
 Z_MODELS = {
      'GLM-4.5-Air': 'GLM-4.5-Air',

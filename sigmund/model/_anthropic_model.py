@@ -231,8 +231,8 @@ class AnthropicModel(BaseModel):
                 logger.warning('empty message in cache breakpoint')
                 last_block['text'] = '(Empty message)'
             last_block['cache_control'] = {'type': 'ephemeral'}
-        # Claude 4.6 Sonnet/ Opus use adaptive thinking
-        if '4-6' in self._model or '4-7' in self._model or '4-8' in self._model:
+        # Claude Sonnet/ Opus/ Fable use adaptive thinking
+        if 'sonnet' in self._model or 'opus' in self._model or 'fable' in self._model:
             kwargs['thinking'] = {"type": "adaptive"}
         else:
             if self._thinking:

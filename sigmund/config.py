@@ -110,12 +110,12 @@ model_config = {
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-6-sonnet-thinking'
+        'answer_model': 'claude-5-sonnet-thinking'
     },
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-4-8-opus-thinking'
+        'answer_model': 'claude-5-fable-thinking'
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',
@@ -167,7 +167,7 @@ model_token_rate = {
         'cache_read_input': 1 * .1,
         'cache_write_input': 1 * 1.25
     },
-    'claude-sonnet-4-6': {
+    'claude-sonnet-5': {
         'output': 15,
         'input': 3,
         'cache_read_input': 3 * .1,
