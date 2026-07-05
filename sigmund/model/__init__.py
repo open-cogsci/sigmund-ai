@@ -22,7 +22,14 @@ ANTHROPIC_MODELS = {
     'claude-4-7-opus': 'claude-opus-4-7',
     'claude-4-7-opus-thinking': 'claude-opus-4-7',
     'claude-4-8-opus': 'claude-opus-4-8',
-    'claude-4-8-opus-thinking': 'claude-opus-4-8'
+    'claude-4-8-opus-thinking': 'claude-opus-4-8',
+    'claude-5-fable': 'claude-fable-5'
+}
+Z_MODELS = {
+     'GLM-4.5-Air': 'GLM-4.5-Air',
+     'GLM-5.2': 'GLM-5.2',
+     'GLM-5.2-thinking': 'GLM-5.2',
+     'GLM-5V-Turbo': 'GLM-5V-Turbo'
 }
 
 
@@ -42,4 +49,7 @@ def model(sigmund, model, **kwargs):
     if 'mistral' in model or 'ministral' in model or 'magistral' in model:
         from ._mistral_model import MistralModel
         return MistralModel(sigmund, MISTRAL_MODELS[model], **kwargs)
+    if model in Z_MODELS:
+        from ._z_model import ZModel
+        return ZModel(sigmund, Z_MODELS[model], **kwargs)
     raise ValueError(f'Unknown model: {model}')

@@ -84,6 +84,7 @@ openai_api_key = os.environ.get('OPENAI_API_KEY', None)
 anthropic_api_key = os.environ.get('ANTHROPIC_API_KEY', None)
 mistral_api_key = os.environ.get('MISTRAL_API_KEY', None)
 bfl_api_key = os.environ.get('BFL_API_KEY', None)
+z_api_key = os.environ.get('Z_API_KEY', None)
 # Force dummy model for development purposes
 dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 # Supported models are continuously updated. See sigmund.model for more
@@ -125,6 +126,12 @@ model_config = {
         'condense_model': 'mistral-small-latest',
         'public_model': 'mistral-small-latest',
         'answer_model': 'mistral-medium-3-5-thinking',
+    },
+    'z': {
+        'condense_model': 'GLM-4.5-Air',
+        'public_model': 'GLM-4.5-Air',
+        'answer_model': 'GLM-5.2-thinking',
+        'vision_model': 'GLM-5V-Turbo'    
     },
     'dummy': {
         'condense_model': 'dummy',
@@ -172,6 +179,12 @@ model_token_rate = {
         'cache_read_input': 5 * .1,
         'cache_write_input': 5 * 1.25
     },
+    'claude-fable-5': {
+        'output': 50,
+        'input': 10,
+        'cache_read_input': 10 * .1,
+        'cache_write_input': 10 * 1.25
+    },
     'gpt-5.5': {
         'output': 30,
         'input': 5,
@@ -199,6 +212,16 @@ model_token_rate = {
     'mistral-small-latest': {
         'output': .6,
         'input': .15,
+    },
+    'GLM-5.2': {
+        'output': 4.4,
+        'input': 1.4,
+        'cache_read_input': .25 * 1.4
+    },
+    'GLM-4.5-Air': {
+        'output': 1.1,
+        'input': 0.2,
+        'cache_read_input': .25 * .2
     }
 }
 

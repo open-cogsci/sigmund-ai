@@ -19,8 +19,22 @@
                 <span class="model-recommendations">
                 Fast and energy-efficient.
                 Recommended for conversations.
+                Europe.
                 </span>
             </button>        
+            <button
+                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                @click="modelConfig = 'z'" 
+                :class="{ active: modelConfig === 'z' }">
+                <!-- Icon for Mistral model -->
+                <span>Z.ai<br><small>GLM 5.2</small></span>
+                <img src="/static/zai.png" alt="Z.ai Icon">
+                <span class="model-recommendations">
+                Best balance between speed, energy, and intelligence.
+                Recommended for complex tasks.
+                China.
+                </span>
+            </button>
             <button
                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                 @click="modelConfig = 'anthropic'" 
@@ -31,6 +45,7 @@
                 <span class="model-recommendations">
                 Slow and energy-intensive.
                 Recommended for complex tasks.
+                US.
                 </span>                
             </button>
             <button
@@ -41,8 +56,9 @@
                 <span>Anthropic<br><small>Claude 4.8 Opus</small></span>
                 <img src="/static/anthropic.png" alt="Anthropic Icon">
                 <span class="model-recommendations">
-                Very slow and energy-intensive.
+                Extremely slow and energy-intensive.
                 Only recommended when everything else fails.
+                US.
                 </span>                    
             </button>
             <button
@@ -55,6 +71,7 @@
                 <span class="model-recommendations">
                 Slow and energy-intensive.
                 Recommended for complex tasks.
+                US.
                 </span>                    
             </button>
             <button
@@ -67,6 +84,7 @@
                 <span class="model-recommendations">
                 Very slow and energy-intensive.
                 Only recommended when everything else fails.
+                US.
                 </span>                   
             </button>            
         </div>        

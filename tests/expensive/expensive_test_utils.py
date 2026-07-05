@@ -39,7 +39,7 @@ class BaseExpensiveTest(unittest.TestCase):
     def test_mistral_regular(self):
         config.settings_default['model_config'] = 'mistral'
         self._test_tool()
-        
-    def test_mistral_thinking(self):
-        config.settings_default['model_config'] = 'mistral_thinking'
+
+    def test_z(self):
+        config.settings_default['model_config'] = 'z'
         self._test_tool()
