@@ -520,7 +520,7 @@ function requestBody(message, workspace_content, workspace_language, user_messag
 }
 
 function expandMessageBox() {
-    document.getElementById('message-box').classList.toggle('expanded-message-box');
+    document.getElementById('message').classList.toggle('expanded-message-input');
 }
 
 function setFavicon(url) {

@@ -6,217 +6,232 @@
     {% endif %}
 {% raw %}
     <!-- Model selection -->
-    <div class="model-selector">
-      <small>Help save energy and protect the environment: use the simplest model that's good enough for your task</small>
-        <div class="model-buttons" class='responsive'>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'mistral'" 
-                :class="{ active: modelConfig === 'mistral' }">
-                <!-- Icon for Mistral model -->
-                <span>Mistral<br><small>Medium 3.5</small></span>
-                <img src="/static/mistral.png" alt="Mistral Icon">
-                <span class="model-recommendations">
-                Fast and energy-efficient.
-                Recommended for conversations.
-                Europe.
-                </span>
-            </button>        
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'z'" 
-                :class="{ active: modelConfig === 'z' }">
-                <!-- Icon for Mistral model -->
-                <span>Z.ai<br><small>GLM 5.2</small></span>
-                <img src="/static/zai.png" alt="Z.ai Icon">
-                <span class="model-recommendations">
-                Best balance between speed, energy, and intelligence.
-                Recommended for complex tasks.
-                China.
-                </span>
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'anthropic'" 
-                :class="{ active: modelConfig === 'anthropic' }">
-                <!-- Icon for Anthropic model -->
-                <span>Anthropic<br><small>Claude 4.6 Sonnet</small></span>
-                <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span class="model-recommendations">
-                Slow and energy-intensive.
-                Recommended for complex tasks.
-                US.
-                </span>                
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'anthropic_thinking'" 
-                :class="{ active: modelConfig === 'anthropic_thinking' }">
-                <!-- Icon for Anthropic model -->
-                <span>Anthropic<br><small>Claude 4.8 Opus</small></span>
-                <img src="/static/anthropic.png" alt="Anthropic Icon">
-                <span class="model-recommendations">
-                Extremely slow and energy-intensive.
-                Only recommended when everything else fails.
-                US.
-                </span>                    
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai'" 
-                :class="{ active: modelConfig === 'openai' }">
-                <!-- Icon for OpenAI model -->
-                <span>OpenAI<br><small>GPT5.4</small></span>
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span class="model-recommendations">
-                Slow and energy-intensive.
-                Recommended for complex tasks.
-                US.
-                </span>                    
-            </button>
-            <button
-                {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                @click="modelConfig = 'openai_thinking'" 
-                :class="{ active: modelConfig === 'openai_thinking' }">
-                <!-- Icon for OpenAI model -->
-                <span>OpenAI<br><small>GPT5.5</small></span>
-                <img src="/static/openai.png" alt="OpenAI Icon">
-                <span class="model-recommendations">
-                Very slow and energy-intensive.
-                Only recommended when everything else fails.
-                US.
-                </span>                   
-            </button>            
-        </div>        
-    </div>
-    <hr class="menu-divider">
-    <!-- Tool section -->
-    <div>
-      <small>For best performance, only enable tools you need</small>
-    </div>    
-    <div class='responsive'>
-      <label>Tools:</label>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-notes" 
-                 v-model="tool_notes">
-          <label for="tool-notes">
-            Memento
-            <small>Improve Sigmund's memory with persistent notes</small>
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-openalex" 
-                 v-model="tool_openalex">
-          <label for="tool-openalex">
-            Search and download scientific literature (OpenAlex)
-            <small>Recommended</small>
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-search-google-scholar" 
-                 v-model="tool_search_google_scholar">
-          <label for="tool-search-google-scholar">
-            Search scientific literature (Google Scholar)
-            <small>Sometimes blocked</small>
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="tool-generate-image-flux" 
-                 v-model="tool_generate_image_flux">
-          <label for="tool-generate-image-flux">
-          Generate and edit images (Flux.2)
-          <small>Attach images to edit them. <a href="/terms">Privacy information.</a></small>
-          </label>
+    <div v-if="menuSection === 'full' || menuSection === 'models'" class="menu-group">
+      <div class="model-selector">
+        <small>Help save energy and protect the environment: use the simplest model that's good enough for your task</small>
+          <div class="model-buttons model-buttons-horizontal" class='responsive'>
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'z'" 
+                  :class="{ active: modelConfig === 'z' }">
+                  <!-- Icon for Mistral model -->
+                  <span>Z.ai GLM 5.2</span>
+                  <img src="/static/zai.png" alt="Z.ai Icon">
+                  <span class="model-recommendations">
+                  Recommended for most tasks.<br>
+                  Best balance between speed, energy, and intelligence.
+                  From China.
+                  </span>
+              </button>
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'mistral'" 
+                  :class="{ active: modelConfig === 'mistral' }">
+                  <!-- Icon for Mistral model -->
+                  <img src="/static/mistral.png" alt="Mistral Icon">
+                  <span>Mistral Medium 3.5</span>
+                  <span class="model-recommendations">                  
+                  Recommended for conversations.<br>
+                  Fast and energy-efficient.
+                  From Europe.
+                  </span>
+              </button>        
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'anthropic'" 
+                  :class="{ active: modelConfig === 'anthropic' }">
+                  <!-- Icon for Anthropic model -->
+                  <span>Anthropic Claude 5 Sonnet</span>
+                  <img src="/static/anthropic.png" alt="Anthropic Icon">
+                  <span class="model-recommendations">   
+                  Recommended for complex tasks.<br>               
+                  Slow and energy-intensive.
+                  From the US.
+                  </span>                
+              </button>
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'anthropic_thinking'" 
+                  :class="{ active: modelConfig === 'anthropic_thinking' }">
+                  <!-- Icon for Anthropic model -->
+                  <span>Anthropic Claude 5 Fable</span>
+                  <img src="/static/anthropic.png" alt="Anthropic Icon">
+                  <span class="model-recommendations">
+                  Only recommended for occasional use when everything else fails.<br>
+                  Extremely slow and energy-intensive.
+                  From the US.
+                  </span>                    
+              </button>
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'openai'" 
+                  :class="{ active: modelConfig === 'openai' }">
+                  <!-- Icon for OpenAI model -->
+                  <span>OpenAI GPT 5.4</span>
+                  <img src="/static/openai.png" alt="OpenAI Icon">
+                  <span class="model-recommendations">
+                  Recommended for complex tasks.<br>
+                  Slow and energy-intensive.
+                  From the US.
+                  </span>                    
+              </button>
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'openai_thinking'" 
+                  :class="{ active: modelConfig === 'openai_thinking' }">
+                  <!-- Icon for OpenAI model -->
+                  <span>OpenAI GPT 5.5</span>
+                  <img src="/static/openai.png" alt="OpenAI Icon">
+                  <span class="model-recommendations">                  
+                  Only recommended for occasional use when everything else fails.<br>
+                  Very slow and energy-intensive.
+                  From the US.
+                  </span>                   
+              </button>            
+          </div>        
       </div>
     </div>
-    <hr class="menu-divider">    
-    <!-- Expert knowledge section -->
-    <div>
-      <small>For best performance, only enable knowledge you need</small>
+    <div v-if="menuSection === 'full'" class="menu-group">
+      <hr class="menu-divider">
     </div>
-    <div class='responsive'>
-      <label>Expert knowledge:</label>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-opensesame" 
-                 v-model="collection_opensesame">
-          <label for="collection-opensesame">OpenSesame
-          </label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-datamatrix" 
-                 v-model="collection_datamatrix">
-          <label for="collection-datamatrix">Python coding and data analysis</label>
-      </div>
-      <div class="tool-item">
-          <input type="checkbox"
-                 {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                 id="collection-forum" 
-                 v-model="collection_forum">
-          <label for="collection-forum">CogSci community forum</label>
-      </div>
-    </div>
-    <hr class="menu-divider">        
-    <div>
-      <small>Build experiments, analyze data, and run code with application connectors</small>
-    </div>    
-    <div class='responsive'>
-      <label>Connect to 
-        <a href="https://osdoc.cogsci.nl/tutorials/beginner-sigmund/" target="_blank">OpenSesame</a>,
-        <a href="https://github.com/open-cogsci/sigmund-analyst" target="_blank">Sigmund Analyst</a>,
-        <a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">JupyterLab</a>
-    </div>
-    <hr class="menu-divider">    
-    <!-- Theme selection -->
-    <div class="model-selector">
-      <small>Choose a color theme</small>
-        <div class="model-buttons">
-            <button
-                @click="themeConfig = 'original'"
-                :class="{ active: themeConfig === 'original' }">
-                <span>Original<br><small>Light/ Dark</small></span>
-            </button>
-            <button
-                @click="themeConfig = 'monokai'"
-                :class="{ active: themeConfig === 'monokai' }">
-                <span>Monokai<br><small>Dark</small></span>
-            </button>
-            <button
-                @click="themeConfig = 'solarized-light'"
-                :class="{ active: themeConfig === 'solarized-light' }">
-                <span>Solarized<br><small>Light</small></span>
-            </button>
-            <button
-                @click="themeConfig = 'solarized-dark'"
-                :class="{ active: themeConfig === 'solarized-dark' }">
-                <span>Solarized<br><small>Dark</small></span>
-            </button>
+    <!-- Tool and knowledge selection -->
+    <div v-if="menuSection === 'full' || menuSection === 'tools'" class="menu-group">
+      <div>
+        <small>For best performance, only enable tools you need</small>
+      </div>    
+      <div class='responsive'>
+        <label>Tools:</label>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="tool-notes" 
+                   v-model="tool_notes">
+            <label for="tool-notes">
+              Memento
+              <small>Improve Sigmund's memory with persistent notes</small>
+            </label>
         </div>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="tool-openalex" 
+                   v-model="tool_openalex">
+            <label for="tool-openalex">
+              Search and download scientific literature (OpenAlex)
+              <small>Recommended</small>
+            </label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="tool-search-google-scholar" 
+                   v-model="tool_search_google_scholar">
+            <label for="tool-search-google-scholar">
+              Search scientific literature (Google Scholar)
+              <small>Sometimes blocked</small>
+            </label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="tool-generate-image-flux" 
+                   v-model="tool_generate_image_flux">
+            <label for="tool-generate-image-flux">
+            Generate and edit images (Flux.2)
+            <small>Attach images to edit them. <a href="/terms">Privacy information.</a></small>
+            </label>
+        </div>
+      </div>
+      <hr class="menu-divider">    
+      <!-- Expert knowledge section -->
+      <div>
+        <small>For best performance, only enable knowledge you need</small>
+      </div>
+      <div class='responsive'>
+        <label>Expert knowledge:</label>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="collection-opensesame" 
+                   v-model="collection_opensesame">
+            <label for="collection-opensesame">OpenSesame
+            </label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="collection-datamatrix" 
+                   v-model="collection_datamatrix">
+            <label for="collection-datamatrix">Python coding and data analysis</label>
+        </div>
+        <div class="tool-item">
+            <input type="checkbox"
+                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                   id="collection-forum" 
+                   v-model="collection_forum">
+            <label for="collection-forum">CogSci community forum</label>
+        </div>
+      </div>
     </div>
-    <hr class="menu-divider">
+    <div v-if="menuSection === 'full'" class="menu-group">
+      <hr class="menu-divider">        
+      <div>
+        <small>Build experiments, analyze data, and run code with application connectors</small>
+      </div>    
+      <div class='responsive'>
+        <label>Connect to 
+          <a href="https://osdoc.cogsci.nl/tutorials/beginner-sigmund/" target="_blank">OpenSesame</a>,
+          <a href="https://github.com/open-cogsci/sigmund-analyst" target="_blank">Sigmund Analyst</a>,
+          <a href="https://github.com/open-cogsci/jupyter-extension-sigmund" target="_blank">JupyterLab</a>
+      </div>
+      <hr class="menu-divider">    
+      <!-- Theme selection -->
+      <div class="model-selector">
+        <small>Choose a color theme</small>
+          <div class="model-buttons">
+              <button
+                  @click="themeConfig = 'original'"
+                  :class="{ active: themeConfig === 'original' }">
+                  <span>Original<br><small>Light/ Dark</small></span>
+              </button>
+              <button
+                  @click="themeConfig = 'monokai'"
+                  :class="{ active: themeConfig === 'monokai' }">
+                  <span>Monokai<br><small>Dark</small></span>
+              </button>
+              <button
+                  @click="themeConfig = 'solarized-light'"
+                  :class="{ active: themeConfig === 'solarized-light' }">
+                  <span>Solarized<br><small>Light</small></span>
+              </button>
+              <button
+                  @click="themeConfig = 'solarized-dark'"
+                  :class="{ active: themeConfig === 'solarized-dark' }">
+                  <span>Solarized<br><small>Dark</small></span>
+              </button>
+          </div>
+      </div>
+      <hr class="menu-divider">
+    </div>
 {% endraw %}    
+    <!-- Conversation menu -->
     {% if need_login %}
-    <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>    
+    <div v-if="menuSection === 'full'" class="menu-group">
+      <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>    
+    </div>
     {% else %}
-    <div class='responsive' v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
-    <div class='responsive' @click="showConversations">Browse conversations</div>
-    <div class='responsive' @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
-    <hr class="menu-divider">    
-    <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>
-    <div class='responsive' @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
-    <div class='responsive' @click="navigateTo('/api/conversation/export')">Download your data</div>
-    <div class='responsive' @click="navigateTo('/logout')">Log out</div>
+    <div v-if="menuSection === 'full' || menuSection === 'conversation'" class="menu-group">
+      <div class='responsive' v-if="shouldShowNewConversationButton" @click="navigateTo(getNewConversationUrl())">New conversation</div>
+      <div class='responsive' @click="showConversations">Browse conversations</div>
+      <div class='responsive' @click="navigateTo('/api/conversation/clear')">Clear conversation</div>
+    </div>
+    <div v-if="menuSection === 'full'" class="menu-group">
+      <hr class="menu-divider">    
+      <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>
+      <div class='responsive' @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
+      <div class='responsive' @click="navigateTo('/api/conversation/export')">Download your data</div>
+      <div class='responsive' @click="navigateTo('/logout')">Log out</div>    
+    </div>
     {% endif %}
 {% raw %}    
   </div>
@@ -277,6 +292,7 @@ new Vue({
   el: '#app',
   data: {
     menuVisible: false,
+    menuSection: 'full',
     showModal: false,
     conversations: {},
     showManageSubscriptions: {{ subscription_required|lower }},
@@ -335,9 +351,12 @@ new Vue({
     getNewConversationUrl() {
       return '/api/conversation/new';
     },
-    toggleMenu: function() {
+    toggleMenu: function(section = 'full') {
       const responseElement = document.getElementById('response');
       this.shouldShowNewConversationButton = responseElement.children.length > 1;
+      if (!this.menuVisible) {
+        this.menuSection = section;
+      }
       this.menuVisible = !this.menuVisible;
       // Attach an event handler to close the menu when the window is clicked.
       // This is done in a timeout to avoid it from being invoked directly as

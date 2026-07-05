@@ -265,6 +265,17 @@ button#send:disabled {
     .model-buttons button:hover {
       background-color: #e0e0e0; }
 
+.model-buttons-horizontal {
+  flex-direction: column !important; }
+  .model-buttons-horizontal button {
+    text-align: left;
+    display: block !important; }
+    .model-buttons-horizontal button img {
+      float: right;
+      margin: 0 10px 0 0 !important;
+      width: 20px;
+      height: 20px; }
+
 .model-buttons img {
   margin-bottom: 10px !important;
   margin-top: 10px; }
@@ -441,6 +452,9 @@ button#send:disabled {
     color: #f8f8f2; }
   .menu #login {
     display: none; }
+  .menu .menu-group {
+    margin: 0;
+    padding: 0; }
 
 .menu-divider {
   border: none;
@@ -592,7 +606,7 @@ button#send:disabled {
 #message-box {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   margin-top: 10px;
   min-height: 120px;
   position: sticky;
@@ -602,17 +616,18 @@ button#send:disabled {
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); }
 
-.expanded-message-box {
-  height: 80vh; }
+.expanded-message-input {
+  height: 50vh !important; }
 
 #message-container {
   width: 100%;
-  display: flex;
-  align-items: stretch;
   padding: 10px;
   border: 1px solid #49483e;
   border-radius: 4px;
   background-color: #3e3d32; }
+
+#message-horizontal-container {
+  display: flex; }
 
 #button-container {
   display: flex;
@@ -620,15 +635,34 @@ button#send:disabled {
   align-self: flex-start; }
 
 textarea#message {
+  height: 8em;
   border: none;
   flex-grow: 1;
-  height: 100%;
   background-color: #3e3d32;
   color: #e6db74; }
   textarea#message:focus {
     outline: none; }
   textarea#message:disabled {
     background: none; }
+
+#quick-buttons {
+  margin-bottom: -5px; }
+  #quick-buttons button {
+    font-family: "Roboto Condensed";
+    margin-bottom: 5px;
+    background-color: #49483e;
+    color: #f8f8f2;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 5px;
+    border: none;
+    border-radius: 5px; }
+    #quick-buttons button.active {
+      background-color: #272822;
+      color: #e6db74; }
+    #quick-buttons button:hover {
+      background-color: #272822;
+      color: #f8f8f2; }
 
 .modal {
   display: none;

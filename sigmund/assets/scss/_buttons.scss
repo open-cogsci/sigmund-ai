@@ -90,6 +90,20 @@ button#send:disabled {
     }
 }
 
+.model-buttons-horizontal {
+    flex-direction: column!important;
+    button {
+        text-align: left;
+        display: block!important;
+        img {
+            float: right;
+            margin: 0 10px 0 0!important;
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
 .model-buttons img {
     margin-bottom: 10px!important;
     margin-top: 10px;

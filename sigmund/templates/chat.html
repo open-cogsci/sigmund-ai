@@ -20,11 +20,6 @@
                 You have reached your weekly usage limit. This is a soft limit, which means that you can continue to use Sigmund. However, we kindly ask you to review <a href="/fair-use">this information on our fair-use policy</a>.
             </div>        
             {% include 'header.html' %}
-            <div id="sign-out">Welcome {{ username }}!
-                <button title="Menu" id="expand" onclick="app.__vue__.toggleMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
             {% include 'menu.html' %}    
             <div id="response">{{ message_history | safe }}</div>
             <div id="loading-message"></div>
@@ -34,29 +29,40 @@
 
             <div id="message-box">
                 <div id="message-container">
-                    <textarea id="message" placeholder="Enter your message"></textarea>
-
-                    <!-- Hidden file input -->
-                    <input 
-                        type="file" 
-                        id="attachment-input" 
-                        style="display: none;" 
-                        multiple 
-                        accept=".pdf,.doc,.docx,.png,.jpg"
-                    >
-
-                    <div id="button-container">
-                        <button 
-                            title="Attach" 
-                            id="attach" 
-                            onclick="document.getElementById('attachment-input').click();"
+                    <div id="message-horizontal-container">
+                        <textarea id="message" placeholder="Enter your message"></textarea>
+    
+                        <!-- Hidden file input -->
+                        <input 
+                            type="file" 
+                            id="attachment-input" 
+                            style="display: none;" 
+                            multiple 
+                            accept=".pdf,.doc,.docx,.png,.jpg"
                         >
-                            <i class="fas fa-paperclip"></i>
+    
+                        <div id="button-container">
+                            <button title="Send" id="send" disabled><i class="fas fa-paper-plane"></i></button>
+                            <button title="Cancel" id="cancel"><i class="fas fa-stop-circle"></i></button>
+                        </div>
+                    </div>
+                    <!-- Quick-access buttons below the message box -->
+                    <div id="quick-buttons">
+                        <button title="Menu" onclick="app.__vue__.toggleMenu('full')">
+                            Menu
                         </button>
-                        <button title="Send" id="send" disabled><i class="fas fa-paper-plane"></i></button>
-                        <button title="Cancel" id="cancel"><i class="fas fa-stop-circle"></i></button>
-                        <button title="Show menu" id="expand" onclick="app.__vue__.toggleMenu()"><i class="fas fa-bars"></i></button>
-                        <button title="Expand message box" id="expand" onclick="expandMessageBox()"><i class="fas fa-expand"></i></button>
+                        <button onclick="document.getElementById('attachment-input').click();">
+                            Attachment
+                        </button>                        
+                        <button title="Model" onclick="app.__vue__.toggleMenu('models')">
+                            Model
+                        </button>
+                        <button title="Tools and knowledge" onclick="app.__vue__.toggleMenu('tools')">
+                            Tools &amp; Knowledge
+                        </button>
+                        <button title="Conversation" onclick="app.__vue__.toggleMenu('conversation')">
+                            Conversation
+                        </button>
                     </div>
                 </div>
             </div>

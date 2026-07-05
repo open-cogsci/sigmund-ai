@@ -5,7 +5,7 @@
 #message-box {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     margin-top: 10px;
     min-height: 120px;
     position: sticky;
@@ -16,18 +16,20 @@
     box-shadow: $box-shadow;
 }
 
-.expanded-message-box {
-    height: 80vh;
+.expanded-message-input {
+    height: 50vh!important;
 }
 
 #message-container {
     width: 100%;
-    display: flex;
-    align-items: stretch;
     padding: 10px;
     border: 1px solid $color-border;
     border-radius: $border-radius;
     background-color: $color-bg-message-container;
+}
+
+#message-horizontal-container {
+    display: flex; 
 }
 
 #button-container {
@@ -37,9 +39,9 @@
 }
 
 textarea#message {
+    height: 8em;
     border: none;
     flex-grow: 1;
-    height: 100%;
     background-color: $color-bg-message-container;
     color: $color-fg-message-container;
 
@@ -50,4 +52,32 @@ textarea#message {
     &:disabled {
         background: none;
     }
+}
+
+// ============================================================
+// Quick-access buttons below the message box
+// ============================================================
+
+#quick-buttons {
+    margin-bottom: -5px;
+    button {
+        font-family: $font-condensed;
+        margin-bottom: 5px;
+        background-color: $color-bg-menu-button;
+        color: $color-fg-menu-button;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        padding: 5px;
+        border: none;
+        border-radius: 5px;
+        
+        &.active {
+            background-color: $color-bg-menu-button-selected;
+            color: $color-fg-menu-button-selected;                
+        }
+        &:hover {
+            background-color: $color-hover-menu;
+            color: $color-fg-menu-button; 
+        }   
+    } 
 }

@@ -33,7 +33,7 @@
     }
     
     .model-recommendations {
-        font-family: $font-condensed;;
+        font-family: $font-condensed;
         font-size: small;
         display: block;
     }   
@@ -129,6 +129,11 @@
 
     #login {
         display: none;
+    }
+    
+    .menu-group {
+        margin: 0;
+        padding: 0;
     }
 }
 
