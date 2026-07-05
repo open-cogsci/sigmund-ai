@@ -113,6 +113,6 @@ class TestCondenseMessageHistory(BaseExpensiveTest):
     
     def _test_tool(self):
         
-        suggested_title = self.sigmund.condense_model.predict(title_prompt)
+        suggested_title = self.sigmund.condense_model.predict(title_prompt).strip()
         print(suggested_title)
         assert len(suggested_title.splitlines()) == 1
