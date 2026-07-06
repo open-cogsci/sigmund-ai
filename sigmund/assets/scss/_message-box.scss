@@ -7,17 +7,12 @@
     justify-content: space-between;
     margin-bottom: 4px;
     margin-top: 10px;
-    min-height: 120px;
     position: sticky;
     bottom: 0;
     padding: 10px;
     background-color: $color-message-box;
     border-radius: $border-radius;
     box-shadow: $box-shadow;
-}
-
-.expanded-message-input {
-    height: 50vh!important;
 }
 
 #message-container {

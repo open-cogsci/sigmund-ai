@@ -56,7 +56,12 @@ function initMain(event) {
     new MutationObserver(updateUsageBar).observe(
         document.getElementById('usage-counter'),
         { attributes: true, attributeFilter: ['data-usage'] }
-    );    
+    );   
+    
+    // Make sure the message input resizes
+    messageInput.addEventListener('input', updateMessageInputHeight);
+    window.addEventListener('resize', updateMessageInputHeight);
+    updateMessageInputHeight();    
 }
 
 function generateUUID() {
@@ -519,10 +524,6 @@ function requestBody(message, workspace_content, workspace_language, user_messag
     });
 }
 
-function expandMessageBox() {
-    document.getElementById('message').classList.toggle('expanded-message-input');
-}
-
 function setFavicon(url) {
     let faviconLink = document.querySelector('link[rel="icon"]');
     faviconLink.href = url;
@@ -554,6 +555,35 @@ function updateUsageBar() {
     } else {
         bar.classList.add('usage-high');
         label.classList.add('usage-high');
+    }
+}
+
+function getMessageInputLineHeight(el) {
+    const cs = window.getComputedStyle(el);
+    let lineHeight = parseFloat(cs.lineHeight);
+    if (isNaN(lineHeight)) {
+        // "normal" — approximate as 1.2 × font size
+        lineHeight = parseFloat(cs.fontSize) * 1.2;
+    }
+    return lineHeight;
+}
+
+function updateMessageInputHeight() {
+    const cs = window.getComputedStyle(messageInput);
+    const lineHeight = getMessageInputLineHeight(messageInput);
+    const paddingTop = parseFloat(cs.paddingTop);
+    const paddingBottom = parseFloat(cs.paddingBottom);
+
+    // Temporarily shrink to 0 so scrollHeight reflects the full
+    // content height including wrapped lines.
+    messageInput.style.height = '0';
+    const contentHeight = messageInput.scrollHeight - paddingTop - paddingBottom;
+    const numLines = Math.max(1, Math.round(contentHeight / lineHeight));
+
+    if (numLines > 4) {
+        messageInput.style.height = '50vh';
+    } else {
+        messageInput.style.height = '8em';
     }
 }
 
