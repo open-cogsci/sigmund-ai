@@ -262,6 +262,12 @@ class Messages:
         doc_prompt = self._sigmund.documentation.prompt(system_prompt=True)
         if doc_prompt:
             parts.append(doc_prompt)
+        # If the message history has been condensed, include the summary
+        if self._condensed_text:
+            logger.info('appending condensed text to user message context')
+            parts.append(prompt.render(
+                prompt.SYSTEM_PROMPT_CONDENSED,
+                summary=self._condensed_text))            
         return '\n\n'.join(parts)
 
     def _user_message_context(self):
@@ -270,8 +276,7 @@ class Messages:
         static for caching purposes.
 
         Includes: transient system prompt, volatile documentation (i.e.
-        documentation that is NOT marked as system_prompt), persistent notes,
-        and condensed conversation history.
+        documentation that is NOT marked as system_prompt), and persistent notes.
         """
         context_parts = []
         if self._sigmund.transient_system_prompt:
@@ -289,12 +294,6 @@ class Messages:
             context_parts.append(prompt.render(
                 prompt.SYSTEM_PROMPT_NOTES,
                 notes=self._notes))
-        # If the message history has been condensed, include the summary
-        if self._condensed_text:
-            logger.info('appending condensed text to user message context')
-            context_parts.append(prompt.render(
-                prompt.SYSTEM_PROMPT_CONDENSED,
-                summary=self._condensed_text))
         if not context_parts:
             return ''
         context = '\n\n'.join(part for part in context_parts if part.strip())
