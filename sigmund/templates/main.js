@@ -49,7 +49,7 @@ function initMain(event) {
     }
     // Scroll to bottom on page load so the most recent messages are visible
     scrollChatToBottom();
-    
+
     // Initialize on load
     updateUsageBar();
     // Watch for dynamic updates to data-usage
@@ -57,7 +57,7 @@ function initMain(event) {
         document.getElementById('usage-counter'),
         { attributes: true, attributeFilter: ['data-usage'] }
     );   
-    
+
     // Make sure the message input resizes
     messageInput.addEventListener('input', updateMessageInputHeight);
     window.addEventListener('resize', updateMessageInputHeight);
@@ -405,7 +405,7 @@ async function sendMessage(
     showImageAttachments();
 
     // Show loading indicator
-    const loadingInfo = createLoadingIndicator();
+    let loadingInfo = createLoadingIndicator();
     currentLoadingMessageBox = loadingInfo.element;
     currentLoadingInterval = loadingInfo.interval;
 
@@ -447,8 +447,11 @@ async function sendMessage(
     currentEventSource = new EventSource('{{ server_url }}/api/chat/stream');
 
     currentEventSource.onmessage = function(event) {
-        console.log(event);
+        // console.log(event);
         const data = JSON.parse(event.data);
+        if (typeof data.stream === 'undefined') {
+            console.log(data);
+        }
 
         // Handle actions
         if (typeof data.action !== 'undefined') {
@@ -480,7 +483,7 @@ async function sendMessage(
         const metadata = data.metadata;
         removeStreamingMessage();
         const aiMessage = createAIMessageElement(data, metadata, forwardReplyToSocket);
-        
+
         // Update usage
         document.getElementById('usage-counter').dataset.usage = data.usage;
 
@@ -488,6 +491,15 @@ async function sendMessage(
         responseDiv.appendChild(aiMessage);
         scrollChatToBottom();
         setFavicon(originalFavicon);
+
+        // Re-create loading indicator for potential next message in the stream.
+        // This ensures that if the stream contains multiple messages, each one
+        // gets its own loading indicator. If the stream closes or errors
+        // immediately after, endStream() and handleStreamingError() will clean
+        // up the new indicator via the global references we update here.
+        loadingInfo = createLoadingIndicator();
+        currentLoadingMessageBox = loadingInfo.element;
+        currentLoadingInterval = loadingInfo.interval;
     };
 
     currentEventSource.onerror = function(event) {
