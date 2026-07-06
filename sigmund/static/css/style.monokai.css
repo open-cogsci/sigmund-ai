@@ -539,7 +539,7 @@ button#send:disabled {
 .message-info {
   margin-bottom: 10px;
   font-size: 0.8em;
-  color: #49483e; }
+  color: #75715e; }
 
 .message-error {
   border-left: 4px solid #f92672;
