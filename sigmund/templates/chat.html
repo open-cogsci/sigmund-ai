@@ -82,6 +82,7 @@
 
         <div id="code-editor">
             <div id="connected-status"><i class="fas fa-plug"></i> Connected to OpenSesame</div>
+            <textarea id="workspace" data-mode="{{ workspace_language }}">{{ workspace_content }}</textarea>
             <div id="code-editor-options">
                 <select id="workspace-language">
                   <option value="css">CSS</option>
@@ -97,7 +98,6 @@
                 <button id="copy-workspace" title="Copy"><i class="fas fa-copy"></i></button>
             </div>
 
-            <textarea id="workspace" data-mode="{{ workspace_language }}">{{ workspace_content }}</textarea>
             <div id="workspace-placeholder">Use this workspace to share text and code</div>                             
         </div>
     </div>

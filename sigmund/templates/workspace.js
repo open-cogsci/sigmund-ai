@@ -1,4 +1,7 @@
 function initWorkspace() {
+    // Get height of workspace options and set it as a variable to be used in the CSS
+    const optionsHeight = document.getElementById('code-editor-options').offsetHeight;
+    document.documentElement.style.setProperty('--code-editor-options-height', `${optionsHeight}px`);    
     // Initialize CodeMirror workspace editor
     const workspaceTextArea = document.getElementById("workspace");
     let language = workspaceTextArea.getAttribute('data-mode') || 'markdown';

@@ -153,7 +153,7 @@
 }
 
 .CodeMirror {
-    height: calc(100vh - var(--connected-status-height, 0px)) !important;
+    height: calc(100vh - var(--connected-status-height, 0px) - var(--code-editor-options-height, 0px)) !important;
 }
 
 // Large screens
