@@ -8,6 +8,7 @@ from .messages import Messages
 from .model import model
 from . import tools as mod_tools
 from .database.manager import DatabaseManager
+from .limits import LimitsChecker
 from . import utils
 logger = logging.getLogger('sigmund')
 
@@ -75,6 +76,7 @@ class Sigmund:
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
         self.theme = self.database.get_setting('theme')
+        self.limits = LimitsChecker(self)
 
     def send_user_message(self, message: str, workspace_content: str = None,
                           workspace_language: str = 'text',
@@ -93,17 +95,9 @@ class Sigmund:
         """        
         if config.log_replies:
             logger.info(f'[user message] {message}')
-        if self._hard_limit_exceeded():
-            yield Reply(config.hard_limit_exceeded_message,
-                        self.messages.metadata())
-            return
-        if self._hourly_limit_exceeded():
-            yield Reply(config.hourly_limit_exceeded_message,
-                        self.messages.metadata())
-            return
-        if self.suspended():
-            yield Reply(config.suspended_message,
-                        self.messages.metadata())
+        block_msg = self.limits.blocked_message()
+        if block_msg is not None:
+            yield Reply(block_msg, self.messages.metadata())
             return
         # The tool result marker allows external applications to return a 
         # tool result through a user message. Rather than treating the result
@@ -153,23 +147,11 @@ class Sigmund:
         for reply in self._answer(attachments):
             yield reply
 
-    def _hourly_limit_exceeded(self):        
-        return self.database.get_activity(
-            time_delta={'hours': 1}
-        ) > config.hourly_token_limit
-        
-    def _hard_limit_exceeded(self):
-        return self.database.get_activity(
-            time_delta={'days': 7}
-        ) > config.hard_token_limit
-        
     def usage(self):
-        return self.database.get_activity(
-            time_delta={'days': 7}
-        ) / config.soft_token_limit
+        return self.limits.usage()
         
     def suspended(self):
-        return self.database.get_suspended()
+        return self.limits.suspended()
 
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
@@ -249,8 +231,7 @@ class Sigmund:
         # If feedback is required by a tool, go for another round.
         if (
             needs_feedback and
-            not self._hourly_limit_exceeded() and
-            not self._hard_limit_exceeded()
+            self.limits.can_send_feedback()
         ):
             if workspace_content is not None:
                 logger.info('workspace content has been updated for feedback')

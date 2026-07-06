@@ -157,6 +157,7 @@ suspended_message = 'Sorry, I can\'t reply right now, because we detected unusua
 hourly_token_limit = 2e6
 hourly_limit_exceeded_message = 'Sorry, I can\'t reply right now, because you have reached the hourly usage limit. Don\'t worry, within at most an hour we\'ll be able to talk to again.\n\nIn the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. 🚦⏳🤗'
 soft_token_limit = 1e7
+soft_limit_exceeded_message = 'Sorry, I can\'t reply right now, because you have reached your weekly usage limit. You can continue using Sigmund once older activity ages out of the 7-day window, or by purchasing additional usage. \n\nIn the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. \U0001f6a6\u23f3\U0001f917'
 hard_token_limit = 5e7
 hard_limit_exceeded_message = 'You have reached the maximum usage limit. This is a hard limit. Please contact the administrator.'
 soft_token_range = 7

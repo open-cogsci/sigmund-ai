@@ -99,6 +99,19 @@ class Activity(Model):
     tokens_consumed = Column(Integer)
 
 
+class BufferActivity(Model):
+    __tablename__ = 'buffer_activity'
+
+    buffer_activity_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'), index=True)
+    time = Column(DateTime)
+    # Positive values indicate buffer additions (e.g. purchases).
+    # Negative values indicate buffer deductions (i.e. usage beyond the
+    # weekly soft limit).
+    tokens = Column(Integer)
+    description = Column(String(200), nullable=True)
+
+
 class Subscription(Model):
     __tablename__ = 'subscription'
 

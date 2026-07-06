@@ -3,8 +3,8 @@ import logging
 import time
 from datetime import datetime, timedelta
 from .. import config
-from .models import db, User, Conversation, Activity, Subscription, Setting, \
-    Message
+from .models import db, User, Conversation, Activity, BufferActivity, \
+    Subscription, Setting, Message
 from .encryption import EncryptionManager
 from sqlalchemy import func, delete
 from sqlalchemy.orm.exc import NoResultFound
@@ -417,11 +417,35 @@ class DatabaseManager:
             return False
 
     def add_activity(self, tokens_consumed: int):
-        """Adds the number of tokens consumed using the current time."""
-        new_activity = Activity(user_id=self.user_id, time=datetime.utcnow(),
-                                tokens_consumed=tokens_consumed)
-        db.session.add(new_activity)
-        db.session.commit()
+        """Adds the number of tokens consumed using the current time.
+
+        If the user is over the weekly soft limit, the excess tokens are
+        deducted from the activity buffer instead of being logged as regular
+        activity. This ensures that usage beyond the soft limit draws from
+        the purchased buffer rather than the free weekly budget.
+        """
+        weekly_activity = self.get_activity(
+            time_delta={'days': config.soft_token_range})
+        remaining_budget = max(0, config.soft_token_limit - weekly_activity)
+        if tokens_consumed <= remaining_budget:
+            # The full consumption fits within the weekly budget.
+            new_activity = Activity(
+                user_id=self.user_id, time=datetime.utcnow(),
+                tokens_consumed=tokens_consumed)
+            db.session.add(new_activity)
+            db.session.commit()
+        else:
+            # Part of the consumption fits within the weekly budget, and the
+            # rest is deducted from the buffer.
+            if remaining_budget > 0:
+                budget_activity = Activity(
+                    user_id=self.user_id, time=datetime.utcnow(),
+                    tokens_consumed=remaining_budget)
+                db.session.add(budget_activity)
+            excess = tokens_consumed - remaining_budget
+            self.deduct_activity_buffer(
+                excess, description='Usage beyond weekly soft limit')
+            db.session.commit()
 
     def get_activity(self, time_delta) -> int:
         """Retrieves the total number of tokens consumed since a particular 
@@ -435,6 +459,46 @@ class DatabaseManager:
             .filter(Activity.time >= after_time) \
             .scalar()
         return total_tokens if total_tokens is not None else 0
+
+    def get_activity_buffer(self) -> int:
+        """Returns the current net activity buffer balance for the user.
+
+        Positive values indicate unused buffer tokens that have been purchased
+        but not yet consumed. Returns 0 if no buffer activity exists.
+        """
+        total = db.session.query(func.sum(BufferActivity.tokens)) \
+            .filter(BufferActivity.user_id == self.user_id) \
+            .scalar()
+        return total if total is not None else 0
+
+    def add_activity_buffer(self, tokens: int, description: str = None):
+        """Adds tokens to the activity buffer (e.g. when a user purchases
+        additional usage). The tokens should be a positive integer.
+        """
+        if tokens <= 0:
+            logger.warning(
+                f'add_activity_buffer called with non-positive tokens: {tokens}')
+            return
+        entry = BufferActivity(
+            user_id=self.user_id, time=datetime.utcnow(),
+            tokens=tokens, description=description)
+        db.session.add(entry)
+        db.session.commit()
+
+    def deduct_activity_buffer(self, tokens: int, description: str = None):
+        """Deducts tokens from the activity buffer (i.e. usage that exceeds
+        the weekly soft limit). The tokens should be a positive integer that
+        will be stored as a negative value in the buffer.
+        """
+        if tokens <= 0:
+            logger.warning(
+                f'deduct_activity_buffer called with non-positive tokens: {tokens}')
+            return
+        entry = BufferActivity(
+            user_id=self.user_id, time=datetime.utcnow(),
+            tokens=-tokens, description=description)
+        db.session.add(entry)
+        db.session.commit()
         
     def get_suspended(self) -> bool:
         """Returns the suspended status of the user."""
