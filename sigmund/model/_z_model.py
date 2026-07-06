@@ -23,6 +23,15 @@ class ZModel(OpenAIModel):
         self._default_model = model
         self._vision_model = config.model_config['z']['vision_model']
         
+    def _prepare_tool_messages(self, messages):        
+        # Z expects at least one user message, which is different from OpenAI.
+        # Therefore, we insert a user message as the first message if there is
+        # no other user message.        
+        if not any(message['role'] == 'user' for message in messages):
+            logger.info('inserting dummy user message')
+            messages.insert(1, {'role': 'user', 'content': 'Hi!'})
+        return super()._prepare_tool_messages(messages)
+        
     def predict(self, messages, attachments=None, stream=False):
         # We need to convert all document attachments to text, because the z-api
         # doesn't appear to accept them. It does accept image attachments though
