@@ -9,7 +9,7 @@
     <div v-if="menuSection === 'full' || menuSection === 'models'" class="menu-group">
       <div class="model-selector">
         <small>Help save energy and protect the environment: use the simplest model that's good enough for your task</small>
-          <div class="model-buttons model-buttons-horizontal" class='responsive'>
+          <div class="model-buttons model-buttons-grid" class='responsive'>
               <button
                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                   @click="modelConfig = 'z'" 

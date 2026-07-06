@@ -90,14 +90,17 @@ button#send:disabled {
     }
 }
 
-.model-buttons-horizontal {
-    flex-direction: column!important;
+.model-buttons-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+
     button {
         text-align: left;
-        display: block!important;
+        display: block !important;
+
         img {
             float: right;
-            margin: 0 10px 0 0!important;
+            margin: 0 10px 0 0 !important;
             width: 20px;
             height: 20px;
         }
@@ -105,7 +108,7 @@ button#send:disabled {
 }
 
 .model-buttons img {
-    margin-bottom: 10px!important;
+    margin-bottom: 10px !important;
     margin-top: 10px;
 }
 
@@ -129,5 +132,9 @@ button#send:disabled {
     .model-buttons {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .model-buttons-grid {
+        grid-template-columns: 1fr;
     }
 }

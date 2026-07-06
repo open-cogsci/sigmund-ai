@@ -265,12 +265,13 @@ button#send:disabled {
     .model-buttons button:hover {
       background-color: #e0e0e0; }
 
-.model-buttons-horizontal {
-  flex-direction: column !important; }
-  .model-buttons-horizontal button {
+.model-buttons-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr); }
+  .model-buttons-grid button {
     text-align: left;
     display: block !important; }
-    .model-buttons-horizontal button img {
+    .model-buttons-grid button img {
       float: right;
       margin: 0 10px 0 0 !important;
       width: 20px;
@@ -295,7 +296,10 @@ button#send:disabled {
 @media (max-width: 600px) {
   .model-buttons {
     flex-direction: column;
-    align-items: stretch; } }
+    align-items: stretch; }
+
+  .model-buttons-grid {
+    grid-template-columns: 1fr; } }
 .menu select,
 #container select,
 #container button,
