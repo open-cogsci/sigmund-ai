@@ -190,11 +190,19 @@ a:visited {
   padding: 10px;
   border: 1px solid #cccccc;
   border-radius: 4px;
-  color: #fff;
-  background-color: #00796b;
+  color: #000000;
+  background-color: #e0e0e0;
   text-decoration: none;
   text-align: center;
-  cursor: pointer; }
+  cursor: pointer;
+  transition: background-color 0.3s; }
+  .link-button:hover,
+  .link-button:visited:hover {
+    background-color: #e0e0e0; }
+
+.link-button-full-width {
+  width: 100%;
+  font-size: 1em; }
 
 input#submit,
 button#start {

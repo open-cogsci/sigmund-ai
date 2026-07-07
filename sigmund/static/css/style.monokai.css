@@ -190,11 +190,19 @@ a:visited {
   padding: 10px;
   border: 1px solid #49483e;
   border-radius: 4px;
-  color: #fff;
+  color: #272822;
   background-color: #e6db74;
   text-decoration: none;
   text-align: center;
-  cursor: pointer; }
+  cursor: pointer;
+  transition: background-color 0.3s; }
+  .link-button:hover,
+  .link-button:visited:hover {
+    background-color: #66d9e8; }
+
+.link-button-full-width {
+  width: 100%;
+  font-size: 1em; }
 
 input#submit,
 button#start {
@@ -321,8 +329,8 @@ button#send:disabled {
   #container input[type="password"]:focus {
     background-color: #49483e; }
 #container input[type="submit"] {
-  background-color: #49483e;
-  color: #f8f8f2;
+  background-color: #e6db74;
+  color: #272822;
   padding: 12px 30px;
   border: none;
   border-radius: 4px;
@@ -333,7 +341,7 @@ button#send:disabled {
   width: 100%;
   transition: background-color 0.3s; }
   #container input[type="submit"]:hover {
-    background-color: #272822; }
+    background-color: #66d9e8; }
 
 .form-group label {
   display: block;
@@ -711,8 +719,8 @@ textarea#message {
     transform: translateY(0);
     opacity: 1; } }
 .modal-reload-button {
-  background-color: #49483e;
-  color: #f8f8f2;
+  background-color: #e6db74;
+  color: #272822;
   padding: 12px 30px;
   border: none;
   border-radius: 4px;
@@ -723,7 +731,7 @@ textarea#message {
   width: 100%;
   transition: background-color 0.3s; }
   .modal-reload-button:hover {
-    background-color: #272822; }
+    background-color: #66d9e8; }
 
 .delete-convo,
 .delete-attachment,
@@ -829,8 +837,8 @@ textarea#message {
       color: #e6db74; }
 
 #show-workspace button {
-  background-color: #49483e;
-  color: #f8f8f2;
+  background-color: #e6db74;
+  color: #272822;
   padding: 5px;
   border: none;
   border-radius: 4px;
@@ -840,6 +848,6 @@ textarea#message {
   width: 100%;
   transition: background-color 0.3s; }
   #show-workspace button:hover {
-    background-color: #272822; }
+    background-color: #66d9e8; }
 
 /*# sourceMappingURL=style.monokai.css.map */

@@ -16,9 +16,6 @@
     </script>
     <div id="container">
         <div id="chat-area">
-            <div id="usage-limit-warning">
-                You have reached your weekly usage limit. This is a soft limit, which means that you can continue to use Sigmund. However, we kindly ask you to review <a href="/fair-use">this information on our fair-use policy</a>.
-            </div>        
             {% include 'header.html' %}
             {% include 'menu.html' %}    
             <div id="response">{{ message_history | safe }}</div>

@@ -239,3 +239,8 @@ class Sigmund:
                 self.messages.workspace_language = workspace_language
             for reply in self._answer(attachments, state='feedback'):
                 yield reply
+                
+    def username(self):
+        if '(google)::' in self.user_id:
+            return self.user_id.split('(google)::')[0] + '(Google)'
+        return self.user_id

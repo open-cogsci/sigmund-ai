@@ -419,14 +419,14 @@ class DatabaseManager:
     def add_activity(self, tokens_consumed: int):
         """Adds the number of tokens consumed using the current time.
 
-        If the user is over the weekly soft limit, the excess tokens are
+        If the user is over the weekly limit, the excess tokens are
         deducted from the activity buffer instead of being logged as regular
-        activity. This ensures that usage beyond the soft limit draws from
+        activity. This ensures that usage beyond the limit draws from
         the purchased buffer rather than the free weekly budget.
         """
         weekly_activity = self.get_activity(
-            time_delta={'days': config.soft_token_range})
-        remaining_budget = max(0, config.soft_token_limit - weekly_activity)
+            time_delta={'days': config.weekly_token_range})
+        remaining_budget = max(0, config.weekly_token_limit - weekly_activity)
         if tokens_consumed <= remaining_budget:
             # The full consumption fits within the weekly budget.
             new_activity = Activity(
@@ -444,7 +444,7 @@ class DatabaseManager:
                 db.session.add(budget_activity)
             excess = tokens_consumed - remaining_budget
             self.deduct_activity_buffer(
-                excess, description='Usage beyond weekly soft limit')
+                excess, description='Usage beyond weekly limit')
             db.session.commit()
 
     def get_activity(self, time_delta) -> int:
@@ -487,7 +487,7 @@ class DatabaseManager:
 
     def deduct_activity_buffer(self, tokens: int, description: str = None):
         """Deducts tokens from the activity buffer (i.e. usage that exceeds
-        the weekly soft limit). The tokens should be a positive integer that
+        the weekly limit). The tokens should be a positive integer that
         will be stored as a negative value in the buffer.
         """
         if tokens <= 0:

@@ -1,13 +1,13 @@
 import os
 os.environ['USE_FLASK_SQLALCHEMY'] = '1'
-from flask import Flask, Config, request
+from flask import Flask, Config, request, redirect
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_session import Session
 from werkzeug.exceptions import HTTPException, NotFound
 from . import config
 from .redis_client import redis_client
-from .routes import api_blueprint, app_blueprint, User, subscribe_blueprint, \
+from .routes import api_blueprint, app_blueprint, User, store_blueprint, \
     google_login_blueprint, public_blueprint, admin_blueprint
 from . import utils
 from .database.models import db
@@ -34,7 +34,7 @@ def create_app(config_class=SigmundConfig):
     Session(app)
     app.register_blueprint(app_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
-    app.register_blueprint(subscribe_blueprint, url_prefix='/subscribe')
+    app.register_blueprint(store_blueprint, url_prefix='/store')
     app.register_blueprint(google_login_blueprint, url_prefix='/google_login')
     app.register_blueprint(public_blueprint, url_prefix='/public')
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
@@ -52,6 +52,15 @@ def create_app(config_class=SigmundConfig):
         return User(user_id)
 
     login_manager.init_app(app)
+
+    # Backwards-compatible redirect from the old /subscribe/webhook to the
+    # new /store/webhook. This ensures that webhooks continue to work even
+    # if the Stripe dashboard hasn't been updated to the new URL yet.
+    # Note: Stripe sends POST requests to the webhook, so we redirect all
+    # methods and preserve the original request body and headers.
+    @app.route('/subscribe/webhook', methods=['POST'])
+    def legacy_subscribe_webhook():
+        return redirect('/store/webhook', code=307)
 
     @app.after_request
     def log_request(response):

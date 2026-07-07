@@ -6,7 +6,7 @@
 
 ## Does Sigmund send my data to third-party AI model providers?
 
-Yes, Sigmund relies on AI models provided by third parties. Depending on which model you select, Sigmund uses Mistral, Anthropic, or OpenAI. This means that your data is sent to their servers. Importantly, the terms and conditions under which this happens clearly state that your data will not be used for any purpose other than replying. Your data will *not* be used to train AI models.
+Yes, Sigmund relies on AI models provided by third parties. Depending on which model you select, Sigmund uses Mistral, Anthropic, OpenAI, or Z.ai. This means that your data is sent to their servers. Importantly, the terms and conditions under which this happens clearly state that your data will not be used for any purpose other than replying. Your data will *not* be used to train AI models.
 
 An important exception is the Flux.2 model series used for generating images. This is provided BlackForestLabs (BFL), which unfortunately reserves the right to train their models on your data. BFL does not have access to the full conversation, but only to the image prompt, and only when an image is actually generated. Nevertheless, this is an important caveat to be aware of.
 
@@ -86,7 +86,7 @@ Abusive accounts will be suspended without advance notice. Here, ‘abuse’ inc
 
 ## Subscriptions and payments
 
-Subscriptions and payments are handled through Stripe. If the monthly subscription fee changes, you will be notified in advance. You can cancel your subscription at any time, in which case the subscription ends at the end of the next billing cycle.
+Subscriptions and payments are handled through Stripe. If the monthly subscription fee changes, you will be notified in advance. You can cancel your subscription at any time, in which case the subscription ends at the end of the next billing cycle. To cancel your subsription, log into SigmundAI, and then go to Menu → Manage subscription. The menu is located in the message box at the bottom of the page.
 
 
 ## Who runs Sigmund?

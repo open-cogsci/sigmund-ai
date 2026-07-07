@@ -107,7 +107,7 @@ class BufferActivity(Model):
     time = Column(DateTime)
     # Positive values indicate buffer additions (e.g. purchases).
     # Negative values indicate buffer deductions (i.e. usage beyond the
-    # weekly soft limit).
+    # weekly limit).
     tokens = Column(Integer)
     description = Column(String(200), nullable=True)
 

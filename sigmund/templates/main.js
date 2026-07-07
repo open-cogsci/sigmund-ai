@@ -549,7 +549,6 @@ function updateUsageBar() {
     const counter = document.getElementById('usage-counter');
     const bar = document.getElementById('usage-bar');
     const label = document.getElementById('usage-label');
-    const warning = document.getElementById('usage-limit-warning');
     if (!counter || !bar || !label) return;
     let value = Math.round(100 * parseFloat(counter.dataset.usage));
     if (isNaN(value)) {
@@ -557,10 +556,9 @@ function updateUsageBar() {
     }
     const pct = Math.min(100, Math.max(0, value));
     bar.style.width = pct + '%';
-    label.innerHTML = formatCredits(counter.dataset.weeklycreditsleft) + ' weekly credits left + ' + formatCredits(counter.dataset.extracreditsleft) + ' extra credits left <a href="/topup">(buy extra credits)</a>';
+    label.innerHTML = formatCredits(counter.dataset.weeklycreditsleft) + ' weekly credits left + ' + formatCredits(counter.dataset.extracreditsleft) + ' extra credits left <a href="/store/buy-extra-credits">(buy extra credits)</a>';
     bar.classList.remove('usage-low', 'usage-medium', 'usage-high');
     label.classList.remove('usage-low', 'usage-medium', 'usage-high');
-    warning.classList.toggle('shown', pct >= 99);
     if (pct < 60) {
         bar.classList.add('usage-low');
         label.classList.add('usage-low');

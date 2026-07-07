@@ -18,9 +18,10 @@
                   <span>Z.ai GLM 5.2</span>
                   <img src="/static/zai.png" alt="Z.ai Icon">
                   <span class="model-recommendations">
-                  Recommended for most tasks.<br>
+                  Recommended for most tasks.
                   Best balance between speed, energy, and intelligence.
                   From China.
+                  Credit cost: 1.0
                   </span>
               </button>
               <button
@@ -31,9 +32,10 @@
                   <img src="/static/mistral.png" alt="Mistral Icon">
                   <span>Mistral Medium 3.5</span>
                   <span class="model-recommendations">                  
-                  Recommended for conversations.<br>
-                  Fast and energy-efficient.
+                  Recommended for conversations.
+                  Good balance between speed, energy, and intelligence.
                   From Europe.
+                  Credit cost: 1.6
                   </span>
               </button>        
               <button
@@ -44,9 +46,10 @@
                   <span>Anthropic Claude 5 Sonnet</span>
                   <img src="/static/anthropic.png" alt="Anthropic Icon">
                   <span class="model-recommendations">   
-                  Recommended for complex tasks.<br>               
+                  Recommended for complex tasks.              
                   Slow and energy-intensive.
                   From the US.
+                  Credit cost: 3.1
                   </span>                
               </button>
               <button
@@ -57,9 +60,10 @@
                   <span>Anthropic Claude 5 Fable</span>
                   <img src="/static/anthropic.png" alt="Anthropic Icon">
                   <span class="model-recommendations">
-                  Only recommended for occasional use when everything else fails.<br>
+                  Only recommended for occasional use when everything else fails.
                   Extremely slow and energy-intensive.
                   From the US.
+                  Credit cost: 10.3
                   </span>                    
               </button>
               <button
@@ -70,9 +74,10 @@
                   <span>OpenAI GPT 5.4</span>
                   <img src="/static/openai.png" alt="OpenAI Icon">
                   <span class="model-recommendations">
-                  Recommended for complex tasks.<br>
+                  Recommended for complex tasks.
                   Slow and energy-intensive.
                   From the US.
+                  Credit cost: 3.0
                   </span>                    
               </button>
               <button
@@ -83,9 +88,10 @@
                   <span>OpenAI GPT 5.5</span>
                   <img src="/static/openai.png" alt="OpenAI Icon">
                   <span class="model-recommendations">                  
-                  Only recommended for occasional use when everything else fails.<br>
+                  Only recommended for occasional use when everything else fails.
                   Very slow and energy-intensive.
                   From the US.
+                  Credit cost: 6.0
                   </span>                   
               </button>            
           </div>        
@@ -138,7 +144,7 @@
                    v-model="tool_generate_image_flux">
             <label for="tool-generate-image-flux">
             Generate and edit images (Flux.2)
-            <small>Attach images to edit them. <a href="/terms">Privacy information.</a></small>
+            <small>Attach images to edit them. <a href="/terms">Uses your data for training.</a></small>
             </label>
         </div>
       </div>
@@ -228,7 +234,8 @@
     <div v-if="menuSection === 'full'" class="menu-group">
       <hr class="menu-divider">    
       <div class='responsive' @click="navigateTo('/terms')">Terms and conditions</div>
-      <div class='responsive' @click="navigateTo('/subscribe/customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
+      <div class='responsive' @click="navigateTo('/store/subscription-customer-portal')" v-if="showManageSubscriptions">Manage subscription</div>
+      <div class='responsive' @click="navigateTo('/store/buy-extra-credits')" v-if="showManageSubscriptions">Buy extra credits</div>
       <div class='responsive' @click="navigateTo('/api/conversation/export')">Download your data</div>
       <div class='responsive' @click="navigateTo('/logout')">Log out</div>    
     </div>

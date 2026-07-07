@@ -59,9 +59,9 @@ $color-fg-menu-button:				$monokai-fg;
 $color-bg-menu-button-selected:	$monokai-bg;
 $color-fg-menu-button-selected:	$color-primary;
 // Reload button in error message that appears inside chat bubble
-$color-bg-reload-button:		$monokai-highlight;
-$color-fg-reload-button:		$monokai-fg;
-$color-hover-reload-button:		$monokai-bg;
+$color-bg-reload-button:		    $color-primary;
+$color-fg-reload-button:			$color-bg;
+$color-hover-reload-button:		$color-link;
 // Modal dialogs, for example for conversation browsing
 $color-bg-modal:            	$monokai-surface;
 $color-fg-modal:				$monokai-fg;

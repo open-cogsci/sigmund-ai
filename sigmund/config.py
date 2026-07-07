@@ -149,18 +149,22 @@ mistral_kwargs = {}
 
 # The model token rate is used to convert model-specific consumption to a 
 # standardized usage measure. The model names below are those defined in the 
-# model module (not the aliases used above). The soft token limit is set such
+# model module (not the aliases used above). The weekly token limit is set such
 # that it corresponds to 10 dollars over a 7 day range.
 # The maximum number of tokens that can be consumed per hour by the answer
 # model.
 suspended_message = 'Sorry, I can\'t reply right now, because we detected unusual activity on your account. Please visit [this page](/suspended) to learn more.'
-hourly_token_limit = 2e6
-hourly_limit_exceeded_message = 'Sorry, I can\'t reply right now, because you have reached the hourly usage limit. Don\'t worry, within at most an hour we\'ll be able to talk to again.\n\nIn the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. 🚦⏳🤗'
-soft_token_limit = 1e7
-soft_limit_exceeded_message = 'Sorry, I can\'t reply right now, because you have reached your weekly usage limit. You can continue using Sigmund once older activity ages out of the 7-day window, or by purchasing additional usage. \n\nIn the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. \U0001f6a6\u23f3\U0001f917'
-hard_token_limit = 5e7
-hard_limit_exceeded_message = 'You have reached the maximum usage limit. This is a hard limit. Please contact the administrator.'
-soft_token_range = 7
+hourly_token_limit = 5e6
+hourly_limit_exceeded_message = '''Sorry, I can't reply right now, because you have reached the hourly usage limit. This limit exists to avoid run-away conversations from incurring high costs. Don't worry, within at most an hour we'll be able to talk to again.
+
+In the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. \U0001f6a6\u23f3\U0001f917
+'''
+weekly_token_limit = 1e7
+weekly_limit_exceeded_message = '''Sorry, I can't reply right now, because you have exhausted your weekly (fair-use) credit allowance. You will automatically be able to use Sigmund again in a while (at most seven days). Alternatively, if you need to continue using Sigmund now, you can [buy extra credits](/store/buy-extra-credits).
+
+In the meanwhile, why not review our [fair-use policy](/fair-use)? This includes suggestions to keep usage under control in the future. \U0001f6a6\u23f3\U0001f917
+'''
+weekly_token_range = 7
 model_token_rate = {
     'claude-haiku-4-5': {
         'output': 5,
@@ -363,7 +367,8 @@ subscription_length = 50
 #
 # The Price ID identifies the product. You can find it in the product catalog
 # of the Stripe dashboard.
-stripe_price_id = os.environ.get('STRIPE_PRICE_ID', None)
+stripe_subscription_price_id = os.environ.get('STRIPE_SUBSCRIPTION_PRICE_ID', None)
+stripe_extra_credits_price_id = os.environ.get('STRIPE_EXTRA_CREDITS_PRICE_ID', None)
 # The publishable key is the API keys section of the Developers dashboard
 stripe_publishable_key = os.environ.get('STRIPE_PUBLISHABLE_KEY', None)
 # The secret (API) key is the API keys section of the Developers dashboard

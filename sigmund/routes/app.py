@@ -41,7 +41,7 @@ def chat_page():
     sigmund = get_sigmund()
     if config.subscription_required and \
             not sigmund.database.check_subscription():
-        return redirect(url_for('subscribe.subscribe'), code=303)
+        return redirect(url_for('store.subscription_page'), code=303)
     if sigmund.limits.suspended():
         return redirect(url_for('app.suspended'), code=303)        
     html_content = ''
@@ -98,9 +98,7 @@ def chat_page():
     if workspace_content is None:
         workspace_content = ''
         workspace_language = 'markdown'
-    username = sigmund.user_id
-    if '(google)::' in username:
-        username = username.split('(google)::')[0] + '(Google)'
+    username = sigmund.username()
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=username,

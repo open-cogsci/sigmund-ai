@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    <div id="centered-container">
+        {% include 'header.html' %}
+        {% include 'sign-out.html' %}
+        <div id="start-text">
+            <h2>Buy extra credits</h2>
+            <p>
+                Do you need more than your weekly fair-use credit allowance? You can 
+                purchase extra credits. These extra credits will only be used
+                when your weekly allowance is exhausted.
+            </p>
+            <p>
+                For reference, the weekly fair-use allowance is 10,000 credits.
+                This means that by purchasing 10,000 extra credits, you double
+                your weekly usage limit.
+            </p>
+            <p>
+                Extra credits do not expire. They are valid for as long as Sigmund exists and uses the current system of fair use in combination with extra credit.
+            </p>
+            <form id="buy-credits-form" action="/store/create-extra-credits-checkout-session" method="GET">
+                <p>
+                    <label for="quantity">Buy</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="100" style="width: 80px;">
+                    <span id="total-credits-display"> = 10,000 extra credits for €13</span>
+                </p>
+                <p>
+                    <button type="submit" class="link-button link-button-full-width">
+                        <i class="fab fa-cc-stripe"></i> Buy <span id="total-units">10,000 extra credits for €13</span>
+                    </button>
+                </p>
+            </form>
+            <script>
+                const qtyInput = document.getElementById('quantity');
+                const totalCreditsDisplay = document.getElementById('total-credits-display');
+                const totalUnitsSpan = document.getElementById('total-units');
+                qtyInput.addEventListener('input', function() {
+                    const qty = Math.max(1, Math.min(100, parseInt(this.value) || 1));
+                    const total = qty * 10000;
+                    const price = qty * 13;
+                    const textContent = total.toLocaleString() + ' extra credits for €' + price.toLocaleString();
+                    totalCreditsDisplay.textContent = '= ' + textContent;
+                    totalUnitsSpan.textContent = textContent;
+                });
+            </script>
+            <p><a href="/">Return to chat</a></p>
+        </div>
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

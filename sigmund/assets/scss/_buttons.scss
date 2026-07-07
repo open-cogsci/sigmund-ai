@@ -8,11 +8,20 @@
     padding: 10px;
     border: 1px solid $color-border;
     border-radius: $border-radius;
-    color: #fff;
-    background-color: $color-primary;
+    color: $color-fg-reload-button;
+    background-color: $color-bg-reload-button;
     text-decoration: none;
     text-align: center;
     cursor: pointer;
+    transition: background-color 0.3s;    
+    &:hover {
+        background-color: $color-hover-reload-button;
+    }    
+}
+
+.link-button-full-width {
+    width: 100%;
+    font-size: 1em;
 }
 
 input#submit,
