@@ -68,14 +68,14 @@
             </div>
             <div id="show-workspace">
                 <button title="Show workspace">Show workspace</button>
-            </div>            
+            </div>
+            {% if not need_login %}  
             <!-- Usage progress bar: data-usage should be a number 0-1 -->
-            <div id="usage-counter" data-usage="{{ usage }}">
+            <div id="usage-counter" data-usage="{{ usage }}" data-weeklycreditsleft="{{ weekly_credits_left }}" data-extracreditsleft="{{ extra_credits_left }}">
                 <div id="usage-bar"></div>
                 <div id="usage-label"></div>
             </div>
-            <div id="message-counter" style="text-align: right;"></div>
-
+            {% endif %}
 
             {% include 'footer.html' %}
         </div>

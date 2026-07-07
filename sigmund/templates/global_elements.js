@@ -11,7 +11,6 @@ function globalElements(event) {
     window.sendButton = document.getElementById('send');
     window.cancelButton = document.getElementById('cancel');
     window.messageInput = document.getElementById('message');
-    window.messageCounter = document.getElementById('message-counter');
     window.messageBox = document.getElementById('message-box');
     window.workspaceLanguageSelect = document.getElementById('workspace-language');
     window.clearWorkspaceButton = document.getElementById('clear-workspace');

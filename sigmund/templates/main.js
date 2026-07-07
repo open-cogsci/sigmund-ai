@@ -6,16 +6,14 @@ let currentLoadingMessageBox = null;
 function initMain(event) {
 
     let maxLength = {{ max_message_length }};
-    function updateCounter() {
+    function truncateUserMessage() {
         let length = messageInput.value.length;
-        messageCounter.innerText = length + '/' + maxLength + ' characters';
-
         if (length >= maxLength) {
             messageInput.value = messageInput.value.slice(0, maxLength - 1);
         }
     }
-    messageInput.addEventListener('input', updateCounter);
-    updateCounter();
+    messageInput.addEventListener('input', truncateUserMessage);
+    truncateUserMessage();
 
     messageInput.addEventListener('input', function() {
         // Enable the send button if there are at least 3 characters in the 
@@ -52,11 +50,15 @@ function initMain(event) {
 
     // Initialize on load
     updateUsageBar();
-    // Watch for dynamic updates to data-usage
+    // Watch for dynamic updates to data-usage, data-weeklycreditsleft, 
+    // and data-extracreditsleft
     new MutationObserver(updateUsageBar).observe(
         document.getElementById('usage-counter'),
-        { attributes: true, attributeFilter: ['data-usage'] }
-    );   
+        { 
+            attributes: true, 
+            attributeFilter: ['data-usage', 'data-weeklycreditsleft', 'data-extracreditsleft'] 
+        }
+    );
 
     // Make sure the message input resizes
     messageInput.addEventListener('input', updateMessageInputHeight);
@@ -398,7 +400,6 @@ async function sendMessage(
     setFavicon('static/loading.svg');
     isStreaming = true;
     const user_message_id = generateUUID();
-    messageCounter.innerText = '';
 
     // Display user message
     displayUserMessage(message, user_message_id);
@@ -486,6 +487,8 @@ async function sendMessage(
 
         // Update usage
         document.getElementById('usage-counter').dataset.usage = data.usage;
+        document.getElementById('usage-counter').dataset.weeklycreditsleft = data.weekly_credits_left;
+        document.getElementById('usage-counter').dataset.extracreditsleft = data.extra_credits_left;
 
         // Append AI message after user message
         responseDiv.appendChild(aiMessage);
@@ -554,7 +557,7 @@ function updateUsageBar() {
     }
     const pct = Math.min(100, Math.max(0, value));
     bar.style.width = pct + '%';
-    label.innerText = pct + '% of weekly usage (soft limit)';
+    label.innerHTML = formatCredits(counter.dataset.weeklycreditsleft) + ' weekly credits left + ' + formatCredits(counter.dataset.extracreditsleft) + ' extra credits left <a href="/topup">(buy extra credits)</a>';
     bar.classList.remove('usage-low', 'usage-medium', 'usage-high');
     label.classList.remove('usage-low', 'usage-medium', 'usage-high');
     warning.classList.toggle('shown', pct >= 99);
@@ -568,6 +571,23 @@ function updateUsageBar() {
         bar.classList.add('usage-high');
         label.classList.add('usage-high');
     }
+}
+
+// Format large credit numbers into natural units (e.g. 1.5 million, 150 thousand)
+function formatCredits(n, downsample = 1000) {
+    n = parseInt(n / downsample, 10);
+    if (isNaN(n)) return n;
+    if (n >= 1000000) {
+        const m = n / 1000000;
+        return Number.isInteger(m) ? m + ' million' : m.toFixed(1) + ' million';
+    }
+    if (n >= 1000) {
+        const k = n / 1000;
+        if (Number.isInteger(k)) {
+            return k + ' thousand';
+        }
+    }
+    return n.toLocaleString();
 }
 
 function getMessageInputLineHeight(el) {

@@ -80,9 +80,18 @@ class LimitsChecker:
         if self.soft_exceeded():
             return False
         return True
+        
+    def weekly_credits_used(self) -> int:
+        return self._db.get_activity(
+            time_delta={'days': config.soft_token_range}
+        )
 
     def usage(self) -> float:
         """Returns the weekly usage as a fraction of the soft token limit."""
-        return self._db.get_activity(
-            time_delta={'days': config.soft_token_range}
-        ) / config.soft_token_limit
+        return self.weekly_credits_used() / config.soft_token_limit
+
+    def weekly_credits_left(self) -> int:
+        return max(0, config.soft_token_limit - self.weekly_credits_used())
+        
+    def extra_credits_left(self) -> int:
+        return max(0, self._db.get_activity_buffer())

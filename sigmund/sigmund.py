@@ -97,7 +97,10 @@ class Sigmund:
             logger.info(f'[user message] {message}')
         block_msg = self.limits.blocked_message()
         if block_msg is not None:
-            yield Reply(block_msg, self.messages.metadata())
+            yield Reply(block_msg, self.messages.metadata(),
+                        usage=self.limits.usage(),
+                        weekly_credits_left=self.limits.weekly_credits_left(),
+                        extra_credits_left=self.limits.extra_credits_left())
             return
         # The tool result marker allows external applications to return a 
         # tool result through a user message. Rather than treating the result
@@ -146,12 +149,6 @@ class Sigmund:
                 yield reply
         for reply in self._answer(attachments):
             yield reply
-
-    def usage(self):
-        return self.limits.usage()
-        
-    def suspended(self):
-        return self.limits.suspended()
 
     def _search(self, message: str) -> GeneratorType:
         """Implements the documentation search phase."""
@@ -215,7 +212,9 @@ class Sigmund:
             else:
                 metadata = self.messages.append('assistant', tool_message)
             yield Reply(tool_message, metadata, workspace_content,
-                        workspace_language, self.usage())
+                        workspace_language, self.limits.usage(),
+                        self.limits.weekly_credits_left(),
+                        self.limits.extra_credits_left())
         # Otherwise the reply is a regular AI message
         else:
             reply, workspace_content, workspace_language = \
@@ -226,7 +225,8 @@ class Sigmund:
                 workspace_content=workspace_content,
                 workspace_language=workspace_language)
             yield Reply(reply, metadata, workspace_content, workspace_language,
-                        self.usage())
+                        self.limits.usage(), self.limits.weekly_credits_left(),
+                        self.limits.extra_credits_left())
             needs_feedback = False
         # If feedback is required by a tool, go for another round.
         if (

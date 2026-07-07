@@ -42,7 +42,7 @@ def chat_page():
     if config.subscription_required and \
             not sigmund.database.check_subscription():
         return redirect(url_for('subscribe.subscribe'), code=303)
-    if sigmund.suspended():
+    if sigmund.limits.suspended():
         return redirect(url_for('app.suspended'), code=303)        
     html_content = ''
     previous_timestamp = None
@@ -107,7 +107,9 @@ def chat_page():
                         settings=json.dumps(settings),
                         workspace_content=workspace_content,
                         workspace_language=workspace_language,
-                        usage=sigmund.usage(),
+                        usage=sigmund.limits.usage(),
+                        weekly_credits_left=sigmund.limits.weekly_credits_left(),
+                        extra_credits_left=sigmund.limits.extra_credits_left(),
                         theme=get_theme())
 
 

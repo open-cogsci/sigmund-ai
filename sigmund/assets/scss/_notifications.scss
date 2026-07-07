@@ -2,7 +2,6 @@
 // Notifications & Status Indicators
 // ============================================================
 
-#message-counter,
 #footer-bar {
     color: gray;
     font-size: 0.7em;
@@ -10,10 +9,6 @@
     font-family: $font-condensed;
     margin-top: 8px;
     margin-bottom: 8px;
-}
-
-#message-counter {
-    display: none;
 }
 
 #footer-bar a {

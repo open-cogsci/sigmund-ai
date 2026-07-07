@@ -15,12 +15,15 @@ class Reply(BaseReply):
     """Corresponds to a regular AI reply that is sent to the client."""
     def __init__(self, msg: str, metadata: dict,
                  workspace_content: str=None, workspace_language: str='text',
-                 usage: float=0):
+                 usage: float=0, weekly_credits_left: float=0,
+                 extra_credits_left: float=0):
         self.msg = msg
         self.metadata = metadata
         self.workspace_content = workspace_content
         self.workspace_language = workspace_language
         self.usage = usage
+        self.weekly_credits_left = weekly_credits_left
+        self.extra_credits_left = extra_credits_left
 
     def to_json(self):
         return json.dumps(
@@ -29,7 +32,9 @@ class Reply(BaseReply):
              'metadata': self.metadata,
              'workspace_content': self.workspace_content,
              'workspace_language': self.workspace_language,
-             'usage': self.usage
+             'usage': self.usage,
+             'weekly_credits_left': self.weekly_credits_left,
+             'extra_credits_left': self.extra_credits_left
             }
         )
 
