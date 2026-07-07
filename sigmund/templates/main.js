@@ -38,6 +38,7 @@ function initMain(event) {
         // Send a message when the send button is clicked
         const message = messageInput.value;
         messageInput.value = '';
+        updateMessageInputHeight();
         sendMessage(message);
     });
     initWorkspace();
