@@ -256,7 +256,7 @@ settings_default = {
     # Theme
     'theme' : 'monokai',
     # Indicates the model configuration as specified above
-    'model_config': 'anthropic',
+    'model_config': 'z',
     # Indicates which tools are enabled
     'tool_search_google_scholar': 'false',
     'tool_search_openalex': 'false',
