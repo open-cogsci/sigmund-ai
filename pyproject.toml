@@ -38,7 +38,8 @@ dependencies = [
     "requests",
     "scholarly",
     "stripe",
-    "tiktoken"
+    "tiktoken",
+    "zai-sdk"
 ]
 keywords = ["ai", "chatbot", "llm"]
 [project.optional-dependencies]

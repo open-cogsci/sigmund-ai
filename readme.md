@@ -12,18 +12,15 @@ Features:
 - __Expert knowledge__: access to documentation 
 - __Continuous conversation__: conversations are summarized when they become too long to fit into the prompt
 - __Tool use__ (in research-assistant mode):
-    - __Code execution__: ability to execute Python and R code
+    - __Memento__: improve memory with persistent notes
     - __Literature search__: ability to search for articles on OpenAlex and Google Scholar
-    - __Image generation__: ability to generate images with Flux.2 and Dall-E 3
+    - __Image generation__: ability to generate images with Flux.2
 - __Integrations__
     - __Python__: [connect to JupyterLab, Notebook, Spyder or Rapunzel](https://github.com/open-cogsci/jupyter-extension-sigmund)
     - __OpenSesame__: [directly integrate with OpenSesame](https://osdoc.cogsci.nl/4.0/manual/sigmund/)
     - __Sigmund Analyst__: [directly integrate with Sigmund Analyst for data analysis](https://github.com/open-cogsci/sigmund-analyst)
     
-Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), and [Mistral](https://mistral.ai/) are supported. API keys from these respective providers are required.
-
-
-[output2.webm](https://github.com/user-attachments/assets/905233c3-5980-45f5-b8fb-dc769b4c3526)
+Sigmund is not a large language model itself. Rather it uses third-party models. Currently, models from [OpenAI](https://openai.com), [Anthropic](https://www.anthropic.com/), [Mistral](https://mistral.ai/), and [Z.ai](https://z.ai) are supported. API keys from these respective providers are required.
 
 
 ## Configuration
