@@ -95,7 +95,7 @@ class opensesame_rename_item(BaseOpenSesameTool):
 
 
 class opensesame_select_item(BaseOpenSesameTool):
-    """Selects an item in the OpenSesame interface. After selecting an item, you can modify its script."""
+    """Selects an item in the OpenSesame interface. After selecting an item, you can modify its script. Do not select an item that is already selected in the workspace."""
 
     arguments = {
         'item_name': {
@@ -106,7 +106,7 @@ class opensesame_select_item(BaseOpenSesameTool):
 
 
 class opensesame_update_item_script(BaseOpenSesameTool):
-    """Updates an item's script. You should only use this tool to modify the currently selected item."""
+    """Updates an item's script. You should only use this tool to modify the currently selected item. Do not use this tool to update the loop table of a loop item; use opensesame_update_loop_table instead."""
 
     arguments = {
         'item_name': {
@@ -116,6 +116,27 @@ class opensesame_update_item_script(BaseOpenSesameTool):
         'script': {
             'type': 'string',
             'description': 'The complete updated script for the item.'
+        }
+    }
+
+
+class opensesame_update_loop_table(BaseOpenSesameTool):
+    """Updates the loop table (i.e. the set of columns and rows) of a loop item. The columns are specified as a dictionary where keys are variable names and values are lists of values, similar to a pandas DataFrame. All columns must have the same length. This replaces the entire loop table; any existing columns that are not included will be removed. The number of cycles is automatically set to the length of the columns. Use this tool instead of opensesame_update_item_script when you want to change the loop table."""
+
+    arguments = {
+        'item_name': {
+            'type': 'string',
+            'description': 'The name of the loop item.'
+        },
+        'columns': {
+            'type': 'object',
+            'description': 'A dictionary (DataFrame-like) where keys are column names and values are lists of values. All lists must have the same length. Example: {"cued_size": ["left", "right"], "target_side": ["left", "right"], "valid": [1, 0]}',
+            'additionalProperties': {
+                'type': 'array',
+                'items': {
+                    'type': ['string', 'number', 'boolean']
+                }
+            }
         }
     }
 

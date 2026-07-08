@@ -236,11 +236,12 @@ tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
          'generate_image_flux',
          'opensesame_select_item', 'opensesame_new_item',
          'opensesame_remove_item_from_parent', 'opensesame_rename_item',
-          'opensesame_add_existing_item_to_parent',
+         'opensesame_add_existing_item_to_parent',
          'opensesame_update_item_script', 'opensesame_set_global_var',
-         'ide_execute_code', 'ide_open_file', 'ide_inspect_files',
-         'ide_list_files', 'ide_write_file', 'ide_execute_shell_command',
-         'add_note', 'update_note', 'remove_note', 'save_workspace_as_note']
+         'opensesame_update_loop_table', 'ide_execute_code', 'ide_open_file',
+         'ide_inspect_files', 'ide_list_files', 'ide_write_file',
+         'ide_execute_shell_command', 'add_note', 'update_note', 'remove_note',
+         'save_workspace_as_note']
 
 # NOTES
 #
