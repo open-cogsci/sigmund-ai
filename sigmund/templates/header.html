@@ -1,3 +1,8 @@
 <div id="header-bar">
     <img src='/static/sofa-with-sigmund.png' id="header-logo">
 </div>
+{% if need_login is defined and not need_login %}
+<div id="sign-out">
+    Welcome {{ username }}! <a href="/logout">Log out</a>
+</div>
+{% endif %}

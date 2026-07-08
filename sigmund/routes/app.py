@@ -102,6 +102,7 @@ def chat_page():
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         username=username,
+                        need_login=False,
                         settings=json.dumps(settings),
                         workspace_content=workspace_content,
                         workspace_language=workspace_language,
