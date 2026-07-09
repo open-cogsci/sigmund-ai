@@ -82,7 +82,18 @@ class OpenAIModel(BaseModel):
         for i, message in enumerate(messages):
             if i == 0 or message['role'] != 'tool':
                 continue
-            tool_info = json.loads(message['content'])
+            try:
+                tool_info = json.loads(message['content'])
+            except json.JSONDecodeError as e:
+                # Occasionally the tool content appears not to be valid JSON. This
+                # should not happen, but is hard to reproduce. Until we've traced
+                # the source of corruption, we fall back to using dummy content.
+                tool_info = {'name': 'unknown', 'args': '{}', 'content': ''}
+                logger.error(f'tool content is not valid JSON: {e}')
+                # Only show invalid content when we're logging replies to avoid
+                # leaking sensitive data to logs.
+                if config.log_replies:                    
+                    logger.error(f'invalid tool content: {message["content"]}')
             tool_call_id = self._tool_call_id(i)
             prev_message = messages[i - 1]
             # an assistant message should not have both content and tool calls
