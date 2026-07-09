@@ -230,18 +230,6 @@ model_token_rate = {
     }
 }
 
-# TOOLS
-#
-tools = ['search_google_scholar', 'search_openalex', 'download_from_openalex',
-         'generate_image_flux',
-         'opensesame_select_item', 'opensesame_new_item',
-         'opensesame_remove_item_from_parent', 'opensesame_rename_item',
-         'opensesame_add_existing_item_to_parent',
-         'opensesame_update_item_script', 'opensesame_set_global_var',
-         'opensesame_update_loop_table', 'ide_execute_code', 'ide_open_file',
-         'ide_inspect_files', 'ide_list_files', 'ide_write_file',
-         'ide_execute_shell_command', 'add_note', 'update_note', 'remove_note',
-         'save_workspace_as_note']
 
 # NOTES
 #
@@ -258,32 +246,12 @@ settings_default = {
     'theme' : 'monokai',
     # Indicates the model configuration as specified above
     'model_config': 'z',
-    # Indicates which tools are enabled
-    'tool_search_google_scholar': 'false',
-    'tool_search_openalex': 'false',
-    'tool_download_from_openalex': 'false',
-    'tool_generate_image_flux': 'false',
-    'tool_opensesame_select_item': 'false',
-    'tool_opensesame_new_item': 'false',
-    'tool_opensesame_remove_item_from_parent': 'false',
-    'tool_opensesame_rename_item': 'false',
-    'tool_opensesame_add_existing_item_to_parent': 'false',
-    'tool_opensesame_update_item_script': 'false',
-    'tool_opensesame_set_global_var': 'false',
-    'tool_ide_execute_code': 'false',
-    'tool_ide_open_file': 'false',
-    'tool_ide_inspect_files': 'false',
-    'tool_ide_list_files': 'false',
-    'tool_ide_write_file': 'false',
-    'tool_ide_execute_shell_command': 'false',
+    # Indicates which tools are enabled. Other tools are disabled by default.
+    # Similarly, knowledge is disabled by default.
     'tool_add_note': 'true',
     'tool_update_note': 'true',
     'tool_remove_note': 'true',
-    'tool_save_workspace_as_note': 'true',
-    # Indicates which library collections are enabled
-    'collection_opensesame': 'false',
-    'collection_datamatrix': 'false',
-    'collection_forum': 'false'
+    'tool_save_workspace_as_note': 'true'
 }
 
 

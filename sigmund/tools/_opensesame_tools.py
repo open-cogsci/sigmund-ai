@@ -1,7 +1,27 @@
 from . import BaseTool
 import logging
 import json
+from ..documentation import Documentation
 logger = logging.getLogger('sigmund')
+
+# Corresponds to all item topics in opensesame.json
+OPENSESAME_ITEM_TYPES = [
+    'inline_script',
+    'inline_javascript',
+    'loop',
+    'logger',
+    'sketchpad',
+    'feedback',
+    'notepad',
+    'sequence',
+    'mouse_response',
+    'keyboard_response',
+    'sampler',
+    'synth',
+    'form_text_input',
+    'form_text_display',
+    'form_multiple_choice'
+]
 
 
 class BaseOpenSesameTool(BaseTool):
@@ -154,3 +174,62 @@ class opensesame_set_global_var(BaseOpenSesameTool):
             'description': 'The value to assign to the variable.'
         }
     }
+    
+    
+class opensesame_update_run_if_expression(BaseOpenSesameTool):
+    """Sets a run-if expression for an item in a sequence. The item is specified based on its position within the sequence."""
+
+    arguments = {
+        'parent_sequence_name': {
+            'type': 'string',
+            'description': 'The name of the parent sequence item.'
+        },
+        'index': {
+            'type': 'number',
+            'description': 'The zero-based index of the item to set the run-if expression for.'
+        },
+        'run_if': {
+            'type': 'string',
+            'description': 'A Python expression that determines whether the item should be run. Example: "correct == 0"'
+        }
+    }
+
+
+class opensesame_get_general_script(BaseOpenSesameTool):
+    """Gets the general script for the entire experiment. Use this to get a high-level understanding of the entire experiment."""
+    
+    arguments = {}
+
+
+class opensesame_update_general_script(BaseOpenSesameTool):
+    """Updates the general script for the entire experiment. Only use this when the user explicitly asks you to build a complete experiment from scratch in one go. Before using this tool, call `opensesame_get_syntax_documentation` to get all reference syntax documents."""
+
+    arguments = {
+         'script': {
+             'type': 'string',
+             'description': 'The new general script for the entire experiment.'
+         }
+     }
+
+
+class opensesame_get_syntax_documentation(BaseTool):
+    """Gets reference syntax documentation for one or more item types. Call this tool before calling `opensesame_update_general_script`.
+    """
+    
+    arguments = {
+        'item_types': {
+            'type': 'array',
+            'items': {
+                'type': 'string',
+                'enum': OPENSESAME_ITEM_TYPES
+            },
+            'description': 'The item types to get syntax documentation for. (default=[all available item types]).'
+        }
+    }
+    required_arguments = []
+    
+    def __call__(self, item_types=OPENSESAME_ITEM_TYPES):
+        documentation = Documentation(self._sigmund,
+                                      foundation_document_topics=item_types)
+        documentation.search(query=None)
+        return None, str(documentation), True

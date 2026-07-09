@@ -9,7 +9,11 @@ from ._opensesame_tools import (opensesame_add_existing_item_to_parent,
                                 opensesame_select_item,
                                 opensesame_set_global_var,
                                 opensesame_update_item_script,
-                                opensesame_update_loop_table)
+                                opensesame_update_loop_table,
+                                opensesame_get_general_script,
+                                opensesame_update_general_script,
+                                opensesame_update_run_if_expression,
+                                opensesame_get_syntax_documentation)
 from ._ide_tools import (ide_execute_code, ide_open_file, ide_inspect_files,
                          ide_list_files, ide_write_file,
                          ide_execute_shell_command)

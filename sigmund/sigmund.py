@@ -9,7 +9,7 @@ from .model import model
 from . import tools as mod_tools
 from .database.manager import DatabaseManager
 from .limits import LimitsChecker
-from . import utils
+from . import utils, tools as tools_module
 logger = logging.getLogger('sigmund')
 
 
@@ -60,7 +60,7 @@ class Sigmund:
             self, foundation_document_topics=foundation_document_topics)
         self.messages = Messages(self, persistent)
         if tools is None:
-            tools = [t for t in config.tools
+            tools = [t for t in dir(tools_module)
                      if self.database.get_setting(f'tool_{t}') == 'true']
         # Tools are class names from the tools module, which need to be
         # instantiated with sigmund (self) as first argument
