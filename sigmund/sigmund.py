@@ -228,7 +228,10 @@ class Sigmund:
                         self.limits.usage(), self.limits.weekly_credits_left(),
                         self.limits.extra_credits_left())
             needs_feedback = False
-        # If feedback is required by a tool, go for another round.
+        # If feedback is required by a tool, go for another round. This second
+        # round doesn't include the attachments anymore, otherwise we risk
+        # getting into an infinite loop in which attachments are interpreted
+        # over and over again.
         if (
             needs_feedback and
             self.limits.can_send_feedback()
@@ -237,7 +240,7 @@ class Sigmund:
                 logger.info('workspace content has been updated for feedback')
                 self.messages.workspace_content = workspace_content
                 self.messages.workspace_language = workspace_language
-            for reply in self._answer(attachments, state='feedback'):
+            for reply in self._answer(state='feedback'):
                 yield reply
                 
     def username(self):
