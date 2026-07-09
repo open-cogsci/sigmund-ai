@@ -48,7 +48,7 @@ class ZModel(OpenAIModel):
                     self._model = self._vision_model
                     logger.info(f'switching to vision model: {self._model}')
                 elif attachment['type'] == 'document':
-                    logger.info(f'converting {attachment["file_name"]} to text')
+                    logger.info('converting attachment to text')
                     response = self._z_client.layout_parsing.create(
                         model="glm-ocr",
                         file=attachment['url']
