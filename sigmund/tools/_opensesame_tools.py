@@ -20,7 +20,8 @@ OPENSESAME_ITEM_TYPES = [
     'synth',
     'form_text_input',
     'form_text_display',
-    'form_multiple_choice'
+    'form_multiple_choice',
+    'osexp_syntax'
 ]
 
 
@@ -240,5 +241,5 @@ class opensesame_get_syntax_documentation(BaseTool):
         if save_as == 'note':
             self._sigmund.messages.set_note('OpenSesame syntax documentation',
                                             content)
-            return None, None, None
+            return None, None, True
         return None, str(documentation), True
