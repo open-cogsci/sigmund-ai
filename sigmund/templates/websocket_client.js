@@ -155,7 +155,9 @@ function connectWebSocket() {
 
                     // Set message and workspace content
                     messageInput.value = data.message;
-                    setWorkspace(data.workspace_content, data.workspace_language);
+                    if (data.workspace_content !== null) {
+                        setWorkspace(data.workspace_content, data.workspace_language);
+                    }
 
                     // Send message (attachments will be included automatically)
                     // and indicate that the reply should be forwarded to the 
