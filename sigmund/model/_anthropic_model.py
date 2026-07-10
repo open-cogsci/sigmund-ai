@@ -243,11 +243,14 @@ class AnthropicModel(BaseModel):
         return messages, kwargs
 
     def _print_error(self, messages, kwargs):
-        import pprint
         print('=== an error occurred while sending messages')
-        pprint.pprint(messages)
-        print('=== system message')
-        print(kwargs.get('system', '(none)'))
+        if config.log_replies:
+            import pprint
+            pprint.pprint(messages)            
+            print('=== system message')
+            print(kwargs.get('system', '(none)'))
+        else:
+            print('messages hidden')
         print('***')
 
     def invoke(self, messages):
