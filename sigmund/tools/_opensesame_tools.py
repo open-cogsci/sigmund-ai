@@ -224,12 +224,21 @@ class opensesame_get_syntax_documentation(BaseTool):
                 'enum': OPENSESAME_ITEM_TYPES
             },
             'description': 'The item types to get syntax documentation for. (default=[all available item types]).'
+        },
+        'save_as': {
+            'type': 'string',
+            'description': 'Indicates whether the documentation should be saved as a presistent note ("note") or exported to the workspace ("workspace"). (default="note")'
         }
     }
     required_arguments = []
     
-    def __call__(self, item_types=OPENSESAME_ITEM_TYPES):
+    def __call__(self, item_types=OPENSESAME_ITEM_TYPES, save_as='note'):
         documentation = Documentation(self._sigmund,
                                       foundation_document_topics=item_types)
         documentation.search(query=None)
+        content = str(documentation)
+        if save_as == 'note':
+            self._sigmund.messages.set_note('OpenSesame syntax documentation',
+                                            content)
+            return None, None, None
         return None, str(documentation), True
