@@ -98,14 +98,14 @@ dummy_model = int(os.environ.get("SIGMUND_DUMMY_MODEL", False))
 #   model
 model_config = {
     'openai': {
-        'condense_model': 'gpt-5.4-mini',
+        'condense_model': 'gpt-5.6-luna',
         'public_model': 'gpt-5.4-nano',
-        'answer_model': 'gpt-5.4'
+        'answer_model': 'gpt-5.6-terra'
     },
     'openai_thinking': {
-        'condense_model': 'gpt-5.4-mini',
+        'condense_model': 'gpt-5.6-luna',
         'public_model': 'gpt-5.4-nano',
-        'answer_model': 'gpt-5.5-thinking'
+        'answer_model': 'gpt-5.6-sol'
     },
     'anthropic': {
         'condense_model': 'claude-4-5-haiku',
@@ -144,7 +144,7 @@ model_config = {
 anthropic_kwargs = {
     'max_tokens': 64_000
 }
-openai_kwargs = {}
+openai_kwargs = {'reasoning_effort': 'none'}
 mistral_kwargs = {}
 
 # The model token rate is used to convert model-specific consumption to a 
@@ -190,16 +190,21 @@ model_token_rate = {
         'cache_read_input': 10 * .1,
         'cache_write_input': 10 * 1.25
     },
-    'gpt-5.5': {
+    'gpt-5.6-sol': {
         'output': 30,
         'input': 5,
         'cache_read_input': 5 * .1
     },
-    'gpt-5.4': {
+    'gpt-5.6-terra': {
         'output': 15,
         'input': 2.5,
         'cache_read_input': 2.5 * .1
     },
+    'gpt-5.6-luna': {
+        'output': 6,
+        'input': 1,
+        'cache_read_input': 1 * .1
+    },    
     'gpt-5.4-mini': {
         'output': 4.5,
         'input': .75,
