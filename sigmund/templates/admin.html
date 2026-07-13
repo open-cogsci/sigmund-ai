@@ -38,6 +38,12 @@
                     <tr><td>Tokens consumed (24 h)</td><td>{{ "{:,}".format(tokens_24h) }}</td></tr>
                     <tr><td>Tokens consumed (7 d)</td><td>{{ "{:,}".format(tokens_7d) }}</td></tr>
                     <tr><td>Tokens consumed (all time)</td><td>{{ "{:,}".format(tokens_all_time) }}</td></tr>
+                    <tr><td>Buffer tokens added (24 h)</td><td>{{ "{:,}".format(buffer_added_24h) }}</td></tr>
+                    <tr><td>Buffer tokens added (7 d)</td><td>{{ "{:,}".format(buffer_added_7d) }}</td></tr>
+                    <tr><td>Buffer tokens added (all time)</td><td>{{ "{:,}".format(buffer_added_all) }}</td></tr>
+                    <tr><td>Buffer tokens used (24 h)</td><td>{{ "{:,}".format(buffer_used_24h) }}</td></tr>
+                    <tr><td>Buffer tokens used (7 d)</td><td>{{ "{:,}".format(buffer_used_7d) }}</td></tr>
+                    <tr><td>Buffer tokens used (all time)</td><td>{{ "{:,}".format(buffer_used_all) }}</td></tr>
                 </tbody>
             </table>
 
@@ -49,6 +55,8 @@
                         <th>Username</th>
                         <th>Tokens (7 d)</th>
                         <th>Tokens (24 h)</th>
+                        <th>Buffer added (7 d)</th>
+                        <th>Buffer used (7 d)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +65,8 @@
                         <td>{{ row.username }}</td>
                         <td>{{ "{:,}".format(row.tokens_7d) }}</td>
                         <td>{{ "{:,}".format(row.tokens_24h) }}</td>
+                        <td>{{ "{:,}".format(row.buffer_added_7d) }}</td>
+                        <td>{{ "{:,}".format(row.buffer_used_7d) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

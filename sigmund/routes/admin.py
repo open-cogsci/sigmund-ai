@@ -6,8 +6,8 @@ from flask_login import current_user
 from sqlalchemy import func
 
 from .. import config, utils
-from ..database.models import db, User, Activity, Conversation, Message, \
-    Subscription
+from ..database.models import db, User, Activity, BufferActivity, Conversation, \
+    Message, Subscription
 
 logger = logging.getLogger('sigmund')
 admin_blueprint = Blueprint('admin', __name__)
@@ -75,6 +75,28 @@ def dashboard():
     tokens_all_time = (db.session.query(func.sum(Activity.tokens_consumed))
                        .scalar() or 0)
 
+    # ── Buffer activity stats ────────────────────────────────────────────────
+    # Positive tokens = buffer additions (e.g. purchases)
+    # Negative tokens = buffer deductions (usage beyond the weekly limit)
+    # The helper below always returns the absolute value.
+    def _buffer_sum(period_start, positive):
+        query = db.session.query(func.sum(BufferActivity.tokens))
+        if period_start is not None:
+            query = query.filter(BufferActivity.time >= period_start)
+        if positive:
+            query = query.filter(BufferActivity.tokens > 0)
+        else:
+            query = query.filter(BufferActivity.tokens < 0)
+        total = query.scalar() or 0
+        return abs(total)
+
+    buffer_added_24h = _buffer_sum(one_day_ago, True)
+    buffer_added_7d  = _buffer_sum(seven_days_ago, True)
+    buffer_added_all = _buffer_sum(None, True)
+    buffer_used_24h  = _buffer_sum(one_day_ago, False)
+    buffer_used_7d   = _buffer_sum(seven_days_ago, False)
+    buffer_used_all  = _buffer_sum(None, False)
+
     # ── Active subscribers ───────────────────────────────────────────────────
     active_sub_ids = [
         uid for (uid,) in
@@ -102,12 +124,35 @@ def dashboard():
 
     tokens_7d_per_user  = _sum_tokens(seven_days_ago)
     tokens_24h_per_user = _sum_tokens(one_day_ago)
+
+    def _buffer_tokens_per_user(period_start, positive):
+        if not active_sub_ids:
+            return {}
+        query = db.session.query(
+            BufferActivity.user_id, func.sum(BufferActivity.tokens))
+        if period_start is not None:
+            query = query.filter(BufferActivity.time >= period_start)
+        query = query.filter(BufferActivity.user_id.in_(active_sub_ids))
+        if positive:
+            query = query.filter(BufferActivity.tokens > 0)
+        else:
+            query = query.filter(BufferActivity.tokens < 0)
+        return {
+            uid: abs(total) for uid, total in
+            query.group_by(BufferActivity.user_id).all()
+        }
+
+    buffer_added_7d_per_user = _buffer_tokens_per_user(seven_days_ago, True)
+    buffer_used_7d_per_user  = _buffer_tokens_per_user(seven_days_ago, False)
+
     subscriber_rows = sorted(
         [
             {
                 'username':         user_map.get(uid, f'user_{uid}'),
                 'tokens_7d':        tokens_7d_per_user.get(uid) or 0,
-                'tokens_24h':       tokens_24h_per_user.get(uid) or 0
+                'tokens_24h':       tokens_24h_per_user.get(uid) or 0,
+                'buffer_added_7d':  buffer_added_7d_per_user.get(uid) or 0,
+                'buffer_used_7d':   buffer_used_7d_per_user.get(uid) or 0,
             }
             for uid in active_sub_ids
         ],
@@ -138,6 +183,13 @@ def dashboard():
         tokens_24h=tokens_24h,
         tokens_7d=tokens_7d,
         tokens_all_time=tokens_all_time,
+        # Buffer activity stats
+        buffer_added_24h=buffer_added_24h,
+        buffer_added_7d=buffer_added_7d,
+        buffer_added_all=buffer_added_all,
+        buffer_used_24h=buffer_used_24h,
+        buffer_used_7d=buffer_used_7d,
+        buffer_used_all=buffer_used_all,
         # Subscriptions
         active_subscription_count=active_subscription_count,
         subscriber_rows=subscriber_rows,
