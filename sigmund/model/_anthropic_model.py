@@ -231,9 +231,11 @@ class AnthropicModel(BaseModel):
                 logger.warning('empty message in cache breakpoint')
                 last_block['text'] = '(Empty message)'
             last_block['cache_control'] = {'type': 'ephemeral'}
-        # Claude Sonnet/ Opus/ Fable use adaptive thinking
+        # Claude Sonnet/ Opus/ Fable use adaptive thinking. We need to add the 
+        # summarized argument to display the thinking content block, otherwise
+        # we only receive a signature, which breaks some functionality.
         if 'sonnet' in self._model or 'opus' in self._model or 'fable' in self._model:
-            kwargs['thinking'] = {"type": "adaptive"}
+            kwargs['thinking'] = {"type": "adaptive", "display": "summarized"}
         else:
             if self._thinking:
                 kwargs['thinking'] = {
