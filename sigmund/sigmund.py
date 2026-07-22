@@ -189,43 +189,44 @@ class Sigmund:
         if callable(reply):
             tool_message, tool_result, tool_language, needs_feedback = reply(
                 attachments)
-            if needs_feedback:
-                logger.info(f'[{state} state] tools need feedback')
-                if not self.answer_model.supports_tool_feedback:
-                    logger.info(
-                        f'[{state} state] model does not support feedback')
-                    needs_feedback = False
-            tool_message, workspace_content, workspace_language = \
-                utils.extract_workspace(tool_message)
-            # If the tool has a result and no workspace content was included in
-            # the message itself, use the result as the workspace message. Also
-            # remember the tool result it in the mssage history.
+            # If there was a tool result, we first save an assistant message,
+            # and then a tool message
             if tool_result:
-                if workspace_content is None:
-                    workspace_content = tool_result['content']
-                    workspace_language = tool_language
+                self.messages.workspace_content = tool_result['content']
+                self.messages.workspace_language = tool_language
                 metadata = self.messages.append(
-                    'assistant', message=tool_message,
-                    workspace_content=workspace_content,
-                    workspace_language=workspace_language)
-                self.messages.append('tool', message=json.dumps(tool_result))
+                    'assistant',
+                    message=tool_message,
+                    workspace_content=self.messages.workspace_content,
+                    workspace_language=self.messages.workspace_language)
+                self.messages.append('tool',
+                                     message=json.dumps(tool_result))
+            # If there was no tool result, treat the response as a regular
+            # assistant message.
             else:
-                metadata = self.messages.append('assistant', tool_message)
-            yield Reply(tool_message, metadata, workspace_content,
-                        workspace_language, self.limits.usage(),
+                metadata = self.messages.append(
+                    'assistant',
+                    tool_message,
+                    workspace_content=self.messages.workspace_content,
+                    workspace_language=self.messages.workspace_language)
+            yield Reply(tool_message,
+                        metadata,
+                        self.messages.workspace_content,
+                        self.messages.workspace_language,
+                        self.limits.usage(),
                         self.limits.weekly_credits_left(),
                         self.limits.extra_credits_left())
-        # Otherwise the reply is a regular AI message
+        # Otherwise the reply is a regular AI message. The workspace content
+        # is simply carried forward
         else:
-            reply, workspace_content, workspace_language = \
-                utils.extract_workspace(reply)
             metadata = self.messages.append(
                 'assistant',
                 message=reply,
-                workspace_content=workspace_content,
-                workspace_language=workspace_language)
-            yield Reply(reply, metadata, workspace_content, workspace_language,
-                        self.limits.usage(), self.limits.weekly_credits_left(),
+                workspace_content=self.messages.workspace_content,
+                workspace_language=self.messages.workspace_language)
+            yield Reply(reply, metadata, self.messages.workspace_content,
+                        self.messages.workspace_language, self.limits.usage(),
+                        self.limits.weekly_credits_left(),
                         self.limits.extra_credits_left())
             needs_feedback = False
         # If feedback is required by a tool, go for another round. This second

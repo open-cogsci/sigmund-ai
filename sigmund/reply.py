@@ -1,5 +1,5 @@
 import json
-from . import config, utils, process_sigmund_message
+from . import utils, process_sigmund_message
 
 
 class BaseReply:
@@ -60,8 +60,6 @@ class StreamReply(BaseReply):
         self.msg = msg
 
     def to_json(self):
-        msg  = utils.extract_workspace(self.msg)[0]
         return json.dumps(
             {'stream': utils.md(
-                process_sigmund_message.process_ai_message(msg))})
-
+                process_sigmund_message.process_ai_message(self.msg))})
