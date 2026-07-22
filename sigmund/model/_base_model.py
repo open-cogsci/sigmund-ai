@@ -8,12 +8,6 @@ logger = logging.getLogger('sigmund')
 class BaseModel:
     """Base implementation for LLM chat models."""
 
-    # Indicates whether the model is able to provide feedback on its own output
-    supports_not_done_yet = False
-    # Indicates whether the model is able to provide feedback on tool results 
-    supports_tool_feedback = True
-    # Approximation to keep track of token costs
-    characters_per_token = 4    
     # Regex that matches a single thinking block (signature div followed by
     # content div). Used by extract_thinking_blocks.
     _thinking_block_pattern = re.compile(

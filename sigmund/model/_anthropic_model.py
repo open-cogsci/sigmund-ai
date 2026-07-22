@@ -7,8 +7,6 @@ logger = logging.getLogger('sigmund')
 
 class AnthropicModel(BaseModel):
 
-    supports_not_done_yet = False
-
     def __init__(self, sigmund, model, **kwargs):
         from anthropic import Anthropic, AsyncAnthropic
         super().__init__(sigmund, model, **kwargs)

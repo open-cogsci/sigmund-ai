@@ -63,7 +63,6 @@ class search_openalex(BaseTool):
                         "oa_url": oa.get("oa_url"),
                     }
                     results.append(result)
-        query_list = '\n'.join(f'- {q}' for q in queries)
         results = json.dumps(results, indent='  ')
         return None, results, True
 

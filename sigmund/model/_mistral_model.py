@@ -11,8 +11,6 @@ logger = logging.getLogger('sigmund')
 
 class MistralModel(OpenAIModel):
 
-    supports_not_done_yet = False
-
     def __init__(self, sigmund, model, **kwargs):
         from mistralai.client import Mistral
         BaseModel.__init__(self, sigmund, model, **kwargs)

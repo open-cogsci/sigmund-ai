@@ -1,6 +1,5 @@
 import json
 import base64
-from datetime import timedelta
 from pathlib import Path
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
