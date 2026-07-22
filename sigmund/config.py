@@ -256,7 +256,8 @@ settings_default = {
     'tool_add_note': 'true',
     'tool_update_note': 'true',
     'tool_remove_note': 'true',
-    'tool_save_workspace_as_note': 'true'
+    'tool_save_workspace_as_note': 'true',
+    'tool_update_workspace_content': 'true'
 }
 
 
