@@ -29,7 +29,8 @@ def subscription_page():
         logger.info(f'redirecting {sigmund.user_id} to customer portal')
         redirect(url_for('store.subscription_customer_portal'), code=303)
     username = sigmund.username()
-    return utils.render('subscribe-now.html', username=username)
+    return utils.render('subscribe-now.html', username=username,
+                        need_login=False)
     
     
 @store_blueprint.route('/create-subscription-checkout-session')
@@ -69,7 +70,7 @@ def subscription_success(checkout_session_id):
     except stripe.error.StripeError as e:
         logger.error(f'Stripe API error ({checkout_session_id}): {e}')
         return utils.render('subscribe-error.html'), 500
-    return utils.render('subscribe-success.html')
+    return utils.render('subscribe-success.html', need_login=False)
 
 
 @store_blueprint.route('/subscription-customer-portal')
@@ -94,7 +95,7 @@ def subscription_customer_portal():
         return redirect(session.url, code=303)
     except stripe.error.StripeError as e:
         logger.error(f'Stripe API error: {e}')
-        return utils.render('subscribe-error.html'), 500
+        return utils.render('subscribe-error.html', need_login=False), 500
 
 
 @store_blueprint.route('/buy-extra-credits')
@@ -110,7 +111,7 @@ def extra_credits_page():
     extra_credits_left = sigmund.limits.extra_credits_left()
     username = sigmund.username()
     return utils.render('buy-extra-credits.html', username=username,
-                        extra_credits_left=extra_credits_left)
+                        extra_credits_left=extra_credits_left, need_login=False)
 
 
 @store_blueprint.route('/create-extra-credits-checkout-session')
@@ -164,7 +165,7 @@ def extra_credits_success(checkout_session_id):
         logger.error(f'Stripe API error ({checkout_session_id}): {e}')
         return utils.render('subscribe-error.html'), 500
     return utils.render('extra-credits-success.html', username=username,
-                        extra_credits_left=extra_credits_left)
+                        extra_credits_left=extra_credits_left, need_login=False)
 
 
 @store_blueprint.route('/webhook', methods=['POST'])
