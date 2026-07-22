@@ -1,5 +1,6 @@
 import json
 import base64
+from datetime import timedelta
 from pathlib import Path
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
@@ -126,10 +127,11 @@ def login_handler(form, failed=False):
                          salt=config.encryption_salt,
                          iterations=100000,
                          backend=default_backend())
+        session.permanent = True
         session['encryption_key'] = base64.urlsafe_b64encode(
             kdf.derive(password.encode()))
         user = User(username)
-        login_user(user)
+        login_user(user, remember=True)
         logger.info('initializing encryption key')
         return redirect('/')
     html_content = utils.render('welcome.html')

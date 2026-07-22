@@ -15,8 +15,8 @@ google_login_blueprint = Blueprint('google_login', __name__)
 
 def get_google_provider_cfg():
     return requests.get(config.google_discovery_url).json()
-    
-    
+
+
 @google_login_blueprint.route("/")
 def login():
     if not config.google_login_enabled:
@@ -54,7 +54,7 @@ def callback():
     except Exception as e:
         logger.warning(f'failed to prepare token request: {e}')
         return redirect('/')
-        
+
     token_response = requests.post(
         token_url,
         headers=headers,
@@ -83,12 +83,13 @@ def callback():
                      salt=config.encryption_salt,
                      iterations=100000,
                      backend=default_backend())
+    session.permanent = True
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
     # We use only part of the unique id, so that the username doesn't allow us
     # to derive the encryption key
     username = f'{username} (google)::{unique_id[:10]}'
     user = User(username)
-    login_user(user)
+    login_user(user, remember=True)
     logger.info(f'initializing encryption key')    
     return redirect('/')
