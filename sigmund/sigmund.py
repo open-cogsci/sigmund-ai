@@ -9,7 +9,7 @@ from .model import model
 from . import tools as mod_tools
 from .database.manager import DatabaseManager
 from .limits import LimitsChecker
-from . import utils, tools as tools_module
+from . import tools as tools_module
 logger = logging.getLogger('sigmund')
 
 
@@ -237,10 +237,6 @@ class Sigmund:
             needs_feedback and
             self.limits.can_send_feedback()
         ):
-            if workspace_content is not None:
-                logger.info('workspace content has been updated for feedback')
-                self.messages.workspace_content = workspace_content
-                self.messages.workspace_language = workspace_language
             for reply in self._answer(state='feedback'):
                 yield reply
                 
