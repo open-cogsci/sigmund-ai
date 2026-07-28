@@ -58,8 +58,6 @@ max_prompt_length = 100_000
 condense_chunk_length = 10000
 
 # MESSAGES
-# The maximum length of a user message
-max_message_length = 10
 # A fixed welcome message
 welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant! How can I help you?'''
 # The default title of a new conversation
@@ -68,7 +66,7 @@ default_conversation_title = 'New conversation'
 # LIMITS
 #
 # Maximum number of characters in a single message
-max_message_length = 500_000
+max_message_length = os.environ.get('SIGMUND_MAX_MESSAGE_LENGTH', 500_000)
 anthropic_max_thinking_tokens = 2048
 
 # LOGGING
