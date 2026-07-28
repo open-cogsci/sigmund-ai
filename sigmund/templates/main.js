@@ -414,6 +414,9 @@ async function sendMessage(
     // Disable input
     disableMessageInput();
     scrollChatToBottom();
+    
+    // Announce through the websocket that an AI message is incoming
+    socketSendMessage('ai_incoming');
 
     // Prepare and send initial request
     const formData = prepareFormData(message, user_message_id, transient_settings, transient_system_prompt, foundation_document_topics);
