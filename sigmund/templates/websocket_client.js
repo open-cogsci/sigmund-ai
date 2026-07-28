@@ -224,6 +224,11 @@ function socketSendMessage(action, message, workspace_content, workspace_languag
 	if (typeof on_connect === 'undefined') {
 		on_connect = false;
 	}
+    // Guard: only send if the socket exists and is in the OPEN state
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        console.warn('socketSendMessage: socket not open, message not sent:', action);
+        return;
+    }	
     const data = JSON.stringify({
         action: action,
         message: message,
