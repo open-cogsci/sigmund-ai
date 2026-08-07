@@ -4,6 +4,20 @@ import logging
 
 logger = logging.getLogger('sigmund')
 
+USER_CONTEXT_NOTES = '''# Persistent notes
+
+How to use persistent notes:
+
+- Use persistent notes, when you receive instructions for a complex task. Store the instructions as a note. In addition, create a todo list as a note, and update it as you work through the task. When the task is done, clear up the notes for the instructions and todo list.
+- Use persistent notes, when you need to make sure that information stays available to you.
+- Do *not* use persistent notes to share information with the user, because the user cannot see your notes. To share information with the user, use the workspace instead.
+
+{% for label, content in notes.items() %}
+<note label="{{ label }}">
+{{ content }}
+</note>
+{% endfor %}'''
+
 
 class add_note(BaseTool):
     """Stores a note that persists throughout the conversation. Use this for
@@ -40,6 +54,13 @@ class add_note(BaseTool):
         while f'note_{counter}' in existing:
             counter += 1
         return f'note_{counter}'
+        
+    def user_context(self):
+        notes = self._sigmund.messages._notes
+        if config.log_replies:
+            for label in notes:
+                logger.info(f'[note] {label}')
+        return prompt.render(USER_CONTEXT_NOTES, notes=notes)
 
 
 class update_note(BaseTool):

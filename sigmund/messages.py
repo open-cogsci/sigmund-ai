@@ -262,6 +262,11 @@ class Messages:
         doc_prompt = self._sigmund.documentation.prompt(system_prompt=True)
         if doc_prompt:
             parts.append(doc_prompt)
+        # Add any system prompts defined by tools
+        for tool in self._sigmund.tools:
+            tool_system_prompt = tool.system_prompt()
+            if tool_system_prompt:
+                parts.append(tool_system_prompt)
         # If the message history has been condensed, include the summary
         if self._condensed_text:
             logger.info('appending condensed text to user message context')
@@ -276,7 +281,7 @@ class Messages:
         static for caching purposes.
 
         Includes: transient system prompt, volatile documentation (i.e.
-        documentation that is NOT marked as system_prompt), and persistent notes.
+        documentation that is NOT marked as system_prompt), and tool context.
         """
         context_parts = []
         if self._sigmund.transient_system_prompt:
@@ -286,14 +291,11 @@ class Messages:
         doc_prompt = self._sigmund.documentation.prompt(system_prompt=False)
         if doc_prompt:
             context_parts.append(doc_prompt)
-        # If there are persistent notes, include them
-        if self._notes:
-            if config.log_replies:
-                for label in self._notes:
-                    logger.info(f'[note] {label}')
-            context_parts.append(prompt.render(
-                prompt.SYSTEM_PROMPT_NOTES,
-                notes=self._notes))
+        # Add any user context defined by tools
+        for tool in self._sigmund.tools:
+            tool_user_context = tool.user_context()
+            if tool_user_context:
+                context_parts.append(tool_user_context)
         if not context_parts:
             return ''
         context = '\n\n'.join(part for part in context_parts if part.strip())

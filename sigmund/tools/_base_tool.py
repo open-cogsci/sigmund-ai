@@ -28,6 +28,17 @@ class BaseTool:
     @property
     def name(self):
         return self.__class__.__name__
+        
+    def system_prompt(self) -> str:
+        """Allows the tool to add a part to the system prompt. This should be
+        mainly used for context and instructions that are relatively stable so
+        they don't break caching.
+        """
+    
+    def user_context(self) -> str:
+        """Allows the tool to add a part to the user context. This should be
+        mainly used for context and instructions that are relatively dynamic.
+        """
     
     def bind(self, args: str, message_prefix: str | None = None) -> callable:
         """Returns a callable that corresponds to a tool function called with
