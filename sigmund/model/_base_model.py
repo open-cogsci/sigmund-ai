@@ -130,11 +130,21 @@ class BaseModel:
     @staticmethod
     def embed_thinking_block(signature: str | None,
                              content: str | None) -> str:
-        """Embeds a single thinking block as HTML divs."""
+        """Embeds a single thinking block as HTML divs.
+
+        Always emits both the signature and content divs, even when one or
+        both values are missing (None or empty). This is crucial because
+        ``extract_thinking_blocks`` relies on the paired signature-content
+        structure to correctly separate consecutive thinking blocks. If a div
+        is omitted, the regex can greedily match across block boundaries,
+        causing signatures to be merged or misattributed.
+        """
         sig = (f'<div class="thinking_block_signature">{signature}</div>'
-               if signature else "")
+               if signature else
+               '<div class="thinking_block_signature"></div>')
         cont = (f'<div class="thinking_block_content">{html.escape(content)}</div>'
-                if content else "")
+                if content else
+               '<div class="thinking_block_content"></div>')
         return sig + cont
 
     @classmethod
@@ -162,7 +172,7 @@ class BaseModel:
                 blocks.append({'type': 'text', 'text': text_before})
             blocks.append({
                 'type': 'thinking',
-                'thinking': match.group(2),
+                'thinking': html.unescape(match.group(2)),
                 'signature': match.group(1),
             })
             last_end = match.end()
