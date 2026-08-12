@@ -171,8 +171,8 @@ model_token_rate = {
         'cache_write_input': 1 * 1.25
     },
     'claude-sonnet-5': {
-        'output': 15,
-        'input': 3,
+        'output': 10,
+        'input': 2,
         'cache_read_input': 3 * .1,
         'cache_write_input': 3 * 1.25
     },
