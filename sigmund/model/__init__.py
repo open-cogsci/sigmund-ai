@@ -22,15 +22,14 @@ ANTHROPIC_MODELS = {
     'claude-4-5-haiku': 'claude-haiku-4-5',
     'claude-4-8-opus': 'claude-opus-4-8',
     'claude-4-8-opus-thinking': 'claude-opus-4-8',
-    'claude-5-fable': 'claude-fable-5',
-    'claude-5-fable-thinking': 'claude-fable-5',
+    'claude-5-1-fable': 'claude-fable-5-1',
+    'claude-5-1-fable-thinking': 'claude-fable-5-1',
     'claude-5-sonnet': 'claude-sonnet-5',
     'claude-5-sonnet-thinking': 'claude-sonnet-5'
 }
 Z_MODELS = {
      'GLM-4.5-Air': 'GLM-4.5-Air',
-     'GLM-5.2': 'GLM-5.2',
-     'GLM-5.2-thinking': 'GLM-5.2',
+     'GLM-5.3-thinking': 'GLM-5.3',
      'GLM-5V-Turbo': 'GLM-5V-Turbo'
 }
 

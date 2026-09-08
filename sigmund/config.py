@@ -113,7 +113,7 @@ model_config = {
     'anthropic_thinking': {
         'condense_model': 'claude-4-5-haiku',
         'public_model': 'claude-4-5-haiku',
-        'answer_model': 'claude-5-fable-thinking'
+        'answer_model': 'claude-5-1-fable-thinking'
     },
     'mistral': {
         'condense_model': 'mistral-small-latest',
@@ -128,7 +128,7 @@ model_config = {
     'z': {
         'condense_model': 'GLM-4.5-Air',
         'public_model': 'GLM-4.5-Air',
-        'answer_model': 'GLM-5.2-thinking',
+        'answer_model': 'GLM-5.3-thinking',
         'vision_model': 'GLM-5V-Turbo'    
     },
     'dummy': {
@@ -182,7 +182,7 @@ model_token_rate = {
         'cache_read_input': 5 * .1,
         'cache_write_input': 5 * 1.25
     },
-    'claude-fable-5': {
+    'claude-fable-5-1': {
         'output': 50,
         'input': 10,
         'cache_read_input': 10 * .1,
@@ -221,7 +221,7 @@ model_token_rate = {
         'output': .6,
         'input': .15,
     },
-    'GLM-5.2': {
+    'GLM-5.3': {
         'output': 4.4,
         'input': 1.4,
         'cache_read_input': .25 * 1.4

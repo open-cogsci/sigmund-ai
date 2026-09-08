@@ -8,14 +8,14 @@
     <!-- Model selection -->
     <div v-if="menuSection === 'full' || menuSection === 'models'" class="menu-group">
       <div class="model-selector">
-        <small>Help save energy and protect the environment: use the simplest model that's good enough for your task</small>
+        <small>Help save energy and protect the environment: use the simplest model that's good enough for your task. Credit costs provide an indication of how many credits different models consume relative to each other.</small>
           <div class="model-buttons model-buttons-grid" class='responsive'>
               <button
                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                   @click="modelConfig = 'z'" 
                   :class="{ active: modelConfig === 'z' }">
                   <!-- Icon for Mistral model -->
-                  <span>Z.ai GLM 5.2</span>
+                  <span>Z.ai GLM 5.3</span>
                   <img src="/static/zai.png" alt="Z.ai Icon">
                   <span class="model-recommendations">
                   Recommended for most tasks.
@@ -57,7 +57,7 @@
                   @click="modelConfig = 'anthropic_thinking'" 
                   :class="{ active: modelConfig === 'anthropic_thinking' }">
                   <!-- Icon for Anthropic model -->
-                  <span>Anthropic Claude 5 Fable</span>
+                  <span>Anthropic Claude 5.1 Fable</span>
                   <img src="/static/anthropic.png" alt="Anthropic Icon">
                   <span class="model-recommendations">
                   Only recommended for occasional use when everything else fails.
