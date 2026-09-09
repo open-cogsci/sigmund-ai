@@ -3,6 +3,11 @@ let currentEventSource = null;
 let currentLoadingInterval = null;
 let currentLoadingMessageBox = null;
 
+// Global variables for the slow-response warning
+let slowResponseTimeout = null;
+let slowResponseWarningBox = null;
+const SLOW_RESPONSE_TIMEOUT_MS = 15000;
+
 function initMain(event) {
 
     let maxLength = {{ max_message_length }};
@@ -314,6 +319,7 @@ function displayCustomErrorMessage(htmlContent) {
     errorMessageBox.innerHTML = htmlContent;
     responseDiv.appendChild(errorMessageBox);
     scrollChatToBottom();
+    return errorMessageBox;
 }
 
 function displayErrorMessage() {
@@ -337,6 +343,32 @@ function displayContentTooLargeError() {
 </ul>`);
 }
 
+// Start a timer that shows a warning when the stream produces no non-action
+// message within SLOW_RESPONSE_TIMEOUT_MS. This covers slow model providers
+// and models that reason for a long time before their reply starts.
+function startSlowResponseTimer() {
+    // Clear any timer or warning that is left over from a previous message.
+    clearSlowResponseWarning();
+    slowResponseTimeout = setTimeout(() => {
+        slowResponseTimeout = null;
+        slowResponseWarningBox = displayCustomErrorMessage(`<p>{{ ai_name }} is taking a long time to respond. This is not an error, but may reflect that the AI-model provider is currently experiencing heavy load. If {{ ai_name }} continues to be slow, you can try selecting a different model.</p>`);
+    }, SLOW_RESPONSE_TIMEOUT_MS);
+}
+
+// Cancel the slow-response timer and remove the warning message if it was
+// already shown. Called when the first non-action message arrives, and when
+// the stream ends, errors out, or is cancelled.
+function clearSlowResponseWarning() {
+    if (slowResponseTimeout) {
+        clearTimeout(slowResponseTimeout);
+        slowResponseTimeout = null;
+    }
+    if (slowResponseWarningBox) {
+        slowResponseWarningBox.remove();
+        slowResponseWarningBox = null;
+    }
+}
+
 function handleStreamingError(loadingInfo, error) {
     console.error('Streaming error:', error);
 
@@ -347,6 +379,7 @@ function handleStreamingError(loadingInfo, error) {
     }
 
     // Clean up streaming message and UI/loading state
+    clearSlowResponseWarning();
     removeStreamingMessage();
     removeLoadingIndicator(loadingInfo);
     enableMessageInput();
@@ -358,6 +391,7 @@ function handleStreamingError(loadingInfo, error) {
 }
 
 function endStream() {
+    clearSlowResponseWarning();
     clearAttachments();
     removeStreamingMessage();
     removeLoadingIndicator({
@@ -414,7 +448,7 @@ async function sendMessage(
     // Disable input
     disableMessageInput();
     scrollChatToBottom();
-    
+
     // Announce through the websocket that an AI message is incoming
     socketSendMessage('ai_incoming');
 
@@ -451,6 +485,12 @@ async function sendMessage(
     // Start streaming
     currentEventSource = new EventSource('{{ server_url }}/api/chat/stream');
 
+    // Start the slow-response timer: if no non-action message arrives within
+    // SLOW_RESPONSE_TIMEOUT_MS, a warning is shown. The timer is cancelled as
+    // soon as the first non-action message (streaming chunk or final message)
+    // arrives; action messages are ignored.
+    startSlowResponseTimer();
+
     currentEventSource.onmessage = function(event) {
         // console.log(event);
         const data = JSON.parse(event.data);
@@ -468,6 +508,10 @@ async function sendMessage(
             }
             return;
         }
+
+        // A non-action message means the reply has started arriving: cancel
+        // the slow-response timer and remove the warning if it was shown.
+        clearSlowResponseWarning();
 
         // Handle streaming text chunks
         if (typeof data.stream !== 'undefined') {
