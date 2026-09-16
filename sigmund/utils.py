@@ -108,6 +108,11 @@ def prepare_messages(messages, allow_ai_first=True, allow_ai_last=True,
 
 
 def remove_masked_elements(content):
+    # Content should never be None, but logs show that it sometimes is, hence
+    # this hacky workaround.
+    if content is None:
+        logger.warning('content is None')
+        return ''
     # This pattern matches:
     #   1) an opening tag <tag ...>
     #   2) that includes class="...mask..."
