@@ -126,10 +126,10 @@ model_config = {
         'answer_model': 'mistral-medium-3-5-thinking',
     },
     'z': {
-        'condense_model': 'GLM-4.5-Air',
-        'public_model': 'GLM-4.5-Air',
+        'condense_model': 'GLM-5.3-flash-thinking',
+        'public_model': 'GLM-5.3-flash-thinking',
         'answer_model': 'GLM-5.3-thinking',
-        'vision_model': 'GLM-5V-Turbo'    
+        'vision_model': 'GLM-5.3-flash'
     },
     'dummy': {
         'condense_model': 'dummy',
@@ -226,10 +226,10 @@ model_token_rate = {
         'input': 1.4,
         'cache_read_input': .25 * 1.4
     },
-    'GLM-4.5-Air': {
-        'output': 1.1,
-        'input': 0.2,
-        'cache_read_input': .25 * .2
+    'GLM-5.3-flash': {
+        'output': 0.5,
+        'input': 0.15,
+        'cache_read_input': .25 * .15
     }
 }
 

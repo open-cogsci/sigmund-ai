@@ -28,9 +28,8 @@ ANTHROPIC_MODELS = {
     'claude-5-sonnet-thinking': 'claude-sonnet-5'
 }
 Z_MODELS = {
-     'GLM-4.5-Air': 'GLM-4.5-Air',
      'GLM-5.3-thinking': 'GLM-5.3',
-     'GLM-5V-Turbo': 'GLM-5V-Turbo'
+     'GLM-5.3-flash-thinking': 'GLM-5.3-flash'
 }
 
 
