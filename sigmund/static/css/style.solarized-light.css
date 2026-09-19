@@ -598,6 +598,16 @@ button#send:disabled {
   .message .image-generation img {
     width: 100%; }
 
+.message .instructions {
+  padding-top: 10px;
+  border-top: solid 1px #93a1a1;
+  font-size: 0.9em; }
+  .message .instructions summary {
+    color: #2aa198;
+    font-family: "Roboto Condensed"; }
+  .message .instructions p {
+    padding: 5px; }
+
 .thinking_block_signature {
   display: none; }
 

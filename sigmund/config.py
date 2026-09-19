@@ -58,8 +58,6 @@ max_prompt_length = 100_000
 condense_chunk_length = 10000
 
 # MESSAGES
-# A fixed welcome message
-welcome_message = '''Nice to meet you! I am Sigmund, your friendly AI assistant! How can I help you?'''
 # The default title of a new conversation
 default_conversation_title = 'New conversation'
 

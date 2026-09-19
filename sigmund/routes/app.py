@@ -49,11 +49,16 @@ def chat_page():
     previous_answer_model = None
     workspace_content = ''
     workspace_language = 'markdown'
-    for role, message, metadata in sigmund.messages.visible_messages():
+    for i, (role, message, metadata) in enumerate(sigmund.messages.visible_messages()):
         message_id = metadata.get('message_id', 0)
         delete_button = f'<button class="message-delete" onclick="deleteMessage(\'{message_id}\')"><i class="fas fa-trash"></i></button>'
         if role == 'assistant':
-            html_body = utils.md(process_sigmund_message.process_ai_message(message))
+            # We escape the HTML tags for all messages, except the first. This is
+            # because the first message contains literal HTML content
+            html_body = utils.md(
+                process_sigmund_message.process_ai_message(
+                    message,
+                    escape_html=i > 0))
             html_class = 'message-ai'
         else:
             html_body = '<p>' + utils.clean(message, 
@@ -133,7 +138,7 @@ def login_handler(form, failed=False):
         login_user(user, remember=True)
         logger.info('initializing encryption key')
         return redirect('/')
-    html_content = utils.render('welcome.html')
+    html_content = '<div class="message message-ai">' + utils.render('welcome.html') + '</div>'
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,
                         form=form,

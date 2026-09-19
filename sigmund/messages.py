@@ -189,7 +189,7 @@ class Messages:
             yield role, message, metadata
 
     def welcome_message(self):
-        return config.welcome_message
+        return utils.render('welcome.html')
 
     # Notes management
 

@@ -103,6 +103,21 @@
     }
 }
 
+.message .instructions {
+    padding-top: 10px;
+    border-top: solid 1px $color-muted;
+    font-size: 0.9em;
+    
+    summary {
+        color: $color-primary;
+        font-family: $font-condensed;
+    }
+    
+    p {
+        padding: 5px;
+    }
+}
+
 .thinking_block_signature {
     display: none;
 }

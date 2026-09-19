@@ -305,7 +305,7 @@ def escape_html_tags(message: str) -> str:
     return ''.join(result)
 
 
-def process_ai_message(msg):
+def process_ai_message(msg, escape_html=True):
     try:
         # msg = BaseModel.strip_thinking_blocks(msg)
         msg = normalize_bullet_points(msg)
@@ -331,7 +331,8 @@ def process_ai_message(msg):
         msg = fix_list_formatting_10(msg)
         msg = fix_list_formatting_11(msg)
         msg = fix_list_formatting_12(msg)
-        msg = escape_html_tags(msg)        
+        if escape_html:
+            msg = escape_html_tags(msg)        
     except Exception as e:
         logger.error(f"Error processing AI message: {e}")
     # We don't want to have empty assistant messages appear in the user 
