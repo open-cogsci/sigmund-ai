@@ -10,6 +10,8 @@ logger = logging.getLogger('sigmund')
 
 
 class MistralModel(OpenAIModel):
+    
+    show_thinking = False
 
     def __init__(self, sigmund, model, **kwargs):
         from mistralai.client import Mistral
@@ -106,7 +108,7 @@ class MistralModel(OpenAIModel):
             for block in content:
                 if block.type == 'text':
                     text.append(block.text)
-                if block.type == 'thinking':
+                if self.show_thinking and block.type == 'thinking':
                     for thinking_chunk in block.thinking:
                         text.append(thinking_chunk.text)
             content = '\n'.join(text)
