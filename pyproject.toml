@@ -13,6 +13,7 @@ dynamic = ["version", "description"]
 dependencies = [
     "anthropic",
     "beautifulsoup4",
+    "bibtexparser==1.4.4",
     "cryptography",
     "chromadb",
     "datamatrix",
