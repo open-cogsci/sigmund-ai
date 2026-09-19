@@ -1,4 +1,5 @@
 import logging
+import json
 import re
 import html
 from .. import config
@@ -102,6 +103,8 @@ class BaseModel:
             raise
         if self._strip_thinking_blocks:
             reply = self.strip_thinking_blocks(reply)
+        if self.json_mode:
+            reply = self.extract_json(reply)
         return reply
 
     def _stream_predict(self, messages):
@@ -190,6 +193,28 @@ class BaseModel:
                 'text': 'I added content to the workspace.'
             })
         return blocks
+        
+    @classmethod
+    def extract_json(cls, content: str) -> str:
+        """Extracts JSON from the content string and returns it as a string."""
+        # If the response is a tool call, we don't want to parse it
+        if not isinstance(content, str):
+            return content
+        # In some cases, the reply may start with thinking content, which needs
+        # to be stripped off. To do so, we iteratively remove the first line
+        # until we get a correct JSON string. If this consumes all lines, we
+        # raise an error
+        json_content = content
+        while True:
+            try:
+                json.loads(json_content)                
+            except json.JSONDecodeError:
+                newline_index = json_content.find('\n')
+                if newline_index < 0:
+                    raise ValueError(f'no JSON found: {content}')
+                json_content = json_content[newline_index + 1:]
+            else:
+                return json_content
         
     @classmethod
     def strip_thinking_blocks(cls, content: str) -> str:

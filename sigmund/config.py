@@ -118,12 +118,14 @@ model_config = {
     'mistral': {
         'condense_model': 'mistral-small-latest',
         'public_model': 'mistral-small-latest',
-        'answer_model': 'mistral-medium-3-5',
+        'answer_model': 'mistral-zai-glm-latest',
+        'attachment_model': 'mistral-medium-latest',
     },
-    'mistral_thinking': {
+    'mistral_small': {
         'condense_model': 'mistral-small-latest',
         'public_model': 'mistral-small-latest',
-        'answer_model': 'mistral-medium-3-5-thinking',
+        'answer_model': 'mistral-small-latest',
+        'attachment_model': 'mistral-small-latest',
     },
     'z': {
         'condense_model': 'GLM-5.3-flash-thinking',
@@ -221,6 +223,11 @@ model_token_rate = {
         'output': .6,
         'input': .15,
     },
+    'zai-glm-latest': {
+        'output': 4.4,
+        'input': 1.4,
+        'cache_read_input': .25 * 1.4
+    },
     'GLM-5.3': {
         'output': 4.4,
         'input': 1.4,
@@ -248,7 +255,7 @@ settings_default = {
     # Theme
     'theme' : 'monokai',
     # Indicates the model configuration as specified above
-    'model_config': 'z',
+    'model_config': 'mistral',
     # Indicates which tools are enabled. Other tools are disabled by default.
     # Similarly, knowledge is disabled by default.
     'tool_add_note': 'true',

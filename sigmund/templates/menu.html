@@ -9,33 +9,33 @@
     <div v-if="menuSection === 'full' || menuSection === 'models'" class="menu-group">
       <div class="model-selector">
         <small>Help save energy and protect the environment: use the simplest model that's good enough for your task. Credit costs provide an indication of how many credits different models consume relative to each other.</small>
-          <div class="model-buttons model-buttons-grid" class='responsive'>
-              <button
-                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                  @click="modelConfig = 'z'" 
-                  :class="{ active: modelConfig === 'z' }">
-                  <!-- Icon for Mistral model -->
-                  <span>Z.ai GLM 5.3</span>
-                  <img src="/static/zai.png" alt="Z.ai Icon">
-                  <span class="model-recommendations">
-                  Recommended for most tasks.
-                  Best balance between speed, energy, and intelligence.
-                  From China.
-                  Credit cost: 1.0
-                  </span>
-              </button>
+          <div class="model-buttons model-buttons-grid" class='responsive'>              
               <button
                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
                   @click="modelConfig = 'mistral'" 
                   :class="{ active: modelConfig === 'mistral' }">
                   <!-- Icon for Mistral model -->
                   <img src="/static/mistral.png" alt="Mistral Icon">
-                  <span>Mistral Medium 3.5</span>
+                  <span>Mistral GLM 5.3</span>
                   <span class="model-recommendations">                  
-                  Recommended for conversations.
-                  Good balance between speed, energy, and intelligence.
+                  Recommended for most tasks.
+                  Excellent balance between speed, energy, and intelligence.
+                  Hosted in Europe. Developed in China and Europe.
+                  Credit cost: 1.0
+                  </span>
+              </button>        
+              <button
+                  {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
+                  @click="modelConfig = 'mistral'" 
+                  :class="{ active: modelConfig === 'mistral_small' }">
+                  <!-- Icon for Mistral model -->
+                  <img src="/static/mistral.png" alt="Mistral Icon">
+                  <span>Mistral Small 4</span>
+                  <span class="model-recommendations">                  
+                  Recommended for easy tasks.
+                  Optimized for speed and energy.
                   From Europe.
-                  Credit cost: 1.6
+                  Credit cost: 0.1
                   </span>
               </button>        
               <button

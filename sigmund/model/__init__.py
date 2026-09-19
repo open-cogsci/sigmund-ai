@@ -5,6 +5,7 @@ MISTRAL_MODELS = {
     'mistral-small-latest': 'mistral-small-latest',
     'mistral-medium-3-5': 'mistral-medium-3-5',
     'mistral-medium-3-5-thinking': 'mistral-medium-3-5',
+    'mistral-zai-glm-latest': 'zai-glm-latest'
 }
 
 OPENAI_MODELS = {

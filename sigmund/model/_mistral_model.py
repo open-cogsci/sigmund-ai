@@ -22,6 +22,8 @@ class MistralModel(OpenAIModel):
         if self._tool_choice not in [None, 'none', 'auto', 'any']:
             self._tool_choice = 'any'
         self._client = Mistral(api_key=config.mistral_api_key)
+        self._attachment_model = \
+            config.model_config['mistral']['attachment_model']        
 
     def predict(self, messages, attachments=None, stream=False):
         if isinstance(messages, str):
@@ -46,8 +48,8 @@ class MistralModel(OpenAIModel):
                                 'content': 'Tool was executed.'})
         # Attachments are included with the last message. The content is now
         # no longer a single str, but a list of dict
-        self._actual_model = self._model
         if attachments:
+            self._actual_model = self._attachment_model
             logger.info('adding attachments to last message')
             content = [{'type': 'text', 'text': messages[-1]['content']}]
             for attachment in attachments:
@@ -76,6 +78,8 @@ class MistralModel(OpenAIModel):
                     content.append({'type': 'document_url',
                                     'document_url': signed_url.url})
             messages[-1]['content'] = content
+        else:
+            self._actual_model = self._model
         return BaseModel.predict(self, messages, attachments, stream)
 
     def get_response(self, response) -> [str, callable]:
