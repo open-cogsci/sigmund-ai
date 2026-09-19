@@ -26,7 +26,7 @@
               </button>        
               <button
                   {% endraw %}{% if need_login %}disabled{% endif %}{% raw %}
-                  @click="modelConfig = 'mistral'" 
+                  @click="modelConfig = 'mistral_small'" 
                   :class="{ active: modelConfig === 'mistral_small' }">
                   <!-- Icon for Mistral model -->
                   <img src="/static/mistral.png" alt="Mistral Icon">
