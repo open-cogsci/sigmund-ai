@@ -192,6 +192,7 @@ class MistralModel(OpenAIModel):
                             all_text += item.text
                             yield all_text, False
                         elif item.type == 'thinking':
+                            yield 'Let me think about this …', False
                             content_items.append(
                                 ('thinking', item.thinking or []))
             # Accumulate streamed tool call fragments

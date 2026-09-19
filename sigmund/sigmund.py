@@ -175,7 +175,10 @@ class Sigmund:
         # StreamReply objects.
         for reply, complete in stream:
             if not complete:
-                yield StreamReply(reply)
+                if reply.startswith('action:'):
+                    yield ActionReply(reply[len("action:"):])
+                else:
+                    yield StreamReply(reply)
         if isinstance(reply, str) and self.documentation.poor_match:
             reply = '''<div class="message-info" markdown="1">Expert knowledge is enabled, but Sigmund was unable to find useful documentation to answer your question. To get a more useful answer:
 

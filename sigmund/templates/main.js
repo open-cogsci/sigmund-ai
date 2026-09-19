@@ -6,7 +6,7 @@ let currentLoadingMessageBox = null;
 // Global variables for the slow-response warning
 let slowResponseTimeout = null;
 let slowResponseWarningBox = null;
-const SLOW_RESPONSE_TIMEOUT_MS = 15000;
+const SLOW_RESPONSE_TIMEOUT_MS = 30000;
 
 function initMain(event) {
 
