@@ -9,7 +9,7 @@ class TestToolNotes(BaseExpensiveTest):
         config.settings_default['tool_update_note'] = 'true'
         config.settings_default['tool_remove_note'] = 'true'
         config.settings_default['tool_save_workspace_as_note'] = 'true'
-        super().setUp()
+        super().setUp(disable_all_tools=False)
 
     def _test_tool(self):
         # Step 1: Ask the model to create a note

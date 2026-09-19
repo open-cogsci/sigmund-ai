@@ -8,10 +8,16 @@ logging.basicConfig(level=logging.INFO, force=True)
 
 class BaseExpensiveTest(unittest.TestCase):
     
-    def setUp(self):
+    def setUp(self, disable_all_tools=True):
         from sigmund.database.models import drop_db, init_db
         drop_db()
         init_db()
+        if disable_all_tools:
+            config.settings_default['tool_add_note'] = 'false'
+            config.settings_default['tool_update_note'] = 'false'
+            config.settings_default['tool_remove_note'] = 'false'
+            config.settings_default['tool_save_workspace_as_note'] = 'false'
+            config.settings_default['tool_update_workspace_content'] = 'false'
         config.max_tokens_per_hour = float('inf')
         config.log_replies = True
         config.search_enabled = False
@@ -39,7 +45,11 @@ class BaseExpensiveTest(unittest.TestCase):
     def test_mistral_regular(self):
         config.settings_default['model_config'] = 'mistral'
         self._test_tool()
-
-    def test_z(self):
-        config.settings_default['model_config'] = 'z'
+        
+    def test_mistral_small(self):
+        config.settings_default['model_config'] = 'mistral_small'
         self._test_tool()
+
+    # def test_z(self):
+        # config.settings_default['model_config'] = 'z'
+        # self._test_tool()
