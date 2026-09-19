@@ -13,15 +13,14 @@ How to use persistent notes:
 - Do *not* use persistent notes to share information with the user, because the user cannot see your notes. To share information with the user, use the workspace instead.
 
 {% for label, content in notes.items() %}
-<note label="{{ label }}">
+<note label="{{ label }}" visible_to_user="false">
 {{ content }}
 </note>
 {% endfor %}'''
 
 
 class add_note(BaseTool):
-    """Stores a note that persists throughout the conversation. Use this for
-    information that you need to remember."""
+    """Stores a note that persists throughout the conversation. Use this for information that you need to remember yourself, such as instructions or a todo list. Do not use this to share information with the user, because the user cannot see your notes."""
 
     arguments = {
         "content": {
@@ -64,7 +63,7 @@ class add_note(BaseTool):
 
 
 class update_note(BaseTool):
-    """Updates the content of an existing persistent note."""
+    """Updates the content of an existing persistent note. Use this to update information that you need to remember yourself, such a todo list. Do not use this to share information with the user, because the user cannot see your notes."""
 
     arguments = {
         "label": {
@@ -111,7 +110,7 @@ class remove_note(BaseTool):
 
 
 class save_workspace_as_note(BaseTool):
-    """Saves the current workspace content as a persistent note."""
+    """Saves the current workspace content as a persistent note. Use this for information that you need to remember yourself, such as instructions or a todo list. Do not use this to share information with the user, because the user cannot see your notes."""
 
     arguments = {
         "label": {
