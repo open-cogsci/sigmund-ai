@@ -3,6 +3,7 @@ import uuid
 from cryptography.fernet import InvalidToken
 import multiprocessing as mp
 import json
+from pathlib import Path
 from . import prompt, config, utils
 logger = logging.getLogger('sigmund')
 
@@ -191,7 +192,7 @@ class Messages:
             yield role, message, metadata
 
     def welcome_message(self):
-        return utils.render('welcome.html')
+        return (Path(__file__).parent / 'templates' / 'welcome.html').read_text()
 
     # Notes management
 
