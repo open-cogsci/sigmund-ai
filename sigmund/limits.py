@@ -15,6 +15,7 @@ class LimitsChecker:
     def __init__(self, sigmund):
         self._sigmund = sigmund
         self._db = sigmund.database
+        self.retry_budget = config.retry_budget
 
     # -- Individual limit checks -------------------------------------------
 
@@ -65,6 +66,8 @@ class LimitsChecker:
         """Returns True if the user can continue in the feedback loop (i.e.
         is not blocked by hard, hourly, or weekly limits).
         """
+        if self.retry_budget <= 0:
+            return False
         if self.hourly_exceeded():
             return False
         if self.weekly_exceeded():

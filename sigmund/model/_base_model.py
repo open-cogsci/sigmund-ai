@@ -32,6 +32,7 @@ class BaseModel:
         return f'{self.__class__.__name__}(model={self._model}, thinking={self._thinking})'
 
     def invalid_tool(self, *args, **kwargs) -> str:
+        self._sigmund.limits.retry_budget -= 1
         return 'This tool call was invalid. I should try again.', None, 'markdown', True
 
     def get_response(self, response) -> [str, callable]:

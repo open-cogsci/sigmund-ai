@@ -66,6 +66,9 @@ default_conversation_title = 'New conversation'
 # Maximum number of characters in a single message
 max_message_length = os.environ.get('SIGMUND_MAX_MESSAGE_LENGTH', 500_000)
 anthropic_max_thinking_tokens = 2048
+# How often the model can retry if an error occurs. This is limited to avoid
+# infinite loops
+retry_budget = 3
 
 # LOGGING
 #
