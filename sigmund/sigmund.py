@@ -165,6 +165,7 @@ class Sigmund:
                 state: str = 'answer') -> GeneratorType:
         """Implements the answer phase."""
         yield ActionReply(f'{config.ai_name} is thinking and typing ')
+        needs_feedback = False
         logger.info(f'[{state} state] entering')
         # We first collect a regular reply to the user message. The prediction
         # is streamed so that we can progressively send text to the client.
@@ -179,13 +180,29 @@ class Sigmund:
                     yield ActionReply(reply[len("action:"):])
                 else:
                     yield StreamReply(reply)
-        if isinstance(reply, str) and self.documentation.poor_match:
-            reply = '''<div class="message-info" markdown="1">Expert knowledge is enabled, but Sigmund was unable to find useful documentation to answer your question. To get a more useful answer:
-
-- Provide more details and relevant keywords
-- Or: Enable expert knowledge that is relevant to your question (see Menu)
-- Or: Disable all expert knowledge to discuss general subjects (see Menu)
-</div>\n\n''' + reply
+        if (
+                (
+                    isinstance(reply, str) and 
+                    not self.answer_model.strip_thinking_blocks(reply).strip()
+                )
+                or reply is None
+        ):
+            # If the model provides an empty response (empty str or None) or 
+            # a response that consists only of thinking blocks, this generally 
+            # means it # lost track of its task during multiple turns. Therefore, 
+            # we remind # the model to continue and git it an opportunity to do 
+            # so in a round of feedback.
+            if reply is None:
+                reply = ''
+            reply += 'I need to continue my task …'
+            needs_feedback = True
+        elif isinstance(reply, str) and self.documentation.poor_match:
+                reply = '''<div class="message-info" markdown="1">Expert knowledge is enabled, but Sigmund was unable to find useful documentation to answer your question. To get a more useful answer:
+    
+    - Provide more details and relevant keywords
+    - Or: Enable expert knowledge that is relevant to your question (see Menu)
+    - Or: Disable all expert knowledge to discuss general subjects (see Menu)
+    </div>\n\n''' + reply
         if config.log_replies:
             logger.info(f'[{state} state] reply: {reply}')
         # If the reply is a callable, then it's a tool that we need to run
@@ -230,8 +247,7 @@ class Sigmund:
             yield Reply(reply, metadata, self.messages.workspace_content,
                         self.messages.workspace_language, self.limits.usage(),
                         self.limits.weekly_credits_left(),
-                        self.limits.extra_credits_left())
-            needs_feedback = False
+                        self.limits.extra_credits_left())            
         # If feedback is required by a tool, go for another round. This second
         # round doesn't include the attachments anymore, otherwise we risk
         # getting into an infinite loop in which attachments are interpreted
