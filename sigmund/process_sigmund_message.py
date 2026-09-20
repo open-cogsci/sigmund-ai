@@ -340,7 +340,7 @@ def process_ai_message(msg, escape_html=True):
     # in which case we insert the thinking block for the message. If there is
     # neither a message nor a thinking block, we insert a placeholder. This
     # should not happen.
-    if not msg.strip():
+    if msg is None or not msg.strip():
         logger.warning('Empty message and empty thinking block.')
         msg = '(Empty message.)'
     return msg

@@ -154,6 +154,8 @@ class Messages:
         model_prompt = [dict(role='system', content=system_prompt)]
         for msg_nr, (role, content) in enumerate(
                 self._condensed_message_history):
+            if content is None or not content.strip():
+                content = '(Empty message.)'
             content = utils.remove_masked_elements(content)
             if role == 'user' and \
                     msg_nr == len(self._condensed_message_history) - 1:
@@ -184,7 +186,7 @@ class Messages:
         for role, message, metadata in self:
             if role == 'tool':
                 continue
-            if not message.strip():
+            if message is None or not message.strip():
                 continue
             yield role, message, metadata
 
