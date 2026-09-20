@@ -11,8 +11,6 @@ logger = logging.getLogger('sigmund')
 
 class MistralModel(OpenAIModel):
     
-    show_thinking = False
-
     def __init__(self, sigmund, model, **kwargs):
         from mistralai.client import Mistral
         BaseModel.__init__(self, sigmund, model, **kwargs)
@@ -81,7 +79,7 @@ class MistralModel(OpenAIModel):
                                     'document_url': signed_url.url})
             messages[-1]['content'] = content
         else:
-            self._actual_model = self._model
+            self._actual_model = self._model        
         return BaseModel.predict(self, messages, attachments, stream)
 
     def get_response(self, response) -> [str, callable]:
@@ -103,15 +101,22 @@ class MistralModel(OpenAIModel):
         # response. This is because there may be multiple thinking and text 
         # blocks mixed in a single response, see also:
         # - <https://github.com/mistralai/client-python/issues/252>
+        thinking_text = []
         if isinstance(content, list):
             text = []
             for block in content:
                 if block.type == 'text':
                     text.append(block.text)
-                if self.show_thinking and block.type == 'thinking':
+                if block.type == 'thinking':
                     for thinking_chunk in block.thinking:
-                        text.append(thinking_chunk.text)
-            content = '\n'.join(text)
+                        thinking_text.append(thinking_chunk.text)
+            if thinking_text:
+                thinking_signature = 'dummy'
+                content = self.embed_thinking_block(
+                    thinking_signature, '\n\n'.join(thinking_text)) + \
+                    '\n\n' + '\n'.join(text)
+            else:
+                content = '\n'.join(text)
         # If tool calls are present, we execute the tool using the current text
         # as a prefix.
         tool_calls = response.choices[0].message.tool_calls
