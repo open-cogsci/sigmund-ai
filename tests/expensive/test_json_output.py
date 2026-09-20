@@ -11,7 +11,7 @@ class TestJsonOutput(BaseExpensiveTest):
     def _test_tool(self):
         messages = [
             dict(role='system', content='You"re Sigmund!"'),
-            dict(role='user', content='What is your favorite color? Please respond with a JSON string like {"color": "red"}')
+            dict(role='user', content='What is your favorite color? Please respond with a JSON string like {"color": "red"}. Don\'t add anything else, just the JSON string.')
         ]
         self.sigmund.answer_model.json_mode = True
         reply = self.sigmund.answer_model.predict(messages)
