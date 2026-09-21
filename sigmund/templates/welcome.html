@@ -6,7 +6,7 @@
     <details>
           <summary>I want to perform a complex, multi-step task</summary>
           <p>
-              First, enable the Memento tool (Menu → Tools). This allows Sigmund to create persistent notes to keep track of the task. Next, provide clear instructions and ask Sigmund to store both these instructions and a todo-list as persistent notes. 
+              First, enable the Memento tool (Menu → Tools). This allows Sigmund to create persistent notes to keep track of the task. Next, provide clear instructions and ask Sigmund to store both these instructions and a todo-list as persistent notes.              
           </p>
     </details>
     <details>
@@ -16,10 +16,16 @@
           </p>
     </details>
     <details>
-          <summary>I want to do a literature search</summary>
+          <summary>I want to perform a literature review</summary>
           <p>
               First, enable the OpenAlex tool (Menu → Tools). <a href="https://openalex.org/" target="_blank">OpenAlex</a> is a database that contains most scientific articles. Next, ask Sigmund to search for articles about your topic of interest. For some articles, Sigmund can download the full text. For others, Sigmund only has access to the abstract.
           </p>
+          <p>
+              The example prompt below is a good start if you want Sigmund to autonomously perform a literature review. Sigmund may pause intermittently, in which case you can simply ask him to continue or provide guidance.
+          </p>
+          <p><i>
+              We're going to review the literature on cognitive offloading as a result of AI use. Please create an overview note that contains a summary of your findings. Initialize the overview note with your own understanding of the topic, without looking anything up yet. Then iteratively search for scientific articles. If you find relevant articles, immediately update the overview note. This is important, because the workspace will be overwritten when you perform another search. Similarly, when you download the full text of an article, immediately update the overview note. Continue your literature review until you can no longer find relevant articles. At that point, stop and provide me with a summary. Before you start, save these instructions as a persistent note.
+          </i><p/>
     </details>
     <details>
           <summary>I want to create a psychology or neuroscience experiment</summary>
