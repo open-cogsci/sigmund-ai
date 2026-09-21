@@ -103,6 +103,10 @@ function connectWebSocket() {
                 );
             }      
 
+            // Strip divs with a mask class from the first message that is
+            // sent when the connection opens; all other messages are sent
+            // unchanged
+            let isFirstMessage = true;
             for (let messageDiv of messagesToSend) {
 				workspace = messageDiv.querySelector('.message-workspace');
 				if (workspace !== null) {
@@ -113,6 +117,10 @@ function connectWebSocket() {
 					workspace_language = null;
 				}
                 messageDiv = copyAndStripDiv(messageDiv);
+                if (isFirstMessage) {
+                    stripMaskDivs(messageDiv);
+                    isFirstMessage = false;
+                }
                 if (messageDiv.classList.contains('message-ai')) {
                     action = 'ai_message';
                     message = messageDiv.getHTML();
@@ -265,4 +273,13 @@ function copyAndStripDiv(originalDiv) {
 
   // Return the stripped clone
   return clonedDiv;
+}
+
+
+function stripMaskDivs(div) {
+  // Remove all divs with a mask class from the given div
+  const maskDivs = div.querySelectorAll('.mask');
+  for (const maskDiv of maskDivs) {
+    maskDiv.remove();
+  }
 }
