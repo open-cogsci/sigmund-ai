@@ -88,6 +88,8 @@ class MistralModel(OpenAIModel):
         token_rate = config.model_token_rate.get(self._model)
         if token_rate is None:
             logger.error(f'no token rate defined for model {self._model}')
+        elif usage is None:
+            logger.error(f'no usage information returned for model {self._model}')
         else:
             activity = int(usage.prompt_tokens * token_rate['input'] + \
                 usage.completion_tokens * token_rate['output'])
