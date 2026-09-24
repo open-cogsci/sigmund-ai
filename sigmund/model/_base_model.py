@@ -221,4 +221,6 @@ class BaseModel:
     def strip_thinking_blocks(cls, content: str) -> str:
         """Removes all thinking blocks from the content string and returns
         the remaining text."""
+        if not isinstance(content, str):
+            return content
         return cls._thinking_block_pattern.sub('', content).strip()

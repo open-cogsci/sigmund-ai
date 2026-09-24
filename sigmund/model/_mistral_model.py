@@ -11,8 +11,10 @@ logger = logging.getLogger('sigmund')
 
 class MistralModel(OpenAIModel):
     
-    def __init__(self, sigmund, model, **kwargs):
+    def __init__(self, sigmund, model, **kwargs):        
         from mistralai.client import Mistral
+        if 'strip_thinking_blocks' not in kwargs:
+            kwargs['strip_thinking_blocks'] = True
         BaseModel.__init__(self, sigmund, model, **kwargs)
         self._actual_model = self._model
         # Mistral doesn't allow a tool to be specified by name. So if this
@@ -127,6 +129,8 @@ class MistralModel(OpenAIModel):
             if self._tools:
                 for tool in self._tools:
                     if tool.name == function.name:
+                        if self._strip_thinking_blocks:
+                            content = self.strip_thinking_blocks(content)
                         return tool.bind(function.arguments,
                                          message_prefix=content)
             logger.warning(f'invalid tool called: {function}')
