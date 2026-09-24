@@ -362,7 +362,8 @@ class Messages:
         if title_prompt[-1]['role'] == 'user':
             title_prompt.pop()
         title_prompt.append(dict(role='user', content=prompt.TITLE_PROMPT))
-        suggested_title = self._sigmund.condense_model.predict(title_prompt).strip()
+        suggested_title = self._sigmund.update_title_model.predict(
+            title_prompt).strip()
         # The prediction may be a tool call, so we need to check if it is a str.
         # This should not ordinarily happen, but sometimes models get confused.
         if not isinstance(suggested_title, str):

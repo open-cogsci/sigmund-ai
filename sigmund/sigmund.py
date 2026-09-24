@@ -75,6 +75,13 @@ class Sigmund:
                                   tool_choice=tool_choice)
         self.condense_model = model(self, self.model_config['condense_model'])
         self.public_model = model(self, self.model_config['public_model'])
+        # The update-title model was added later and may not be defined. 
+        # Therefore we fall back to the condense model.
+        self.update_title_model = model(
+            self,
+            self.model_config.get('update_title_model',
+                                  self.model_config['condense_model'])
+        )
         self.theme = self.database.get_setting('theme')
         self.limits = LimitsChecker(self)
 
