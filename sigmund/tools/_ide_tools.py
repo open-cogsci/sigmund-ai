@@ -124,4 +124,4 @@ class ide_execute_shell_command(BaseIDETool):
             'description': 'The directory in which the command will be executed. (default=current working directory)'
         }
     }
-    required_arguments = ["command"]
+    required_arguments = ["shell_command"]
