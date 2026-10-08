@@ -20,3 +20,4 @@ from ._ide_tools import (ide_execute_code, ide_open_file, ide_inspect_files,
 from ._notes import (add_note, update_note, remove_note,
                      save_workspace_as_note)
 from ._workspace import update_workspace_content
+from ._multiple_tools import multiple_tools

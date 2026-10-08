@@ -2,6 +2,7 @@ import json
 import logging
 from types import SimpleNamespace
 from .. import config
+from ..tools import multiple_tools
 from . import BaseModel
 
 
@@ -134,17 +135,40 @@ class OpenAIModel(BaseModel):
                 self._sigmund.database.add_activity(activity)   
         # Process response
         tool_calls = response.choices[0].message.tool_calls
+        content = response.choices[0].message.content
         if tool_calls:
-            function = tool_calls[0].function
-            if self._tools:
+            return self._tool_function(content, tool_calls)
+        return content
+        
+    def _tool_function(self, content, tool_calls):
+        tools = []
+        # First process all tool calls
+        if self._tools:
+            for tool_call in tool_calls:
+                function = tool_call.function
                 for tool in self._tools:
                     if tool.name == function.name:
-                        return tool.bind(
-                            function.arguments,
-                            message_prefix=response.choices[0].message.content)
-            logger.warning(f'invalid tool called: {function}')
-            return self.invalid_tool
-        return response.choices[0].message.content
+                        if self._strip_thinking_blocks:
+                            content = self.strip_thinking_blocks(content)
+                        tools.append(
+                            tool.bind(function.arguments,
+                                      message_prefix=content)
+                        )
+                        # Only the first tool call gets a prefix
+                        content = None
+                        break
+                else:
+                    return self.invalid_tool
+            # If there are multiple tool calls, wrap them inside a single
+            # multiple_tools.
+            if len(tools) > 1:
+                multi_tool = multiple_tools(self._sigmund)
+                multi_tool.set_tools(tools)
+                return multi_tool.bind('{}')
+            elif len(tools) == 1:
+                return tools[0]
+        logger.warning(f'invalid tool called: {function}')
+        return self.invalid_tool        
 
     def _tool_args(self):
         if not self._tools:

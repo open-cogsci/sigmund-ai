@@ -1,5 +1,6 @@
 from . import BaseModel
 from .. import config, utils
+from ..tools import multiple_tools
 import logging
 import json
 logger = logging.getLogger('sigmund')
@@ -168,20 +169,35 @@ class AnthropicModel(BaseModel):
                 self._sigmund.database.add_activity(activity)        
         # Process the response
         parts = []
+        tools = []
         for block in response.content:
             if block.type == 'tool_use':
                 if self._tools:
                     for tool in self._tools:
                         if tool.name == block.name:
-                            return tool.bind(json.dumps(block.input),
-                                             message_prefix='\n'.join(parts))
-                return self.invalid_tool
+                            tools.append(
+                                tool.bind(json.dumps(block.input),
+                                          message_prefix='\n'.join(parts))
+                            )
+                            parts = []
+                            break
+                    else:
+                        return self.invalid_tool
             if block.type == 'text':
                 parts.append(block.text)
             if block.type == 'thinking':
                 thinking_html = self.embed_thinking_block(
                     block.signature, block.thinking)
                 parts.append(thinking_html)
+        # If there are multiple tool calls, wrap them inside a single
+        # multiple_tools.
+        if len(tools) > 1:
+            multi_tool = multiple_tools(self._sigmund)
+            multi_tool.set_tools(tools)
+            multi_tool.suffix = '\n'.join(parts)
+            return multi_tool.bind('{}')
+        elif len(tools) == 1:
+            return tools[0]
         return '\n'.join(parts)
 
     def _tool_args(self):

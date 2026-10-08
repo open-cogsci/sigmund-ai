@@ -120,7 +120,7 @@ model_config = {
         'condense_model': 'mistral-small-latest',
         'public_model': 'mistral-small-latest',
         'answer_model': 'mistral-zai-glm-latest',
-        'attachment_model': 'mistral-medium-latest',
+        'attachment_model': 'mistral-medium-3-5',
     },
     'mistral_small': {
         'condense_model': 'mistral-small-latest',
@@ -224,6 +224,10 @@ model_token_rate = {
         'output': .6,
         'input': .15,
     },
+    'mistral-large-4': {
+        'output': 4.18,
+        'input': 1.36
+    },
     'zai-glm-latest': {
         'output': 4.4,
         'input': 1.4,
@@ -263,7 +267,8 @@ settings_default = {
     'tool_update_note': 'true',
     'tool_remove_note': 'true',
     'tool_save_workspace_as_note': 'true',
-    'tool_update_workspace_content': 'true'
+    'tool_update_workspace_content': 'true',
+    'tool_multiple_tools': 'true'
 }
 
 

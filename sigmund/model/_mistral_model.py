@@ -5,6 +5,7 @@ import os
 from types import SimpleNamespace
 from .. import config, utils
 from . import BaseModel
+from ..tools import multiple_tools
 from ._openai_model import OpenAIModel
 logger = logging.getLogger('sigmund')
 
@@ -125,16 +126,7 @@ class MistralModel(OpenAIModel):
         # as a prefix.
         tool_calls = response.choices[0].message.tool_calls
         if tool_calls:
-            function = tool_calls[0].function
-            if self._tools:
-                for tool in self._tools:
-                    if tool.name == function.name:
-                        if self._strip_thinking_blocks:
-                            content = self.strip_thinking_blocks(content)
-                        return tool.bind(function.arguments,
-                                         message_prefix=content)
-            logger.warning(f'invalid tool called: {function}')
-            return self.invalid_tool
+            return self._tool_function(content, tool_calls)
         return content
 
     def _tool_call_id(self, nr):
