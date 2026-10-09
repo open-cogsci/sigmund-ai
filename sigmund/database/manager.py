@@ -95,7 +95,7 @@ class DatabaseManager:
             self.user_id = user.user_id
             self.new_conversation()
     
-    def get_message(self, message_id: int) -> dict:
+    def get_message(self, message_id: int, max_size: int = None) -> dict:
         # If it's not an int, then it's an old-style mesage
         if not isinstance(message_id, int):
             return message_id
@@ -103,6 +103,9 @@ class DatabaseManager:
             # First, check if the message exists in the new Message table
             message = Message.query.filter_by(message_id=message_id).first()
             if message:
+                if max_size is not None and len(message.data) > max_size:
+                    logger.warning(f"Message {message_id} is too large")
+                    return {}
                 # If it exists, decrypt and return the message
                 decrypted_data = self.encryption_manager.decrypt_data(message.data)
                 return json.loads(decrypted_data)
@@ -113,12 +116,12 @@ class DatabaseManager:
             logger.error(f"Error retrieving message {message_id}: {e}")
             return {}
             
-    def get_message_history(self, conversation_data):
+    def get_message_history(self, conversation_data, max_size=None):
         """Returns a list of message dicts, excluding empty ones"""
         message_ids = conversation_data.get('message_history', [])
         message_history = []
         for msg_id in message_ids:
-            msg = self.get_message(msg_id)
+            msg = self.get_message(msg_id, max_size)
             if msg:
                 message_history.append(msg)
         return message_history
@@ -342,7 +345,8 @@ class DatabaseManager:
                         # If the title doesn't match, then we do a full-text
                         # search on the message history
                         match = False
-                        for message in self.get_message_history(data):
+                        for message in self.get_message_history(
+                                data, max_size=config.max_message_search_size):
                             message_text = message[1]
                             if query.lower() in message_text.lower():
                                 match = True

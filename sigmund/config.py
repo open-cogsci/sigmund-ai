@@ -69,6 +69,10 @@ anthropic_max_thinking_tokens = 2048
 # How often the model can retry if an error occurs. This is limited to avoid
 # infinite loops
 retry_budget = 3
+# The maximum size of a message during search. This is limited to avoid 
+# decrypting very large messages during search. These likely contain image or 
+# other data anyway.
+max_message_search_size = 500_000
 
 # LOGGING
 #
