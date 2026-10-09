@@ -13,18 +13,11 @@ MISTRAL_MODELS = {
 OPENAI_MODELS = {
     'gpt-5.6-sol': 'gpt-5.6-sol',
     'gpt-5.6-terra': 'gpt-5.6-terra',
-    'gpt-5.6-luna': 'gpt-5.6-luna',    
-    'gpt-5.5-thinking': 'gpt-5.5',
-    'gpt-5.5': 'gpt-5.5',
-    'gpt-5.4-thinking': 'gpt-5.4',
-    'gpt-5.4': 'gpt-5.4',
-    'gpt-5.4-mini': 'gpt-5.4-mini',
+    'gpt-5.6-luna': 'gpt-5.6-luna',
     'gpt-5.4-nano': 'gpt-5.4-nano'
 }
 ANTHROPIC_MODELS = {
-    'claude-4-5-haiku': 'claude-haiku-4-5',
-    'claude-4-8-opus': 'claude-opus-4-8',
-    'claude-4-8-opus-thinking': 'claude-opus-4-8',
+    'claude-5-5-haiku': 'claude-haiku-5-5',
     'claude-5-1-fable': 'claude-fable-5-1',
     'claude-5-1-fable-thinking': 'claude-fable-5-1',
     'claude-5-sonnet': 'claude-sonnet-5',

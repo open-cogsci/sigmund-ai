@@ -107,13 +107,13 @@ model_config = {
         'answer_model': 'gpt-5.6-sol'
     },
     'anthropic': {
-        'condense_model': 'claude-4-5-haiku',
-        'public_model': 'claude-4-5-haiku',
+        'condense_model': 'claude-5-5-haiku',
+        'public_model': 'claude-5-5-haiku',
         'answer_model': 'claude-5-sonnet-thinking'
     },
     'anthropic_thinking': {
-        'condense_model': 'claude-4-5-haiku',
-        'public_model': 'claude-4-5-haiku',
+        'condense_model': 'claude-5-5-haiku',
+        'public_model': 'claude-5-5-haiku',
         'answer_model': 'claude-5-1-fable-thinking'
     },
     'mistral': {
@@ -167,23 +167,17 @@ In the meanwhile, why not review our [fair-use policy](/fair-use)? This includes
 '''
 weekly_token_range = 7
 model_token_rate = {
-    'claude-haiku-4-5': {
-        'output': 5,
-        'input': 1,
-        'cache_read_input': 1 * .1,
-        'cache_write_input': 1 * 1.25
+    'claude-haiku-5-5': {
+        'output': .5,
+        'input': .1,
+        'cache_read_input': .01,
+        'cache_write_input': .0125
     },
     'claude-sonnet-5': {
         'output': 10,
         'input': 2,
         'cache_read_input': 3 * .1,
         'cache_write_input': 3 * 1.25
-    },
-    'claude-opus-4-8': {
-        'output': 25,
-        'input': 5,
-        'cache_read_input': 5 * .1,
-        'cache_write_input': 5 * 1.25
     },
     'claude-fable-5-1': {
         'output': 50,
