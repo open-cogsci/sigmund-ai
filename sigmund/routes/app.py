@@ -117,6 +117,18 @@ def chat_page():
                         theme=get_theme())
 
 
+def post_login_redirect():
+    """Redirects to the page that the user was heading to before logging in,
+    which is only ever an OIDC authorization request (see oidc_provider.py).
+    In all other cases, including when OIDC is disabled, this redirects to the
+    main page, as it always did.
+    """
+    target = session.pop('oidc_next', None)
+    if isinstance(target, str) and target.startswith('/oidc/authorize?'):
+        return redirect(target)
+    return redirect('/')
+
+
 def login_handler(form, failed=False):
     if form.validate_on_submit():
         username = form.username.data.strip().lower()
@@ -137,7 +149,7 @@ def login_handler(form, failed=False):
         user = User(username)
         login_user(user, remember=True)
         logger.info('initializing encryption key')
-        return redirect('/')
+        return post_login_redirect()
     html_content = '<div class="message message-ai">' + utils.render('welcome.html') + '</div>'
     return utils.render('chat.html', message_history=html_content,
                         subscription_required=config.subscription_required,

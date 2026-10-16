@@ -5,6 +5,7 @@ import base64
 from flask import redirect, Blueprint, request, session, jsonify
 from flask_login import login_user
 from . import User
+from .app import post_login_redirect
 from .. import config
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
@@ -92,4 +93,4 @@ def callback():
     user = User(username)
     login_user(user, remember=True)
     logger.info(f'initializing encryption key')    
-    return redirect('/')
+    return post_login_redirect()

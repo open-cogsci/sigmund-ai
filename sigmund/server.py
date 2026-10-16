@@ -38,6 +38,16 @@ def create_app(config_class=SigmundConfig):
     app.register_blueprint(google_login_blueprint, url_prefix='/google_login')
     app.register_blueprint(public_blueprint, url_prefix='/public')
     app.register_blueprint(admin_blueprint, url_prefix='/admin')
+    # The OIDC provider is optional. It is imported only when enabled, and any
+    # configuration problem disables the provider without affecting Sigmund.
+    if config.oidc_enabled:
+        try:
+            from .routes.oidc_provider import oidc_blueprint, init_oidc
+            init_oidc(app)
+            app.register_blueprint(oidc_blueprint)
+            logger.info('OIDC provider enabled')
+        except Exception as e:
+            logger.error(f'OIDC provider NOT enabled: {e}')
     # Initialize the database
     db.init_app(app)
     with app.app_context():

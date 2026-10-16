@@ -386,3 +386,36 @@ admin_user_ids = [
     for uid in os.environ.get('SIGMUND_ADMIN_USER_IDS', '').split(',')
     if uid.strip().isdigit()
 ]
+
+# OIDC PROVIDER
+#
+# Allows other applications (e.g. LibreChat) to use Sigmund's login as single
+# sign-on. Disabled by default. See dev-docs/librechat-oidc.md.
+#
+# Set SIGMUND_OIDC_ENABLED=1 to enable the provider. If the settings below are
+# incomplete or unsafe, the provider is skipped and an error is logged, but
+# Sigmund itself keeps running.
+oidc_enabled = bool(int(os.environ.get('SIGMUND_OIDC_ENABLED', 0)))
+# The issuer must exactly match the URL that the client uses to reach Sigmund,
+# without a trailing slash, e.g. https://sigmundai.eu
+oidc_issuer = os.environ.get('SIGMUND_OIDC_ISSUER', server_url).rstrip('/')
+# The single client that is allowed to use the provider
+oidc_client_id = os.environ.get('SIGMUND_OIDC_CLIENT_ID', 'librechat')
+# A long random string (at least 32 characters). Do not share.
+oidc_client_secret = os.environ.get('SIGMUND_OIDC_CLIENT_SECRET', None)
+# Comma-separated list of exact redirect URIs, e.g.
+# https://lc.sigmundai.eu/oauth/openid/callback
+oidc_redirect_uris = [
+    uri.strip()
+    for uri in os.environ.get('SIGMUND_OIDC_REDIRECT_URIS', '').split(',')
+    if uri.strip()
+]
+# An RSA private key (2048 bits or more, PEM) used to sign ID tokens. Either
+# the path to a file, or the PEM itself. The key must be the same for all
+# server processes and should be stored outside the repository.
+oidc_private_key_file = os.environ.get('SIGMUND_OIDC_PRIVATE_KEY_FILE', None)
+oidc_private_key = os.environ.get('SIGMUND_OIDC_PRIVATE_KEY', None)
+# Sigmund doesn't store email addresses. Clients receive a derived,
+# non-deliverable address in this domain.
+oidc_email_domain = os.environ.get('SIGMUND_OIDC_EMAIL_DOMAIN',
+                                   'sigmund.invalid')
