@@ -141,7 +141,8 @@ def authorize():
                               error_description=description, state=state)
 
     if response_type != 'code':
-        return fail('unsupported_response_type only response_type=code is supported')
+        return fail('unsupported_response_type only',
+                    'response_type=code is supported')
     if 'openid' not in scope.split():
         return fail('invalid_scope', 'the openid scope is required')
     if any(len(v) > MAX_PARAM_LENGTH for v in (scope, state or '', nonce or '')):
@@ -173,11 +174,20 @@ def authorize():
             'Subscription required',
             'An active subscription is required. You can '
             f'[subscribe here]({url_for("store.subscription_page")}).', 403)
+    # The session contains the real name and email address if the user logged
+    # in with Google. The profile is only used if it belongs to the current
+    # user. Other login methods fall back to derived values (see
+    # _user_claims()).
+    profile = session.get('oidc_profile')
+    if not isinstance(profile, dict) or profile.get('username') != username:
+        profile = {}
     code = secrets.token_urlsafe(32)
     _store('code', code, {
         'client_id': config.oidc_client_id,
         'redirect_uri': redirect_uri,
         'username': username,
+        'name': profile.get('name'),
+        'email': profile.get('email'),
         'scope': scope,
         'nonce': nonce,
         'code_challenge': code_challenge,
@@ -236,9 +246,11 @@ def token():
     }
     if payload.get('nonce'):
         id_claims['nonce'] = payload['nonce']
-    id_claims.update(_user_claims(username, scope))
+    name, email = payload.get('name'), payload.get('email')
+    id_claims.update(_user_claims(username, scope, name, email))
     access_token = secrets.token_urlsafe(32)
-    _store('access', access_token, {'username': username, 'scope': scope},
+    _store('access', access_token, {'username': username, 'scope': scope,
+                                    'name': name, 'email': email},
            ACCESS_TOKEN_TTL)
     logger.info(f'oidc: issued tokens for {username}')
     return _no_store(jsonify({
@@ -262,9 +274,9 @@ def userinfo():
         response.status_code = 401
         response.headers['WWW-Authenticate'] = 'Bearer error="invalid_token"'
         return _no_store(response)
-    return _no_store(jsonify(_user_claims(data['username'], data['scope'])))
-
-
+    return _no_store(jsonify(_user_claims(
+        data['username'], data['scope'], data.get('name'),
+        data.get('email'))))
 
 
 # -- Signing -----------------------------------------------------------------
@@ -428,15 +440,22 @@ def _email(username: str) -> str:
     return f'{slug or "user"}.{digest}@{config.oidc_email_domain}'
 
 
-def _user_claims(username: str, scope: str) -> dict:
+def _user_claims(username: str, scope: str, name: str = None,
+                 email: str = None) -> dict:
+    """Builds the claims for the ID token and userinfo. The real name and
+    email address are used if the login method provided them (currently only
+    Google, which has verified the address). Otherwise, values are derived
+    from the username.
+    """
     scopes = scope.split()
     claims = {'sub': username}
     if 'profile' in scopes:
-        claims['name'] = _display_name(username)
+        claims['name'] = name or _display_name(username)
         claims['preferred_username'] = username
     if 'email' in scopes:
-        claims['email'] = _email(username)
-        # Not a real mailbox, but we do vouch for its uniqueness
+        # A derived address is not a real mailbox, but we do vouch for its
+        # uniqueness
+        claims['email'] = email or _email(username)
         claims['email_verified'] = True
     return claims
 

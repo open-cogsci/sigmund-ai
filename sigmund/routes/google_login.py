@@ -70,12 +70,13 @@ def callback():
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
-    unique_id = userinfo_response.json()["sub"]
-    username = userinfo_response.json()["given_name"]
+    userinfo = userinfo_response.json()
+    unique_id = userinfo["sub"]
+    username = userinfo["given_name"]
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
     # app, and now you've verified their email through Google!
-    if not userinfo_response.json().get("email_verified"):
+    if not userinfo.get("email_verified"):
         logger.info(f'google log-in failed ({username})')
         return redirect('/login_failed')
     logger.info(f'google log-in successful ({username})')
@@ -87,10 +88,22 @@ def callback():
     session.permanent = True
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
+    # We use the full name for display purposes only (not for the username,
+    # because that would change existing accounts)
+    full_name = userinfo.get('name') or userinfo['given_name']
     # We use only part of the unique id, so that the username doesn't allow us
     # to derive the encryption key
     username = f'{username} (google)::{unique_id[:10]}'
     user = User(username)
     login_user(user, remember=True)
+    # The profile is kept in the session so that the OIDC provider can use it
+    # (see oidc_provider.authorize()). It is bound to the username, so that it
+    # is ignored if the user later logs in through a different method in the
+    # same session. It is not stored in the database.
+    session['oidc_profile'] = {
+        'username': username,
+        'name': full_name,
+        'email': userinfo['email'],
+    }
     logger.info(f'initializing encryption key')    
     return post_login_redirect()
