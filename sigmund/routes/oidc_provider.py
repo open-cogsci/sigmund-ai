@@ -78,7 +78,7 @@ def discovery():
         'grant_types_supported': ['authorization_code'],
         'subject_types_supported': ['public'],
         'id_token_signing_alg_values_supported': ['RS256'],
-        'scopes_supported': ['openid'],
+        'scopes_supported': ['openid', 'profile', 'email'],
         'token_endpoint_auth_methods_supported': [
             'client_secret_basic', 'client_secret_post'],
         'code_challenge_methods_supported': ['S256'],
@@ -120,32 +120,31 @@ def authorize():
     """
     args = request.args
     redirect_uri = args.get('redirect_uri', '')
+    state = args.get('state')
+    scope = args.get('scope', '')
+    nonce = args.get('nonce')
+    response_type = args.get('response_type')
+    code_challenge = args.get('code_challenge')
+    client_id = args.get('client_id')
+    prompt = args.get('prompt', '')
     # Until the client and redirect URI are verified, errors must not be sent
     # to the redirect URI, because that would make this an open redirect.
-    if args.get('client_id') != config.oidc_client_id or \
+    if client_id != config.oidc_client_id or \
             redirect_uri not in config.oidc_redirect_uris:
-        logger.warning('oidc: rejected request with unknown client or '
-                       'redirect_uri')
+        logger.warning('oidc: rejected request with unknown client or redirect_uri')
         return _error_page(
-            'Invalid request',
-            'The application that sent you here is not configured correctly.',
+            'Invalid request. The application that sent you here is not configured correctly.',
             400)
-    state = args.get('state')
 
     def fail(error, description):
         return _redirect_with(redirect_uri, error=error,
                               error_description=description, state=state)
 
-    scope = args.get('scope', '')
-    nonce = args.get('nonce')
-    code_challenge = args.get('code_challenge')
-    if args.get('response_type') != 'code':
-        return fail('unsupported_response_type',
-                    'only response_type=code is supported')
+    if response_type != 'code':
+        return fail('unsupported_response_type only response_type=code is supported')
     if 'openid' not in scope.split():
         return fail('invalid_scope', 'the openid scope is required')
-    if any(len(v) > MAX_PARAM_LENGTH for v in (scope, state or '',
-                                               nonce or '')):
+    if any(len(v) > MAX_PARAM_LENGTH for v in (scope, state or '', nonce or '')):
         return fail('invalid_request', 'parameter too long')
     if code_challenge is not None:
         if args.get('code_challenge_method') != 'S256':
@@ -154,7 +153,7 @@ def authorize():
         if not PKCE_PATTERN.fullmatch(code_challenge):
             return fail('invalid_request', 'malformed code_challenge')
     if not current_user.is_authenticated:
-        if 'none' in args.get('prompt', '').split():
+        if 'none' in prompt.split():
             return fail('login_required', 'the user is not logged in')
         # Sigmund's existing login (forum or Google) takes over, and sends the
         # user back here afterwards. See post_login_redirect() in app.py.
