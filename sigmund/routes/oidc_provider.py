@@ -9,17 +9,22 @@ the following routes and does not touch any existing route:
     /oidc/authorize                     authorization endpoint
     /oidc/token                         token endpoint
     /oidc/userinfo                      userinfo endpoint
+    /oidc/logout                        end-session endpoint (RP-Initiated
+                                        Logout)
 
 Scope and deliberate limitations
 --------------------------------
 - There is exactly one client, which is configured through the environment
   (see config.py). There is no dynamic client registration.
 - Only the authorization code flow is supported, with optional PKCE (S256).
-- No refresh tokens are issued, and there is no end-session (logout) endpoint.
-  Logging out of the client does not log the user out of Sigmund and vice versa.
+- No refresh tokens are issued. RP-Initiated Logout is supported through
+  /oidc/logout: when the user logs out of the client, the user is also logged
+  out of Sigmund and his or her access tokens are revoked. The reverse is not
+  implemented: logging out of Sigmund does not end the client's session.
 - prompt=login and max_age are ignored. prompt=none is honored.
-- Authorization codes and access tokens are stored in Redis (hashed) and expire
-  automatically. ID tokens are signed with RS256.
+- Authorization codes and access tokens are stored in Redis (hashed) and
+  expire automatically. Access tokens are also indexed by user, so that they
+  can be revoked at logout. ID tokens are signed with RS256.
 - Access is checked when the authorization request is made. A suspension or
   expired subscription therefore does not end sessions that the client has
   already established.
@@ -40,7 +45,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from flask import Blueprint, current_app, jsonify, redirect, request, \
     session, url_for
-from flask_login import current_user
+from flask_login import current_user, logout_user
 from .. import config
 from .. import utils
 from ..redis_client import redis_client
@@ -58,6 +63,9 @@ DEFAULT_SECRET_KEY = '0123456789ABCDEF'
 LOCAL_HOSTS = ('localhost', '127.0.0.1')
 PKCE_PATTERN = re.compile(r'[A-Za-z0-9\-._~]{43,128}')
 MAX_PARAM_LENGTH = 512
+# An id_token_hint is an ID token (at most a few kB) and not an attack
+# surface, but the length is limited to avoid parsing absurd input.
+MAX_HINT_LENGTH = 4096
 
 
 # -- Endpoints ---------------------------------------------------------------
@@ -73,6 +81,7 @@ def discovery():
         'authorization_endpoint': issuer + '/oidc/authorize',
         'token_endpoint': issuer + '/oidc/token',
         'userinfo_endpoint': issuer + '/oidc/userinfo',
+        'end_session_endpoint': issuer + '/oidc/logout',
         'jwks_uri': issuer + '/oidc/jwks',
         'response_types_supported': ['code'],
         'grant_types_supported': ['authorization_code'],
@@ -133,7 +142,8 @@ def authorize():
             redirect_uri not in config.oidc_redirect_uris:
         logger.warning('oidc: rejected request with unknown client or redirect_uri')
         return _error_page(
-            'Invalid request. The application that sent you here is not configured correctly.',
+            'Invalid request',
+            'The application that sent you here is not configured correctly.',
             400)
 
     def fail(error, description):
@@ -141,8 +151,8 @@ def authorize():
                               error_description=description, state=state)
 
     if response_type != 'code':
-        return fail('unsupported_response_type only',
-                    'response_type=code is supported')
+        return fail('unsupported_response_type',
+                    'only response_type=code is supported')
     if 'openid' not in scope.split():
         return fail('invalid_scope', 'the openid scope is required')
     if any(len(v) > MAX_PARAM_LENGTH for v in (scope, state or '', nonce or '')):
@@ -279,10 +289,64 @@ def userinfo():
         data.get('email'))))
 
 
+@oidc_blueprint.route('/oidc/logout')
+def end_session():
+    """RP-Initiated Logout (OpenID Connect). The client navigates the user's
+    browser here when the user logs out of the client:
+
+        /oidc/logout?id_token_hint=<id token>&post_logout_redirect_uri=<uri>
+
+    The ID token serves as a hint that identifies the user. It is verified
+    (signature, issuer, audience), but an expired token is accepted, because
+    a client's session can outlive the ID tokens that Sigmund issues (one
+    hour). The current Sigmund session is only ended when the hint belongs
+    to the user behind this browser; a hint for another user merely revokes
+    that user's access tokens. Without a valid hint, the current user is
+    logged out, like on Sigmund's own /logout route. Afterwards the user is
+    sent back to the client, but only if the post-logout URI is whitelisted
+    (see config.oidc_post_logout_redirect_uris).
+    """
+    id_token_hint = request.args.get('id_token_hint')
+    claims = _verify_id_token(id_token_hint) if id_token_hint else None
+    if id_token_hint and claims is None:
+        logger.info('oidc: ignoring invalid id_token_hint')
+    subject = claims.get('sub') if claims is not None else None
+    username = current_user.get_id() if current_user.is_authenticated else None
+    if subject is not None:
+        # The hinted user's access tokens are revoked in all cases, so that
+        # logging out of the client also ends API access through tokens that
+        # Sigmund issued earlier, even if they belong to an old session.
+        _revoke_access_tokens(subject)
+        if subject == username:
+            logout_user()
+            session.clear()
+            logger.info(f'oidc: end-session for {subject}')
+        else:
+            logger.info(f'oidc: end-session revoked the tokens of {subject}, '
+                        'but left the session of the current user alone')
+    elif username is not None:
+        # No or unusable hint. The current user is logged out anyway, which
+        # matches Sigmund's own /logout route and keeps this endpoint useful
+        # for clients that cannot provide an ID token.
+        _revoke_access_tokens(username)
+        logout_user()
+        session.clear()
+        logger.info(f'oidc: end-session without a hint for {username}')
+    post_logout_redirect_uri = request.args.get('post_logout_redirect_uri')
+    if post_logout_redirect_uri in config.oidc_post_logout_redirect_uris:
+        return _no_store(_redirect_with(post_logout_redirect_uri,
+                                        state=request.args.get('state')))
+    return _no_store(redirect(url_for('app.login')))
+
+
 # -- Signing -----------------------------------------------------------------
 
 def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b'=').decode('ascii')
+
+
+def _b64url_decode(data: str) -> bytes:
+    return base64.urlsafe_b64decode(data + '=' * (-len(data) % 4))
 
 
 def _b64url_uint(value: int) -> str:
@@ -302,7 +366,8 @@ class _Signer:
         if private_key.key_size < 2048:
             raise ValueError('the OIDC signing key must be at least 2048 bits')
         self._private_key = private_key
-        numbers = private_key.public_key().public_numbers()
+        self.public_key = private_key.public_key()
+        numbers = self.public_key.public_numbers()
         n, e = _b64url_uint(numbers.n), _b64url_uint(numbers.e)
         # The key id is the RFC 7638 thumbprint of the public key
         thumbprint_input = json.dumps({'e': e, 'kty': 'RSA', 'n': n},
@@ -318,6 +383,39 @@ class _Signer:
         signature = self._private_key.sign(
             signing_input.encode('ascii'), padding.PKCS1v15(), hashes.SHA256())
         return '{}.{}'.format(signing_input, _b64url(signature))
+
+
+def _verify_id_token(id_token):
+    """Verifies that an ID token was signed by this provider and issued to
+    the configured client, and returns its claims. Malformed tokens, invalid
+    signatures, and tokens from other issuers or for other clients return
+    None. An expired token is accepted: ID tokens are used here only as a
+    hint that identifies the user, and a client's session can outlive them
+    (the OpenID Connect RP-Initiated Logout specification recommends
+    accepting expired ID tokens as hints).
+    """
+    try:
+        if len(id_token) > MAX_HINT_LENGTH:
+            return None
+        header_b64, payload_b64, signature_b64 = id_token.split('.')
+        header = json.loads(_b64url_decode(header_b64))
+        if header.get('alg') != 'RS256':
+            return None
+        signature = _b64url_decode(signature_b64)
+        _signer().public_key.verify(
+            signature, f'{header_b64}.{payload_b64}'.encode('ascii'),
+            padding.PKCS1v15(), hashes.SHA256())
+        claims = json.loads(_b64url_decode(payload_b64))
+        if not isinstance(claims, dict) or claims.get('iss') != config.oidc_issuer:
+            return None
+        aud = claims.get('aud')
+        audiences = aud if isinstance(aud, list) else [aud]
+        if config.oidc_client_id not in audiences:
+            return None
+        return claims
+    except Exception:
+        logger.info('oidc: could not verify id_token_hint')
+        return None
 
 
 def _load_private_key():
@@ -353,6 +451,9 @@ def init_oidc(app):
     for uri in config.oidc_redirect_uris:
         if not _is_secure_or_local(uri):
             problems.append(f'redirect URI must use https: {uri}')
+    for uri in config.oidc_post_logout_redirect_uris:
+        if not _is_secure_or_local(uri):
+            problems.append(f'post-logout redirect URI must use https: {uri}')
     if not _is_secure_or_local(config.oidc_issuer):
         problems.append('the issuer (SIGMUND_OIDC_ISSUER or FLASK_SERVER_URL) '
                         'must use https')
@@ -381,8 +482,37 @@ def _key(kind: str, secret: str) -> str:
         secret.encode()).hexdigest()
 
 
+def _user_index_key(username: str) -> str:
+    return KEY_PREFIX + 'user_tokens:' + username
+
+
 def _store(kind: str, secret: str, payload: dict, ttl: int):
-    redis_client.setex(_key(kind, secret), ttl, json.dumps(payload))
+    key = _key(kind, secret)
+    redis_client.setex(key, ttl, json.dumps(payload))
+    if kind == 'access':
+        # Secondary index from username to token keys, so that all access
+        # tokens of a user can be revoked at logout. The set is given the TTL
+        # of the newest token; members that outlive their token (only
+        # possible if the TTLs would ever differ) are harmless, because
+        # deleting an expired key does nothing.
+        index_key = _user_index_key(payload['username'])
+        redis_client.sadd(index_key, key)
+        redis_client.expire(index_key, ttl)
+
+
+def _revoke_access_tokens(username: str):
+    """Deletes all outstanding access tokens of a user, so that requests
+    presenting them fail immediately. Called by the end-session endpoint.
+    """
+    index_key = _user_index_key(username)
+    keys = redis_client.smembers(index_key)
+    if not keys:
+        return
+    pipe = redis_client.pipeline()
+    for key in keys:
+        pipe.delete(key)
+    pipe.delete(index_key)
+    pipe.execute()
 
 
 def _lookup(kind: str, secret: str):

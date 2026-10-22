@@ -410,6 +410,18 @@ oidc_redirect_uris = [
     for uri in os.environ.get('SIGMUND_OIDC_REDIRECT_URIS', '').split(',')
     if uri.strip()
 ]
+# Comma-separated list of exact post-logout redirect URIs that /oidc/logout
+# may send the user to, e.g. https://lc.sigmundai.eu/login. This must match
+# the client's post-logout URI (LibreChat defaults to ${DOMAIN_CLIENT}/login).
+# URIs must use https, and are validated like the redirect URIs above. If a
+# client asks for a URI that is not listed, the user is sent to Sigmund's own
+# login page instead.
+oidc_post_logout_redirect_uris = [
+    uri.strip()
+    for uri in os.environ.get(
+        'SIGMUND_OIDC_POST_LOGOUT_REDIRECT_URIS', '').split(',')
+    if uri.strip()
+]
 # An RSA private key (2048 bits or more, PEM) used to sign ID tokens. Either
 # the path to a file, or the PEM itself. The key must be the same for all
 # server processes and should be stored outside the repository.

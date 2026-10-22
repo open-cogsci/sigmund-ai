@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+import time
 import unittest
 from urllib.parse import urlsplit, parse_qs
 from cryptography.hazmat.primitives import hashes, serialization
@@ -11,11 +12,13 @@ from sigmund import config
 CLIENT_ID = 'librechat'
 CLIENT_SECRET = 'a-client-secret-that-is-long-enough-for-tests'
 REDIRECT_URI = 'https://lc.example.org/oauth/openid/callback'
+POST_LOGOUT_URI = 'https://lc.example.org/login'
 ISSUER = 'https://sigmund.example.org'
 OIDC_SETTINGS = ('oidc_enabled', 'oidc_issuer', 'oidc_client_id',
                  'oidc_client_secret', 'oidc_redirect_uris',
-                 'oidc_private_key', 'oidc_private_key_file',
-                 'oidc_email_domain', 'subscription_required')
+                 'oidc_post_logout_redirect_uris', 'oidc_private_key',
+                 'oidc_private_key_file', 'oidc_email_domain',
+                 'subscription_required')
 
 
 class OIDCTestConfig(SigmundConfig):
@@ -46,6 +49,7 @@ class BaseOIDCTestCase(unittest.TestCase):
         config.oidc_client_id = CLIENT_ID
         config.oidc_client_secret = CLIENT_SECRET
         config.oidc_redirect_uris = [REDIRECT_URI]
+        config.oidc_post_logout_redirect_uris = [POST_LOGOUT_URI]
         config.oidc_private_key_file = None
         config.oidc_private_key = key.private_bytes(
             serialization.Encoding.PEM,
@@ -125,6 +129,7 @@ class TestOIDCProvider(BaseOIDCTestCase):
         assert doc['authorization_endpoint'] == ISSUER + '/oidc/authorize'
         assert doc['token_endpoint'] == ISSUER + '/oidc/token'
         assert doc['userinfo_endpoint'] == ISSUER + '/oidc/userinfo'
+        assert doc['end_session_endpoint'] == ISSUER + '/oidc/logout'
         assert doc['jwks_uri'] == ISSUER + '/oidc/jwks'
         assert 'S256' in doc['code_challenge_methods_supported']
 
@@ -298,6 +303,107 @@ class TestOIDCProvider(BaseOIDCTestCase):
         assert self.authorize().status_code == 302
 
 
+class TestEndSession(BaseOIDCTestCase):
+
+    def login_as(self, username):
+        return self.client.post('/login', data=dict(
+            username=username, password='password'))
+
+    def userinfo(self, access_token):
+        return self.client.get('/oidc/userinfo', headers={
+            'Authorization': 'Bearer ' + access_token})
+
+    def test_logout_with_valid_hint(self):
+        # A complete login flow, as LibreChat would do it
+        code = self.get_code()
+        tokens = self.exchange(code).get_json()
+        assert self.userinfo(tokens['access_token']).status_code == 200
+        # LibreChat navigates the browser to the end-session endpoint
+        response = self.client.get('/oidc/logout', query_string=dict(
+            id_token_hint=tokens['id_token'],
+            post_logout_redirect_uri=POST_LOGOUT_URI))
+        assert response.status_code == 302
+        assert response.headers['Location'] == POST_LOGOUT_URI
+        # The Sigmund session is gone: the main page redirects to the login
+        # page instead of showing the chat page
+        response = self.client.get('/')
+        assert response.status_code == 302
+        assert urlsplit(response.headers['Location']).path == '/login'
+        # And so are the access tokens: the userinfo endpoint refuses them
+        assert self.userinfo(tokens['access_token']).status_code == 401
+
+    def test_logout_with_expired_hint(self):
+        # A client's session can outlive the one-hour ID tokens, so an
+        # expired hint must still identify the user
+        self.login()
+        from sigmund.routes.oidc_provider import _signer
+        now = int(time.time())
+        expired_token = _signer().sign({
+            'iss': ISSUER, 'aud': CLIENT_ID, 'sub': 'test',
+            'iat': now - 10_000, 'exp': now - 1_000,
+            'auth_time': now - 10_000})
+        response = self.client.get('/oidc/logout', query_string=dict(
+            id_token_hint=expired_token))
+        assert response.status_code == 302
+        assert self.client.get('/').status_code == 302
+
+    def test_logout_without_hint(self):
+        # Without a hint the current user is logged out, as on /logout
+        self.login()
+        response = self.client.get('/oidc/logout')
+        assert response.status_code == 302
+        assert urlsplit(response.headers['Location']).path == '/login'
+        assert self.client.get('/').status_code == 302
+
+    def test_logout_with_tampered_hint(self):
+        # A token that we did not sign must not control who is logged out,
+        # but the current user is logged out nonetheless, as on /logout
+        self.login()
+        forged = '.'.join(['a' * 40, 'b' * 40, 'c' * 40])
+        response = self.client.get('/oidc/logout', query_string=dict(
+            id_token_hint=forged))
+        assert response.status_code == 302
+        assert self.client.get('/').status_code == 302
+
+    def test_hint_for_another_user_spares_the_current_session(self):
+        # LibreChat sessions can outlive Sigmund sessions: by the time the
+        # user logs out of LibreChat, the same browser may be logged into
+        # Sigmund as someone else. Only the hinted user's tokens are
+        # revoked; the new session is left alone.
+        code = self.get_code()  # logs in as 'test' and issues tokens
+        tokens = self.exchange(code).get_json()
+        # End the Sigmund session and log back in as someone else in the
+        # same browser, as would happen between using two LibreChat
+        # sessions. (Logging in while already logged in is refused.)
+        self.client.get('/logout')
+        self.login_as('other')
+        response = self.client.get('/oidc/logout', query_string=dict(
+            id_token_hint=tokens['id_token']))
+        assert response.status_code == 302
+        assert urlsplit(response.headers['Location']).path == '/login'
+        # 'other' is still logged in: a new authorization succeeds without
+        # being sent to the login page first
+        response = self.authorize()
+        assert response.status_code == 302
+        assert response.headers['Location'].startswith(REDIRECT_URI + '?')
+        # The tokens of 'test' are revoked nonetheless
+        assert self.userinfo(tokens['access_token']).status_code == 401
+
+    def test_unlisted_post_logout_uri_is_refused(self):
+        self.login()
+        response = self.client.get('/oidc/logout', query_string=dict(
+            id_token_hint='irrelevant',
+            post_logout_redirect_uri='https://evil.example.org/'))
+        assert response.status_code == 302
+        assert urlsplit(response.headers['Location']).path == '/login'
+
+    def test_logout_when_not_logged_in(self):
+        response = self.client.get('/oidc/logout', query_string=dict(
+            post_logout_redirect_uri=POST_LOGOUT_URI))
+        assert response.status_code == 302
+        assert response.headers['Location'] == POST_LOGOUT_URI
+
+
 class TestOIDCMisconfigured(BaseOIDCTestCase):
     """A broken OIDC configuration must disable the provider, but not Sigmund.
     """
@@ -321,7 +427,7 @@ class TestOIDCDisabled(BaseOIDCTestCase):
 
     def test_routes_do_not_exist(self):
         for path in ('/.well-known/openid-configuration', '/oidc/jwks',
-                     '/oidc/authorize', '/oidc/userinfo'):
+                     '/oidc/authorize', '/oidc/userinfo', '/oidc/logout'):
             assert self.client.get(path).status_code == 404
         assert self.client.post('/oidc/token').status_code == 404
         assert self.client.get('/login').status_code == 200
