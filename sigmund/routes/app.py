@@ -38,6 +38,10 @@ def get_sigmund(db_cache='default', transient_settings=None,
 
 
 def chat_page():
+    # When the user is partly logged out, the missing encryption key can cause a
+    # confusing error. We capture this and redirect to the logout page.
+    if 'encryption_key' not in session:
+        redirect(url_for('app.logout'))
     sigmund = get_sigmund()
     if config.subscription_required and \
             not sigmund.database.check_subscription():
@@ -129,7 +133,7 @@ def post_login_redirect():
     return redirect('/')
 
 
-def login_handler(form, failed=False):
+def login_handler(form, template='chat.html', failed=False):
     if form.validate_on_submit():
         username = form.username.data.strip().lower()
         password = form.password.data.strip()
@@ -151,7 +155,7 @@ def login_handler(form, failed=False):
         logger.info('initializing encryption key')
         return post_login_redirect()
     html_content = '<div class="message message-ai">' + utils.render('welcome.html') + '</div>'
-    return utils.render('chat.html', message_history=html_content,
+    return utils.render(template, message_history=html_content,
                         subscription_required=config.subscription_required,
                         form=form,
                         need_login=True,
@@ -201,6 +205,16 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('app.chat'))
     return login_handler(LoginForm())
+
+
+@app_blueprint.route('/oidc/login', methods=['GET', 'POST'])
+def oidc_login():
+    """A simplified login screen that doesn't show the legacy Sigmund chat 
+    window.
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('app.chat'))
+    return login_handler(LoginForm(), template='oidc-login.html')
 
 
 @app_blueprint.route('/login_failed', methods=['GET', 'POST'])
