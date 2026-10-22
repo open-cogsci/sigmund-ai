@@ -41,7 +41,7 @@ def chat_page():
     # When the user is partly logged out, the missing encryption key can cause a
     # confusing error. We capture this and redirect to the logout page.
     if 'encryption_key' not in session:
-        redirect(url_for('app.logout'))
+        return redirect(url_for('app.logout'))
     sigmund = get_sigmund()
     if config.subscription_required and \
             not sigmund.database.check_subscription():

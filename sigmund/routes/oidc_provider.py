@@ -169,7 +169,7 @@ def authorize():
         # Sigmund's existing login (forum or Google) takes over, and sends the
         # user back here afterwards. See post_login_redirect() in app.py.
         session['oidc_next'] = request.full_path
-        return redirect(url_for('app.login'))
+        return redirect(url_for('app.oidc_login'))
     username = current_user.get_id()
     reason = _access_denied_reason(username)
     if reason == 'suspended':
