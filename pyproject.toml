@@ -38,7 +38,7 @@ dependencies = [
     "redis",
     "requests",
     "scholarly",
-    "stripe",
+    "stripe>=16.0.0,<17.0.0",
     "tiktoken",
     "zai-sdk"
 ]
