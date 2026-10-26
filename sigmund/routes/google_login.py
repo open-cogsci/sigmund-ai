@@ -95,7 +95,7 @@ def callback():
     # to derive the encryption key
     username = f'{username} (google)::{unique_id[:10]}'
     user = User(username)
-    login_user(user, remember=True)
+    login_user(user)
     # The profile is kept in the session so that the OIDC provider can use it
     # (see oidc_provider.authorize()). It is bound to the username, so that it
     # is ignored if the user later logs in through a different method in the

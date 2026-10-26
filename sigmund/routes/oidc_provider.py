@@ -316,8 +316,8 @@ def end_session():
         _revoke_access_tokens(subject)
     if username is not None:
         _revoke_access_tokens(username)
-    logout_user()
     session.clear()
+    logout_user()
     post_logout_redirect_uri = request.args.get('post_logout_redirect_uri')
     if post_logout_redirect_uri in config.oidc_post_logout_redirect_uris:
         return _no_store(_redirect_with(post_logout_redirect_uri,

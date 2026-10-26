@@ -151,7 +151,7 @@ def login_handler(form, template='chat.html', failed=False):
         session['encryption_key'] = base64.urlsafe_b64encode(
             kdf.derive(password.encode()))
         user = User(username)
-        login_user(user, remember=True)
+        login_user(user)
         logger.info('initializing encryption key')
         return post_login_redirect()
     html_content = '<div class="message message-ai">' + utils.render('welcome.html') + '</div>'
@@ -225,6 +225,8 @@ def login_failed():
 @app_blueprint.route('/logout')
 def logout():
     logout_user()
+    if config.oidc_client_logout_url:
+        return redirect(f'{config.oidc_client_logout_url}?redirect_uri={config.oidc_client_logout_redirect_uri}')
     return redirect(url_for('app.login'))
 
 

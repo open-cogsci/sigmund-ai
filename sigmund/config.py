@@ -431,3 +431,6 @@ oidc_private_key = os.environ.get('SIGMUND_OIDC_PRIVATE_KEY', None)
 # non-deliverable address in this domain.
 oidc_email_domain = os.environ.get('SIGMUND_OIDC_EMAIL_DOMAIN',
                                    'sigmund.invalid')
+oidc_client_logout_url = os.environ.get('SIGMUND_OIDC_CLIENT_LOGOUT_URL', None)
+oidc_client_logout_redirect_uri = os.environ.get(
+    'SIGMUND_OIDC_CLIENT_LOGOUT_REDIRECT_URI', None)
