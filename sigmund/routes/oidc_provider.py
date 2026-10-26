@@ -313,30 +313,16 @@ def end_session():
     subject = claims.get('sub') if claims is not None else None
     username = current_user.get_id() if current_user.is_authenticated else None
     if subject is not None:
-        # The hinted user's access tokens are revoked in all cases, so that
-        # logging out of the client also ends API access through tokens that
-        # Sigmund issued earlier, even if they belong to an old session.
         _revoke_access_tokens(subject)
-        if subject == username:
-            logout_user()
-            session.clear()
-            logger.info(f'oidc: end-session for {subject}')
-        else:
-            logger.info(f'oidc: end-session revoked the tokens of {subject}, '
-                        'but left the session of the current user alone')
-    elif username is not None:
-        # No or unusable hint. The current user is logged out anyway, which
-        # matches Sigmund's own /logout route and keeps this endpoint useful
-        # for clients that cannot provide an ID token.
+    if username is not None:
         _revoke_access_tokens(username)
-        logout_user()
-        session.clear()
-        logger.info(f'oidc: end-session without a hint for {username}')
+    logout_user()
+    session.clear()
     post_logout_redirect_uri = request.args.get('post_logout_redirect_uri')
     if post_logout_redirect_uri in config.oidc_post_logout_redirect_uris:
         return _no_store(_redirect_with(post_logout_redirect_uri,
                                         state=request.args.get('state')))
-    return _no_store(redirect(url_for('app.login')))
+    return _no_store(redirect(url_for('app.oidc_login')))
 
 
 # -- Signing -----------------------------------------------------------------
