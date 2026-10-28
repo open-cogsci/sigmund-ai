@@ -364,7 +364,7 @@ stripe_webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET', None)
 # the checkout process
 stripe_checkout_keywords = dict(
     allow_promotion_codes=True,
-    payment_method_types=['card', 'ideal', 'bancontact', 'paypal'])
+    allowed_payment_method_types=['card', 'ideal', 'bancontact', 'paypal'])
 
 
 # GOOGLE LOGIN
