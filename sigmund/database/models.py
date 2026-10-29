@@ -47,6 +47,9 @@ class User(Model):
 
     user_id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
+    # The email address is registered on the first login that provides one
+    # (see DatabaseManager.set_email) and is kept static afterwards.
+    email = Column(String(255), nullable=True)
     active_conversation_id = Column(
         Integer, ForeignKey('conversation.conversation_id'), index=True)
     suspended = Column(Boolean, default=False, server_default='0',

@@ -184,20 +184,11 @@ def authorize():
             'Subscription required',
             'An active subscription is required. You can '
             f'[subscribe here]({url_for("store.subscription_page")}).', 403)
-    # The session contains the real name and email address if the user logged
-    # in with Google. The profile is only used if it belongs to the current
-    # user. Other login methods fall back to derived values (see
-    # _user_claims()).
-    profile = session.get('oidc_profile')
-    if not isinstance(profile, dict) or profile.get('username') != username:
-        profile = {}
     code = secrets.token_urlsafe(32)
     _store('code', code, {
         'client_id': config.oidc_client_id,
         'redirect_uri': redirect_uri,
         'username': username,
-        'name': profile.get('name'),
-        'email': profile.get('email'),
         'scope': scope,
         'nonce': nonce,
         'code_challenge': code_challenge,
@@ -256,11 +247,9 @@ def token():
     }
     if payload.get('nonce'):
         id_claims['nonce'] = payload['nonce']
-    name, email = payload.get('name'), payload.get('email')
-    id_claims.update(_user_claims(username, scope, name, email))
+    id_claims.update(_user_claims(username, scope))
     access_token = secrets.token_urlsafe(32)
-    _store('access', access_token, {'username': username, 'scope': scope,
-                                    'name': name, 'email': email},
+    _store('access', access_token, {'username': username, 'scope': scope},
            ACCESS_TOKEN_TTL)
     logger.info(f'oidc: issued tokens for {username}')
     return _no_store(jsonify({
@@ -284,9 +273,7 @@ def userinfo():
         response.status_code = 401
         response.headers['WWW-Authenticate'] = 'Bearer error="invalid_token"'
         return _no_store(response)
-    return _no_store(jsonify(_user_claims(
-        data['username'], data['scope'], data.get('name'),
-        data.get('email'))))
+    return _no_store(jsonify(_user_claims(data['username'], data['scope'])))
 
 
 @oidc_blueprint.route('/oidc/logout')
@@ -540,38 +527,42 @@ def _access_denied_reason(username: str):
 
 
 def _display_name(username: str) -> str:
-    # Google usernames look like 'Name (google)::unique_id'
-    match = re.match(r'^(.*) \(google\)::', username)
-    return match.group(1) if match else username
+    # This mirrors Sigmund.username(): Google usernames look like
+    # 'Name (google)::unique_id', and the suffix is replaced by '(Google)'.
+    # The Sigmund class itself is not instantiated here, because that has
+    # side effects, such as creating the user.
+    if '(google)::' in username:
+        return username.split('(google)::')[0] + '(Google)'
+    return username
 
 
 def _email(username: str) -> str:
-    """Sigmund doesn't store email addresses, and users can be known by Google
-    or by forum accounts. We therefore derive a stable, unique, but
-    non-deliverable address from the username. This is the one place to change
-    if real email addresses become available.
+    """Returns the email address of a user: the address that was registered
+    in the database on login (currently only Google does so, and Google has
+    verified the address), or, if no address has been registered, a stable,
+    unique, but non-deliverable address derived from the username.
     """
+    user = DbUser.query.filter_by(username=username).first()
+    if user is not None and user.email:
+        return user.email
     slug = re.sub(r'[^a-z0-9]+', '-', username.lower()).strip('-')[:40]
     digest = hashlib.sha256(username.encode()).hexdigest()[:8]
     return f'{slug or "user"}.{digest}@{config.oidc_email_domain}'
 
 
-def _user_claims(username: str, scope: str, name: str = None,
-                 email: str = None) -> dict:
-    """Builds the claims for the ID token and userinfo. The real name and
-    email address are used if the login method provided them (currently only
-    Google, which has verified the address). Otherwise, values are derived
-    from the username.
+def _user_claims(username: str, scope: str) -> dict:
+    """Builds the claims for the ID token and userinfo. The display name is
+    derived from the username (see _display_name), and the email address is
+    taken from the database if one has been registered on login (see _email).
+    Otherwise, a stable address is derived from the username.
     """
     scopes = scope.split()
     claims = {'sub': username}
     if 'profile' in scopes:
-        claims['name'] = name or _display_name(username)
+        claims['name'] = _display_name(username)
         claims['preferred_username'] = username
     if 'email' in scopes:
-        # A derived address is not a real mailbox, but we do vouch for its
-        # uniqueness
-        claims['email'] = email or _email(username)
+        claims['email'] = _email(username)
         claims['email_verified'] = True
     return claims
 

@@ -9,6 +9,7 @@ from flask_login import login_user, current_user, logout_user, UserMixin
 from .. import config
 from .. import utils
 from .. import process_sigmund_message
+from ..database.manager import DatabaseManager
 from ..forms import LoginForm
 from ..sigmund import Sigmund
 import logging
@@ -138,6 +139,11 @@ def login_handler(form, template='chat.html', failed=False):
         username = form.username.data.strip().lower()
         password = form.password.data.strip()
         username = config.validate_user(username, password)
+        if isinstance(username, str):
+            email = 'unknown@domain.eu'
+            logger.warning('user validation didn\'t return email address')
+        else:
+            username, email = username
         if username is None:
             logger.info(f'log-in failed ({username})')
             return redirect('/login_failed')
@@ -152,6 +158,12 @@ def login_handler(form, template='chat.html', failed=False):
             kdf.derive(password.encode()))
         user = User(username)
         login_user(user)
+        # Instantiating the DatabaseManager also materializes the user account,
+        # so that user details are registered even if the user never visits the chat
+        # page (e.g. when logging in through the OIDC provider only).
+        DatabaseManager(None, username,
+                        encryption_key=session['encryption_key'],
+                        email=email)        
         logger.info('initializing encryption key')
         return post_login_redirect()
     html_content = '<div class="message message-ai">' + utils.render('welcome.html') + '</div>'

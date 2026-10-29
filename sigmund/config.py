@@ -323,17 +323,17 @@ def validate_user(username, password):
 
     Returns
     -------
-    str or None:
-        If the user is validated, the username is returned. This is typically
-        equal to the `username` parameter, but in some cases it may differ, for
-        example if the user logs in with an email address instead of the actual
-        username. If the user is not validated, None is returned.
+    (str, str) or None:
+        If the user is validated, a (username, email) is returned. The username
+        is typically equal to the `username` parameter, but in some cases it may
+        differ, for example if the user logs in with an email address instead of
+        the actual username. If the user is not validated, None is returned.
     """
     try:
         import user_validation
     except ImportError:
         logger.info('no user validation script found')
-        return username
+        return username, f'{username}@domain.eu'
     logger.info('using validation script')
     return user_validation.validate(username, password)
 

@@ -15,12 +15,14 @@ logger = logging.getLogger('sigmund')
 class DatabaseManager:
     
     def __init__(self, sigmund, username: str,
-                 encryption_key: [str, bytes]=None):
+                 encryption_key: [str, bytes]=None, email: str=None):
         self.transient_settings = {}
         self._sigmund = sigmund
         self.username = username
         self.encryption_manager = EncryptionManager(encryption_key)
         self.ensure_user_exists()
+        if email:
+            self.set_email(email)
         logger.info(
             f'initializing database for user {self.username} ({self.user_id})')
         
@@ -120,6 +122,26 @@ class DatabaseManager:
             db.session.commit()
             self.user_id = user.user_id
             self.new_conversation()
+    
+    def set_email(self, email: str):
+        """Registers an email address for the current user.
+
+        By default, no email address is associated with a user. The address
+        is registered on the first login that provides one (currently only
+        the Google login). Once an email address has been registered, it is
+        kept static: later log-ins do not update it, even if the login
+        provider reports a different address, because the address is used as
+        a stable identifier by other parties (e.g. the OIDC provider).
+        """
+        user = self._get_user()
+        if user.email is None:
+            logger.info(f'registering email for user {self.username}')
+            user.email = email
+            db.session.commit()
+        else:
+            logger.info(
+                f'keeping previously registered email for user '
+                f'{self.username}')
     
     def get_message(self, message_id: int, max_size: int = None) -> dict:
         # If it's not an int, then it's an old-style mesage

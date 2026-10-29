@@ -7,6 +7,7 @@ from flask_login import login_user
 from . import User
 from .app import post_login_redirect
 from .. import config
+from ..database.manager import DatabaseManager
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -95,24 +96,16 @@ def callback():
     session.permanent = True
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
-    # We use the full name for display purposes only (not for the username,
-    # because that would change existing accounts). If no full name is
-    # available, we fall back to the same value that the username is based
-    # on (given_name, name, or email).
-    full_name = userinfo.get('name') or username
     # We use only part of the unique id, so that the username doesn't allow us
     # to derive the encryption key
     username = f'{username} (google)::{unique_id[:10]}'
     user = User(username)
     login_user(user)
-    # The profile is kept in the session so that the OIDC provider can use it
-    # (see oidc_provider.authorize()). It is bound to the username, so that it
-    # is ignored if the user later logs in through a different method in the
-    # same session. It is not stored in the database.
-    session['oidc_profile'] = {
-        'username': username,
-        'name': full_name,
-        'email': userinfo['email'],
-    }
+    # Instantiating the DatabaseManager also materializes the user account,
+    # so that user details are registered even if the user never visits the chat
+    # page (e.g. when logging in through the OIDC provider only).
+    DatabaseManager(None, username,
+                    encryption_key=session['encryption_key'],
+                    email=userinfo['email'])
     logger.info(f'initializing encryption key')    
     return post_login_redirect()
