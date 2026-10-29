@@ -1,3 +1,3 @@
 """AI-based chatbot that provides sensible answers based on documentation"""
 
-__version__ = '2.6.3'
+__version__ = '2.7.0'

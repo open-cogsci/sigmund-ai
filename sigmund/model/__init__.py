@@ -20,8 +20,8 @@ ANTHROPIC_MODELS = {
     'claude-5-5-haiku': 'claude-haiku-5-5',
     'claude-5-1-fable': 'claude-fable-5-1',
     'claude-5-1-fable-thinking': 'claude-fable-5-1',
-    'claude-5-sonnet': 'claude-sonnet-5',
-    'claude-5-sonnet-thinking': 'claude-sonnet-5'
+    'claude-5-5-sonnet': 'claude-sonnet-5-5',
+    'claude-5-5-sonnet-thinking': 'claude-sonnet-5-5'
 }
 Z_MODELS = {
      'GLM-5.3-thinking': 'GLM-5.3',

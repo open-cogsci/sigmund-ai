@@ -113,7 +113,7 @@ model_config = {
     'anthropic': {
         'condense_model': 'claude-5-5-haiku',
         'public_model': 'claude-5-5-haiku',
-        'answer_model': 'claude-5-sonnet-thinking'
+        'answer_model': 'claude-5-5-sonnet-thinking'
     },
     'anthropic_thinking': {
         'condense_model': 'claude-5-5-haiku',
@@ -177,7 +177,7 @@ model_token_rate = {
         'cache_read_input': .01,
         'cache_write_input': .0125
     },
-    'claude-sonnet-5': {
+    'claude-sonnet-5-5': {
         'output': 10,
         'input': 2,
         'cache_read_input': 3 * .1,
@@ -365,7 +365,6 @@ stripe_webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET', None)
 stripe_checkout_keywords = dict(
     allow_promotion_codes=True,
     payment_method_types=['card', 'ideal', 'bancontact', 'paypal'])
-
 
 # GOOGLE LOGIN
 #
