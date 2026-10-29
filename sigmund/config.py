@@ -386,6 +386,22 @@ admin_user_ids = [
     if uid.strip().isdigit()
 ]
 
+# LIBRECHAT
+#
+# Sigmund can push subscription state and purchased credits to a LibreChat
+# server, which gates chat access on them. The client is in
+# sigmund/librechat.py; see dev-docs/librechat-sync.md for the full setup.
+# Disabled by default.
+librechat_enabled = bool(int(os.environ.get('SIGMUND_LIBRECHAT_ENABLED', 0)))
+# The base URL of the LibreChat server, without a trailing slash. Both
+# servers usually run on the same machine, so the default is the local
+# LibreChat port.
+librechat_url = os.environ.get(
+    'SIGMUND_LIBRECHAT_URL', 'http://127.0.0.1:3080').rstrip('/')
+# The shared secret, which must be equal to LibreChat's
+# SUBSCRIPTION_SYNC_SECRET.
+librechat_secret = os.environ.get('SIGMUND_LIBRECHAT_SECRET', None)
+
 # OIDC PROVIDER
 #
 # Allows other applications (e.g. LibreChat) to use Sigmund's login as single

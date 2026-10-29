@@ -142,6 +142,13 @@ class DatabaseManager:
             logger.info(
                 f'keeping previously registered email for user '
                 f'{self.username}')
+
+    def get_email(self) -> str:
+        """Returns the user's registered email address (see set_email),
+        which identifies the user to LibreChat (see librechat.py). Every
+        user has a registered address.
+        """
+        return self._get_user().email
     
     def get_message(self, message_id: int, max_size: int = None) -> dict:
         # If it's not an int, then it's an old-style mesage
@@ -609,6 +616,20 @@ class DatabaseManager:
             .first()
         )
         return subscription_record.stripe_customer_id if subscription_record else None
+
+    def get_subscription_end_date(self):
+        """Returns the to_date of the user's most recent subscription record
+        (the subscription runs until then), or None when the user has no
+        subscription records. Used to push the current subscription state
+        to LibreChat (see librechat.sync_subscription).
+        """
+        subscription_record = (
+            Subscription.query
+            .filter(Subscription.user_id == self.user_id)
+            .order_by(Subscription.to_date.desc(), Subscription.from_date.desc())
+            .first()
+        )
+        return subscription_record.to_date if subscription_record else None
 
     @staticmethod
     def from_stripe_customer_id(stripe_customer_id: str):

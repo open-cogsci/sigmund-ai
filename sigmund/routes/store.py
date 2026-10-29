@@ -1,7 +1,7 @@
 import logging
 from flask import jsonify, redirect, Blueprint, url_for, request
 from flask_login import login_required
-from .. import config, utils
+from .. import config, librechat, utils
 from ..database.manager import DatabaseManager
 from .app import get_sigmund
 import stripe
@@ -168,6 +168,33 @@ def extra_credits_success(checkout_session_id):
                         extra_credits_left=extra_credits_left, need_login=False)
 
 
+def _sync_librechat_subscription(database):
+    """Pushes the user's current subscription state to LibreChat, which
+    gates chat access on it. Failures are logged inside the client and
+    never affect the webhook's response to Stripe.
+    """
+    if not librechat.enabled():
+        return
+    expires_at = database.get_subscription_end_date()
+    librechat.sync_subscription(
+        database.get_email(), expires_at,
+        status='active' if expires_at else None)
+
+
+def _add_librechat_balance(database, credits, checkout_session_id):
+    """Adds purchased credits to the user's LibreChat token balance. The
+    amount transfers 1:1, because Sigmund's usage units and LibreChat's
+    token credits are both USD-normalized (see librechat.add_balance). The
+    Stripe checkout session id is recorded as the transaction's context,
+    so purchases are traceable in LibreChat's transaction history.
+    """
+    if not librechat.enabled():
+        return
+    librechat.add_balance(
+        database.get_email(), credits,
+        context=f'stripe-checkout:{checkout_session_id}')
+
+
 @store_blueprint.route('/webhook', methods=['POST'])
 def webhook():
     """The webhook is the main mechanism through which Stripe informs the app
@@ -216,6 +243,7 @@ def webhook():
                 f'completed subscription checkout for {sigmund_user_id} '
                 f'(stripe_customer_id: {stripe_customer_id}, '
                 f'stripe_subscription_id: {stripe_subscription_id})')
+            _sync_librechat_subscription(database)
         elif checkout_mode == 'payment':
             # A one-time payment for extra credits. Add the credits to the
             # user's activity buffer based on the purchased quantity. Each
@@ -237,6 +265,7 @@ def webhook():
                 f'(stripe_customer_id: {stripe_customer_id}, '
                 f'checkout_session_id: {checkout_session_id}, '
                 f'quantity: {total_quantity}, credits: {credits})')
+            _add_librechat_balance(database, credits, checkout_session_id)
         else:
             logger.warning(
                 f'unexpected checkout mode: {checkout_mode} '
@@ -262,5 +291,6 @@ def webhook():
                 f'received payment for {database.username} '
                 f'(stripe_customer_id: {stripe_customer_id}, '
                 f'stripe_subscription_id: {stripe_subscription_id})')
+            _sync_librechat_subscription(database)
     logger.info('webhook successful')
     return jsonify(success=True), 200

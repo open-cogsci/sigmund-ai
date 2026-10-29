@@ -48,6 +48,7 @@ from flask import Blueprint, current_app, jsonify, redirect, request, \
 from flask_login import current_user, logout_user
 from .. import config
 from .. import utils
+from .. import librechat
 from ..redis_client import redis_client
 from ..database.models import db, User as DbUser, Subscription
 from .app import get_theme
@@ -184,6 +185,9 @@ def authorize():
             'Subscription required',
             'An active subscription is required. You can '
             f'[subscribe here]({url_for("store.subscription_page")}).', 403)
+    # The user is allowed in, so LibreChat's subscription gate should be
+    # given the same state that was just verified here.
+    _sync_librechat_subscription(username)
     code = secrets.token_urlsafe(32)
     _store('code', code, {
         'client_id': config.oidc_client_id,
@@ -526,6 +530,37 @@ def _access_denied_reason(username: str):
     return None
 
 
+def _sync_librechat_subscription(username):
+    """Pushes the user's current subscription state to LibreChat, so that
+    LibreChat's subscription gate always sees the same state that this
+    authorization request just verified. This also covers users who
+    subscribed before they ever logged into LibreChat: the Stripe webhook
+    cannot sync those, because LibreChat does not know them yet (it answers
+    404 user_not_found), so the first login is the moment their state
+    arrives. Failures are logged and never block the login.
+    """
+    if not librechat.enabled():
+        return
+    try:
+        user = DbUser.query.filter_by(username=username).one()
+        record = (Subscription.query
+                  .filter(Subscription.user_id == user.user_id)
+                  .order_by(Subscription.to_date.desc(),
+                            Subscription.from_date.desc())
+                  .first())
+        now = datetime.utcnow()
+        active = (record is not None and record.from_date is not None
+                  and record.to_date is not None
+                  and record.from_date <= now < record.to_date)
+        librechat.sync_subscription(
+            user.email,
+            record.to_date if active else None,
+            status='active' if active else None)
+    except Exception as e:
+        logger.error(f'oidc: failed to sync the LibreChat subscription '
+                     f'of {username}: {e}')
+
+
 def _display_name(username: str) -> str:
     # This mirrors Sigmund.username(): Google usernames look like
     # 'Name (google)::unique_id', and the suffix is replaced by '(Google)'.
@@ -537,17 +572,13 @@ def _display_name(username: str) -> str:
 
 
 def _email(username: str) -> str:
-    """Returns the email address of a user: the address that was registered
-    in the database on login (currently only Google does so, and Google has
-    verified the address), or, if no address has been registered, a stable,
-    unique, but non-deliverable address derived from the username.
+    """Returns the user's registered email address (see
+    DatabaseManager.set_email). Every user has one. LibreChat matches users
+    by this claim, and the Stripe webhook identifies them by the same
+    address (see sigmund/librechat.py).
     """
     user = DbUser.query.filter_by(username=username).first()
-    if user is not None and user.email:
-        return user.email
-    slug = re.sub(r'[^a-z0-9]+', '-', username.lower()).strip('-')[:40]
-    digest = hashlib.sha256(username.encode()).hexdigest()[:8]
-    return f'{slug or "user"}.{digest}@{config.oidc_email_domain}'
+    return user.email
 
 
 def _user_claims(username: str, scope: str) -> dict:
