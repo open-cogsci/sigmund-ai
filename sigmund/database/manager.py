@@ -69,6 +69,13 @@ class DatabaseManager:
             # Name (google)::unique_id. Previously, Google usernames looked like
             # Name (google). If an old Google username exists, we automatically
             # rename the user to the new unique username.
+            #
+            # In addition, the name part of the username is based on the
+            # given_name of the user's Google profile, which the user can
+            # change at any time. Therefore, if no user exists under the
+            # current or old-style username, we also check whether any user
+            # exists with the same numeric Google suffix, and if so we rename
+            # that user to the new username as well.
             if '(google)::' in self.username:
                 # Strip everything after (google)::
                 old_username = self.username.split('(google)::')[0] + '(google)'
@@ -78,8 +85,27 @@ class DatabaseManager:
                     user = User.query.filter_by(username=old_username).one()
                     self.user_id = user.user_id
                 except NoResultFound:
+                    # The user doesn't exist under the old-style name either.
+                    # Because the user may have changed the given_name in their
+                    # Google profile, we check whether any user exists with the
+                    # same numeric Google suffix, and if so we rename that user
+                    # to the new username as well.
+                    suffix = self.username.split('(google)::')[-1]
+                    users = User.query.filter(
+                        User.username.endswith(f'(google)::{suffix}')).all()
+                    if users:
+                        if len(users) > 1:
+                            logger.warning(
+                                f'multiple users found with google suffix '
+                                f'"{suffix}": '
+                                + ', '.join(u.username for u in users))
+                        user = users[0]
+                        logger.info(f'renaming {user.username} to {self.username}')
+                        user.username = self.username
+                        self.user_id = user.user_id
+                        db.session.commit()
+                        return
                     # No the user really doesn't exist
-                    pass
                 else:
                     # Yes, the user has an old-style name, so we need to update
                     # the database so that User.username is set to old username

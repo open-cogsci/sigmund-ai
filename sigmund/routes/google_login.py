@@ -72,7 +72,14 @@ def callback():
     userinfo_response = requests.get(uri, headers=headers, data=body)
     userinfo = userinfo_response.json()
     unique_id = userinfo["sub"]
-    username = userinfo["given_name"]
+    # The username is normally based on the given_name, but this can be
+    # missing if the user's Google profile contains no first name. We then
+    # fall back to the full name, and finally to the email address. This
+    # doesn't affect the robustness of the login, because the sub is the
+    # unique identifier: DatabaseManager.ensure_user_exists() recognizes
+    # existing accounts based on the numeric google suffix alone.
+    username = (userinfo.get('given_name') or userinfo.get('name')
+                or userinfo.get('email'))
     # You want to make sure their email is verified.
     # The user authenticated with Google, authorized your
     # app, and now you've verified their email through Google!
@@ -89,8 +96,10 @@ def callback():
     session['encryption_key'] = base64.urlsafe_b64encode(
         kdf.derive(unique_id.encode()))
     # We use the full name for display purposes only (not for the username,
-    # because that would change existing accounts)
-    full_name = userinfo.get('name') or userinfo['given_name']
+    # because that would change existing accounts). If no full name is
+    # available, we fall back to the same value that the username is based
+    # on (given_name, name, or email).
+    full_name = userinfo.get('name') or username
     # We use only part of the unique id, so that the username doesn't allow us
     # to derive the encryption key
     username = f'{username} (google)::{unique_id[:10]}'
