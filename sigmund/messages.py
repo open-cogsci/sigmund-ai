@@ -339,8 +339,10 @@ class Messages:
         }
         self._conversation_id = self._sigmund.database.update_active_conversation(conversation)
         # We update the title in a background process so that we don't block
-        # the conversation
-        mp.Process(target=self._update_title).start()
+        # the conversation. We use an explicit fork method for compatibility
+        # with Python 3.14. This is a hack, and should ideally be replaced by
+        # a forkserver-friendly method.
+        mp.get_context("fork").Process(target=self._update_title).start()
 
     def _update_title(self):
         """The conversation title is updated when there are at least two 
