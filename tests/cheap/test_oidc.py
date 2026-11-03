@@ -178,7 +178,7 @@ class TestOIDCProvider(BaseOIDCTestCase):
         assert claims['aud'] == CLIENT_ID
         assert claims['sub'] == 'test'
         assert claims['nonce'] == 'nonce-456'
-        assert claims['email'].endswith('@sigmund.invalid')
+        assert claims['email'].endswith('@domain.eu')
         assert claims['exp'] > claims['iat']
         response = self.client.get(
             '/oidc/userinfo',
@@ -278,9 +278,9 @@ class TestOIDCProvider(BaseOIDCTestCase):
 
     def test_suspended_user_is_refused(self):
         from sigmund.database.models import db, User
-        self.login()
         db.session.add(User(username='test', suspended=True))
         db.session.commit()
+        self.login()
         response = self.authorize()
         assert response.status_code == 403
         assert 'Location' not in response.headers
@@ -289,11 +289,10 @@ class TestOIDCProvider(BaseOIDCTestCase):
         from datetime import datetime, timedelta
         from sigmund.database.models import db, User, Subscription
         config.subscription_required = True
-        self.login()
-        assert self.authorize().status_code == 403
         user = User(username='test')
         db.session.add(user)
         db.session.commit()
+        self.login()
         assert self.authorize().status_code == 403
         now = datetime.utcnow()
         db.session.add(Subscription(user_id=user.user_id,
