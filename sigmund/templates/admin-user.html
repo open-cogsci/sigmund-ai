@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+{% include 'head.html' %}
+<body>
+    <div id="centered-container">
+        {% include 'header.html' %}
+        <div id="start-text">
+            <p><a href="/admin"><i class="fas fa-arrow-left"></i> Back to admin dashboard</a></p>
+            <h1>👤 {{ user.username }}</h1>
+            <p><small>Overview generated {{ now.strftime('%Y-%m-%d %H:%M:%S') }} UTC</small></p>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <p class="admin-flash">✅ {{ message }}</p>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <h2>Account details</h2>
+            <table>
+                <tbody>
+                    <tr><td>User ID</td><td>{{ user.user_id }}</td></tr>
+                    <tr><td>Username</td><td>{{ user.username }}</td></tr>
+                    <tr><td>Email</td><td>{% if user.email %}{{ user.email }}{% else %}<em>Not registered</em>{% endif %}</td></tr>
+                    <tr><td>Status</td><td>{% if user.suspended %}⛔ Suspended{% else %}✅ Active{% endif %}</td></tr>
+                    <tr><td>Last activity (UTC)</td><td>{% if last_activity %}{{ last_activity.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}Never{% endif %}</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Subscription</h2>
+            <p>
+                {% if subscription_active %}
+                ✅ Active until {{ subscription_end.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+                {% else %}
+                ❌ Not active{% if subscription_last_ended %} (last subscription ended {{ subscription_last_ended.strftime('%Y-%m-%d %H:%M:%S') }} UTC){% endif %}
+                {% endif %}
+            </p>
+            <form method="POST" action="/admin/user/{{ user.user_id }}/extend-subscription" class="admin-form">
+                {{ extend_form.hidden_tag() }}
+                <p>
+                    {{ extend_form.days.label }} {{ extend_form.days(size=6) }}
+                    {{ extend_form.submit() }}
+                </p>
+                <p><small>Extends the subscription starting from now, like a Stripe renewal. Default is the regular subscription period.</small></p>
+            </form>
+            {% if subscriptions %}
+            <h3>Subscription history</h3>
+            <table>
+                <thead>
+                    <tr><th>From (UTC)</th><th>Until (UTC)</th><th>Stripe customer</th><th>Stripe subscription</th></tr>
+                </thead>
+                <tbody>
+                    {% for subscription in subscriptions %}
+                    <tr{% if subscription.from_date and subscription.to_date and subscription.from_date <= now and subscription.to_date > now %} style="font-weight:bold"{% endif %}>
+                        <td>{% if subscription.from_date %}{{ subscription.from_date.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</td>
+                        <td>{% if subscription.to_date %}{{ subscription.to_date.strftime('%Y-%m-%d %H:%M') }}{% else %}—{% endif %}</td>
+                        <td>{% if subscription.stripe_customer_id %}{{ subscription.stripe_customer_id }}{% else %}<em>manual</em>{% endif %}</td>
+                        <td>{% if subscription.stripe_subscription_id %}{{ subscription.stripe_subscription_id }}{% else %}<em>manual</em>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p><small>Bold rows are currently active.</small></p>
+            {% else %}
+            <p><em>No subscription records.</em></p>
+            {% endif %}
+
+            <h2>Usage</h2>
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>Value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Tokens consumed (24 h)</td><td>{{ "{:,}".format(tokens_24h) }}</td></tr>
+                    <tr><td>Tokens consumed (7 d)</td><td>{{ "{:,}".format(tokens_7d) }}</td></tr>
+                    <tr><td>Tokens consumed (30 d)</td><td>{{ "{:,}".format(tokens_30d) }}</td></tr>
+                    <tr><td>Tokens consumed (all time)</td><td>{{ "{:,}".format(tokens_all) }}</td></tr>
+                    <tr><td>Weekly fair-use limit</td><td>{{ "{:,}".format(weekly_token_limit|int) }}</td></tr>
+                    <tr><td>Weekly credits left</td><td>{{ "{:,}".format(weekly_credits_left) }}</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Extra credits buffer</h2>
+            <p>Current buffer balance: <strong>{{ "{:,}".format(buffer_balance) }}</strong> tokens.</p>
+            <form method="POST" action="/admin/user/{{ user.user_id }}/add-credits" class="admin-form">
+                {{ add_credits_form.hidden_tag() }}
+                <p>
+                    {{ add_credits_form.units.label }} {{ add_credits_form.units(size=6) }}
+                    {{ add_credits_form.submit() }}
+                </p>
+                <p><small>Each unit corresponds to {{ "{:,}".format(credits_per_unit) }} tokens, the same unit that is sold through the store.</small></p>
+            </form>
+            {% if buffer_history %}
+            <h3>Buffer history (last {{ buffer_history|length }} entries)</h3>
+            <table>
+                <thead>
+                    <tr><th>Time (UTC)</th><th>Tokens</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    {% for entry in buffer_history %}
+                    <tr>
+                        <td>{% if entry.time %}{{ entry.time.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}—{% endif %}</td>
+                        <td>{{ "{:+,}".format(entry.tokens) }}</td>
+                        <td>{% if entry.description %}{{ entry.description }}{% else %}<em>none</em>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p><em>No buffer activity.</em></p>
+            {% endif %}
+        </div>
+        {% include 'footer.html' %}
+    </div>
+</body>
+</html>

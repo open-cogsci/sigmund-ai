@@ -9,11 +9,19 @@
             <h1>🛡️ Admin Dashboard</h1>
             <p><small>Updated {{ now.strftime('%Y-%m-%d %H:%M:%S') }} UTC &mdash; auto-refreshing every 60&nbsp;s</small></p>
 
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <p class="admin-flash">✅ {{ message }}</p>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
             <h2>Active users (past hour): {{ active_count_hour }}</h2>
-            {% if active_usernames_hour %}
+            {% if active_users_hour %}
             <ul>
-                {% for name in active_usernames_hour %}
-                <li>{{ name }}</li>
+                {% for active_user in active_users_hour %}
+                <li><a href="/admin/user/{{ active_user.user_id }}">{{ active_user.username }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}
@@ -62,7 +70,7 @@
                 <tbody>
                     {% for row in subscriber_rows %}
                     <tr{% if row.suspended %} style="opacity:0.5"{% endif %}>
-                        <td>{{ row.username }}</td>
+                        <td><a href="/admin/user/{{ row.user_id }}">{{ row.username }}</a></td>
                         <td>{{ "{:,}".format(row.tokens_7d) }}</td>
                         <td>{{ "{:,}".format(row.tokens_24h) }}</td>
                         <td>{{ "{:,}".format(row.buffer_added_7d) }}</td>
@@ -71,8 +79,40 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <p><small>Grayed-out rows indicate suspended users.</small></p>
             {% else %}
             <p><em>No active subscribers.</em></p>
+            {% endif %}
+
+            <h2>All users: {{ all_user_rows|length }}</h2>
+            {% if all_user_rows %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Status</th>
+                        <th>Subscription</th>
+                        <th>Last activity (UTC)</th>
+                        <th>Tokens (7 d)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in all_user_rows %}
+                    <tr{% if row.suspended %} style="opacity:0.5"{% endif %}>
+                        <td>{{ row.user_id }}</td>
+                        <td><a href="/admin/user/{{ row.user_id }}">{{ row.username }}</a></td>
+                        <td>{% if row.suspended %}⛔ Suspended{% else %}✅ Active{% endif %}</td>
+                        <td>{% if row.subscribed %}✅ Active{% else %}—{% endif %}</td>
+                        <td>{% if row.last_activity %}{{ row.last_activity.strftime('%Y-%m-%d %H:%M:%S') }}{% else %}Never{% endif %}</td>
+                        <td>{{ "{:,}".format(row.tokens_7d) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p><small>Grayed-out rows indicate suspended users.</small></p>
+            {% else %}
+            <p><em>No users.</em></p>
             {% endif %}
         </div>
         {% include 'footer.html' %}

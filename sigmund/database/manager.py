@@ -593,6 +593,28 @@ class DatabaseManager:
             to_date=to_date
         )
 
+    def extend_subscription(self, days: int, stripe_customer_id: str = None,
+                            stripe_subscription_id: str = None):
+        """Appends a subscription record that starts now and runs for the
+        specified number of days. This is used for manual (admin)
+        extensions, which always start from now, like Stripe renewals. If
+        no stripe_customer_id is given, the customer id of the user's
+        latest subscription record is reused, so that Stripe webhook
+        lookups (see from_stripe_customer_id) keep working.
+        """
+        if days <= 0:
+            logger.warning(
+                f'extend_subscription called with non-positive days: {days}')
+            return
+        if stripe_customer_id is None:
+            stripe_customer_id = self.get_stripe_customer_id()
+        now = datetime.utcnow()
+        return self.add_subscription_record(
+            stripe_customer_id=stripe_customer_id,
+            stripe_subscription_id=stripe_subscription_id,
+            from_date=now,
+            to_date=now + timedelta(days=days))
+
     def check_subscription(self) -> bool:
         """Return True if at least one subscription row is currently active."""
         now = datetime.utcnow()

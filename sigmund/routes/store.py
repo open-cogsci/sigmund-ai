@@ -175,9 +175,15 @@ def _sync_librechat_subscription(database):
     """
     if not librechat.enabled():
         return
+    email = database.get_email()
+    if not email:
+        logger.warning(
+            'skipping LibreChat subscription sync, because no email address '
+            'is registered for the user')
+        return
     expires_at = database.get_subscription_end_date()
     librechat.sync_subscription(
-        database.get_email(), expires_at,
+        email, expires_at,
         status='active' if expires_at else None)
 
 
@@ -190,8 +196,14 @@ def _add_librechat_balance(database, credits, checkout_session_id):
     """
     if not librechat.enabled():
         return
+    email = database.get_email()
+    if not email:
+        logger.warning(
+            'skipping LibreChat balance update, because no email address is '
+            'registered for the user')
+        return
     librechat.add_balance(
-        database.get_email(), credits,
+        email, credits,
         context=f'stripe-checkout:{checkout_session_id}')
 
 

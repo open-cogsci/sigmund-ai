@@ -18,10 +18,10 @@ class BaseRoutesTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         
-    def login(self):
+    def login(self, username='test', password='test'):
         response = self.client.post('/login', data=dict(
-            username='test',
-            password='test'
+            username=username,
+            password=password
         ), follow_redirects=True)
         assert response.status_code == 200
         
