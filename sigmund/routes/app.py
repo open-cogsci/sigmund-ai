@@ -186,6 +186,14 @@ def terms():
         'info-page.html',
         content=utils.md(Path('sigmund/static/terms.md').read_text()),
         theme=get_theme())
+    
+    
+@app_blueprint.route('/sigmund-3')
+def sigmund_3():
+    return utils.render(
+        'info-page.html',
+        content=utils.md(Path('sigmund/static/sigmund-3.md').read_text()),
+        theme=get_theme())
 
 
 @app_blueprint.route('/suspended')
