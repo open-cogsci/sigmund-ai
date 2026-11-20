@@ -23,27 +23,51 @@ In the meantime, we are working to implement full encryption also in Sigmund 3!
 
 # How to connect an application to Sigmund 3
 
-(First, enable Sigmund 3 in your application as explained below.)
+## OpenSesame
 
-Log into [chat.sigmundai.eu](https://chat.sigmundai.eu). Click the + button below the chat box to reveal the tool menu. Select the "Get Pairing Code" tool. Now ask Sigmund for a pairing code: "Hi Sigmund, can you give me a pairing code?"
+Ensure that you are using `opensesame-extension-sigmund` version 1.5.0 or higher. Update through the automatic updater, or run:
 
-Now switch to OpenSesame or Sigmund Analyst. Click on the Sigmund icon in the toolbar to reveal the Sigmund widget. Click "Connect" and enter the pairing code.
+```
+pip install opensesame-extension-sigmund pyqt_code_editor sigmund-mcp-relay --upgrade
+```
 
-Sigmund 3 is now connected to OpenSesame or Sigmund Analyst!
+Next:
+
+1. Start OpenSesame.
+2. Open Tools → Preferences → Advanced Settings. Under SigmundMcpRelay, enable sigmund_mcp_relay_enabled.
+3. Restart OpenSesame.
+4. Open a browser and visit [chat.sigmundai.eu](https://chat.sigmundai.eu).
+5. Click the + button below the chat box and activate "Get Pairing Code".
+6. Ask for a pairing code. ("Hi Sigmund, can you give me a pairing code?")
+7. Switch back to OpenSesame.
+8. Click on the Sigmund icon in the toolbar to reveal the Sigmund widget. Click "Connect" and enter the pairing code.
+
+You are now connected!
 
 
-# How to enable Sigmund 3 in Sigmund Analyst
+## Sigmund Analyst
 
-Requires Sigmund Analyst version 1.3.0 or higher.
+Requires Sigmund Analyst (`pyqt_code_editor`) version 1.3.0 or higher. To update, run:
 
-Click the gear icon in the toolbox to reveal the settings. Under "Sigmund 3", enable "Sigmund Mcp Relay Enabled". Close and restart the application. Sigmund 3 is now enabled!
+```
+pip install pyqt_code_editor sigmund-mcp-relay --upgrade
+```
 
+Open Sigmund Analyst (the desktop application). Click the gear icon in the toolbox to reveal the settings. Under "Sigmund 3", enable "Sigmund Mcp Relay Enabled". Close and restart the application. Sigmund 3 is now enabled!
 
-# How to enable Sigmund 3 in OpenSesame
+Next:
 
-TODO
+1. Start Sigmund Analyst.
+2. Click the gear icon in the toolbox to reveal the settings. Under "Sigmund 3", enable "Sigmund Mcp Relay Enabled". sigmund_mcp_relay_enabled.
+3. Restart Sigmund Analyst.
+4. Open a browser and visit [chat.sigmundai.eu](https://chat.sigmundai.eu).
+5. Click the + button below the chat box and activate "Get Pairing Code".
+6. Ask for a pairing code. ("Hi Sigmund, can you give me a pairing code?")
+7. Switch back to Sigmund Analyst.
+8. Click on the Sigmund icon in the toolbar to reveal the Sigmund widget. Click "Connect" and enter the pairing code.
 
+You are now connected!
 
-# How to enable Sigmund 3 in JASP
+## JASP
 
 TODO
