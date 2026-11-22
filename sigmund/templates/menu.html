@@ -1,10 +1,19 @@
 <div id="app">
   <div ref="menu" class="menu scrollable-menu" v-bind:class="{ 'active': menuVisible }">
     <div ref="menuCloseButton" class="close"><small id="return-to-chat">Return to chat</small>&nbsp;<i class="fas fa-window-close"></i></div> 
+    <div class='why-sigmund'>    
+      <p>The future is now – <b>Sigmund 3</b> is in public beta! 
+        <a href="/sigmund-3" target="_blank">Read more</a>
+        or 
+        <a href="https://chat.sigmundai.eu" target="_blank">try it out now</a>!
+      </p>
+    </div>
+    <hr class="menu-divider">        
     {% if need_login %}
       {% include 'login-div.html' %}
     {% endif %}
 {% raw %}
+
     <!-- Model selection -->
     <div v-if="menuSection === 'full' || menuSection === 'models'" class="menu-group">
       <div class="model-selector">
