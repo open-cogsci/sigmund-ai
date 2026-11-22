@@ -27,6 +27,7 @@ dependencies = [
     "jinja2",
     "jq",
     "markdown",
+    "mcp>=2,<3",
     "oauthlib",
     "openai",
     "mistralai>=2.1.3",
@@ -46,7 +47,14 @@ keywords = ["ai", "chatbot", "llm"]
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "mcp>=2,<3"
+]
+# Extra for the MCP server (see sigmund/mcp_server.py). The mcp package
+# requires Python 3.10 or later, and is therefore kept out of the base
+# dependencies, which support older Python versions.
+mcp = [
+    "mcp>=2,<3"
 ]
 [project.urls]
 Documentation = "https://sigmundai.eu"

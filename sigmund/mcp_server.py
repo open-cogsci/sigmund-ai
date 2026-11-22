@@ -20,6 +20,12 @@ Configuration (via the environment or .env, see below):
   interface itself).
 - SIGMUND_MCP_PORT: The port at which the server listens. The default is
   8010, just above a commonly used alternative default port of 8000.
+- SIGMUND_MCP_SERVER_URL: The external (public) URL at which the server
+  is reachable, for example https://sigmundai.eu:8010/mcp. The hostname of
+  this URL is added to the Host-header allowlist of the transport's
+  DNS-rebinding protection, and is also used as the OAuth issuer and
+  resource URL. Therefore this must be set to the public address through
+  which MCP clients reach the server.
 
 The mcp package requires Python 3.10 or later, and is an optional
 extra (pip install sigmund[mcp], or pip install "mcp>=2,<3" directly).
@@ -189,24 +195,51 @@ def create_mcp_server() -> MCPServer:
     return mcp
 
 
+def _host_patterns(hostname, scheme):
+    """Returns Host- and Origin-header allow patterns for a hostname.
+
+    The hostname is allowed both by itself (which is what a Host header
+    looks like for default ports) and with any explicitly spelled out
+    port (for example when the server is directly exposed at a
+    non-default port, like https://sigmundai.eu:8010). DNS-rebinding
+    protection concerns the hostname, not the port.
+    """
+    if not hostname:
+        return [], []
+    # urlparse() strips the square brackets from IPv6 addresses, whereas
+    # Host and Origin headers include them.
+    if ':' in hostname:
+        hostname = f'[{hostname}]'
+    hosts = [hostname, f'{hostname}:*']
+    origins = [f'{scheme}://{hostname}', f'{scheme}://{hostname}:*']
+    return hosts, origins
+
+
 def _transport_security() -> TransportSecuritySettings:
     """Returns the transport-security settings for the HTTP transport.
 
     DNS-rebinding protection is enabled, and the allowed hosts are the
     localhost (where the reverse proxy connects, see mcp_host) plus the
-    public host of the issuer URL (see mcp_issuer). That way the Host
-    header is accepted regardless of whether the reverse proxy keeps the
-    original Host header (proxy_set_header Host $host) or sends the
-    proxy address (nginx' default behavior).
+    public hostname of the issuer URL (see mcp_issuer). The hostname is
+    added both by itself and with a port wildcard, so that the Host
+    header is accepted regardless of which port the reverse proxy
+    spells out, and regardless of whether the original Host header is
+    kept (nginx' proxy_set_header Host $http_host), relayed without the
+    port (proxy_set_header Host $host), or rewritten (nginx' default). In
+    all cases only the hostname is relevant for rebinding protection.
     """
     issue_parts = urlparse(config.mcp_issuer)
+    domain_hosts, domain_origins = _host_patterns(
+        issue_parts.hostname, issue_parts.scheme)
     return TransportSecuritySettings(
         enable_dns_rebinding_protection=True,
-        allowed_hosts=['127.0.0.1:*', 'localhost:*', '[::1]:*',
-                       issue_parts.netloc],
-        allowed_origins=['http://127.0.0.1:*', 'http://localhost:*',
-                         'http://[::1]:*',
-                         f'{issue_parts.scheme}://{issue_parts.netloc}'])
+        allowed_hosts=['localhost', 'localhost:*', '127.0.0.1',
+                       '127.0.0.1:*', '[::1]', '[::1]:*',
+                       issue_parts.netloc, *domain_hosts],
+        allowed_origins=['http://localhost', 'http://localhost:*',
+                         'http://127.0.0.1', 'http://127.0.0.1:*',
+                         'http://[::1]', 'http://[::1]:*',
+                         f'http://{issue_parts.netloc}', *domain_origins])
 
 
 def mcp_args():
@@ -234,10 +267,11 @@ def run() -> None:
     # self-contained and includes the protocol-version header, and no
     # server-side session state is retained between requests. This is the
     # most robust mode to serve simple function calls to external clients.
-    logger.info(f"allowing Host headers for: {config.mcp_issuer}")
+    security = _transport_security()
+    logger.info(f"allowing Host headers: {security.allowed_hosts}")
     mcp.run(transport='streamable-http', streamable_http_path='/mcp',
             json_response=True, stateless_http=True,
-            transport_security=_transport_security(), **args)
+            transport_security=security, **args)
 
 
 if __name__ == '__main__':

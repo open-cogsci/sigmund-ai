@@ -326,9 +326,12 @@ mcp_host = os.environ.get('SIGMUND_MCP_HOST', '127.0.0.1')
 # The port to listen on. 8010 is used instead of the common default of 8000,
 # because on the dev machine 8000 was already in use.
 mcp_port = int(os.environ.get('SIGMUND_MCP_PORT', 8010))
-# The external URL at which the MCP server is reachable, without trailing
-# slash. Used as the OAuth issuer and resource URL for the MCP server. It
-# should match the address through which MCP clients reach the server.
+# The external (public) URL at which the MCP server is reachable, without
+# trailing slash, for example https://sigmundai.eu:8010/mcp. This is used
+# as the OAuth issuer and resource URL, and the hostname of this URL is
+# added to the transport's Host-header allowlist (DNS-rebinding
+# protection). Therefore, the hostname must match the public domain name
+# through which MCP clients reach the server.
 mcp_issuer = os.environ.get(
     'SIGMUND_MCP_SERVER_URL', server_url.rstrip('/')) + '/mcp'
 

@@ -194,6 +194,46 @@ class TestInitialize(McpServerTestCase):
                          tool['inputSchema'].get('required', []))
 
 
+class TestTransportSecurity(unittest.TestCase):
+    """The Host-header allowlist is derived from mcp_issuer (see the
+    DNS-rebinding protection of the transport). The public hostname
+    should be allowed with and without an explicitly spelled out port,
+    because the reverse proxy (nginx) determines how the Host header is
+    spelled out.
+    """
+
+    def _allowed_hosts(self, issuer):
+        with mock.patch.object(config, 'mcp_issuer', issuer):
+            return mcp_server._transport_security().allowed_hosts
+
+    def test_public_domain_with_port(self):
+        # A server that is exposed at a non-default public port.
+        hosts = self._allowed_hosts('https://sigmundai.eu:8010/mcp')
+        self.assertIn('sigmundai.eu', hosts)
+        self.assertIn('sigmundai.eu:*', hosts)
+        self.assertIn('sigmundai.eu:8010', hosts)
+
+    def test_public_domain_without_port(self):
+        hosts = self._allowed_hosts('https://sigmundai.eu/mcp')
+        self.assertIn('sigmundai.eu', hosts)
+        self.assertIn('sigmundai.eu:*', hosts)
+
+    def test_localhost_default(self):
+        # The default issuer is a local address (derived from the flask
+        # server URL), in which case only localhost is allowed.
+        hosts = self._allowed_hosts('http://127.0.0.1:5000/mcp')
+        self.assertIn('127.0.0.1:5000', hosts)
+        self.assertIn('127.0.0.1:*', hosts)
+        public = [h for h in hosts if h.startswith('sigmundai')]
+        self.assertEqual(public, [])
+
+    def test_ipv6(self):
+        hosts = self._allowed_hosts('http://[::1]:9090/mcp')
+        # Host headers include square brackets around IPv6 addresses.
+        self.assertIn('[::1]:9090', hosts)
+        self.assertIn('[::1]:*', hosts)
+
+
 class TestSearchInvalidInput(McpServerTestCase):
     """Client-error cases of the search tool, which don't require the
     documentation library.
