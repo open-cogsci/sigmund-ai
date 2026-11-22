@@ -309,6 +309,30 @@ search_embedding_provider = "openai"
 search_embedding_model = "text-embedding-3-large"
 
 
+# MCP SERVER
+#
+# The Sigmund MCP server is a separate process (see sigmund/mcp_server.py)
+# that exposes the documentation search as a `search_documentation` tool
+# for external MCP clients. It reads its configuration from this same
+# config file, and requires the `mcp` package to be installed.
+mcp_enabled = bool(int(os.environ.get('SIGMUND_MCP_ENABLED', 0)))
+# The bearer token that MCP clients must provide in an Authorization header.
+mcp_bearer_token = os.environ.get('SIGMUND_MCP_BEARER_TOKEN', None)
+# The address to bind the MCP server to. The default is localhost only, so
+# that in production the server sits behind a reverse proxy that provides
+# public exposure and TLS. Do not bind to 0.0.0.0 unless you install
+# additional firewall rules.
+mcp_host = os.environ.get('SIGMUND_MCP_HOST', '127.0.0.1')
+# The port to listen on. 8010 is used instead of the common default of 8000,
+# because on the dev machine 8000 was already in use.
+mcp_port = int(os.environ.get('SIGMUND_MCP_PORT', 8010))
+# The external URL at which the MCP server is reachable, without trailing
+# slash. Used as the OAuth issuer and resource URL for the MCP server. It
+# should match the address through which MCP clients reach the server.
+mcp_issuer = os.environ.get(
+    'SIGMUND_MCP_SERVER_URL', server_url.rstrip('/')) + '/mcp'
+
+
 
 def validate_user(username, password):
     """user_validation.validate() should connect to an authentication system

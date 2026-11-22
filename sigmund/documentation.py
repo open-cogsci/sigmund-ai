@@ -7,19 +7,30 @@ logger = logging.getLogger('sigmund')
 
 class Documentation:
 
-    def __init__(self, sigmund, foundation_document_topics=None):
+    def __init__(self, sigmund, foundation_document_topics=None, library=None,
+                 collections=None):
         self._sigmund = sigmund
         self._foundation_document_topics = foundation_document_topics
         self._documents = []
         self.poor_match = False
-        self._library = Library(
+        # A library can be provided externally, so that a single (expensive
+        # to initialize) library can be shared between instances, as is done
+        # by the MCP server.
+        self._library = library if library is not None else Library(
             persist_directory=config.search_persist_directory,
             embedding_provider=config.search_embedding_provider,
             embedding_model=config.search_embedding_model)
-        self._collections = {
-            c for c in config.search_collections
-            if self._sigmund.database.get_setting(f'collection_{c}') == 'true'
-        }
+        # A set of collections can be provided externally, which is used by
+        # the MCP server. When no collections are provided, the collections
+        # are based on the user settings (see config.search_collections).
+        if collections is not None:
+            self._collections = set(collections)
+        else:
+            self._collections = {
+                c for c in config.search_collections
+                if self._sigmund.database.get_setting(
+                    f'collection_{c}') == 'true'
+            }
         logger.info(f'using collections: {self._collections}')
 
     @property
