@@ -181,10 +181,7 @@ def authorize():
             '[suspension page](/suspended) to learn more.', 403)
     if reason == 'subscription':
         logger.info(f'oidc: refused user without subscription {username}')
-        return _error_page(
-            'Subscription required',
-            'An active subscription is required. You can '
-            f'[subscribe here]({url_for("store.subscription_page")}).', 403)
+        return redirect(url_for('store.subscription_page'), code=303)
     # The user is allowed in, so LibreChat's subscription gate should be
     # given the same state that was just verified here.
     _sync_librechat_subscription(username)

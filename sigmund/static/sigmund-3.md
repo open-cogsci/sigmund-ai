@@ -12,11 +12,11 @@ Right now, Sigmund 3 integrates with the following tools:
 
 - __OpenSesame__ for developing psychology experiments
 - __Sigmund Analyst__ for data analysis with Python
+- __JASP__ for statistical analysis
 - __OpenAlex__ for literature search
 
 Support for the following tools will be rolled out soon:
 
-- __JASP__ for statistical analysis
 - __Jupyter Notebook__ for data analysis with Python
 - __Positron (formerly RStudio)__ for data analysis with R
 - __MindProbe/ JATOS__ for managing online psychology experiments
@@ -34,51 +34,47 @@ For now, if full encryption is important, use Sigmund 2, which will remain avail
 
 # Supported applications
 
+## Connect to Sigmund 3 (all applications)
+
+Sigmund 3 lives in the cloud and connects to your computer through a bridge (or relay) that is built into OpenSesame and Sigmund Analyst.
+
+This bridge is only available in the most recent software updates. So first make sure you are up to date by running the following command in the Jupyter (Python) console of OpenSesame/ Sigmund Analyst:
+
+```
+pip install opensesame-core opensesame-extension-sigmund pyqt_code_editor sigmund-mcp-relay --upgrade
+```
+
+Restart OpenSesame/ Sigmund Analyst after the update is complete.
+
+Now click on the Sigmund icon in the toolbar. The Sigmund panel will appear. By default, it still connects to Sigmund 2. Therefore, click "Try out the new Sigmund 3 (beta)!" at the top of the panel. The panel will now switch to Sigmund 3.
+
+In the Sigmund 3 panel, click "Connect". If you haven't connected before, Sigmund now asks for a pairing code.
+
+Now open <a href="https://chat.sigmundai.eu" target="_blank">chat.sigmundai.eu</a> in a browser and log in. Click the + button below the chat box. In the tool menu that appears, click on "Show All" next to MCP SERVERS. In the tool overview that appears, activate "Get Pairing Code". Switch back to the conversation, and ask for a pairing code. ("Hi Sigmund, can you give me a pairing code?")
+
+Switch back to OpenSesame/ Sigmund Analyst and enter the pairing code.
+
+You are now connected!
+
+
 ## OpenSesame
 
-Sigmund 3 requires `opensesame-extension-sigmund` version 1.6.0 or higher. You can update through the automatic updater, or by running:
-
-```
-pip install opensesame-extension-sigmund pyqt_code_editor sigmund-mcp-relay --upgrade
-```
-
-Next:
-
-1. Start OpenSesame (restart after an update).
-2. Click on the Sigmund icon in the toolbar.
-3. At the top of the Sigmund panel, click "Try out the new Sigmund 3 (beta)!".
-4. Open a browser and visit [chat.sigmundai.eu](https://chat.sigmundai.eu).
-5. Click the + button below the chat box and activate "Get Pairing Code".
-6. Ask for a pairing code. ("Hi Sigmund, can you give me a pairing code?")
-7. Switch back to OpenSesame.
-8. In the Sigmund panbel, click "Connect" and enter the pairing code. You are now connected!
-9. Switch back to Sigmund, and activate "Build Experiments" and/ or "Search OpenSesame documentation".
+Connect OpenSesame to Sigmund 3 as described above. Activate the "Build Experiments" and/ or "Search OpenSesame documentation" tools in OpenSesame as well as in Sigmund 3.
 
 
 ## Sigmund Analyst
 
-Sigmind 3 requires Sigmund Analyst (`pyqt_code_editor`) version 1.4.0 or higher. To update, run:
+__Important:__ By connecting Sigmund Analyst to Sigmund 3, you provide an AI with (nearly) unrestricted access to your computer.
 
-```
-pip install opensesame-extension-sigmund pyqt_code_editor sigmund-mcp-relay --upgrade
-```
-
-Next:
-
-1. Start Sigmund Analyst (restart after an update).
-2. Click on the Sigmund icon in the toolbar.
-3. At the top of the Sigmund panel, click "Try out the new Sigmund 3 (beta)!", and restart Sigmund Analyst.
-4. Open a browser and visit [chat.sigmundai.eu](https://chat.sigmundai.eu).
-5. Click the + button below the chat box and activate "Get Pairing Code".
-6. Ask for a pairing code. ("Hi Sigmund, can you give me a pairing code?")
-7. Switch back to Sigmund Analyst.
-8. Click on the Sigmund icon in the toolbar to reveal the Sigmund widget. Click "Connect" and enter the pairing code. You are now connected!
-9. Switch back to Sigmund, and activate "Execute Code" and/ or "Access Files and Folders"
+Connect Sigmund Analyst to Sigmund 3 as described above. Activate the "Execute Code" and/ or "Access Files and Folders" tools in Sigmund Analyst as well as in Sigmund 3. The "Access Files and Folders" tool lets you select a folder that Sigmund 3 can access.
 
 
 ## JASP
 
-Coming soon!
+In JASP, go to Preferences → Advanced → Remote control and enable the JASP-RPC server. Leave JASP running.
+
+Connect OpenSesame or Sigmund Analyst to Sigmund 3 as described above. Activate the "Perform Statistics with JASP" tool in OpenSesame/ Sigmund Analyst as well as in Sigmund 3.
+
 
 ## Jupyter Notebook
 

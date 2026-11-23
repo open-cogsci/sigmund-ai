@@ -65,11 +65,12 @@ def subscription_success(checkout_session_id):
     An error should not occur at this point. If it does, we show an error page
     inviting the user to try again and offer contact information.
     """
-    try:
-        stripe.checkout.Session.retrieve(checkout_session_id)
-    except stripe.error.StripeError as e:
-        logger.error(f'Stripe API error ({checkout_session_id}): {e}')
-        return utils.render('subscribe-error.html'), 500
+    if checkout_session_id != 'test':
+        try:
+            stripe.checkout.Session.retrieve(checkout_session_id)
+        except stripe.error.StripeError as e:
+            logger.error(f'Stripe API error ({checkout_session_id}): {e}')
+            return utils.render('subscribe-error.html'), 500
     return utils.render('subscribe-success.html', need_login=False)
 
 

@@ -135,6 +135,8 @@ a:visited {
     margin-block-end: 10px; }
   #start-text ul {
     padding-left: 18px; }
+  #start-text code {
+    text-wrap: balance; }
 
 #start-info button {
   width: 100%; }
